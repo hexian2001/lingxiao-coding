@@ -4,7 +4,7 @@
   <img src="./assets/logo.svg" width="96" alt="LingXiao logo" />
 </p>
 
-> AI 工程指挥系统 — 不是聊天壳，而是本地编排内核。
+> 一剑开天，做你所想。
 
 当前版本：`1.0.0`
 
@@ -241,7 +241,7 @@ Proprietary. All rights reserved.
 
 <div align="center">
 
-**LingXiao** — AI 工程指挥系统
+**LingXiao** — 一剑开天，做你所想
 
 未经授权禁止复制、修改或传播
 
