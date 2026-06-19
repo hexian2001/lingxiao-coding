@@ -35,32 +35,28 @@ Write-Host "★ 检测到平台: $target" -ForegroundColor Cyan
 # ── 获取版本 ──────────────────────────────────────────────────────────────────
 if ([string]::IsNullOrEmpty($Version)) {
   Write-Host "▸ 获取最新版本..."
-  # 多级回退策略获取最新 release tag
-  # 方法1: 跟随重定向，从最终 URL 提取版本号（最可靠）
+  # 优先用 GitHub API（最可靠），回退到跟随重定向
   try {
-    $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -UseBasicParsing -MaximumRedirection 10
-    $finalUrl = $resp.BaseResponse.ResponseUri.AbsoluteUri
-    if ($finalUrl -match 'tag/(.+)$') {
-      $Version = $Matches[1]
-    }
-  } catch {}
-  # 方法2: 不跟随重定向，从 302 Location header 提取
-  if ([string]::IsNullOrEmpty($Version)) {
+    $apiResp = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -UseBasicParsing
+    $Version = $apiResp.tag_name
+  } catch {
+    Write-Host "  ℹ GitHub API 不可用，尝试重定向方式..." -ForegroundColor Yellow
     try {
-      $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -MaximumRedirection 0 -UseBasicParsing
-      $redirectUrl = $resp.Headers.Location
-      if ($redirectUrl -match 'tag/(.+)$') { $Version = $Matches[1] }
+      $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -UseBasicParsing -MaximumRedirection 10
+      $finalUrl = $resp.BaseResponse.ResponseUri.AbsoluteUri
+      if ($finalUrl -match 'tag/(.+)$') {
+        $Version = $Matches[1]
+      }
     } catch {
-      $redirectUrl = $_.Exception.Response.Headers.Location
-      if ($redirectUrl -match 'tag/(.+)$') { $Version = $Matches[1] }
+      try {
+        $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -MaximumRedirection 0 -UseBasicParsing
+        $redirectUrl = $resp.Headers.Location
+        if ($redirectUrl -match 'tag/(.+)$') { $Version = $Matches[1] }
+      } catch {
+        $redirectUrl = $_.Exception.Response.Headers.Location
+        if ($redirectUrl -match 'tag/(.+)$') { $Version = $Matches[1] }
+      }
     }
-  }
-  # 方法3: GitHub API（有 rate limit 但最可靠）
-  if ([string]::IsNullOrEmpty($Version)) {
-    try {
-      $apiResp = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -UseBasicParsing
-      $Version = $apiResp.tag_name
-    } catch {}
   }
   if ([string]::IsNullOrEmpty($Version)) {
     Write-Host "✗ 无法获取最新版本，请用 -Version 指定" -ForegroundColor Red
