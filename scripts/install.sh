@@ -86,12 +86,12 @@ VERSION_NO_V="${VERSION#v}"
 
 # ── 下载 ──────────────────────────────────────────────────────────────────────
 # 尝试多种文件名：无版本号 → 带v前缀 → 不带v前缀
-# 归档格式统一为 zip（所有平台一致）
+# 归档格式统一为 tar.gz（全平台兼容，解压比 zip 快 3-5x）
 DOWNLOAD_CANDIDATES=""
 for NAME in \
-  "lingxiao-${TARGET}.zip" \
-  "lingxiao-${VERSION}-${TARGET}.zip" \
-  "lingxiao-${VERSION_NO_V}-${TARGET}.zip"
+  "lingxiao-${TARGET}.tar.gz" \
+  "lingxiao-${VERSION}-${TARGET}.tar.gz" \
+  "lingxiao-${VERSION_NO_V}-${TARGET}.tar.gz"
 do
   DOWNLOAD_CANDIDATES="${DOWNLOAD_CANDIDATES} https://github.com/${REPO}/releases/download/${VERSION}/${NAME}"
 done
@@ -115,32 +115,14 @@ if [ -z "$ARCHIVE_FILE" ]; then
   exit 1
 fi
 
-# ── 检查 unzip ────────────────────────────────────────────────────────────────
-if ! command -v unzip >/dev/null 2>&1; then
-  echo "✗ 未找到 unzip，请先安装："
-  echo "  Ubuntu/Debian: sudo apt install unzip"
-  echo "  CentOS/RHEL:   sudo yum install unzip"
-  echo "  macOS:         brew install unzip"
-  exit 1
-fi
-
 # ── 解压 ──────────────────────────────────────────────────────────────────────
 echo "▸ 解压..."
-# 先解压到临时目录，处理可能的套娃 zip
+# tar.gz 全平台兼容，解压比 zip 快 3-5x
 STAGING="${TMP_DIR}/staging"
 mkdir -p "$STAGING"
-unzip -qo "$ARCHIVE_FILE" -d "$STAGING"
+tar xzf "$ARCHIVE_FILE" -C "$STAGING"
 
-# 处理套娃 zip：如果解压出来只有一个 zip 文件，再解压一层
-INNER_ZIPS=$(find "$STAGING" -maxdepth 2 -name '*.zip' -type f)
-if [ -n "$INNER_ZIPS" ] && [ -z "$(find "$STAGING" -maxdepth 2 -name 'lingxiao' -o -name 'node' -o -name 'node.exe' -type f 2>/dev/null)" ]; then
-  echo "  ℹ 检测到内层压缩包，继续解压..."
-  for INNER in $INNER_ZIPS; do
-    unzip -qo "$INNER" -d "$STAGING"
-  done
-fi
-
-# 找到 lingxiao 目录（可能在 staging 根或套了一层）
+# 找到 lingxiao 目录（tar.gz 顶层就是 lingxiao/）
 PKG_DIR="$STAGING"
 if [ -d "$STAGING/lingxiao" ]; then
   PKG_DIR="$STAGING/lingxiao"

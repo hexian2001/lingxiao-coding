@@ -54,10 +54,11 @@ $versionNoV = $Version -replace '^v', ''
 
 # ── 下载 ──────────────────────────────────────────────────────────────────────
 # 尝试多种文件名：无版本号 → 带v前缀 → 不带v前缀
+# tar.gz 全平台兼容，解压比 zip 快 3-5x
 $downloadCandidates = @(
-  "lingxiao-$target.zip"
-  "lingxiao-$Version-$target.zip"
-  "lingxiao-$versionNoV-$target.zip"
+  "lingxiao-$target.tar.gz"
+  "lingxiao-$Version-$target.tar.gz"
+  "lingxiao-$versionNoV-$target.tar.gz"
 )
 
 $tempDir = New-Item -ItemType Directory -Force -Path "$env:TEMP\lingxiao-install-$(Get-Random)"
@@ -91,22 +92,12 @@ if (Test-Path $InstallDir) {
   Move-Item $InstallDir $backup
 }
 
-# 先解压到临时目录，处理可能的套娃 zip
+# Windows 10 1803+ 内置 tar，比 Expand-Archive 快很多
 $staging = Join-Path $tempDir.FullName "staging"
 New-Item -ItemType Directory -Force -Path $staging | Out-Null
-Expand-Archive -Path $archivePath -DestinationPath $staging -Force
+tar xzf "$archivePath" -C "$staging"
 
-# 处理套娃 zip：如果解压出来只有 zip 文件，再解压一层
-$innerZips = Get-ChildItem $staging -Filter "*.zip" -File
-$hasNodeExe = Get-ChildItem $staging -Recurse -Filter "node.exe" -File -ErrorAction SilentlyContinue
-if ($innerZips -and -not $hasNodeExe) {
-  Write-Host "  ℹ 检测到内层压缩包，继续解压..." -ForegroundColor Yellow
-  foreach ($innerZip in $innerZips) {
-    Expand-Archive -Path $innerZip.FullName -DestinationPath $staging -Force
-  }
-}
-
-# 找到 lingxiao 目录（可能在 staging 根或套了一层）
+# 找到 lingxiao 目录
 $pkgDir = $staging
 $innerLingxiaoDir = Join-Path $staging "lingxiao"
 if (Test-Path $innerLingxiaoDir) {
