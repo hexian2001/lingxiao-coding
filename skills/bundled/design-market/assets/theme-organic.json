@@ -1,0 +1,623 @@
+[
+  {
+    "id": "signature-organic-hero",
+    "name": "Living Field 首屏",
+    "category": "hero",
+    "themes": [
+      "organic"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "organic",
+      "自然生活方式系统"
+    ],
+    "description": "Living Field 的首屏素材，服务于自然生活方式系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Living Field 首屏\n定位: 自然生活方式系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f5f3e7，主强调 #4f7b58，辅助强调 #b08345。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-organic-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(79,123,88,0.22);\n  border-radius: 30px;\n  background: linear-gradient(145deg, #f5f3e7, #dfe7d3);\n  color: #233128;\n  box-shadow: 0 30px 70px rgba(68,92,68,0.18);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-organic-hero::before { content: \"\"; position: absolute; inset: 0; background: radial-gradient(circle at 15% 20%, rgba(79,123,88,0.18), transparent 24%), radial-gradient(circle at 80% 74%, rgba(176,131,69,0.16), transparent 26%); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-organic-hero > * { position: relative; z-index: 1; }\n.sig-organic-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-organic-hero .kicker { width: fit-content; border: 1px solid rgba(79,123,88,0.22); border-radius: 999px; padding: 6px 10px; color: #4f7b58; background: #dfe7d3; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-organic-hero h1 { margin: 0; max-width: 620px; font-family: Georgia, Times New Roman, serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-organic-hero p { margin: 0; max-width: 560px; color: #60705f; font-size: 15px; line-height: 1.78; }\n.sig-organic-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-organic-hero button { height: 40px; padding: 0 16px; border-radius: calc(30px / 2 + 4px); border: 1px solid rgba(79,123,88,0.22); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-organic-hero .primary { background: #4f7b58; color: #f5f3e7; border-color: #4f7b58; }\n.sig-organic-hero .secondary { background: transparent; color: #233128; }\n.sig-organic-hero button:hover { transform: translateY(-1px); border-color: #4f7b58; }\n.sig-organic-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(79,123,88,0.22); border-radius: calc(30px - 2px); background: #dfe7d3; backdrop-filter: blur(18px) saturate(140%); }\n.sig-organic-hero .artifact h2 { margin: 0; font-size: 13px; color: #4f7b58; text-transform: uppercase; letter-spacing: 0; }\n.sig-organic-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-organic-hero .metric { padding: 14px; border: 1px solid rgba(79,123,88,0.22); border-radius: calc(30px - 4px); background: color-mix(in srgb, #f5f3e7 76%, transparent); }\n.sig-organic-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-organic-hero .metric span { display: block; margin-top: 6px; color: #60705f; font-size: 11px; }\n.sig-organic-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #4f7b58, #b08345); }\n@media (max-width: 780px) { .sig-organic-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-organic-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">自然生活方式系统</div>\n    <h1>Let the interface breathe with the day.</h1>\n    <p>A living field system for rituals, wellness plans, agriculture, and slower decisions.</p>\n    <div class=\"actions\"><button class=\"primary\">Plan ritual</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Field Notes / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>6:40</strong><span>morning window</span></div>\n      <div class=\"metric\"><strong>18c</strong><span>soil warmth</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Living Field 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-organic-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 420,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-organic-card",
+    "name": "Living Field 洞察卡片",
+    "category": "card",
+    "themes": [
+      "organic"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "organic",
+      "自然生活方式系统"
+    ],
+    "description": "Living Field 的洞察卡片素材，服务于自然生活方式系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Living Field 洞察卡片\n定位: 自然生活方式系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f5f3e7，主强调 #4f7b58，辅助强调 #b08345。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-organic-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(79,123,88,0.22); border-radius: 30px; background: #f5f3e7; color: #233128; box-shadow: 0 30px 70px rgba(68,92,68,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-organic-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-organic-card .label { color: #4f7b58; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-organic-card .pill { border: 1px solid rgba(79,123,88,0.22); border-radius: 999px; padding: 5px 9px; color: #60705f; background: #dfe7d3; font-size: 11px; }\n.sig-organic-card h3 { margin: 0 0 10px; font-family: Georgia, Times New Roman, serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-organic-card p { margin: 0; color: #60705f; font-size: 13px; line-height: 1.7; }\n.sig-organic-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(79,123,88,0.22); }\n.sig-organic-card .strip strong { font-variant-numeric: tabular-nums; color: #233128; }\n.sig-organic-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(30px - 4px); background: #4f7b58; color: #f5f3e7; font-weight: 900; }",
+    "html": "<article class=\"sig-organic-card\">\n  <div class=\"top\"><div><div class=\"label\">Field Notes</div><h3>6:40</h3></div><span class=\"pill\">morning window</span></div>\n  <p>A living field system for rituals, wellness plans, agriculture, and slower decisions.</p>\n  <div class=\"strip\"><span>soil warmth</span><strong>18c</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Living Field 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-organic-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-organic-nav",
+    "name": "Living Field 导航",
+    "category": "navigation",
+    "themes": [
+      "organic"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "organic",
+      "自然生活方式系统"
+    ],
+    "description": "Living Field 的导航素材，服务于自然生活方式系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Living Field 导航\n定位: 自然生活方式系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f5f3e7，主强调 #4f7b58，辅助强调 #b08345。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-organic-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(79,123,88,0.22); border-radius: 30px; background: #f5f3e7; color: #233128; box-shadow: 0 30px 70px rgba(68,92,68,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-organic-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Georgia, Times New Roman, serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-organic-nav .mark { width: 30px; height: 30px; border-radius: calc(30px - 4px); background: linear-gradient(135deg, #4f7b58, #b08345); box-shadow: inset 0 0 0 1px rgba(79,123,88,0.22); }\n.sig-organic-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-organic-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(30px - 6px); color: #60705f; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-organic-nav a:hover, .sig-organic-nav a.active { color: #233128; background: #dfe7d3; }\n.sig-organic-nav button { height: 34px; padding: 0 13px; border-radius: calc(30px - 6px); border: 1px solid #4f7b58; background: #4f7b58; color: #f5f3e7; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-organic-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-organic-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Field Notes</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Rituals</a><a href=\"#\">Garden</a><a href=\"#\">Weather</a><a href=\"#\">Journal</a></div>\n  <button>Plan ritual</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Living Field 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-organic-hero",
+      "signature-organic-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-organic-form",
+    "name": "Living Field 表单",
+    "category": "form",
+    "themes": [
+      "organic"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "organic",
+      "自然生活方式系统"
+    ],
+    "description": "Living Field 的表单素材，服务于自然生活方式系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Living Field 表单\n定位: 自然生活方式系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f5f3e7，主强调 #4f7b58，辅助强调 #b08345。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-organic-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(79,123,88,0.22); border-radius: 30px; background: #f5f3e7; color: #233128; box-shadow: 0 30px 70px rgba(68,92,68,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-organic-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #233128; }\n.sig-organic-form small { color: #60705f; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-organic-form .row { display: flex; gap: 10px; }\n.sig-organic-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(30px - 6px); border: 1px solid rgba(79,123,88,0.22); background: #dfe7d3; color: #233128; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-organic-form input:focus { border-color: #4f7b58; box-shadow: 0 0 0 3px color-mix(in srgb, #4f7b58 18%, transparent); }\n.sig-organic-form button { height: 42px; padding: 0 14px; border-radius: calc(30px - 6px); border: 1px solid #4f7b58; background: #4f7b58; color: #f5f3e7; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-organic-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-organic-form\">\n  <label>Daily ritual<small>Natural UI needs gentle structure, not decorative leaves everywhere.</small></label>\n  <div class=\"row\"><input value=\"breath + water + notes\" aria-label=\"Daily ritual\" /><button type=\"button\">Plan ritual</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Living Field 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-organic-hero",
+      "signature-organic-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-organic-table",
+    "name": "Living Field 数据表",
+    "category": "table",
+    "themes": [
+      "organic"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "organic",
+      "自然生活方式系统"
+    ],
+    "description": "Living Field 的数据表素材，服务于自然生活方式系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Living Field 数据表\n定位: 自然生活方式系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f5f3e7，主强调 #4f7b58，辅助强调 #b08345。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-organic-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(79,123,88,0.22); border-radius: 30px; background: #f5f3e7; color: #233128; box-shadow: 0 30px 70px rgba(68,92,68,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-organic-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-organic-table th, .sig-organic-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(79,123,88,0.22); }\n.sig-organic-table th { color: #60705f; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #dfe7d3; }\n.sig-organic-table td { color: #233128; }\n.sig-organic-table tr:last-child td { border-bottom: 0; }\n.sig-organic-table tbody tr:hover td { background: #dfe7d3; }\n.sig-organic-table .mono { font-variant-numeric: tabular-nums; }\n.sig-organic-table .status { display: inline-flex; align-items: center; gap: 6px; color: #4f7b58; font-weight: 800; }\n.sig-organic-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #4f7b58; }",
+    "html": "<div class=\"sig-organic-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Sunrise</td><td><span class=\"status\">Open</span></td><td class=\"mono\">6:40</td></tr><tr><td>Garden</td><td><span class=\"status\">Moist</span></td><td class=\"mono\">18</td></tr><tr><td>Journal</td><td><span class=\"status\">Quiet</span></td><td class=\"mono\">03</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Living Field 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-organic-hero",
+      "signature-organic-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 320,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-aurora-real",
+    "name": "Real Aurora",
+    "category": "background",
+    "themes": [
+      "dark",
+      "gradient",
+      "organic"
+    ],
+    "tags": [
+      "aurora",
+      "animated",
+      "organic",
+      "ethereal",
+      "slow"
+    ],
+    "stylePrompt": "高级设计指令: Real Aurora\n定位: Real Aurora 是一款 dark / gradient / organic 背景素材，适合 aurora、animated、organic、ethereal 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Real Aurora — 真实极光背景。不是 linear-gradient 假极光——是用多个窄长椭圆(width:200vw height:30vh)叠加+hue-rotate动画模拟极光帷幕的真实形态。颜色: 绿(#22c55e opacity:0.12)、蓝绿(#06b6d4 opacity:0.08)。整体极其subtle——像北欧夜空远处隐约的光。底色 #020617。动画40s+极慢。",
+    "css": ".bg-aurora-real {\n  min-height: 100vh;\n  background: #020617;\n  position: relative;\n  overflow: hidden;\n}\n.bg-aurora-real .curtain {\n  position: absolute;\n  width: 200vw;\n  height: 30vh;\n  left: -50vw;\n  border-radius: 50%;\n  filter: blur(60px);\n  animation: aurora-drift 40s ease-in-out infinite alternate;\n}\n.bg-aurora-real .c1 {\n  top: 10%;\n  background: rgba(34, 197, 94, 0.1);\n  animation-delay: 0s;\n}\n.bg-aurora-real .c2 {\n  top: 20%;\n  background: rgba(6, 182, 212, 0.07);\n  animation-delay: -12s;\n}\n.bg-aurora-real .c3 {\n  top: 5%;\n  background: rgba(34, 197, 94, 0.05);\n  animation-delay: -24s;\n  height: 20vh;\n}\n@keyframes aurora-drift {\n  0% { transform: translateX(0) scaleY(1) rotate(0deg); }\n  50% { transform: translateX(-5%) scaleY(1.3) rotate(1deg); }\n  100% { transform: translateX(3%) scaleY(0.8) rotate(-1deg); }\n}",
+    "html": "<div class=\"bg-aurora-real\">\n  <div class=\"curtain c1\"></div>\n  <div class=\"curtain c2\"></div>\n  <div class=\"curtain c3\"></div>\n</div>",
+    "description": "Real Aurora 是一款 dark / gradient / organic 背景素材，适合 aurora、animated、organic、ethereal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "bg-paper-warm",
+    "name": "Warm Paper",
+    "category": "background",
+    "themes": [
+      "light",
+      "editorial",
+      "organic"
+    ],
+    "tags": [
+      "paper",
+      "warm",
+      "light",
+      "texture",
+      "cream",
+      "organic"
+    ],
+    "stylePrompt": "高级设计指令: Warm Paper\n定位: Warm Paper 是一款 light / editorial / organic 背景素材，适合 paper、warm、light、texture 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Warm Paper — 暖纸背景。不是冷白#fff——是温暖的米色(#faf9f7)配合极细微的纸纹理(用 noise SVG opacity:0.02)。像是摸得到的高克重纸张。用于承载衬线字体和杂志排版内容时效果最佳。气质: KINFOLK、CEREAL magazine。",
+    "css": ".bg-paper-warm {\n  min-height: 100vh;\n  background: #faf9f7;\n  background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.018'/%3E%3C/svg%3E\");\n}",
+    "description": "Warm Paper 是一款 light / editorial / organic 背景素材，适合 paper、warm、light、texture 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 1,
+    "html": "<section class=\"bg-paper-warm\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(79,123,88,0.22);border-radius:28px;background:#dfe7d3;color:#233128;box-shadow:0 26px 64px rgba(68,92,68,0.18);\">\n    <div style=\"color:#4f7b58;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Warm Paper</h2>\n    <p style=\"margin:0;color:#60705f;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "btn-soft-bounce",
+    "name": "Soft Bounce",
+    "category": "button",
+    "themes": [
+      "light",
+      "organic"
+    ],
+    "tags": [
+      "organic",
+      "soft",
+      "rounded",
+      "playful",
+      "spring"
+    ],
+    "stylePrompt": "高级设计指令: Soft Bounce\n定位: Soft Bounce 是一款 light / organic 按钮素材，适合 organic、soft、rounded、playful 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Soft Bounce — 柔弹按钮。温暖的圆润感: 背景是柔和的薰衣草紫(#ede9fe), 文字深紫(#5b21b6), 大圆角(12px)。hover时用 spring easing 做一个轻微的 Y 弹跳(-3px) + 阴影出现。active 时向下压(+1px) + 阴影消失。字体 Inter 600 14px。气质: Notion、Linear、现代 SaaS。",
+    "css": ".btn-soft-bounce {\n  padding: 11px 22px;\n  background: #ede9fe;\n  color: #5b21b6;\n  font-family: 'Inter', system-ui, sans-serif;\n  font-size: 14px;\n  font-weight: 600;\n  border: none;\n  border-radius: 12px;\n  cursor: pointer;\n  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);\n  box-shadow: 0 0 0 rgba(91, 33, 182, 0);\n}\n.btn-soft-bounce:hover {\n  transform: translateY(-3px);\n  box-shadow: 0 8px 20px rgba(91, 33, 182, 0.12);\n  background: #e0d7fa;\n}\n.btn-soft-bounce:active {\n  transform: translateY(1px);\n  box-shadow: 0 0 0 rgba(91, 33, 182, 0);\n  background: #ddd6fe;\n}",
+    "html": "<button class=\"btn-soft-bounce\">New project</button>",
+    "description": "Soft Bounce 是一款 light / organic 按钮素材，适合 organic、soft、rounded、playful 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "btn-organic-blob",
+    "name": "Living Blob",
+    "category": "button",
+    "themes": [
+      "organic",
+      "light"
+    ],
+    "tags": [
+      "organic",
+      "blob",
+      "morphing",
+      "nature",
+      "playful"
+    ],
+    "stylePrompt": "高级设计指令: Living Blob\n定位: Living Blob 是一款 organic / light 按钮素材，适合 organic、blob、morphing、nature 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Living Blob — 有机变形按钮。border-radius 用不规则值(60% 40% 70% 30% / 40% 60% 30% 70%)让按钮像活的amoeba。hover时 border-radius 缓慢变形(4s animation)。背景: 柔和自然色(#dcfce7 浅绿)。字体 Inter 500 #166534。气质: 自然、有机、Headspace app。",
+    "css": ".btn-blob {\n  padding: 13px 28px;\n  background: #dcfce7;\n  color: #166534;\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  font-weight: 500;\n  border: none;\n  border-radius: 60% 40% 70% 30% / 40% 60% 30% 70%;\n  cursor: pointer;\n  transition: all 0.3s;\n  animation: blob-idle 6s ease-in-out infinite;\n}\n.btn-blob:hover {\n  background: #bbf7d0;\n  transform: scale(1.05);\n  animation-play-state: paused;\n}\n@keyframes blob-idle {\n  0%, 100% { border-radius: 60% 40% 70% 30% / 40% 60% 30% 70%; }\n  33% { border-radius: 40% 60% 30% 70% / 60% 40% 70% 30%; }\n  66% { border-radius: 70% 30% 50% 50% / 30% 70% 50% 50%; }\n}",
+    "html": "<button class=\"btn-blob\">Breathe</button>",
+    "description": "Living Blob 是一款 organic / light 按钮素材，适合 organic、blob、morphing、nature 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "card-organic-nature",
+    "name": "Nature Card",
+    "category": "card",
+    "themes": [
+      "organic",
+      "light"
+    ],
+    "tags": [
+      "organic",
+      "nature",
+      "rounded",
+      "warm",
+      "botanical"
+    ],
+    "stylePrompt": "高级设计指令: Nature Card\n定位: Nature Card 是一款 organic / light 卡片素材，适合 organic、nature、rounded、warm 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Nature Card — 有机自然卡片。极圆角(28px), 暖色背景(#fef9f0 奶白), 边框无——靠轻阴影(0 4px 20px rgba(120,80,40,0.06))定义。内容区用自然色系: 标题 #3d2c1e(深棕), 正文 #78716c。可配叶子/花纹 emoji 装饰。字体: 'DM Serif Display' 标题 + Inter 正文。气质: 有机食品品牌、植物学、Aesop。",
+    "css": ".card-nature {\n  width: 300px;\n  padding: 32px 28px;\n  background: #fef9f0;\n  border-radius: 28px;\n  box-shadow: 0 4px 20px rgba(120,80,40,0.06);\n}\n.card-nature .emoji { font-size: 32px; margin-bottom: 16px; }\n.card-nature h3 {\n  font-family: 'Georgia', serif;\n  font-size: 20px;\n  font-weight: 700;\n  color: #3d2c1e;\n  margin: 0 0 10px;\n}\n.card-nature p {\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  color: #78716c;\n  line-height: 1.7;\n  margin: 0;\n}",
+    "html": "<div class=\"card-nature\">\n  <div class=\"emoji\">⌥</div>\n  <h3>Botanical Extract</h3>\n  <p>Sustainably sourced from ancient forests, processed with zero waste.</p>\n</div>",
+    "description": "Nature Card 是一款 organic / light 卡片素材，适合 organic、nature、rounded、warm 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "bg-organic-warmth",
+    "name": "Organic Warmth",
+    "category": "background",
+    "themes": [
+      "organic",
+      "light"
+    ],
+    "tags": [
+      "organic",
+      "warm",
+      "cream",
+      "natural",
+      "gentle"
+    ],
+    "stylePrompt": "高级设计指令: Organic Warmth\n定位: Organic Warmth 是一款 organic / light 背景素材，适合 organic、warm、cream、natural 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Organic Warmth — 有机暖色背景。不是冷白#fff, 也不是#fafafa——是带黄调的暖奶白(#fdfbf7)。极subtle的径向渐变: 中心稍亮(#fff)→边缘稍暖(#faf5eb)。配合自然色系组件使用。气质: 有机品牌、手工陶瓷、日本和纸。",
+    "css": ".bg-organic-warmth {\n  min-height: 100vh;\n  background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #fdfbf7 50%, #faf5eb 100%);\n}",
+    "description": "Organic Warmth 是一款 organic / light 背景素材，适合 organic、warm、cream、natural 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 5,
+    "html": "<section class=\"bg-organic-warmth\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(79,123,88,0.22);border-radius:28px;background:#dfe7d3;color:#233128;box-shadow:0 26px 64px rgba(68,92,68,0.18);\">\n    <div style=\"color:#4f7b58;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Organic Warmth</h2>\n    <p style=\"margin:0;color:#60705f;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "org-btn-leaf",
+    "name": "Leaf Button",
+    "category": "button",
+    "tags": [
+      "organic",
+      "leaf",
+      "green",
+      "asymmetric"
+    ],
+    "description": "Leaf Button 是一款 organic 按钮素材，适合 organic、leaf、green、asymmetric 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Leaf Button\n定位: Leaf-shaped organic button\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Leaf Button。不对称圆角(4px 20px 4px 20px)模拟叶片。#166534深绿底+白字。hover变浅。",
+    "css": ".org-btn-leaf { padding:11px 24px; background:#166534; color:#fff; font-family:Inter,system-ui; font-size:14px; font-weight:500; border:none; border-radius:4px 20px 4px 20px; cursor:pointer; transition:background 0.2s; } .org-btn-leaf:hover { background:#15803d; }",
+    "html": "<button class=\"org-btn-leaf\">Explore</button>",
+    "themes": [
+      "organic"
+    ],
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "org-card-seed",
+    "name": "Seed Card",
+    "category": "card",
+    "tags": [
+      "organic",
+      "seed",
+      "rounded",
+      "warm"
+    ],
+    "description": "Seed Card 是一款 organic 卡片素材，适合 organic、seed、rounded、warm 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Seed Card\n定位: Seed-shaped warm card\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Seed Card。不对称大圆角(40px 40px 20px 40px)。暖色底#fef9f0。Georgia serif标题+Inter正文。轻阴影。",
+    "css": ".org-card-seed { width:280px; padding:32px; background:#fef9f0; border-radius:40px 40px 20px 40px; box-shadow:0 4px 16px rgba(120,80,40,0.05); } .org-card-seed h3 { font-family:Georgia,serif; font-size:18px; color:#3d2c1e; margin:0 0 10px; } .org-card-seed p { font-family:Inter,system-ui; font-size:14px; color:#78716c; line-height:1.7; margin:0; }",
+    "html": "<div class=\"org-card-seed\"><h3>Growth Cycle</h3><p>Every product starts as a seed of an idea.</p></div>",
+    "themes": [
+      "organic"
+    ],
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "org-wave-divider",
+    "name": "Wave Divider",
+    "category": "effect",
+    "tags": [
+      "organic",
+      "wave",
+      "svg",
+      "natural"
+    ],
+    "description": "Wave Divider 是一款 organic 特效素材，适合 organic、wave、svg、natural 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Wave Divider\n定位: Organic SVG wave divider line\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Wave Divider。SVG不规则波浪线, #86efac opacity:0.4, stroke-width 1.5, 无fill。高度24px。",
+    "css": ".org-wave { width:100%; height:24px; } .org-wave svg { width:100%; height:100%; }",
+    "html": "<div class=\"org-wave\"><svg viewBox=\"0 0 1200 24\" preserveAspectRatio=\"none\"><path d=\"M0,12 C200,4 400,20 600,12 C800,4 1000,20 1200,12\" stroke=\"rgba(134,239,172,0.4)\" stroke-width=\"1.5\" fill=\"none\"/></svg></div>",
+    "themes": [
+      "organic"
+    ],
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "org-hero-breath",
+    "name": "Breathing Hero",
+    "category": "hero",
+    "tags": [
+      "organic",
+      "breathing",
+      "calm",
+      "slow"
+    ],
+    "description": "Breathing Hero 是一款 organic 首屏素材，适合 organic、breathing、calm、slow 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Breathing Hero\n定位: Gently breathing hero section\n审美系统: Living System / natural workflow with soft structure。使用 #4f7b58 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Breathing Hero。居中内容做极慢scale呼吸(1→1.02, 6s)。暖白底#fdfbf7。Georgia 36px。",
+    "css": ".org-hero-breath { min-height:80vh; display:flex; align-items:center; justify-content:center; background:#fdfbf7; } .org-hero-breath .c { text-align:center; animation:breathe 6s ease-in-out infinite; } @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} } .org-hero-breath h1 { font-family:Georgia,serif; font-size:36px; color:#3d2c1e; margin:0 0 12px; } .org-hero-breath p { font-family:Inter,system-ui; font-size:15px; color:#78716c; }",
+    "html": "<section class=\"org-hero-breath\"><div class=\"c\"><h1>Slow down. Create.</h1><p>The best work comes from stillness.</p></div></section>",
+    "themes": [
+      "organic"
+    ],
+    "designNotes": "此素材已按 Living System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #eef0df 0%, #bfd1b8 100%)",
+      "minHeight": 340,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

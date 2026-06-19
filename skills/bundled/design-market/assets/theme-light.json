@@ -1,0 +1,624 @@
+[
+  {
+    "id": "signature-light-hero",
+    "name": "Pearl Workspace 首屏",
+    "category": "hero",
+    "themes": [
+      "light"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "light",
+      "明亮办公产品系统"
+    ],
+    "description": "Pearl Workspace 的首屏素材，服务于明亮办公产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Pearl Workspace 首屏\n定位: 明亮办公产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #ffffff，主强调 #526f7b，辅助强调 #a77720。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-light-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(91,104,111,0.22);\n  border-radius: 12px;\n  background: linear-gradient(145deg, #ffffff, #f1f5f1);\n  color: #172025;\n  box-shadow: 0 28px 70px rgba(48,75,86,0.14);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-light-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(82,111,123,0.10), transparent 48%); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-light-hero > * { position: relative; z-index: 1; }\n.sig-light-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-light-hero .kicker { width: fit-content; border: 1px solid rgba(91,104,111,0.22); border-radius: 999px; padding: 6px 10px; color: #526f7b; background: #f1f5f1; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-light-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-light-hero p { margin: 0; max-width: 560px; color: #667174; font-size: 15px; line-height: 1.78; }\n.sig-light-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-light-hero button { height: 40px; padding: 0 16px; border-radius: calc(12px / 2 + 4px); border: 1px solid rgba(91,104,111,0.22); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-light-hero .primary { background: #526f7b; color: #ffffff; border-color: #526f7b; }\n.sig-light-hero .secondary { background: transparent; color: #172025; }\n.sig-light-hero button:hover { transform: translateY(-1px); border-color: #526f7b; }\n.sig-light-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(91,104,111,0.22); border-radius: calc(12px - 2px); background: #f1f5f1; backdrop-filter: blur(18px) saturate(140%); }\n.sig-light-hero .artifact h2 { margin: 0; font-size: 13px; color: #526f7b; text-transform: uppercase; letter-spacing: 0; }\n.sig-light-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-light-hero .metric { padding: 14px; border: 1px solid rgba(91,104,111,0.22); border-radius: calc(12px - 4px); background: color-mix(in srgb, #ffffff 76%, transparent); }\n.sig-light-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-light-hero .metric span { display: block; margin-top: 6px; color: #667174; font-size: 11px; }\n.sig-light-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #526f7b, #a77720); }\n@media (max-width: 780px) { .sig-light-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-light-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">明亮办公产品系统</div>\n    <h1>Make dense work feel composed.</h1>\n    <p>A daylight workspace for briefs, approvals, schedules, and handoff quality.</p>\n    <div class=\"actions\"><button class=\"primary\">Plan day</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Pearl OS / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>12</strong><span>briefs ready</span></div>\n      <div class=\"metric\"><strong>3</strong><span>handoffs due</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Pearl Workspace 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-light-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 420,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-light-card",
+    "name": "Pearl Workspace 洞察卡片",
+    "category": "card",
+    "themes": [
+      "light"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "light",
+      "明亮办公产品系统"
+    ],
+    "description": "Pearl Workspace 的洞察卡片素材，服务于明亮办公产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Pearl Workspace 洞察卡片\n定位: 明亮办公产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #ffffff，主强调 #526f7b，辅助强调 #a77720。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-light-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(91,104,111,0.22); border-radius: 12px; background: #ffffff; color: #172025; box-shadow: 0 28px 70px rgba(48,75,86,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-light-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-light-card .label { color: #526f7b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-light-card .pill { border: 1px solid rgba(91,104,111,0.22); border-radius: 999px; padding: 5px 9px; color: #667174; background: #f1f5f1; font-size: 11px; }\n.sig-light-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-light-card p { margin: 0; color: #667174; font-size: 13px; line-height: 1.7; }\n.sig-light-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(91,104,111,0.22); }\n.sig-light-card .strip strong { font-variant-numeric: tabular-nums; color: #172025; }\n.sig-light-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(12px - 4px); background: #526f7b; color: #ffffff; font-weight: 900; }",
+    "html": "<article class=\"sig-light-card\">\n  <div class=\"top\"><div><div class=\"label\">Pearl OS</div><h3>12</h3></div><span class=\"pill\">briefs ready</span></div>\n  <p>A daylight workspace for briefs, approvals, schedules, and handoff quality.</p>\n  <div class=\"strip\"><span>handoffs due</span><strong>3</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Pearl Workspace 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-light-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-light-nav",
+    "name": "Pearl Workspace 导航",
+    "category": "navigation",
+    "themes": [
+      "light"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "light",
+      "明亮办公产品系统"
+    ],
+    "description": "Pearl Workspace 的导航素材，服务于明亮办公产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Pearl Workspace 导航\n定位: 明亮办公产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #ffffff，主强调 #526f7b，辅助强调 #a77720。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-light-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(91,104,111,0.22); border-radius: 12px; background: #ffffff; color: #172025; box-shadow: 0 28px 70px rgba(48,75,86,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-light-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-light-nav .mark { width: 30px; height: 30px; border-radius: calc(12px - 4px); background: linear-gradient(135deg, #526f7b, #a77720); box-shadow: inset 0 0 0 1px rgba(91,104,111,0.22); }\n.sig-light-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-light-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(12px - 6px); color: #667174; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-light-nav a:hover, .sig-light-nav a.active { color: #172025; background: #f1f5f1; }\n.sig-light-nav button { height: 34px; padding: 0 13px; border-radius: calc(12px - 6px); border: 1px solid #526f7b; background: #526f7b; color: #ffffff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-light-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-light-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Pearl OS</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Briefs</a><a href=\"#\">Calendar</a><a href=\"#\">Review</a><a href=\"#\">Library</a></div>\n  <button>Plan day</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Pearl Workspace 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-light-hero",
+      "signature-light-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-light-form",
+    "name": "Pearl Workspace 表单",
+    "category": "form",
+    "themes": [
+      "light"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "light",
+      "明亮办公产品系统"
+    ],
+    "description": "Pearl Workspace 的表单素材，服务于明亮办公产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Pearl Workspace 表单\n定位: 明亮办公产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #ffffff，主强调 #526f7b，辅助强调 #a77720。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-light-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(91,104,111,0.22); border-radius: 12px; background: #ffffff; color: #172025; box-shadow: 0 28px 70px rgba(48,75,86,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-light-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #172025; }\n.sig-light-form small { color: #667174; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-light-form .row { display: flex; gap: 10px; }\n.sig-light-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(12px - 6px); border: 1px solid rgba(91,104,111,0.22); background: #f1f5f1; color: #172025; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-light-form input:focus { border-color: #526f7b; box-shadow: 0 0 0 3px color-mix(in srgb, #526f7b 18%, transparent); }\n.sig-light-form button { height: 42px; padding: 0 14px; border-radius: calc(12px - 6px); border: 1px solid #526f7b; background: #526f7b; color: #ffffff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-light-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-light-form\">\n  <label>Project room<small>Invite stakeholders without creating a noisy workspace.</small></label>\n  <div class=\"row\"><input value=\"spring-launch\" aria-label=\"Project room\" /><button type=\"button\">Plan day</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Pearl Workspace 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-light-hero",
+      "signature-light-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-light-table",
+    "name": "Pearl Workspace 数据表",
+    "category": "table",
+    "themes": [
+      "light"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "light",
+      "明亮办公产品系统"
+    ],
+    "description": "Pearl Workspace 的数据表素材，服务于明亮办公产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Pearl Workspace 数据表\n定位: 明亮办公产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #ffffff，主强调 #526f7b，辅助强调 #a77720。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-light-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(91,104,111,0.22); border-radius: 12px; background: #ffffff; color: #172025; box-shadow: 0 28px 70px rgba(48,75,86,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-light-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-light-table th, .sig-light-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(91,104,111,0.22); }\n.sig-light-table th { color: #667174; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #f1f5f1; }\n.sig-light-table td { color: #172025; }\n.sig-light-table tr:last-child td { border-bottom: 0; }\n.sig-light-table tbody tr:hover td { background: #f1f5f1; }\n.sig-light-table .mono { font-variant-numeric: tabular-nums; }\n.sig-light-table .status { display: inline-flex; align-items: center; gap: 6px; color: #526f7b; font-weight: 800; }\n.sig-light-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #526f7b; }",
+    "html": "<div class=\"sig-light-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Creative brief</td><td><span class=\"status\">Approved</span></td><td class=\"mono\">A</td></tr><tr><td>QA pass</td><td><span class=\"status\">Open</span></td><td class=\"mono\">B</td></tr><tr><td>Launch copy</td><td><span class=\"status\">Draft</span></td><td class=\"mono\">A</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Pearl Workspace 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-light-hero",
+      "signature-light-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 320,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "layout-content-centered",
+    "name": "Content Centered",
+    "category": "layout",
+    "themes": [
+      "minimal",
+      "dark",
+      "light"
+    ],
+    "tags": [
+      "centered",
+      "prose",
+      "reading",
+      "blog",
+      "typographic",
+      "light"
+    ],
+    "stylePrompt": "高级设计指令: Content Centered\n定位: Content Centered 是一款 minimal / dark / light 布局素材，适合 centered、prose、reading、blog 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Content Centered — 阅读居中布局。max-width:680px 居中，适合长文阅读。无侧栏、无分散注意力的元素。字体: 正文 Inter 16px/1.8 #d4d4d8; 标题 Inter 700 28px。段间距 1.5em。气质: Medium、Substack、paul graham essays。",
+    "css": ".layout-prose {\n  max-width: 680px;\n  margin: 0 auto;\n  padding: 80px 24px;\n  color: #d4d4d8;\n  font-family: 'Inter', system-ui;\n}\n.layout-prose h1 { font-size: 28px; font-weight: 700; color: #fafafa; letter-spacing: -0.02em; margin: 0 0 16px; }\n.layout-prose h2 { font-size: 22px; font-weight: 600; color: #e4e4e7; margin: 2em 0 0.8em; }\n.layout-prose p { font-size: 16px; line-height: 1.8; margin: 0 0 1.5em; }\n.layout-prose a { color: #60a5fa; text-decoration: underline; text-underline-offset: 3px; }\n.layout-prose code { font-family: 'JetBrains Mono', monospace; font-size: 14px; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }",
+    "html": "<article class=\"layout-prose\">\n  <h1>On Design Systems</h1>\n  <p>A design system is not a Figma library. It's a shared language—a set of decisions made once so they don't have to be made again.</p>\n</article>",
+    "description": "Content Centered 是一款 minimal / dark / light 布局素材，适合 centered、prose、reading、blog 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 340,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "form-toggle-ios",
+    "name": "iOS Toggle",
+    "category": "form",
+    "themes": [
+      "dark",
+      "minimal",
+      "light"
+    ],
+    "tags": [
+      "toggle",
+      "switch",
+      "ios",
+      "boolean",
+      "animated",
+      "light"
+    ],
+    "stylePrompt": "高级设计指令: iOS Toggle\n定位: iOS Toggle 是一款 dark / minimal / light 表单素材，适合 toggle、switch、ios、boolean 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: iOS Toggle — 原生级开关。灵感: iOS/macOS toggle。轨道 44x24px, 关闭态 #27272a, 开启态 #22c55e(不是渐变——是纯色)。滑块 18px 纯白圆 + 轻微阴影(0 1px 3px rgba黑0.2)。transition 0.2s spring easing。无多余——纯功能性美。",
+    "css": ".form-toggle-ios {\n  position: relative;\n  width: 44px;\n  height: 24px;\n  cursor: pointer;\n}\n.form-toggle-ios input { display: none; }\n.form-toggle-ios .track {\n  position: absolute;\n  inset: 0;\n  border-radius: 12px;\n  background: #27272a;\n  transition: background 0.2s;\n}\n.form-toggle-ios .thumb {\n  position: absolute;\n  top: 3px;\n  left: 3px;\n  width: 18px;\n  height: 18px;\n  border-radius: 50%;\n  background: #fff;\n  box-shadow: 0 1px 3px rgba(0,0,0,0.2);\n  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);\n}\n.form-toggle-ios input:checked ~ .track { background: #22c55e; }\n.form-toggle-ios input:checked ~ .thumb { transform: translateX(20px); }",
+    "html": "<label class=\"form-toggle-ios\">\n  <input type=\"checkbox\" checked />\n  <span class=\"track\"></span>\n  <span class=\"thumb\"></span>\n</label>",
+    "description": "iOS Toggle 是一款 dark / minimal / light 表单素材，适合 toggle、switch、ios、boolean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "btn-paper-fold",
+    "name": "Paper Fold",
+    "category": "button",
+    "themes": [
+      "light",
+      "minimal"
+    ],
+    "tags": [
+      "minimal",
+      "light",
+      "elegant",
+      "subtle",
+      "paper"
+    ],
+    "stylePrompt": "高级设计指令: Paper Fold\n定位: Paper Fold 是一款 light / minimal 按钮素材，适合 minimal、light、elegant、subtle 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Paper Fold — 纸张折叠按钮。灵感来自实体纸张的微妙阴影层次。浅灰底(#f5f5f4)上，按钮是一张微微抬起的白纸——底部有0.5px的阴影暗示它从页面上'浮起'。hover时纸张进一步抬起(阴影加深+Y偏移)。字体 Söhne/Inter 500，深灰色(#1c1917)，14px。无边框，靠阴影定义边界。圆角4px(纸张不是圆的)。气质: 日式极简、无印良品。",
+    "css": ".btn-paper-fold {\n  padding: 12px 24px;\n  background: #fff;\n  color: #1c1917;\n  font-family: 'Inter', system-ui, sans-serif;\n  font-size: 14px;\n  font-weight: 500;\n  border: none;\n  border-radius: 4px;\n  cursor: pointer;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.06);\n  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n}\n.btn-paper-fold:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.04);\n}\n.btn-paper-fold:active {\n  transform: translateY(0);\n  box-shadow: 0 0 0 rgba(0,0,0,0), 0 1px 1px rgba(0,0,0,0.08);\n}",
+    "html": "<button class=\"btn-paper-fold\">Continue</button>",
+    "description": "Paper Fold 是一款 light / minimal 按钮素材，适合 minimal、light、elegant、subtle 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "light-card-shadow",
+    "name": "Elevated Card",
+    "category": "card",
+    "tags": [
+      "light",
+      "shadow",
+      "elevated",
+      "clean",
+      "modern"
+    ],
+    "description": "Elevated Card 是一款 light 卡片素材，适合 light、shadow、elevated、clean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Elevated Card\n定位: 浮起感白卡\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Elevated Card。#fff底, 极微妙的多层阴影(0 1px 2px rgba黑0.04 + 0 4px 12px rgba黑0.05)创造精致浮起感。圆角12px。无边框——纯靠阴影。字体 Inter。气质: Notion card。",
+    "css": ".light-card-elev { padding:24px; background:#fff; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.05); } .light-card-elev h3 { font-family:Inter,system-ui; font-size:15px; font-weight:600; color:#1c1917; margin:0 0 8px; } .light-card-elev p { font-family:Inter,system-ui; font-size:14px; color:#78716c; line-height:1.6; margin:0; }",
+    "html": "<div class=\"light-card-elev\"><h3>Quick note</h3><p>Ideas captured in the moment last longer than those saved for later.</p></div>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "light-btn-outline",
+    "name": "Light Outline Button",
+    "category": "button",
+    "tags": [
+      "light",
+      "outline",
+      "border",
+      "clean",
+      "subtle"
+    ],
+    "description": "Light Outline Button 是一款 light 按钮素材，适合 light、outline、border、clean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Light Outline Button\n定位: 明亮描边按钮\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Light Outline Button。透明底 + 1px border #e5e5e5 + 深色文字 #1c1917。hover时 border→#d4d4d4 + background→#fafafa。圆角 8px。Inter 14px 500。气质: GitHub button。",
+    "css": ".light-btn-outline { padding:9px 16px; background:transparent; border:1px solid #e5e5e5; border-radius:8px; color:#1c1917; font-family:Inter,system-ui; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.15s; } .light-btn-outline:hover { background:#fafafa; border-color:#d4d4d4; }",
+    "html": "<button class=\"light-btn-outline\">Edit profile</button>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "light-nav-clean",
+    "name": "Clean Top Navigation",
+    "category": "navigation",
+    "tags": [
+      "light",
+      "navigation",
+      "clean",
+      "horizontal",
+      "saas"
+    ],
+    "description": "Clean Top Navigation 是一款 light 导航素材，适合 light、navigation、clean、horizontal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Clean Top Navigation\n定位: 明亮简洁顶部导航\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Clean Top Navigation。#fff底, 底部border 1px #f4f4f5。items: Inter 14px 500 #71717a, hover→#1c1917, active→#1c1917 font-weight:600。logo左侧, links中间, CTA右侧。",
+    "css": ".light-nav { display:flex; align-items:center; padding:0 24px; height:56px; background:#fff; border-bottom:1px solid #f4f4f5; } .light-nav .logo { font-family:Inter,system-ui; font-size:15px; font-weight:700; color:#1c1917; margin-right:32px; } .light-nav .links { display:flex; gap:24px; } .light-nav .links a { font-family:Inter,system-ui; font-size:14px; font-weight:500; color:#71717a; text-decoration:none; transition:color 0.15s; } .light-nav .links a:hover { color:#1c1917; } .light-nav .links a.active { color:#1c1917; font-weight:600; }",
+    "html": "<nav class=\"light-nav\"><span class=\"logo\">Acme</span><div class=\"links\"><a href=\"#\" class=\"active\">Dashboard</a><a href=\"#\">Projects</a><a href=\"#\">Team</a></div></nav>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "light-input-subtle",
+    "name": "Subtle Input",
+    "category": "form",
+    "tags": [
+      "light",
+      "input",
+      "subtle",
+      "border",
+      "focus"
+    ],
+    "description": "Subtle Input 是一款 light 表单素材，适合 light、input、subtle、border 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Subtle Input\n定位: 微妙边框输入框\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Subtle Input。#fff底, border 1px #e5e5e5, 圆角 8px。focus时 border→#3b82f6 + ring(0 0 0 3px rgba(59,130,246,0.1))。placeholder #a1a1aa。Inter 14px #1c1917。",
+    "css": ".light-input { width:100%; padding:10px 12px; background:#fff; border:1px solid #e5e5e5; border-radius:8px; font-family:Inter,system-ui; font-size:14px; color:#1c1917; outline:none; transition:border-color 0.15s,box-shadow 0.15s; } .light-input:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); } .light-input::placeholder { color:#a1a1aa; }",
+    "html": "<input class=\"light-input\" placeholder=\"Enter your email\" />",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "light-badge-soft",
+    "name": "Soft Color Badge",
+    "category": "badge",
+    "tags": [
+      "light",
+      "soft",
+      "pastel",
+      "semantic",
+      "rounded"
+    ],
+    "description": "Soft Color Badge 是一款 light 徽章素材，适合 light、soft、pastel、semantic 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Soft Color Badge\n定位: 柔和色彩徽章\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Soft Color Badge。柔和底色(语义色的极低饱和度版)+深色文字。绿: bg #dcfce7 text #166534。蓝: bg #dbeafe text #1e40af。padding 2px 8px, 圆角50px, 12px 500。",
+    "css": ".light-badge { display:inline-block; padding:2px 8px; border-radius:50px; font-family:Inter,system-ui; font-size:12px; font-weight:500; } .light-badge.green { background:#dcfce7; color:#166534; } .light-badge.blue { background:#dbeafe; color:#1e40af; } .light-badge.amber { background:#fef3c7; color:#92400e; } .light-badge.red { background:#fef2f2; color:#991b1b; }",
+    "html": "<span class=\"light-badge green\">Active</span> <span class=\"light-badge blue\">New</span> <span class=\"light-badge amber\">Pending</span> <span class=\"light-badge red\">Error</span>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "light-table-clean",
+    "name": "Clean Light Table",
+    "category": "table",
+    "tags": [
+      "light",
+      "table",
+      "clean",
+      "striped",
+      "modern"
+    ],
+    "description": "Clean Light Table 是一款 light 表格素材，适合 light、table、clean、striped 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Clean Light Table\n定位: 明亮简洁表格\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Clean Light Table。#fff底, th: 12px 500 #71717a uppercase, td: 14px #1c1917。border-bottom 1px #f4f4f5。hover行 bg #fafafa。圆角容器包裹+overflow hidden。",
+    "css": ".light-table-wrap { border-radius:12px; border:1px solid #f4f4f5; overflow:hidden; } .light-table { width:100%; border-collapse:collapse; background:#fff; font-family:Inter,system-ui; } .light-table th { padding:10px 16px; text-align:left; font-size:12px; font-weight:500; color:#71717a; background:#fafafa; border-bottom:1px solid #f4f4f5; } .light-table td { padding:12px 16px; font-size:14px; color:#1c1917; border-bottom:1px solid #f4f4f5; } .light-table tr:last-child td { border-bottom:none; } .light-table tr:hover td { background:#fafafa; }",
+    "html": "<div class=\"light-table-wrap\"><table class=\"light-table\"><thead><tr><th>Name</th><th>Status</th><th>Role</th></tr></thead><tbody><tr><td>Alice</td><td>Active</td><td>Admin</td></tr><tr><td>Bob</td><td>Pending</td><td>Editor</td></tr></tbody></table></div>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "light-footer-simple",
+    "name": "Light Simple Footer",
+    "category": "footer",
+    "tags": [
+      "light",
+      "footer",
+      "simple",
+      "centered",
+      "clean"
+    ],
+    "description": "Light Simple Footer 是一款 light 页脚素材，适合 light、footer、simple、centered 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Light Simple Footer\n定位: 明亮简洁页脚\n审美系统: Pearl Workspace / quiet daylight productivity。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Light Simple Footer。#fff底, border-top 1px #f4f4f5。居中: 链接行(Inter 13px #71717a hover→#1c1917) + 版权(12px #a1a1aa)。padding 32px。",
+    "css": ".light-footer { background:#fff; border-top:1px solid #f4f4f5; padding:32px 24px; text-align:center; } .light-footer .links { display:flex; justify-content:center; gap:20px; margin-bottom:12px; } .light-footer .links a { font-family:Inter,system-ui; font-size:13px; color:#71717a; text-decoration:none; transition:color 0.15s; } .light-footer .links a:hover { color:#1c1917; } .light-footer .copy { font-family:Inter,system-ui; font-size:12px; color:#a1a1aa; }",
+    "html": "<footer class=\"light-footer\"><div class=\"links\"><a href=\"#\">About</a><a href=\"#\">Privacy</a><a href=\"#\">Terms</a></div><div class=\"copy\">© 2026 Company</div></footer>",
+    "themes": [
+      "light"
+    ],
+    "designNotes": "此素材已按 Pearl Workspace 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbfcf8 0%, #e9eee8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

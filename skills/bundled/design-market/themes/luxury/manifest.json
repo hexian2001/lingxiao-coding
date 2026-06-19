@@ -1,0 +1,28 @@
+{
+  "id": "luxury",
+  "name": "Maison Reserve",
+  "title": "静奢限量商品预约站",
+  "description": "为限量高定商品、私享预约与编辑电商设计的完整纯前端单页主题：暖象牙底、深棕文本、古金强调、杂志式留白，围绕商品故事、库存余量、预约时段与顾问确认建立克制转化路径。",
+  "version": "1.0.0",
+  "category": "editorial-commerce",
+  "tags": [
+    "luxury",
+    "quiet-luxury",
+    "editorial-commerce",
+    "limited-release",
+    "appointment",
+    "premium-retail",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#fbf8f1",
+    "surfaceMuted": "#efe4d2",
+    "ink": "#211b16",
+    "text": "#2f2520",
+    "muted": "#7a6b5d",
+    "accent": "#9a7738",
+    "line": "rgba(154, 119, 56, 0.34)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

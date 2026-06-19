@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nocturne Incident Ops</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090d0f;
+      --surface: #0f1416;
+      --surface-2: #151b1e;
+      --surface-3: #1b2327;
+      --line: rgba(210, 219, 222, 0.16);
+      --line-strong: rgba(210, 219, 222, 0.26);
+      --text: #eff2f1;
+      --muted: #8c989a;
+      --faint: #586366;
+      --primary: #aebdc5;
+      --amber: #f2c673;
+      --red: #ef6f6c;
+      --green: #7fd6a7;
+      --blue: #8ab9ff;
+      --shadow: 0 28px 78px rgba(0, 0, 0, 0.38);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(174, 189, 197, 0.18), transparent 32rem),
+        radial-gradient(circle at 100% 20%, rgba(242, 198, 115, 0.08), transparent 24rem),
+        linear-gradient(145deg, #080b0d 0%, #101619 48%, #090d0f 100%);
+      color: var(--text);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(174, 189, 197, 0.06) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(174, 189, 197, 0.045) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 78%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(15, 20, 22, 0.82);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand, .nav, .operator, .status-pill, .row, .mini-row, .metric-head, .ticket-meta, .footer-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand { gap: 11px; min-width: max-content; font-weight: 830; letter-spacing: -0.02em; }
+
+    .mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(135deg, rgba(174, 189, 197, 0.95), rgba(242, 198, 115, 0.82)),
+        #151b1e;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .nav {
+      gap: 4px;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav a {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .nav a:hover, .nav a:focus-visible, .nav a.active {
+      color: var(--text);
+      background: rgba(239, 242, 241, 0.06);
+      outline: none;
+    }
+
+    .operator { gap: 10px; min-width: max-content; color: var(--muted); font-size: 12px; }
+
+    .operator strong { color: var(--text); font-size: 13px; }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(127, 214, 167, 0.12);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 26px;
+      align-items: stretch;
+      padding: 42px 0 26px;
+    }
+
+    .brief {
+      position: relative;
+      overflow: hidden;
+      min-height: 440px;
+      padding: 38px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(15, 20, 22, 0.96), rgba(239, 242, 241, 0.055)),
+        var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .brief::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -90px;
+      width: 280px;
+      height: 280px;
+      border: 1px solid rgba(174, 189, 197, 0.22);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,189,197,0.12), transparent 58%);
+    }
+
+    .kicker {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(239, 242, 241, 0.055);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 22px 0 16px;
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: 0.96;
+      letter-spacing: -0.065em;
+    }
+
+    .lead {
+      max-width: 640px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+
+    .button {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(239, 242, 241, 0.055);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 760;
+      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, background 160ms ease;
+    }
+
+    .button.primary { border-color: var(--primary); background: var(--primary); color: var(--surface); }
+    .button:hover, .button:focus-visible { transform: translateY(-1px); border-color: var(--line-strong); outline: none; }
+    .button.primary:hover, .button.primary:focus-visible { border-color: #d5e1e5; background: #d5e1e5; }
+
+    .handoff {
+      position: absolute;
+      left: 38px;
+      right: 38px;
+      bottom: 32px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .handoff article, .side-card, .panel, .ticket, .console, .review-card {
+      border: 1px solid var(--line);
+      background: rgba(15, 20, 22, 0.78);
+      border-radius: 14px;
+    }
+
+    .handoff article { padding: 14px; }
+    .eyebrow { color: var(--faint); font-size: 11px; font-weight: 820; text-transform: uppercase; }
+    .value { margin-top: 8px; color: var(--text); font-size: 21px; font-weight: 780; letter-spacing: -0.03em; }
+    .caption { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .side-stack { display: grid; gap: 14px; }
+
+    .side-card { padding: 18px; background: rgba(15, 20, 22, 0.92); box-shadow: var(--shadow); }
+
+    .status-pill {
+      gap: 8px;
+      width: fit-content;
+      padding: 6px 9px;
+      border: 1px solid rgba(242, 198, 115, 0.32);
+      border-radius: 999px;
+      color: var(--amber);
+      background: rgba(242, 198, 115, 0.08);
+      font-size: 12px;
+      font-weight: 780;
+    }
+
+    .side-card h2 { margin: 14px 0 8px; font-size: 28px; letter-spacing: -0.045em; }
+    .side-card p { margin: 0; color: var(--muted); line-height: 1.65; font-size: 13px; }
+
+    .timeline { display: grid; gap: 12px; margin-top: 18px; }
+    .timeline .row { justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .time { color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .event { color: var(--text); font-size: 13px; }
+
+    .grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 26px; }
+
+    .panel { padding: 20px; background: rgba(15, 20, 22, 0.82); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    h2, h3, p { margin-top: 0; }
+    .section-head h2 { margin-bottom: 5px; font-size: 24px; letter-spacing: -0.04em; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+    .metric {
+      min-height: 142px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: linear-gradient(160deg, rgba(239, 242, 241, 0.058), rgba(239, 242, 241, 0.018));
+    }
+
+    .metric-head { justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+    .metric strong { display: block; margin-top: 18px; font-size: 34px; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; }
+    .trend { margin-top: 8px; color: var(--green); font-size: 12px; }
+    .trend.warn { color: var(--amber); }
+    .trend.bad { color: var(--red); }
+
+    .tickets { display: grid; gap: 10px; }
+    .ticket { padding: 14px; background: rgba(239, 242, 241, 0.035); }
+    .ticket-meta { justify-content: space-between; gap: 12px; margin-bottom: 10px; color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .severity { color: var(--red); font-weight: 820; }
+    .severity.medium { color: var(--amber); }
+    .severity.low { color: var(--green); }
+    .ticket h3 { margin: 0 0 8px; font-size: 16px; letter-spacing: -0.02em; }
+    .ticket p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .lower { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 26px; margin-top: 26px; }
+
+    .console { overflow: hidden; background: #0b1012; }
+    .console-head { display: flex; justify-content: space-between; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .log { margin: 0; padding: 18px; overflow-x: auto; color: #c9d2d6; font: 12px/1.8 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .log .ok { color: var(--green); }
+    .log .warn { color: var(--amber); }
+    .log .bad { color: var(--red); }
+
+    .review-card { padding: 20px; background: rgba(15, 20, 22, 0.88); }
+    .review-card h2 { margin-bottom: 8px; font-size: 23px; letter-spacing: -0.04em; }
+    .checklist { display: grid; gap: 10px; margin: 18px 0; }
+    .mini-row { justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .mini-row strong { color: var(--text); }
+    textarea {
+      width: 100%;
+      min-height: 92px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(239, 242, 241, 0.055);
+      color: var(--text);
+      outline: none;
+    }
+    textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(174, 189, 197, 0.16); }
+    .footer-actions { justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 980px) {
+      .hero, .grid, .lower { grid-template-columns: 1fr; }
+      .handoff { position: relative; left: auto; right: auto; bottom: auto; margin-top: 28px; }
+      .brief { min-height: auto; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .operator { justify-content: space-between; }
+      .brief { padding: 24px; }
+      .handoff, .metric-grid { grid-template-columns: 1fr; }
+      h1 { font-size: clamp(38px, 14vw, 58px); }
+      .section-head { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar" aria-label="Incident operations navigation">
+      <a class="brand" href="#"><span class="mark" aria-hidden="true"></span><span>Nocturne Ops</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a class="active" href="#">Command</a>
+        <a href="#">Incidents</a>
+        <a href="#">Deploys</a>
+        <a href="#">Runbooks</a>
+        <a href="#">Audit</a>
+      </nav>
+      <div class="operator"><span class="dot" aria-hidden="true"></span><span>On-call <strong>CN-SRE-03</strong></span></div>
+    </header>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="brief">
+        <div class="kicker">Incident Ops / SEV-2 watch</div>
+        <h1 id="hero-title">Control the incident before it controls the room.</h1>
+        <p class="lead">把发布健康、告警噪声、用户影响面和自动化处置放在同一张值守台上，让工程团队先判断、再升级、最后复盘。</p>
+        <div class="actions">
+          <button class="button primary" type="button">Open war room</button>
+          <button class="button" type="button">Review release gate</button>
+        </div>
+        <div class="handoff" aria-label="Current operational handoff">
+          <article>
+            <div class="eyebrow">Impact window</div>
+            <div class="value">14m 22s</div>
+            <div class="caption">EU checkout p95 latency above guardrail</div>
+          </article>
+          <article>
+            <div class="eyebrow">Noise reduced</div>
+            <div class="value">71%</div>
+            <div class="caption">duplicate alerts grouped into one incident thread</div>
+          </article>
+          <article>
+            <div class="eyebrow">Next action</div>
+            <div class="value">Rollback</div>
+            <div class="caption">payment-adapter v42.7 waiting approval</div>
+          </article>
+        </div>
+      </div>
+
+      <aside class="side-stack" aria-label="Live incident summary">
+        <section class="side-card">
+          <div class="status-pill"><span class="dot" style="background: var(--amber); box-shadow: 0 0 0 4px rgba(242,198,115,0.12)"></span>Active containment</div>
+          <h2>Checkout degradation</h2>
+          <p>自动化已冻结灰度扩大，当前只允许 SRE lead、release captain 和 payments owner 批准下一步动作。</p>
+          <div class="timeline">
+            <div class="row"><span class="event">Alert correlated with deploy v42.7</span><span class="time">21:18</span></div>
+            <div class="row"><span class="event">Traffic shifted 20% away from eu-west-1</span><span class="time">21:23</span></div>
+            <div class="row"><span class="event">Rollback plan generated from runbook</span><span class="time">21:31</span></div>
+          </div>
+        </section>
+        <section class="side-card">
+          <div class="eyebrow">Decision ledger</div>
+          <h2>3 approvals pending</h2>
+          <p>所有自动化动作都绑定影响面、触发原因和回滚窗口，避免只看单点指标做决策。</p>
+        </section>
+      </aside>
+    </section>
+
+    <section class="grid" aria-label="Operational dashboard">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Service pulse</h2>
+            <p>核心服务以用户旅程聚合，而不是按组件堆叠。</p>
+          </div>
+          <button class="button" type="button">Tune guardrails</button>
+        </div>
+        <div class="metric-grid">
+          <article class="metric">
+            <div class="metric-head"><span>Checkout p95</span><span>eu-west-1</span></div>
+            <strong>1.84s</strong>
+            <div class="trend bad">+620ms over 10m budget</div>
+          </article>
+          <article class="metric">
+            <div class="metric-head"><span>Error budget</span><span>monthly</span></div>
+            <strong>18.6%</strong>
+            <div class="trend warn">burn rate 4.2x during incident</div>
+          </article>
+          <article class="metric">
+            <div class="metric-head"><span>Alert groups</span><span>deduped</span></div>
+            <strong>9</strong>
+            <div class="trend">43 raw alerts suppressed</div>
+          </article>
+          <article class="metric">
+            <div class="metric-head"><span>Runbook match</span><span>confidence</span></div>
+            <strong>92%</strong>
+            <div class="trend">payment rollback path verified</div>
+          </article>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Incident queue</h2>
+            <p>按业务影响排序，保持状态、责任人与下一步动作清晰。</p>
+          </div>
+          <span class="status-pill">4 open</span>
+        </div>
+        <div class="tickets">
+          <article class="ticket">
+            <div class="ticket-meta"><span class="severity">SEV-2</span><span>owner: payments</span></div>
+            <h3>Payment adapter v42.7 raises checkout latency</h3>
+            <p>建议动作：冻结灰度，回滚 adapter，保留 async receipt worker 变更。</p>
+          </article>
+          <article class="ticket">
+            <div class="ticket-meta"><span class="severity medium">SEV-3</span><span>owner: growth</span></div>
+            <h3>Signup email queue crosses retry threshold</h3>
+            <p>建议动作：切换到 secondary provider，并降低 welcome campaign 批量速率。</p>
+          </article>
+          <article class="ticket">
+            <div class="ticket-meta"><span class="severity low">WATCH</span><span>owner: platform</span></div>
+            <h3>Search index lag approaching customer promise</h3>
+            <p>建议动作：暂不升级，持续观察 reindex backfill 完成率。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="lower" aria-label="Automation and review">
+      <div class="console">
+        <div class="console-head"><span>automation trace</span><span>runbook/payment-rollback.yml</span></div>
+        <pre class="log"><span class="ok">✓</span> guardrail.lock_deploys(scope="checkout", region="eu-west-1")
+<span class="ok">✓</span> correlate.deploy(version="payment-adapter@42.7", window="20m")
+<span class="warn">!</span> require_approval(role="release-captain", action="rollback")
+<span class="ok">✓</span> prepare.traffic_shift(target="stable", percent=35)
+<span class="bad">×</span> blocked: customer-impact note missing for enterprise tier
+<span class="warn">→</span> waiting for incident commander decision</pre>
+      </div>
+
+      <div class="review-card">
+        <h2>Commander review</h2>
+        <p class="caption">把自动化建议转成可审计决策，避免在高压场景里只靠口头同步。</p>
+        <div class="checklist">
+          <div class="mini-row"><span>Customer impact</span><strong>EU checkout, 12.4k sessions</strong></div>
+          <div class="mini-row"><span>Rollback window</span><strong>7 minutes</strong></div>
+          <div class="mini-row"><span>Data migration risk</span><strong>None detected</strong></div>
+        </div>
+        <label class="eyebrow" for="decision-note">Decision note</label>
+        <textarea id="decision-note">Approve rollback for payment-adapter v42.7 after enterprise impact note is attached. Keep receipt worker enabled.</textarea>
+        <div class="footer-actions">
+          <span>Audit trail will attach metrics, runbook and approver list.</span>
+          <button class="button primary" type="button">Approve action</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

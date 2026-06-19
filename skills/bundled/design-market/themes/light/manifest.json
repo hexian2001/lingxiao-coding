@@ -1,0 +1,29 @@
+{
+  "id": "light",
+  "name": "Brief Handoff",
+  "title": "明亮办公协作交接站",
+  "description": "为跨职能办公团队设计的明亮协作交接网站：以 Pearl Workspace 的白色表面、低噪声边界、青灰主强调和温金提示构建 brief、审批、日程、交付风险的完整业务界面。",
+  "version": "1.0.0",
+  "category": "business-product",
+  "tags": [
+    "light",
+    "brief-handoff",
+    "office-collaboration",
+    "workspace",
+    "handoff",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#ffffff",
+    "canvas": "#f7f9f4",
+    "surfaceMuted": "#eef3ec",
+    "ink": "#172025",
+    "text": "#293337",
+    "muted": "#667174",
+    "accent": "#526f7b",
+    "accentWarm": "#a77720",
+    "line": "rgba(91, 104, 111, 0.22)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

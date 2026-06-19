@@ -1,0 +1,622 @@
+[
+  {
+    "id": "signature-editorial-hero",
+    "name": "Index Magazine 首屏",
+    "category": "hero",
+    "themes": [
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "editorial",
+      "出版级产品叙事"
+    ],
+    "description": "Index Magazine 的首屏素材，服务于出版级产品叙事，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Index Magazine 首屏\n定位: 出版级产品叙事，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbfaf7，主强调 #b03d2d，辅助强调 #151515。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-editorial-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(21,21,21,0.22);\n  border-radius: 4px;\n  background: linear-gradient(145deg, #fbfaf7, #151515);\n  color: #151515;\n  box-shadow: 0 28px 64px rgba(21,21,21,0.14);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-editorial-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(21,21,21,0.08) 1px, transparent 1px); background-size: 84px 100%; opacity: 0.78; pointer-events: none; }\n.sig-editorial-hero > * { position: relative; z-index: 1; }\n.sig-editorial-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-editorial-hero .kicker { width: fit-content; border: 1px solid rgba(21,21,21,0.22); border-radius: 999px; padding: 6px 10px; color: #b03d2d; background: #151515; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-editorial-hero h1 { margin: 0; max-width: 620px; font-family: Georgia, Times New Roman, serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-editorial-hero p { margin: 0; max-width: 560px; color: #6f6b63; font-size: 15px; line-height: 1.78; }\n.sig-editorial-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-editorial-hero button { height: 40px; padding: 0 16px; border-radius: calc(4px / 2 + 4px); border: 1px solid rgba(21,21,21,0.22); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-editorial-hero .primary { background: #b03d2d; color: #fbfaf7; border-color: #b03d2d; }\n.sig-editorial-hero .secondary { background: transparent; color: #151515; }\n.sig-editorial-hero button:hover { transform: translateY(-1px); border-color: #b03d2d; }\n.sig-editorial-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(21,21,21,0.22); border-radius: calc(4px - 2px); background: #151515; backdrop-filter: blur(18px) saturate(140%); }\n.sig-editorial-hero .artifact h2 { margin: 0; font-size: 13px; color: #b03d2d; text-transform: uppercase; letter-spacing: 0; }\n.sig-editorial-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-editorial-hero .metric { padding: 14px; border: 1px solid rgba(21,21,21,0.22); border-radius: calc(4px - 4px); background: color-mix(in srgb, #fbfaf7 76%, transparent); }\n.sig-editorial-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-editorial-hero .metric span { display: block; margin-top: 6px; color: #6f6b63; font-size: 11px; }\n.sig-editorial-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #b03d2d, #151515); }\n@media (max-width: 780px) { .sig-editorial-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-editorial-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">出版级产品叙事</div>\n    <h1>Turn product facts into a readable issue.</h1>\n    <p>A magazine-grade interface for launches, reports, research indexes, and cultural products.</p>\n    <div class=\"actions\"><button class=\"primary\">Read issue</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>INDEX 26 / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>12</strong><span>features</span></div>\n      <div class=\"metric\"><strong>04</strong><span>essays</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Index Magazine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-editorial-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 420,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-editorial-card",
+    "name": "Index Magazine 洞察卡片",
+    "category": "card",
+    "themes": [
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "editorial",
+      "出版级产品叙事"
+    ],
+    "description": "Index Magazine 的洞察卡片素材，服务于出版级产品叙事，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Index Magazine 洞察卡片\n定位: 出版级产品叙事，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbfaf7，主强调 #b03d2d，辅助强调 #151515。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-editorial-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(21,21,21,0.22); border-radius: 4px; background: #fbfaf7; color: #151515; box-shadow: 0 28px 64px rgba(21,21,21,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-editorial-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-editorial-card .label { color: #b03d2d; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-editorial-card .pill { border: 1px solid rgba(21,21,21,0.22); border-radius: 999px; padding: 5px 9px; color: #6f6b63; background: #151515; font-size: 11px; }\n.sig-editorial-card h3 { margin: 0 0 10px; font-family: Georgia, Times New Roman, serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-editorial-card p { margin: 0; color: #6f6b63; font-size: 13px; line-height: 1.7; }\n.sig-editorial-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(21,21,21,0.22); }\n.sig-editorial-card .strip strong { font-variant-numeric: tabular-nums; color: #151515; }\n.sig-editorial-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(4px - 4px); background: #b03d2d; color: #fbfaf7; font-weight: 900; }",
+    "html": "<article class=\"sig-editorial-card\">\n  <div class=\"top\"><div><div class=\"label\">INDEX 26</div><h3>12</h3></div><span class=\"pill\">features</span></div>\n  <p>A magazine-grade interface for launches, reports, research indexes, and cultural products.</p>\n  <div class=\"strip\"><span>essays</span><strong>04</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Index Magazine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-editorial-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-editorial-nav",
+    "name": "Index Magazine 导航",
+    "category": "navigation",
+    "themes": [
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "editorial",
+      "出版级产品叙事"
+    ],
+    "description": "Index Magazine 的导航素材，服务于出版级产品叙事，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Index Magazine 导航\n定位: 出版级产品叙事，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbfaf7，主强调 #b03d2d，辅助强调 #151515。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-editorial-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(21,21,21,0.22); border-radius: 4px; background: #fbfaf7; color: #151515; box-shadow: 0 28px 64px rgba(21,21,21,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-editorial-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Georgia, Times New Roman, serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-editorial-nav .mark { width: 30px; height: 30px; border-radius: calc(4px - 4px); background: linear-gradient(135deg, #b03d2d, #151515); box-shadow: inset 0 0 0 1px rgba(21,21,21,0.22); }\n.sig-editorial-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-editorial-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(4px - 6px); color: #6f6b63; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-editorial-nav a:hover, .sig-editorial-nav a.active { color: #151515; background: #151515; }\n.sig-editorial-nav button { height: 34px; padding: 0 13px; border-radius: calc(4px - 6px); border: 1px solid #b03d2d; background: #b03d2d; color: #fbfaf7; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-editorial-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-editorial-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>INDEX 26</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Features</a><a href=\"#\">Notes</a><a href=\"#\">Objects</a><a href=\"#\">Credits</a></div>\n  <button>Read issue</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Index Magazine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-editorial-hero",
+      "signature-editorial-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-editorial-form",
+    "name": "Index Magazine 表单",
+    "category": "form",
+    "themes": [
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "editorial",
+      "出版级产品叙事"
+    ],
+    "description": "Index Magazine 的表单素材，服务于出版级产品叙事，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Index Magazine 表单\n定位: 出版级产品叙事，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbfaf7，主强调 #b03d2d，辅助强调 #151515。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-editorial-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(21,21,21,0.22); border-radius: 4px; background: #fbfaf7; color: #151515; box-shadow: 0 28px 64px rgba(21,21,21,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-editorial-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #151515; }\n.sig-editorial-form small { color: #6f6b63; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-editorial-form .row { display: flex; gap: 10px; }\n.sig-editorial-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(4px - 6px); border: 1px solid rgba(21,21,21,0.22); background: #151515; color: #151515; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-editorial-form input:focus { border-color: #b03d2d; box-shadow: 0 0 0 3px color-mix(in srgb, #b03d2d 18%, transparent); }\n.sig-editorial-form button { height: 42px; padding: 0 14px; border-radius: calc(4px - 6px); border: 1px solid #b03d2d; background: #b03d2d; color: #fbfaf7; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-editorial-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-editorial-form\">\n  <label>Issue title<small>Editorial UI needs hierarchy, captions, and rhythm more than decoration.</small></label>\n  <div class=\"row\"><input value=\"systems of attention\" aria-label=\"Issue title\" /><button type=\"button\">Read issue</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Index Magazine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-editorial-hero",
+      "signature-editorial-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-editorial-table",
+    "name": "Index Magazine 数据表",
+    "category": "table",
+    "themes": [
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "editorial",
+      "出版级产品叙事"
+    ],
+    "description": "Index Magazine 的数据表素材，服务于出版级产品叙事，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Index Magazine 数据表\n定位: 出版级产品叙事，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbfaf7，主强调 #b03d2d，辅助强调 #151515。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-editorial-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(21,21,21,0.22); border-radius: 4px; background: #fbfaf7; color: #151515; box-shadow: 0 28px 64px rgba(21,21,21,0.14); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-editorial-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-editorial-table th, .sig-editorial-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(21,21,21,0.22); }\n.sig-editorial-table th { color: #6f6b63; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #151515; }\n.sig-editorial-table td { color: #151515; }\n.sig-editorial-table tr:last-child td { border-bottom: 0; }\n.sig-editorial-table tbody tr:hover td { background: #151515; }\n.sig-editorial-table .mono { font-variant-numeric: tabular-nums; }\n.sig-editorial-table .status { display: inline-flex; align-items: center; gap: 6px; color: #b03d2d; font-weight: 800; }\n.sig-editorial-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #b03d2d; }",
+    "html": "<div class=\"sig-editorial-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Feature</td><td><span class=\"status\">Lead</span></td><td class=\"mono\">12</td></tr><tr><td>Essay</td><td><span class=\"status\">Edited</span></td><td class=\"mono\">04</td></tr><tr><td>Credits</td><td><span class=\"status\">Set</span></td><td class=\"mono\">31</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Index Magazine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-editorial-hero",
+      "signature-editorial-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 320,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "btn-ink-spread",
+    "name": "Ink Spread",
+    "category": "button",
+    "themes": [
+      "dark",
+      "editorial"
+    ],
+    "tags": [
+      "editorial",
+      "hover-effect",
+      "ink",
+      "creative",
+      "bold"
+    ],
+    "stylePrompt": "高级设计指令: Ink Spread\n定位: Ink Spread 是一款 dark / editorial 按钮素材，适合 editorial、hover-effect、ink、creative 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Ink Spread — 墨水扩散按钮。透明底+白色文字，hover时从中心扩散出一个纯黑圆形背景(用 radial-gradient + background-size 从0%到300%动画)。字体 'Instrument Serif' italic 或 Playfair Display italic，18px，优雅感。气质: 高端杂志、Kinfolk。",
+    "css": ".btn-ink-spread {\n  position: relative;\n  padding: 14px 32px;\n  background: radial-gradient(circle, #000 0%, #000 50%, transparent 50.1%);\n  background-size: 0% 0%;\n  background-position: center;\n  background-repeat: no-repeat;\n  color: #fff;\n  font-family: 'Playfair Display', serif;\n  font-size: 17px;\n  font-style: italic;\n  font-weight: 400;\n  border: none;\n  border-bottom: 1px solid rgba(255,255,255,0.3);\n  border-radius: 0;\n  cursor: pointer;\n  transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s;\n}\n.btn-ink-spread:hover {\n  background-size: 300% 300%;\n  color: #fff;\n  border-bottom-color: transparent;\n}\n.btn-ink-spread:active {\n  background-size: 280% 280%;\n}",
+    "html": "<button class=\"btn-ink-spread\">Read Article</button>",
+    "description": "Ink Spread 是一款 dark / editorial 按钮素材，适合 editorial、hover-effect、ink、creative 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "fx-text-reveal-clip",
+    "name": "Text Clip Reveal",
+    "category": "effect",
+    "themes": [
+      "dark",
+      "editorial",
+      "minimal"
+    ],
+    "tags": [
+      "text",
+      "reveal",
+      "clip",
+      "entrance",
+      "scroll",
+      "editorial"
+    ],
+    "stylePrompt": "高级设计指令: Text Clip Reveal\n定位: Text Clip Reveal 是一款 dark / editorial / minimal 特效素材，适合 text、reveal、clip、entrance 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Text Clip Reveal — 文字裁切入场。每行文字被一个 overflow:hidden 容器裁切, 初始 translateY(100%)(完全藏在容器下方), 入场时 translateY(0)。逐行 stagger(每行 delay +0.1s)。纯几何动画——不是 opacity 渐变, 是物理位移。字体: 大号衬线(Playfair 48px+)。气质: 高端地产广告、LVMH。",
+    "css": ".fx-text-reveal .line {\n  overflow: hidden;\n  display: block;\n}\n.fx-text-reveal .line span {\n  display: block;\n  transform: translateY(110%);\n  animation: clip-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;\n}\n.fx-text-reveal .line:nth-child(1) span { animation-delay: 0s; }\n.fx-text-reveal .line:nth-child(2) span { animation-delay: 0.1s; }\n.fx-text-reveal .line:nth-child(3) span { animation-delay: 0.2s; }\n@keyframes clip-up {\n  to { transform: translateY(0); }\n}",
+    "html": "<h1 class=\"fx-text-reveal\" style=\"font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:#fafafa;line-height:1.2\">\n  <span class=\"line\"><span>Design is not</span></span>\n  <span class=\"line\"><span>what it looks like.</span></span>\n  <span class=\"line\"><span>It's how it works.</span></span>\n</h1>",
+    "description": "Text Clip Reveal 是一款 dark / editorial / minimal 特效素材，适合 text、reveal、clip、entrance 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "nav-tabs-underline-animated",
+    "name": "Animated Underline Tabs",
+    "category": "navigation",
+    "themes": [
+      "dark",
+      "minimal",
+      "editorial"
+    ],
+    "tags": [
+      "tabs",
+      "underline",
+      "animated",
+      "indicator",
+      "clean",
+      "editorial"
+    ],
+    "stylePrompt": "高级设计指令: Animated Underline Tabs\n定位: Animated Underline Tabs 是一款 dark / minimal / editorial 导航素材，适合 tabs、underline、animated、indicator 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Animated Underline Tabs。灵感: Stripe dashboard tabs。items 水平排列, 底部2px指示线跟随active项滑动(用 translateX + width transition)。inactive 项 #71717a, active 项 #fafafa。底部统一 0.5px border #1a1a1a。字体 Inter 13px 500。气质: 专业SaaS后台。",
+    "css": ".nav-tabs-anim {\n  display: flex;\n  gap: 24px;\n  border-bottom: 0.5px solid #1a1a1a;\n  position: relative;\n}\n.nav-tabs-anim a {\n  padding: 10px 0;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  font-weight: 500;\n  color: #71717a;\n  text-decoration: none;\n  transition: color 0.15s;\n  position: relative;\n}\n.nav-tabs-anim a:hover { color: #a1a1aa; }\n.nav-tabs-anim a.active { color: #fafafa; }\n.nav-tabs-anim a.active::after {\n  content: '';\n  position: absolute;\n  bottom: -0.5px;\n  left: 0;\n  right: 0;\n  height: 2px;\n  background: #fafafa;\n  border-radius: 1px 1px 0 0;\n}",
+    "html": "<nav class=\"nav-tabs-anim\">\n  <a href=\"#\" class=\"active\">Overview</a>\n  <a href=\"#\">Activity</a>\n  <a href=\"#\">Settings</a>\n  <a href=\"#\">Members</a>\n</nav>",
+    "description": "Animated Underline Tabs 是一款 dark / minimal / editorial 导航素材，适合 tabs、underline、animated、indicator 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "layout-split-asymmetric",
+    "name": "Asymmetric Split",
+    "category": "layout",
+    "themes": [
+      "editorial",
+      "dark",
+      "light"
+    ],
+    "tags": [
+      "split",
+      "asymmetric",
+      "golden-ratio",
+      "editorial",
+      "feature"
+    ],
+    "stylePrompt": "高级设计指令: Asymmetric Split\n定位: Asymmetric Split 是一款 editorial / dark / light 布局素材，适合 split、asymmetric、golden-ratio、editorial 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Asymmetric Split — 黄金比例分割布局。不是50/50——是 38:62 (接近黄金分割)。左窄栏放标题/标签, 右宽栏放正文/图片。两栏间用极细竖线(0.5px #27272a)分隔而非gap。上下 padding 80px。气质: 建筑事务所网站、高端 portfolio。",
+    "css": ".layout-asym-split {\n  display: grid;\n  grid-template-columns: 38fr 62fr;\n  min-height: 80vh;\n  border-top: 0.5px solid #27272a;\n}\n.layout-asym-split .left {\n  padding: 80px 40px 80px 48px;\n  border-right: 0.5px solid #27272a;\n}\n.layout-asym-split .right {\n  padding: 80px 48px 80px 40px;\n}\n@media (max-width: 768px) {\n  .layout-asym-split { grid-template-columns: 1fr; }\n  .layout-asym-split .left { border-right: none; border-bottom: 0.5px solid #27272a; padding: 40px 24px; }\n  .layout-asym-split .right { padding: 40px 24px; }\n}",
+    "html": "<section class=\"layout-asym-split\">\n  <div class=\"left\">\n    <span style=\"font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#52525b\">Chapter 01</span>\n    <h2 style=\"font-family:'Playfair Display',serif;font-size:32px;color:#fafafa;margin:12px 0 0;line-height:1.2\">The Art of<br>Negative Space</h2>\n  </div>\n  <div class=\"right\">\n    <p style=\"font-size:16px;color:#a1a1aa;line-height:1.9;font-family:Inter,system-ui\">Emptiness is not absence. It is the deliberate creation of breathing room—the silent partner to every element on the page.</p>\n  </div>\n</section>",
+    "description": "Asymmetric Split 是一款 editorial / dark / light 布局素材，适合 split、asymmetric、golden-ratio、editorial 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 340,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "card-editorial-feature",
+    "name": "Editorial Feature",
+    "category": "card",
+    "themes": [
+      "editorial",
+      "light"
+    ],
+    "tags": [
+      "editorial",
+      "magazine",
+      "serif",
+      "image",
+      "luxury"
+    ],
+    "stylePrompt": "高级设计指令: Editorial Feature\n定位: Editorial Feature 是一款 editorial / light 卡片素材，适合 editorial、magazine、serif、image 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Editorial Feature — 杂志特写卡片。灵感: Monocle/KINFOLK。上方大图(aspect-ratio:3/2, 无圆角——杂志不做圆角)，下方: 极小的category标签(全大写10px tracking 0.1em 灰色), 标题用衬线(Playfair Display 22px 700), 摘要用无衬线(14px #666 line-height:1.8)。整体零圆角、零阴影、靠排版和留白说话。宽度 340px。",
+    "css": ".card-editorial {\n  width: 340px;\n}\n.card-editorial .image {\n  aspect-ratio: 3/2;\n  background: #e8e4e0;\n  margin-bottom: 20px;\n}\n.card-editorial .category {\n  font-family: 'Inter', sans-serif;\n  font-size: 10px;\n  font-weight: 600;\n  letter-spacing: 0.1em;\n  text-transform: uppercase;\n  color: #a1a1aa;\n  margin-bottom: 10px;\n}\n.card-editorial h3 {\n  font-family: 'Playfair Display', serif;\n  font-size: 22px;\n  font-weight: 700;\n  color: #18181b;\n  line-height: 1.3;\n  margin: 0 0 12px;\n}\n.card-editorial p {\n  font-family: 'Inter', sans-serif;\n  font-size: 14px;\n  color: #71717a;\n  line-height: 1.8;\n  margin: 0;\n}",
+    "html": "<article class=\"card-editorial\">\n  <div class=\"image\"></div>\n  <div class=\"category\">Architecture</div>\n  <h3>The Quiet Power of Restraint</h3>\n  <p>Why the best designs are the ones you barely notice—until they're gone.</p>\n</article>",
+    "description": "Editorial Feature 是一款 editorial / light 卡片素材，适合 editorial、magazine、serif、image 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "edit-pullquote",
+    "name": "Pull Quote",
+    "category": "typography",
+    "tags": [
+      "editorial",
+      "quote",
+      "serif",
+      "large",
+      "magazine"
+    ],
+    "description": "Pull Quote 是一款 editorial 排版素材，适合 editorial、quote、serif、large 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Pull Quote\n定位: Pull quote with left border\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Pull Quote。Playfair Display 28px italic。左侧3px竖线#1c1917。padding-left 24px。line-height 1.5。",
+    "css": ".edit-pullquote { font-family:'Playfair Display',serif; font-size:28px; font-style:italic; color:#1c1917; line-height:1.5; border-left:3px solid #1c1917; padding-left:24px; margin:40px 0; max-width:560px; }",
+    "html": "<blockquote class=\"edit-pullquote\">Good design is as little design as possible.</blockquote>",
+    "themes": [
+      "editorial"
+    ],
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "edit-dropcap",
+    "name": "Drop Cap",
+    "category": "typography",
+    "tags": [
+      "editorial",
+      "dropcap",
+      "initial",
+      "serif",
+      "article"
+    ],
+    "description": "Drop Cap 是一款 editorial 排版素材，适合 editorial、dropcap、initial、serif 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Drop Cap\n定位: First letter drop cap\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Drop Cap。首字母 float:left, 72px Playfair Display 700。正文 Inter 16px/1.9。",
+    "css": ".edit-dropcap::first-letter { float:left; font-family:'Playfair Display',serif; font-size:72px; font-weight:700; line-height:0.8; margin-right:8px; color:#1c1917; } .edit-dropcap { font-family:Inter,system-ui; font-size:16px; line-height:1.9; color:#44403c; }",
+    "html": "<p class=\"edit-dropcap\">Typography is the craft of endowing human language with a durable visual form, refined across centuries of practice.</p>",
+    "themes": [
+      "editorial"
+    ],
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "edit-section-num",
+    "name": "Section Number",
+    "category": "navigation",
+    "tags": [
+      "editorial",
+      "section",
+      "number",
+      "chapter"
+    ],
+    "description": "Section Number 是一款 editorial 导航素材，适合 editorial、section、number、chapter 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Section Number\n定位: Chapter section number marker\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Section Number。大号数字48px Inter 200 #e5e5e5 + 小标题11px uppercase #71717a。垂直居中。",
+    "css": ".edit-section-num { text-align:center; } .edit-section-num .num { font-family:Inter,system-ui; font-size:48px; font-weight:200; color:#e5e5e5; line-height:1; margin-bottom:8px; } .edit-section-num .label { font-family:Inter,system-ui; font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#71717a; }",
+    "html": "<div class=\"edit-section-num\"><div class=\"num\">03</div><div class=\"label\">Process</div></div>",
+    "themes": [
+      "editorial"
+    ],
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "edit-hero-longform",
+    "name": "Longform Hero",
+    "category": "hero",
+    "tags": [
+      "editorial",
+      "longform",
+      "centered",
+      "serif"
+    ],
+    "description": "Long-form article hero with metadata",
+    "stylePrompt": "高级设计指令: Longform Hero\n定位: Long-form article hero with metadata\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Longform Hero。居中: category(11px uppercase) → 标题(Playfair 40px) → subtitle(16px) → author。暖白底#faf8f5。",
+    "css": ".edit-hero-long { min-height:60vh; display:flex; align-items:center; justify-content:center; background:#faf8f5; padding:80px 24px; text-align:center; } .edit-hero-long .inner { max-width:640px; } .edit-hero-long .cat { font-family:Inter,system-ui; font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#a1a1aa; margin-bottom:16px; } .edit-hero-long h1 { font-family:'Playfair Display',serif; font-size:40px; font-weight:700; color:#1c1917; line-height:1.2; margin:0 0 16px; } .edit-hero-long .sub { font-family:Inter,system-ui; font-size:16px; color:#71717a; line-height:1.6; margin:0 0 20px; } .edit-hero-long .author { font-size:13px; color:#a1a1aa; }",
+    "html": "<section class=\"edit-hero-long\"><div class=\"inner\"><div class=\"cat\">Design</div><h1>The Invisible Architecture</h1><div class=\"sub\">How the best interfaces disappear.</div><div class=\"author\">By Sarah Mitchell</div></div></section>",
+    "themes": [
+      "editorial"
+    ],
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 340,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "edit-caption",
+    "name": "Figure Caption",
+    "category": "typography",
+    "tags": [
+      "editorial",
+      "caption",
+      "small",
+      "figure"
+    ],
+    "description": "Figure Caption 是一款 editorial 排版素材，适合 editorial、caption、small、figure 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Figure Caption\n定位: Image caption with em-dash\n审美系统: Index Magazine / publication-grade product storytelling。使用 #b03d2d 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Figure Caption。Inter 12px italic #71717a。前置 em-dash。margin-top 8px。",
+    "css": ".edit-caption { font-family:Inter,system-ui; font-size:12px; font-style:italic; color:#71717a; margin-top:8px; } .edit-caption::before { content:\"\\2014 \"; }",
+    "html": "<figcaption class=\"edit-caption\">Fondazione Prada, Milan. Photo by Bas Princen.</figcaption>",
+    "themes": [
+      "editorial"
+    ],
+    "designNotes": "此素材已按 Index Magazine 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #fbfaf7 0%, #ddd8ce 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

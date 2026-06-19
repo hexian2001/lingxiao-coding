@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>玄门秘境档案系统</title>
+  <style>
+    :root {
+      --bg: #0b1211;
+      --surface: rgba(16, 29, 25, 0.88);
+      --surface-2: rgba(24, 43, 36, 0.72);
+      --surface-3: rgba(218, 191, 124, 0.08);
+      --gold: #dabf7c;
+      --jade: #8fc7aa;
+      --ink: #f3ead2;
+      --muted: #b7c3aa;
+      --line: rgba(218, 191, 124, 0.28);
+      --danger: #d98a73;
+      --shadow: 0 34px 90px rgba(3, 8, 7, 0.46);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(143, 199, 170, 0.18), transparent 30%),
+        radial-gradient(circle at 78% 0%, rgba(218, 191, 124, 0.22), transparent 34%),
+        linear-gradient(145deg, #09100f 0%, #14251f 50%, #0d1414 100%);
+      font-family: Inter, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(rgba(218, 191, 124, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(218, 191, 124, 0.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 10%, #000 0%, transparent 70%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button, a, input, select { outline-offset: 3px; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--jade); }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 42px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(16, 29, 25, 0.82);
+      box-shadow: 0 18px 48px rgba(3, 8, 7, 0.32);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: max-content;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .seal {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(218, 191, 124, 0.45);
+      border-radius: 11px;
+      color: #101d19;
+      background: linear-gradient(135deg, var(--gold), var(--jade));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .nav a:hover, .nav a.active {
+      color: var(--ink);
+      background: var(--surface-3);
+    }
+
+    .top-action {
+      min-width: max-content;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: #101d19;
+      background: var(--gold);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 22px;
+      margin-top: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(145deg, var(--surface), rgba(218, 191, 124, 0.09));
+      box-shadow: var(--shadow);
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 80% 0%, rgba(218, 191, 124, 0.16), transparent 36%);
+    }
+
+    .intro {
+      min-height: 440px;
+      display: grid;
+      align-content: center;
+      padding: clamp(28px, 5vw, 54px);
+    }
+
+    .kicker {
+      width: fit-content;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--gold);
+      background: var(--surface-3);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 650px;
+      margin-bottom: 18px;
+      font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      max-width: 580px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.82;
+    }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 15px;
+      color: var(--ink);
+      background: rgba(16, 29, 25, 0.62);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: var(--gold); }
+    .btn.primary { color: #101d19; border-color: var(--gold); background: var(--gold); font-weight: 900; }
+    .btn:active { transform: translateY(0); }
+
+    .brief {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .brief-head, .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .eyebrow {
+      margin-bottom: 5px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h2 { margin-bottom: 0; font-family: "Noto Serif SC", "Songti SC", Georgia, serif; font-size: 24px; }
+    h3 { margin-bottom: 6px; font-family: "Noto Serif SC", "Songti SC", Georgia, serif; font-size: 18px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 9px;
+      color: var(--muted);
+      background: rgba(218, 191, 124, 0.08);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--jade);
+      box-shadow: 0 0 14px rgba(143, 199, 170, 0.7);
+    }
+
+    .oracle {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-height: 104px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(7, 14, 13, 0.38);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 30px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric span { color: var(--muted); font-size: 13px; }
+    .metric.jade strong { color: var(--jade); }
+    .metric.gold strong { color: var(--gold); }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(218, 191, 124, 0.06);
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); }
+    .time { font-variant-numeric: tabular-nums; color: var(--ink); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .card { padding: 20px; }
+    .muted { color: var(--muted); }
+
+    .filter {
+      display: grid;
+      gap: 13px;
+      margin-top: 18px;
+    }
+
+    label { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 800; }
+
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: rgba(7, 14, 13, 0.45);
+    }
+
+    .team-list { display: grid; gap: 10px; margin-top: 18px; }
+
+    .disciple {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid rgba(218, 191, 124, 0.18);
+      border-radius: 14px;
+      background: rgba(7, 14, 13, 0.28);
+    }
+
+    .disciple b { display: block; margin-bottom: 3px; }
+    .disciple span { color: var(--muted); font-size: 12px; }
+    .score { color: var(--gold); font-weight: 900; font-variant-numeric: tabular-nums; }
+
+    .archive { padding: 20px; }
+
+    .table-wrap { overflow-x: auto; margin-top: 18px; }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 13px; }
+    th, td { padding: 13px 12px; border-bottom: 1px solid rgba(218, 191, 124, 0.18); text-align: left; }
+    th { color: var(--muted); background: rgba(218, 191, 124, 0.06); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+    tbody tr { transition: background 140ms ease; }
+    tbody tr:hover { background: rgba(218, 191, 124, 0.07); }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .status { display: inline-flex; align-items: center; gap: 7px; color: var(--jade); font-weight: 800; }
+    .status.warn { color: var(--gold); }
+    .status.risk { color: var(--danger); }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    .lower {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .notice {
+      padding: 18px;
+      border: 1px solid rgba(218, 191, 124, 0.22);
+      border-radius: var(--radius);
+      background: rgba(7, 14, 13, 0.32);
+    }
+
+    .notice p { margin-bottom: 0; color: var(--muted); font-size: 13px; }
+    .notice .tag { color: var(--gold); font-size: 12px; font-weight: 900; }
+
+    @media (max-width: 920px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .intro { min-height: 360px; }
+      .lower { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 22px, 1180px); padding-top: 12px; }
+      .topbar { position: static; align-items: stretch; flex-direction: column; }
+      .nav { padding-bottom: 2px; }
+      .top-action { width: 100%; }
+      .oracle { grid-template-columns: 1fr; }
+      .brief-head, .section-head { flex-direction: column; }
+      h1 { font-size: clamp(36px, 14vw, 52px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar" aria-label="玄门秘境档案导航">
+      <a class="brand" href="#"><span class="seal">玄</span><span>玄门秘境档案</span></a>
+      <nav class="nav" aria-label="主导航">
+        <a class="active" href="#missions">宗门任务</a>
+        <a href="#archive">秘境卷宗</a>
+        <a href="#teams">队伍资质</a>
+        <a href="#risk">灵脉巡检</a>
+      </nav>
+      <button class="top-action" type="button">开启今日勘界</button>
+    </header>
+
+    <section class="hero">
+      <div class="panel intro">
+        <div class="kicker">CELESTIAL OPERATIONS / 甲辰年秋巡</div>
+        <h1>把宗门任务、秘境窗口与封印风险收束成一卷可执行档案。</h1>
+        <p class="lead">执事堂今日需要确认 12 支小队的入境资格、3 处秘境的灵脉波动，以及「青冥玉台」封印松动后的复核路径。系统优先展示可行动事项，而不是玄幻装饰堆叠。</p>
+        <div class="hero-actions">
+          <button class="btn primary" type="button">查看待派任务</button>
+          <button class="btn" type="button">核验秘境状态</button>
+        </div>
+      </div>
+
+      <aside class="panel brief" aria-label="今日宗门简报">
+        <div class="brief-head">
+          <div>
+            <div class="eyebrow">LIVE BRIEF</div>
+            <h2>执事堂简报</h2>
+          </div>
+          <span class="pill">灵脉可控</span>
+        </div>
+        <div class="oracle">
+          <div class="metric gold"><strong>12</strong><span>待编组任务</span></div>
+          <div class="metric jade"><strong>86%</strong><span>主峰灵压稳定</span></div>
+          <div class="metric"><strong>03</strong><span>秘境开放窗口</span></div>
+          <div class="metric"><strong>27</strong><span>卷宗待复核</span></div>
+        </div>
+        <div class="timeline">
+          <div class="step"><span class="dot"></span><span>青冥玉台二次勘界</span><span class="time">辰时三刻</span></div>
+          <div class="step"><span class="dot"></span><span>外门队伍资质复验</span><span class="time">巳时初</span></div>
+          <div class="step"><span class="dot"></span><span>剑冢封印读数归档</span><span class="time">午时二刻</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid" id="missions">
+      <aside class="panel card" id="teams">
+        <div class="eyebrow">MISSION FILTER</div>
+        <h2>任务筛选</h2>
+        <p class="muted">按秘境风险、队伍资质与开放窗口筛出今日可执行卷宗。</p>
+        <form class="filter">
+          <label>秘境名称<input value="青冥玉台" aria-label="秘境名称" /></label>
+          <label>风险等级<select aria-label="风险等级"><option>乙级：需执事复核</option><option>甲级：长老会审批</option><option>丙级：小队自领</option></select></label>
+          <button class="btn primary" type="button">生成派遣建议</button>
+        </form>
+        <div class="team-list">
+          <div class="disciple"><div><b>听雪小队</b><span>剑修 2 / 丹修 1 / 阵修 1</span></div><span class="score">92</span></div>
+          <div class="disciple"><div><b>归岚小队</b><span>筑基后期，缺少阵眼校验</span></div><span class="score">78</span></div>
+          <div class="disciple"><div><b>明烛小队</b><span>适合低灵压采样任务</span></div><span class="score">84</span></div>
+        </div>
+      </aside>
+
+      <section class="panel archive" id="archive">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">REALM ARCHIVE</div>
+            <h2>秘境卷宗队列</h2>
+          </div>
+          <span class="pill">每 15 分钟校验一次</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>卷宗</th><th>入口窗口</th><th>负责堂口</th><th>状态</th><th class="num">灵压</th><th class="num">待办</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>青冥玉台</td><td>辰时三刻 - 巳时末</td><td>执事堂 / 阵法院</td><td><span class="status warn">待复核</span></td><td class="num">72</td><td class="num">5</td></tr>
+              <tr><td>沉星剑冢</td><td>午时二刻 - 申时初</td><td>剑阁</td><td><span class="status">可进入</span></td><td class="num">88</td><td class="num">2</td></tr>
+              <tr><td>雾海丹窟</td><td>酉时初 - 戌时正</td><td>丹房</td><td><span class="status">采样中</span></td><td class="num">81</td><td class="num">4</td></tr>
+              <tr><td>玄烬古井</td><td>暂缓开放</td><td>戒律堂</td><td><span class="status risk">封印扰动</span></td><td class="num">43</td><td class="num">9</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="lower" id="risk" aria-label="风险与行动摘要">
+      <article class="notice">
+        <div class="tag">封印风险</div>
+        <h3>玄烬古井需暂停派遣</h3>
+        <p>近三次读数出现逆向波纹，建议先由阵法院完成外环镇石复测，再开放队伍申请。</p>
+      </article>
+      <article class="notice">
+        <div class="tag">资源缺口</div>
+        <h3>阵修排班不足</h3>
+        <p>今日高风险任务至少需要 6 名阵修，当前可用 4 名，应降低并发入境数量。</p>
+      </article>
+      <article class="notice">
+        <div class="tag">卷宗治理</div>
+        <h3>27 份记录待归档</h3>
+        <p>优先补全入口时刻、灵压读数与撤离路径字段，避免下次勘界缺少依据。</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

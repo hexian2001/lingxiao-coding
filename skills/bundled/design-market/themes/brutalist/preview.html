@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Museum Archive Catalogue</title>
+  <style>
+    :root {
+      --paper: #f8f1cf;
+      --paper-muted: #ece3bd;
+      --ink: #111111;
+      --muted: #4c4636;
+      --accent: #e03b2f;
+      --accent-dark: #9f241d;
+      --white: #fff7d6;
+      --shadow: 10px 10px 0 rgba(0, 0, 0, 0.94);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(17, 17, 17, 0.07) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(17, 17, 17, 0.07) 1px, transparent 1px),
+        linear-gradient(135deg, var(--paper) 0%, var(--paper-muted) 58%, #181818 58%, #181818 100%);
+      background-size: 28px 28px, 28px 28px, auto;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; }
+
+    button, input, select { font: inherit; }
+
+    .site {
+      width: min(100%, 1440px);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: stretch;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .brand, .nav a, .ticket {
+      display: flex;
+      align-items: center;
+      min-height: 58px;
+      padding: 12px 16px;
+      border-right: 2px solid var(--ink);
+      text-decoration: none;
+      font-family: "Arial Black", Arial, Helvetica, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+    }
+
+    .brand span {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+      color: var(--white);
+      background: var(--accent);
+      border: 2px solid var(--ink);
+    }
+
+    .nav {
+      display: flex;
+      overflow-x: auto;
+      border-right: 2px solid var(--ink);
+    }
+
+    .nav a {
+      min-width: max-content;
+      font-size: 13px;
+      font-family: "Courier New", Courier, monospace;
+      letter-spacing: 0;
+    }
+
+    .nav a:hover, .nav a:focus-visible {
+      color: var(--white);
+      background: var(--ink);
+      outline: none;
+    }
+
+    .ticket {
+      border: 0;
+      background: var(--accent);
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .ticket:hover, .ticket:focus-visible {
+      background: var(--accent-dark);
+      outline: 3px solid var(--ink);
+      outline-offset: -6px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+      min-height: 590px;
+      margin-top: 26px;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      display: grid;
+      align-content: space-between;
+      gap: 32px;
+      padding: clamp(24px, 5vw, 58px);
+      border-right: 2px solid var(--ink);
+    }
+
+    .stamp-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .stamp {
+      display: inline-flex;
+      padding: 5px 10px;
+      border: 2px dashed currentColor;
+      color: var(--accent);
+      transform: rotate(-2deg);
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 0;
+      font-family: "Arial Black", Impact, Arial, Helvetica, sans-serif;
+      font-size: clamp(54px, 11vw, 156px);
+      line-height: 0.82;
+      letter-spacing: -0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero-copy p {
+      max-width: 620px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 21px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .action {
+      min-height: 48px;
+      padding: 0 18px;
+      border: 2px solid var(--ink);
+      border-radius: 0;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 5px 5px 0 var(--ink);
+      cursor: pointer;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .action.primary {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .action:hover, .action:focus-visible {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 var(--ink);
+      outline: none;
+    }
+
+    .ticket:active, .action:active, .submit-filter:active {
+      transform: translate(5px, 5px);
+      box-shadow: none;
+    }
+
+    .hero-panel {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .panel-head, .panel-foot {
+      padding: 18px;
+      border-bottom: 2px solid var(--paper);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .panel-foot { border-top: 2px solid var(--paper); border-bottom: 0; }
+
+    .catalogue-number {
+      display: grid;
+      place-items: center;
+      min-height: 280px;
+      border-bottom: 2px solid var(--paper);
+      font-family: "Arial Black", Impact, Arial, Helvetica, sans-serif;
+      font-size: clamp(90px, 18vw, 210px);
+      line-height: 0.8;
+      color: var(--accent);
+      letter-spacing: -0.1em;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 2px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .stat {
+      padding: 20px;
+      border-right: 2px solid var(--ink);
+    }
+
+    .stat:last-child { border-right: 0; }
+
+    .stat strong {
+      display: block;
+      font-family: "Arial Black", Arial, Helvetica, sans-serif;
+      font-size: clamp(30px, 5vw, 64px);
+      line-height: 0.9;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 26px;
+      margin-top: 34px;
+    }
+
+    .rail-card, .content-card {
+      border: 2px solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .rail-card {
+      position: sticky;
+      top: 18px;
+      align-self: start;
+    }
+
+    .rail-title, .card-title {
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--ink);
+      background: var(--ink);
+      color: var(--white);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .index-list { margin: 0; padding: 0; list-style: none; }
+
+    .index-list a {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 2px solid var(--ink);
+      text-decoration: none;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+    }
+
+    .index-list li:last-child a { border-bottom: 0; }
+
+    .index-list a:hover, .index-list a:focus-visible {
+      background: var(--accent);
+      color: var(--white);
+      outline: none;
+    }
+
+    .content-card { overflow: hidden; }
+
+    .exhibition-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .exhibition {
+      min-height: 260px;
+      padding: 18px;
+      border-right: 2px solid var(--ink);
+      display: grid;
+      align-content: space-between;
+      gap: 28px;
+    }
+
+    .exhibition:last-child { border-right: 0; }
+
+    .exhibition.featured {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .meta {
+      color: inherit;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .exhibition h2 {
+      margin: 0;
+      font-family: "Arial Black", Arial, Helvetica, sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 0.92;
+      letter-spacing: -0.06em;
+      text-transform: uppercase;
+    }
+
+    .exhibition p { margin: 0; color: inherit; }
+
+    .archive-table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--ink);
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td:last-child, th:last-child { border-right: 0; }
+
+    tbody tr:hover td { background: #fff0a7; }
+
+    .status {
+      display: inline-flex;
+      padding: 2px 8px;
+      border: 2px solid currentColor;
+      color: var(--accent);
+      font-weight: 900;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .search-panel {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0;
+      border-top: 2px solid var(--ink);
+    }
+
+    .search-panel label {
+      display: grid;
+      gap: 6px;
+      padding: 16px;
+      border-right: 2px solid var(--ink);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 2px solid var(--ink);
+      border-radius: 0;
+      background: var(--white);
+      color: var(--ink);
+      outline-offset: 3px;
+    }
+
+    input:focus, select:focus {
+      outline: 3px solid var(--accent);
+    }
+
+    .submit-filter {
+      min-width: 180px;
+      border: 0;
+      border-left: 2px solid var(--ink);
+      background: var(--ink);
+      color: var(--white);
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .submit-filter:hover, .submit-filter:focus-visible {
+      background: var(--accent);
+      outline: none;
+    }
+
+    .footer {
+      margin-top: 34px;
+      padding: 22px;
+      border: 2px solid var(--paper);
+      background: var(--ink);
+      color: var(--white);
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 980px) {
+      .topbar, .hero, .section-grid, .search-panel { grid-template-columns: 1fr; }
+      .brand, .nav, .nav a, .hero-copy, .search-panel label { border-right: 0; }
+      .brand, .nav { border-bottom: 2px solid var(--ink); }
+      .hero-copy { border-bottom: 2px solid var(--ink); }
+      .rail-card { position: static; }
+      .exhibition-grid { grid-template-columns: 1fr; }
+      .exhibition { border-right: 0; border-bottom: 2px solid var(--ink); }
+      .exhibition:last-child { border-bottom: 0; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { border-right: 0; border-bottom: 2px solid var(--ink); }
+      .stat:last-child { border-bottom: 0; }
+      .submit-filter { min-height: 54px; border-left: 0; border-top: 2px solid var(--ink); }
+    }
+
+    @media (max-width: 560px) {
+      .site { padding: 10px; }
+      .hero-copy { padding: 22px; }
+      .hero-actions { display: grid; }
+      .action { width: 100%; }
+      .catalogue-number { min-height: 190px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="site">
+    <header class="topbar" aria-label="展览目录导航">
+      <a class="brand" href="#top"><span>04</span>Museum Archive</a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#current">01. 当前展览</a>
+        <a href="#archive">02. 馆藏索引</a>
+        <a href="#research">03. 研究预约</a>
+      </nav>
+      <button class="ticket" type="button">Issue Reading Pass</button>
+    </header>
+
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="stamp-row">
+          <span class="stamp">Public File / Open</span>
+          <span>2026 春季展览目录</span>
+        </div>
+        <div>
+          <h1 id="hero-title">Hard Filed Memory</h1>
+          <p>一个为美术馆展览、公共馆藏和研究访问设计的粗野主义档案站。所有视觉边界都对应真实信息：展厅、藏品号、开放状态、借阅条件和研究入口。</p>
+        </div>
+        <div class="hero-actions">
+          <button class="action primary" type="button">查看当前展览</button>
+          <button class="action" type="button">预约档案阅览</button>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="展览实时摘要">
+        <div class="panel-head">Room 04 / Exhibition Dossier</div>
+        <div class="catalogue-number">128</div>
+        <div class="panel-foot">Objects filed · 18 wall texts · 6 conservation alerts</div>
+      </aside>
+    </section>
+
+    <section class="stats" aria-label="档案统计">
+      <div class="stat"><strong>04</strong><span>展厅开放</span></div>
+      <div class="stat"><strong>72%</strong><span>数字化完成</span></div>
+      <div class="stat"><strong>18</strong><span>研究席位剩余</span></div>
+    </section>
+
+    <section class="section-grid" id="current">
+      <aside class="rail-card" aria-label="目录索引">
+        <div class="rail-title">Catalogue Index</div>
+        <ol class="index-list">
+          <li><a href="#current"><span>01</span><span>当前展览与展厅状态</span></a></li>
+          <li><a href="#archive"><span>02</span><span>重点馆藏登记表</span></a></li>
+          <li><a href="#research"><span>03</span><span>研究访问与筛选</span></a></li>
+          <li><a href="#footer"><span>04</span><span>机构出版信息</span></a></li>
+        </ol>
+      </aside>
+
+      <div class="content-card">
+        <div class="card-title">Current Exhibitions / Not a Component Stack</div>
+        <div class="exhibition-grid">
+          <article class="exhibition featured">
+            <div class="meta">Gallery A · Until 2026.09.14</div>
+            <h2>Concrete Poster Memory</h2>
+            <p>战后公共海报、城市公告与展览印刷品的并置档案，强调版面结构如何塑造公共叙事。</p>
+          </article>
+          <article class="exhibition">
+            <div class="meta">Gallery B · Conservation Watch</div>
+            <h2>Unbound Catalogues</h2>
+            <p>馆藏目录、借阅卡和策展批注以时间线方式公开，帮助研究者追踪版本差异。</p>
+          </article>
+          <article class="exhibition">
+            <div class="meta">Study Room · 18 seats</div>
+            <h2>Reading Room Protocol</h2>
+            <p>研究访问需选择馆藏范围、使用目的和阅览日期；高风险纸本仅开放监督阅览。</p>
+          </article>
+        </div>
+
+        <div class="archive-table-wrap" id="archive" aria-label="重点馆藏登记表">
+          <table>
+            <thead>
+              <tr>
+                <th>Accession</th>
+                <th>Object</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Research Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MA-1968-044</td>
+                <td>地铁施工公告原稿</td>
+                <td>Gallery A</td>
+                <td><span class="status">On View</span></td>
+                <td>边角有胶带酸化，禁止强光拍摄。</td>
+              </tr>
+              <tr>
+                <td>MA-1974-118</td>
+                <td>独立出版社展览目录</td>
+                <td>Archive Drawer 7</td>
+                <td><span class="status">Filed</span></td>
+                <td>可预约阅览，需提前声明出版用途。</td>
+              </tr>
+              <tr>
+                <td>MA-1989-203</td>
+                <td>公共艺术听证会记录</td>
+                <td>Study Room</td>
+                <td><span class="status">Request</span></td>
+                <td>含手写批注，复制件优先提供。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <form class="search-panel" id="research" aria-label="研究访问筛选">
+          <label>
+            Accession or keyword
+            <input value="public poster archive" aria-label="藏品号或关键词" />
+          </label>
+          <label>
+            Visit purpose
+            <select aria-label="访问目的">
+              <option>Curatorial research</option>
+              <option>Publication clearance</option>
+              <option>Conservation review</option>
+            </select>
+          </label>
+          <button class="submit-filter" type="button">Search Files</button>
+        </form>
+      </div>
+    </section>
+
+    <footer class="footer" id="footer">
+      <div>MUSEUM ARCHIVE CATALOGUE — PUBLIC REFERENCE SITE</div>
+      <div>OPEN HOURS: TUE-SUN 10:00-18:00 / STUDY ROOM BY APPOINTMENT</div>
+      <div>CONTACT: archive-desk@example.local / ACCESSION REQUESTS REVIEWED WEEKLY</div>
+    </footer>
+  </main>
+</body>
+</html>

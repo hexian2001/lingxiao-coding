@@ -1,0 +1,590 @@
+@import "tailwindcss";
+@import "./styles/theme.css";
+@import "./styles/ink-decoration.css";
+
+@theme inline {
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-bg-tertiary: var(--color-bg-tertiary);
+  --color-bg-input: var(--color-bg-input);
+  --color-bg-card: var(--color-bg-card);
+  --color-bg-user: var(--color-bg-user);
+  --color-bg-hover: var(--color-bg-hover);
+  --color-bg-code: var(--color-bg-code);
+  --color-bg-diff-add: var(--color-bg-diff-add);
+  --color-bg-diff-del: var(--color-bg-diff-del);
+  --color-bg-channel: var(--color-bg-channel);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-user: var(--color-text-user);
+  --color-text-link: var(--color-text-link);
+
+  --color-accent-brand: var(--color-accent-brand);
+  --color-accent-green: var(--color-accent-green);
+  --color-accent-red: var(--color-accent-red);
+  --color-accent-yellow: var(--color-accent-yellow);
+  --color-accent-blue: var(--color-accent-blue);
+  --color-accent-purple: var(--color-accent-purple);
+  --color-accent-pink: var(--color-accent-pink);
+
+  --color-border-default: var(--color-border-default);
+  --color-border-muted: var(--color-border-muted);
+  --color-border-input: var(--color-border-input);
+  --color-border-channel: var(--color-border-channel);
+
+  --color-focus-ring: var(--color-focus-ring);
+  --color-scrollbar: var(--color-scrollbar);
+  --color-scrollbar-hover: var(--color-scrollbar-hover);
+  --color-channel-accent: var(--color-channel-accent);
+  --color-error-bg: var(--color-error-bg);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-success-bg: var(--color-success-bg);
+  --color-info-bg: var(--color-info-bg);
+}
+
+/* ===== 设计令牌：字体栈 + 字阶（几何量，与主题无关） =====
+   字阶替代 779 处手填 text-[Npx]，6 级、有层级；caption→display。
+   font-sans/font-mono 覆盖 v4 默认；display 宋体栈保留在 theme.css:13。 */
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+
+  --text-caption: 11px;
+  --text-caption--line-height: 1.45;
+  --text-meta: 12px;
+  --text-meta--line-height: 1.5;
+  --text-body: 14px;
+  --text-body--line-height: 1.6;
+  --text-subhead: 16px;
+  --text-subhead--line-height: 1.45;
+  --text-title: 18px;
+  --text-title--line-height: 1.35;
+  --text-display: 28px;
+  --text-display--line-height: 1.2;
+}
+
+/* ===== Markdown & DOCX 富文本渲染样式 ===== */
+
+.artifact-prose h1,
+.artifact-prose h2,
+.artifact-prose h3,
+.artifact-prose h4,
+.artifact-prose h5,
+.artifact-prose h6 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+.artifact-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--color-border-muted); padding-bottom: 0.4em; }
+.artifact-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--color-border-muted); padding-bottom: 0.3em; }
+.artifact-prose h3 { font-size: 1.1rem; }
+.artifact-prose h4, .artifact-prose h5, .artifact-prose h6 { font-size: 0.95rem; }
+
+.artifact-prose p {
+  margin-bottom: 0.8em;
+  line-height: 1.7;
+}
+
+.artifact-prose ul, .artifact-prose ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.8em;
+}
+.artifact-prose li { margin-bottom: 0.3em; line-height: 1.6; }
+.artifact-prose ul { list-style-type: disc; }
+.artifact-prose ol { list-style-type: decimal; }
+
+.artifact-prose strong { color: var(--color-text-primary); font-weight: 600; }
+.artifact-prose em { font-style: italic; }
+
+.artifact-prose a {
+  color: var(--color-accent-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.artifact-prose a:hover { opacity: 0.8; }
+
+.artifact-prose code {
+  background: var(--color-bg-code);
+  border-radius: 3px;
+  padding: 0.15em 0.4em;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  color: var(--color-accent-green);
+}
+
+.artifact-prose pre {
+  background: var(--color-bg-code);
+  border: 1px solid var(--color-border-muted);
+  border-radius: 6px;
+  padding: 1em;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+.artifact-prose pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: var(--color-text-secondary);
+}
+
+.artifact-prose blockquote {
+  border-left: 3px solid var(--color-accent-brand);
+  padding-left: 1em;
+  margin: 0.8em 0;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+.artifact-prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+  font-size: 0.875rem;
+}
+.artifact-prose th {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5em 0.75em;
+  border: 1px solid var(--color-border-muted);
+}
+.artifact-prose td {
+  padding: 0.4em 0.75em;
+  border: 1px solid var(--color-border-muted);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+}
+.artifact-prose tr:nth-child(even) td { background: var(--color-bg-secondary); }
+
+.artifact-prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border-muted);
+  margin: 1.5em 0;
+}
+
+.artifact-prose img {
+  max-width: 100%;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-muted);
+}
+
+/* DOCX HTML 渲染专用样式（mammoth 输出可能带特殊元素） */
+.artifact-docx-prose {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.artifact-docx-prose h1,
+.artifact-docx-prose h2,
+.artifact-docx-prose h3,
+.artifact-docx-prose h4,
+.artifact-docx-prose h5,
+.artifact-docx-prose h6 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+}
+.artifact-docx-prose h1 { font-size: 1.5rem; }
+.artifact-docx-prose h2 { font-size: 1.25rem; }
+.artifact-docx-prose h3 { font-size: 1.05rem; }
+
+.artifact-docx-prose p { margin-bottom: 0.75em; }
+
+.artifact-docx-prose ul,
+.artifact-docx-prose ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+.artifact-docx-prose li { margin-bottom: 0.25em; }
+.artifact-docx-prose ul { list-style-type: disc; }
+.artifact-docx-prose ol { list-style-type: decimal; }
+
+.artifact-docx-prose strong { color: var(--color-text-primary); font-weight: 600; }
+.artifact-docx-prose em { font-style: italic; }
+.artifact-docx-prose u { text-decoration: underline; }
+
+.artifact-docx-prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+  font-size: 0.85rem;
+}
+.artifact-docx-prose th {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--color-border-muted);
+  text-align: left;
+}
+.artifact-docx-prose td {
+  padding: 0.35em 0.6em;
+  border: 1px solid var(--color-border-muted);
+  color: var(--color-text-secondary);
+  vertical-align: top;
+}
+
+.artifact-office-scroll {
+  height: 100%;
+  overflow: auto;
+  padding: clamp(10px, 3vw, 24px);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-secondary) 78%, transparent), var(--color-bg-primary));
+}
+
+/* Mode toggles: restrained glass motion for BugHunt / Office / Workflow */
+.mode-toggle {
+  --mode-accent: var(--color-accent-brand);
+  --mode-surface: color-mix(in srgb, var(--color-bg-card) 82%, transparent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 24px;
+  padding: 0.25rem 0.625rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  color: var(--color-text-tertiary);
+  background: color-mix(in srgb, var(--mode-surface) 74%, transparent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  backdrop-filter: blur(18px) saturate(1.3);
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.mode-toggle:hover {
+  color: var(--mode-accent);
+  border-color: color-mix(in srgb, var(--mode-accent) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--mode-accent) 8%, var(--mode-surface));
+  transform: translateY(-1px);
+}
+
+.mode-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mode-toggle.is-active {
+  color: var(--mode-accent);
+  border-color: color-mix(in srgb, var(--mode-accent) 46%, var(--color-border-default));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--mode-accent) 14%, transparent), transparent),
+    color-mix(in srgb, var(--mode-accent) 10%, var(--mode-surface));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mode-accent) 12%, transparent) inset,
+    0 8px 24px color-mix(in srgb, var(--mode-accent) 14%, transparent);
+}
+
+.mode-toggle.is-loading .mode-toggle__icon {
+  animation: modeIconSpin 900ms linear infinite;
+}
+
+.mode-toggle.is-active .mode-toggle__icon {
+  animation: modeIconPulse 1550ms ease-in-out infinite;
+}
+
+.mode-toggle__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0%, color-mix(in srgb, white 34%, transparent) 42%, transparent 68%);
+  opacity: 0;
+  transform: translateX(-115%);
+}
+
+.mode-toggle.is-active .mode-toggle__shine {
+  animation: modeShine 2200ms ease-in-out infinite;
+}
+
+.mode-toggle__icon,
+.mode-toggle__count {
+  position: relative;
+  z-index: 1;
+}
+
+.mode-toggle__count {
+  color: color-mix(in srgb, var(--mode-accent) 72%, var(--color-text-muted));
+  font-variant-numeric: tabular-nums;
+}
+
+.mode-toggle--bughunt {
+  --mode-accent: var(--color-accent-yellow);
+}
+
+.mode-toggle--office {
+  --mode-accent: var(--color-accent-brand);
+}
+
+.mode-toggle--workflow {
+  --mode-accent: var(--color-accent-purple);
+}
+
+.mode-burst {
+  --mode-accent: var(--color-accent-brand);
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 150px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 34px;
+  padding: 0.45rem 0.7rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--mode-accent) 36%, var(--color-border-default));
+  border-radius: 999px;
+  color: var(--color-text-primary);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--mode-accent) 13%, transparent), transparent 62%),
+    color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  box-shadow:
+    0 18px 44px color-mix(in srgb, var(--mode-accent) 18%, transparent),
+    0 0 0 1px color-mix(in srgb, white 12%, transparent) inset;
+  backdrop-filter: blur(22px) saturate(1.45);
+  pointer-events: none;
+  animation: modeBurstIn 260ms cubic-bezier(.2,.8,.2,1), modeBurstOut 260ms ease 1400ms forwards;
+}
+
+.mode-burst--bughunt {
+  --mode-accent: var(--color-accent-yellow);
+}
+
+.mode-burst--office {
+  --mode-accent: var(--color-accent-brand);
+}
+
+.mode-burst--workflow {
+  --mode-accent: var(--color-accent-purple);
+}
+
+.mode-burst__halo {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  left: -20px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--mode-accent) 38%, transparent), transparent 68%);
+  animation: modeHalo 1300ms ease-out forwards;
+}
+
+.mode-burst__icon,
+.mode-burst__text {
+  position: relative;
+  z-index: 1;
+}
+
+.mode-burst__icon {
+  color: var(--mode-accent);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--mode-accent) 42%, transparent));
+}
+
+.mode-burst__text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+@keyframes modeShine {
+  0%, 35% { opacity: 0; transform: translateX(-115%); }
+  55% { opacity: 0.65; }
+  75%, 100% { opacity: 0; transform: translateX(115%); }
+}
+
+@keyframes modeIconPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+  45% { transform: scale(1.12); filter: drop-shadow(0 0 8px color-mix(in srgb, var(--mode-accent) 42%, transparent)); }
+}
+
+@keyframes modeIconSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes modeBurstIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modeBurstOut {
+  to { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+
+@keyframes modeHalo {
+  from { opacity: 0.85; transform: scale(0.45); }
+  to { opacity: 0; transform: scale(1.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-toggle,
+  .mode-toggle__shine,
+  .mode-toggle__icon,
+  .mode-burst,
+  .mode-burst__halo {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.artifact-office-page {
+  max-width: 860px;
+  min-height: 1050px;
+  margin: 0 auto;
+  padding: clamp(24px, 6vw, 56px) clamp(18px, 7vw, 64px);
+  border: 1px solid color-mix(in srgb, var(--color-border-muted) 82%, transparent);
+  border-radius: 6px;
+  background: var(--color-bg-card);
+  box-shadow: 0 18px 54px rgba(15, 23, 42, 0.12);
+  overflow-wrap: anywhere;
+}
+
+.artifact-office-page table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* ===== PPTX 预览容器样式 ===== */
+.pptx-preview-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+.pptx-preview-container .slide-wrapper {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 100%;
+}
+.pptx-preview-container .wrapper {
+  max-width: 100%;
+  overflow: visible;
+}
+
+.artifact-slide {
+  container-type: inline-size;
+  position: relative;
+  width: min(960px, 100%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border-muted) 85%, transparent);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-bg-card) 96%, #b8c3d2 4%), var(--color-bg-card) 52%, color-mix(in srgb, var(--color-bg-card) 90%, #aeb8c8 10%));
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+}
+
+.artifact-slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 4px solid color-mix(in srgb, var(--color-accent-brand) 62%, #aeb8c8 38%);
+  pointer-events: none;
+}
+
+.artifact-slide::after {
+  content: "";
+  position: absolute;
+  right: 9%;
+  bottom: -18%;
+  width: 52%;
+  height: 42%;
+  border-top: 1px solid color-mix(in srgb, var(--color-accent-brand) 34%, transparent);
+  transform: rotate(-18deg);
+  pointer-events: none;
+}
+
+.artifact-slide-rune {
+  position: absolute;
+  right: 28px;
+  bottom: 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.artifact-slide-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8% 10%;
+}
+
+.artifact-slide h2 {
+  max-width: 86%;
+  color: var(--color-text-primary);
+  font-size: clamp(22px, 5.2cqw, 42px);
+  font-weight: 650;
+  line-height: 1.12;
+}
+
+.artifact-slide ul {
+  margin-top: 28px;
+  display: grid;
+  gap: 14px;
+  max-width: 78%;
+  color: var(--color-text-secondary);
+  font-size: clamp(13px, 2.25cqw, 20px);
+  line-height: 1.45;
+  list-style: none;
+}
+
+.artifact-slide li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.artifact-slide li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 12px;
+  height: 1px;
+  background: var(--color-accent-brand);
+}
+
+.artifact-slide p {
+  margin-top: 22px;
+  max-width: 72%;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .artifact-recent-pane {
+    display: none;
+  }
+
+  .artifact-office-page {
+    min-height: auto;
+  }
+
+  .artifact-slide-content {
+    padding: 9% 8%;
+  }
+
+  .artifact-slide h2,
+  .artifact-slide ul,
+  .artifact-slide p {
+    max-width: 92%;
+  }
+}

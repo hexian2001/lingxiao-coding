@@ -1,17 +1,41 @@
-PROPRIETARY LICENSE — ALL RIGHTS RESERVED
+LingXiao Dual License (Personal Free + Commercial Paid)
 
 Copyright (c) 2025-2026 LingXiao. All rights reserved.
 
-This software and its source code are proprietary and confidential.
+────────────────────────────────────────────────────────────────────────
+PERSONAL & NON-COMMERCIAL USE — FREE
+────────────────────────────────────────────────────────────────────────
 
-Unauthorized copying, modification, merger, publication, distribution,
-sublicensing, and/or selling of this software, in whole or in part,
-without the express prior written permission of the copyright holder
-is strictly prohibited.
+Permission is hereby granted, free of charge, to any individual or
+non-commercial entity obtaining a copy of this software and associated
+documentation files (the "Software"), to use, copy, modify, merge, and
+run the Software for personal learning, research, education, and
+non-commercial projects, subject to the following conditions:
 
-This software is provided for use as a compiled binary or installed
-package. Access to, modification of, or distribution of the source code
-is not permitted without explicit authorization.
+1. The above copyright notice and this license shall be included in all
+   copies or substantial portions of the Software.
+
+2. Modifications for personal use are permitted, but distribution of
+   modified versions requires the copyright holder's written permission.
+
+────────────────────────────────────────────────────────────────────────
+COMMERCIAL USE — REQUIRES LICENSE
+────────────────────────────────────────────────────────────────────────
+
+Commercial use of the Software, including but not limited to:
+
+  - Internal deployment within a commercial organization
+  - Integration into a commercial product or service
+  - Offering the Software (or derived works) as a paid service (SaaS)
+  - Reselling, sublicensing, or distributing the Software for profit
+
+requires a separate Commercial License from the copyright holder.
+
+To obtain a Commercial License, contact: hexian2001@github.com
+
+────────────────────────────────────────────────────────────────────────
+WARRANTY DISCLAIMER
+────────────────────────────────────────────────────────────────────────
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF

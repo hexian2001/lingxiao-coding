@@ -1,0 +1,638 @@
+[
+  {
+    "id": "signature-glassmorphism-hero",
+    "name": "Frosted Atrium 首屏",
+    "category": "hero",
+    "themes": [
+      "glassmorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "glassmorphism",
+      "空间化玻璃控制层"
+    ],
+    "description": "Frosted Atrium 的首屏素材，服务于空间化玻璃控制层，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Frosted Atrium 首屏\n定位: 空间化玻璃控制层，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.18)，主强调 #d9f3ff，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-glassmorphism-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(255,255,255,0.32);\n  border-radius: 20px;\n  background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.14));\n  color: #f8fbfa;\n  box-shadow: 0 30px 78px rgba(8,19,25,0.26);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-glassmorphism-hero::before { content: \"\"; position: absolute; inset: 0; background: radial-gradient(circle at 18% 20%, rgba(255,255,255,0.34), transparent 22%), radial-gradient(circle at 86% 80%, rgba(217,243,255,0.24), transparent 24%); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-glassmorphism-hero > * { position: relative; z-index: 1; }\n.sig-glassmorphism-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-glassmorphism-hero .kicker { width: fit-content; border: 1px solid rgba(255,255,255,0.32); border-radius: 999px; padding: 6px 10px; color: #d9f3ff; background: rgba(255,255,255,0.14); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-glassmorphism-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-glassmorphism-hero p { margin: 0; max-width: 560px; color: rgba(248,251,250,0.74); font-size: 15px; line-height: 1.78; }\n.sig-glassmorphism-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-glassmorphism-hero button { height: 40px; padding: 0 16px; border-radius: calc(20px / 2 + 4px); border: 1px solid rgba(255,255,255,0.32); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-glassmorphism-hero .primary { background: #d9f3ff; color: #102027; border-color: #d9f3ff; }\n.sig-glassmorphism-hero .secondary { background: transparent; color: #f8fbfa; }\n.sig-glassmorphism-hero button:hover { transform: translateY(-1px); border-color: #d9f3ff; }\n.sig-glassmorphism-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(255,255,255,0.32); border-radius: calc(20px - 2px); background: rgba(255,255,255,0.14); backdrop-filter: blur(18px) saturate(140%); }\n.sig-glassmorphism-hero .artifact h2 { margin: 0; font-size: 13px; color: #d9f3ff; text-transform: uppercase; letter-spacing: 0; }\n.sig-glassmorphism-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-glassmorphism-hero .metric { padding: 14px; border: 1px solid rgba(255,255,255,0.32); border-radius: calc(20px - 4px); background: color-mix(in srgb, rgba(255,255,255,0.18) 76%, transparent); }\n.sig-glassmorphism-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-glassmorphism-hero .metric span { display: block; margin-top: 6px; color: rgba(248,251,250,0.74); font-size: 11px; }\n.sig-glassmorphism-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #d9f3ff, #f2c673); }\n@media (max-width: 780px) { .sig-glassmorphism-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-glassmorphism-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">空间化玻璃控制层</div>\n    <h1>Layer decisions without hiding the room.</h1>\n    <p>A translucent command atrium for ambient status, previews, and live controls.</p>\n    <div class=\"actions\"><button class=\"primary\">Focus layer</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Atrium / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>7</strong><span>active panes</span></div>\n      <div class=\"metric\"><strong>84%</strong><span>clarity index</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Frosted Atrium 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-glassmorphism-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-glassmorphism-card",
+    "name": "Frosted Atrium 洞察卡片",
+    "category": "card",
+    "themes": [
+      "glassmorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "glassmorphism",
+      "空间化玻璃控制层"
+    ],
+    "description": "Frosted Atrium 的洞察卡片素材，服务于空间化玻璃控制层，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Frosted Atrium 洞察卡片\n定位: 空间化玻璃控制层，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.18)，主强调 #d9f3ff，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-glassmorphism-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; background: rgba(255,255,255,0.18); color: #f8fbfa; box-shadow: 0 30px 78px rgba(8,19,25,0.26); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-glassmorphism-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-glassmorphism-card .label { color: #d9f3ff; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-glassmorphism-card .pill { border: 1px solid rgba(255,255,255,0.32); border-radius: 999px; padding: 5px 9px; color: rgba(248,251,250,0.74); background: rgba(255,255,255,0.14); font-size: 11px; }\n.sig-glassmorphism-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-glassmorphism-card p { margin: 0; color: rgba(248,251,250,0.74); font-size: 13px; line-height: 1.7; }\n.sig-glassmorphism-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.32); }\n.sig-glassmorphism-card .strip strong { font-variant-numeric: tabular-nums; color: #f8fbfa; }\n.sig-glassmorphism-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(20px - 4px); background: #d9f3ff; color: #102027; font-weight: 900; }",
+    "html": "<article class=\"sig-glassmorphism-card\">\n  <div class=\"top\"><div><div class=\"label\">Atrium</div><h3>7</h3></div><span class=\"pill\">active panes</span></div>\n  <p>A translucent command atrium for ambient status, previews, and live controls.</p>\n  <div class=\"strip\"><span>clarity index</span><strong>84%</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Frosted Atrium 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-glassmorphism-hero"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-glassmorphism-nav",
+    "name": "Frosted Atrium 导航",
+    "category": "navigation",
+    "themes": [
+      "glassmorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "glassmorphism",
+      "空间化玻璃控制层"
+    ],
+    "description": "Frosted Atrium 的导航素材，服务于空间化玻璃控制层，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Frosted Atrium 导航\n定位: 空间化玻璃控制层，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.18)，主强调 #d9f3ff，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-glassmorphism-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; background: rgba(255,255,255,0.18); color: #f8fbfa; box-shadow: 0 30px 78px rgba(8,19,25,0.26); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-glassmorphism-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-glassmorphism-nav .mark { width: 30px; height: 30px; border-radius: calc(20px - 4px); background: linear-gradient(135deg, #d9f3ff, #f2c673); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.32); }\n.sig-glassmorphism-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-glassmorphism-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(20px - 6px); color: rgba(248,251,250,0.74); text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-glassmorphism-nav a:hover, .sig-glassmorphism-nav a.active { color: #f8fbfa; background: rgba(255,255,255,0.14); }\n.sig-glassmorphism-nav button { height: 34px; padding: 0 13px; border-radius: calc(20px - 6px); border: 1px solid #d9f3ff; background: #d9f3ff; color: #102027; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-glassmorphism-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-glassmorphism-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Atrium</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Layers</a><a href=\"#\">Previews</a><a href=\"#\">Rooms</a><a href=\"#\">Signals</a></div>\n  <button>Focus layer</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Frosted Atrium 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-glassmorphism-hero",
+      "signature-glassmorphism-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-glassmorphism-form",
+    "name": "Frosted Atrium 表单",
+    "category": "form",
+    "themes": [
+      "glassmorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "glassmorphism",
+      "空间化玻璃控制层"
+    ],
+    "description": "Frosted Atrium 的表单素材，服务于空间化玻璃控制层，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Frosted Atrium 表单\n定位: 空间化玻璃控制层，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.18)，主强调 #d9f3ff，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-glassmorphism-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; background: rgba(255,255,255,0.18); color: #f8fbfa; box-shadow: 0 30px 78px rgba(8,19,25,0.26); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-glassmorphism-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #f8fbfa; }\n.sig-glassmorphism-form small { color: rgba(248,251,250,0.74); font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-glassmorphism-form .row { display: flex; gap: 10px; }\n.sig-glassmorphism-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(20px - 6px); border: 1px solid rgba(255,255,255,0.32); background: rgba(255,255,255,0.14); color: #f8fbfa; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-glassmorphism-form input:focus { border-color: #d9f3ff; box-shadow: 0 0 0 3px color-mix(in srgb, #d9f3ff 18%, transparent); }\n.sig-glassmorphism-form button { height: 42px; padding: 0 14px; border-radius: calc(20px - 6px); border: 1px solid #d9f3ff; background: #d9f3ff; color: #102027; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-glassmorphism-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-glassmorphism-form\">\n  <label>Review lens<small>Name the current layer so collaborators know what is being judged.</small></label>\n  <div class=\"row\"><input value=\"visual-density\" aria-label=\"Review lens\" /><button type=\"button\">Focus layer</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Frosted Atrium 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-glassmorphism-hero",
+      "signature-glassmorphism-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-glassmorphism-table",
+    "name": "Frosted Atrium 数据表",
+    "category": "table",
+    "themes": [
+      "glassmorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "glassmorphism",
+      "空间化玻璃控制层"
+    ],
+    "description": "Frosted Atrium 的数据表素材，服务于空间化玻璃控制层，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Frosted Atrium 数据表\n定位: 空间化玻璃控制层，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.18)，主强调 #d9f3ff，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-glassmorphism-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(255,255,255,0.32); border-radius: 20px; background: rgba(255,255,255,0.18); color: #f8fbfa; box-shadow: 0 30px 78px rgba(8,19,25,0.26); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-glassmorphism-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-glassmorphism-table th, .sig-glassmorphism-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.32); }\n.sig-glassmorphism-table th { color: rgba(248,251,250,0.74); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(255,255,255,0.14); }\n.sig-glassmorphism-table td { color: #f8fbfa; }\n.sig-glassmorphism-table tr:last-child td { border-bottom: 0; }\n.sig-glassmorphism-table tbody tr:hover td { background: rgba(255,255,255,0.14); }\n.sig-glassmorphism-table .mono { font-variant-numeric: tabular-nums; }\n.sig-glassmorphism-table .status { display: inline-flex; align-items: center; gap: 6px; color: #d9f3ff; font-weight: 800; }\n.sig-glassmorphism-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #d9f3ff; }",
+    "html": "<div class=\"sig-glassmorphism-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>North pane</td><td><span class=\"status\">Live</span></td><td class=\"mono\">84</td></tr><tr><td>Brief layer</td><td><span class=\"status\">Pinned</span></td><td class=\"mono\">71</td></tr><tr><td>Preview</td><td><span class=\"status\">Soft</span></td><td class=\"mono\">63</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Frosted Atrium 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-glassmorphism-hero",
+      "signature-glassmorphism-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-glass-depth",
+    "name": "Glass Depth Field",
+    "category": "background",
+    "themes": [
+      "glassmorphism",
+      "dark"
+    ],
+    "tags": [
+      "glass",
+      "depth",
+      "layers",
+      "blur",
+      "premium",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Glass Depth Field\n定位: Glass Depth Field 是一款 glassmorphism / dark 背景素材，适合 glass、depth、layers、blur 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Glass Depth Field — 多层景深背景。模拟相机浅景深效果: 远处(底层)有2-3个大色块heavily blurred(150px+), 中层是较小的半透明圆 moderately blurred(60px), 前景(内容层)完全清晰。色块配色: 靛蓝 #1d4ed8 opacity:0.2, 紫 #7c3aed opacity:0.15, 青 #06b6d4 opacity:0.1。底色 #030712。气质: Apple Vision Pro UI。",
+    "css": ".bg-glass-depth {\n  min-height: 100vh;\n  background: #030712;\n  position: relative;\n  overflow: hidden;\n}\n.bg-glass-depth .orb {\n  position: absolute;\n  border-radius: 50%;\n}\n.bg-glass-depth .orb-1 {\n  width: 60vw;\n  height: 60vw;\n  background: rgba(29, 78, 216, 0.18);\n  filter: blur(150px);\n  top: -20%;\n  left: -15%;\n}\n.bg-glass-depth .orb-2 {\n  width: 40vw;\n  height: 40vw;\n  background: rgba(124, 58, 237, 0.12);\n  filter: blur(120px);\n  bottom: -10%;\n  right: -10%;\n}\n.bg-glass-depth .orb-3 {\n  width: 25vw;\n  height: 25vw;\n  background: rgba(6, 182, 212, 0.08);\n  filter: blur(60px);\n  top: 40%;\n  left: 50%;\n}",
+    "html": "<div class=\"bg-glass-depth\">\n  <div class=\"orb orb-1\"></div>\n  <div class=\"orb orb-2\"></div>\n  <div class=\"orb orb-3\"></div>\n</div>",
+    "description": "Glass Depth Field 是一款 glassmorphism / dark 背景素材，适合 glass、depth、layers、blur 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "btn-glass-frost-pro",
+    "name": "Frost Pro",
+    "category": "button",
+    "themes": [
+      "glassmorphism",
+      "dark"
+    ],
+    "tags": [
+      "glass",
+      "premium",
+      "blur",
+      "subtle",
+      "refined",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Frost Pro\n定位: Frost Pro 是一款 glassmorphism / dark 按钮素材，适合 glass、premium、blur、subtle 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Frost Pro — 专业级磨砂玻璃按钮。不是那种入门级的 rgba(255,255,255,0.1)——而是多层复合: 底层 rgba(255,255,255,0.03) + 中层 backdrop-filter:blur(16px)saturate(180%) + 顶层 inset border-top 1px rgba白(模拟光源从上方照射的高光)。hover时 background 从 0.03 升到 0.07 + border-top 亮度增加。字体 Inter 500, rgba(255,255,255,0.9)。圆角 10px。气质: macOS Sonoma 原生控件。",
+    "css": ".btn-frost-pro {\n  padding: 11px 22px;\n  background: rgba(255,255,255,0.03);\n  backdrop-filter: blur(16px) saturate(180%);\n  -webkit-backdrop-filter: blur(16px) saturate(180%);\n  color: rgba(255,255,255,0.9);\n  font-family: 'Inter', -apple-system, sans-serif;\n  font-size: 13px;\n  font-weight: 500;\n  border: 0.5px solid rgba(255,255,255,0.1);\n  border-top-color: rgba(255,255,255,0.2);\n  border-radius: 10px;\n  cursor: pointer;\n  transition: all 0.2s;\n  box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.05);\n}\n.btn-frost-pro:hover {\n  background: rgba(255,255,255,0.07);\n  border-top-color: rgba(255,255,255,0.35);\n  box-shadow: 0 4px 16px rgba(0,0,0,0.2), 0 0 0 0.5px rgba(0,0,0,0.08);\n}\n.btn-frost-pro:active {\n  background: rgba(255,255,255,0.02);\n  transform: scale(0.97);\n  box-shadow: 0 1px 4px rgba(0,0,0,0.2);\n}",
+    "html": "<button class=\"btn-frost-pro\">Open Settings</button>",
+    "description": "Frost Pro 是一款 glassmorphism / dark 按钮素材，适合 glass、premium、blur、subtle 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "card-glass-panel",
+    "name": "Vision Panel",
+    "category": "card",
+    "themes": [
+      "glassmorphism",
+      "dark"
+    ],
+    "tags": [
+      "glass",
+      "panel",
+      "premium",
+      "depth",
+      "refined",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Vision Panel\n定位: Vision Panel 是一款 glassmorphism / dark 卡片素材，适合 glass、panel、premium、depth 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Vision Panel — Apple Vision Pro 级别的玻璃面板。多层光学: background rgba(255,255,255,0.02) + backdrop-filter:blur(40px)saturate(150%) + border-top 0.5px rgba白0.15(顶部高光) + border其余 rgba白0.05。内部无具体内容约束——纯容器。圆角 20px。box-shadow: 0 8px 32px rgba黑0.2 + 极轻微的 inset shadow 模拟厚度。气质: visionOS panel。",
+    "css": ".card-vision {\n  width: 380px;\n  padding: 32px;\n  border-radius: 20px;\n  background: rgba(255, 255, 255, 0.02);\n  backdrop-filter: blur(40px) saturate(150%);\n  -webkit-backdrop-filter: blur(40px) saturate(150%);\n  border: 0.5px solid rgba(255, 255, 255, 0.06);\n  border-top-color: rgba(255, 255, 255, 0.15);\n  box-shadow:\n    0 8px 32px rgba(0, 0, 0, 0.25),\n    0 2px 8px rgba(0, 0, 0, 0.1),\n    inset 0 -1px 1px rgba(0, 0, 0, 0.05);\n  color: rgba(255, 255, 255, 0.92);\n}",
+    "html": "<div class=\"card-vision\">\n  <h3 style=\"margin:0 0 12px;font-size:17px;font-weight:600;font-family:Inter,system-ui\">Spatial Computing</h3>\n  <p style=\"margin:0;font-size:14px;opacity:0.6;line-height:1.6;font-family:Inter,system-ui\">Interact with your content in three dimensions.</p>\n</div>",
+    "description": "Vision Panel 是一款 glassmorphism / dark 卡片素材，适合 glass、panel、premium、depth 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "hero-glass-orb",
+    "name": "Glass Orb",
+    "category": "hero",
+    "themes": [
+      "glassmorphism",
+      "dark"
+    ],
+    "tags": [
+      "glass",
+      "orb",
+      "3d",
+      "centered",
+      "premium",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Glass Orb\n定位: Glass Orb 是一款 glassmorphism / dark 首屏素材，适合 glass、orb、3d、centered 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Glass Orb — 玻璃球体 Hero。深黑底上居中一个巨大的模糊光球(600px, 多层径向渐变 + blur), 在光球之上是玻璃面板(Vision Panel风格)承载文字。光球颜色极subtle: 靛蓝到紫(opacity 0.15-0.2)。文字在玻璃面板内。气质: Apple 发布会背景。",
+    "css": ".hero-glass-orb {\n  min-height: 100vh;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #030712;\n  position: relative;\n  overflow: hidden;\n}\n.hero-glass-orb .orb {\n  position: absolute;\n  width: 600px;\n  height: 600px;\n  border-radius: 50%;\n  background: radial-gradient(circle at 40% 40%, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.1) 40%, transparent 70%);\n  filter: blur(80px);\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n}\n.hero-glass-orb .panel {\n  position: relative;\n  padding: 48px 40px;\n  border-radius: 24px;\n  background: rgba(255,255,255,0.02);\n  backdrop-filter: blur(40px) saturate(150%);\n  border: 0.5px solid rgba(255,255,255,0.08);\n  border-top-color: rgba(255,255,255,0.15);\n  text-align: center;\n  color: #e4e4e7;\n  max-width: 480px;\n  box-shadow: 0 16px 64px rgba(0,0,0,0.3);\n}\n.hero-glass-orb .panel h1 {\n  font-family: 'Inter', system-ui;\n  font-size: 36px;\n  font-weight: 700;\n  margin: 0 0 12px;\n  letter-spacing: -0.02em;\n}\n.hero-glass-orb .panel p {\n  font-size: 15px;\n  color: #a1a1aa;\n  margin: 0;\n  line-height: 1.6;\n}",
+    "html": "<section class=\"hero-glass-orb\">\n  <div class=\"orb\"></div>\n  <div class=\"panel\">\n    <h1>Beyond the screen</h1>\n    <p>Design experiences that transcend flat surfaces and invite exploration.</p>\n  </div>\n</section>",
+    "description": "Glass Orb 是一款 glassmorphism / dark 首屏素材，适合 glass、orb、3d、centered 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "nav-floating-pill",
+    "name": "Floating Pill Nav",
+    "category": "navigation",
+    "themes": [
+      "dark",
+      "glassmorphism"
+    ],
+    "tags": [
+      "floating",
+      "pill",
+      "center",
+      "glass",
+      "compact",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Floating Pill Nav\n定位: Floating Pill Nav 是一款 dark / glassmorphism 导航素材，适合 floating、pill、center、glass 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Floating Pill Nav — 浮动胶囊导航。居中的 inline-flex 胶囊容器(非全宽)。底色 rgba(255,255,255,0.03) + blur(20px) + 0.5px border。items 之间无分隔线——靠间距(gap:4px)和 active 项的 subtle 背景(rgba白0.06)区分。字体 Inter 13px 500。圆角 50px(真胶囊)。fixed top:16px。气质: Raycast website nav。",
+    "css": ".nav-floating-pill {\n  position: fixed;\n  top: 16px;\n  left: 50%;\n  transform: translateX(-50%);\n  display: inline-flex;\n  gap: 2px;\n  padding: 4px;\n  border-radius: 50px;\n  background: rgba(255,255,255,0.03);\n  backdrop-filter: blur(20px) saturate(150%);\n  border: 0.5px solid rgba(255,255,255,0.08);\n  z-index: 1000;\n}\n.nav-floating-pill a {\n  padding: 8px 16px;\n  border-radius: 50px;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  font-weight: 500;\n  color: rgba(255,255,255,0.5);\n  text-decoration: none;\n  transition: all 0.2s;\n}\n.nav-floating-pill a:hover { color: rgba(255,255,255,0.8); }\n.nav-floating-pill a.active {\n  color: rgba(255,255,255,0.95);\n  background: rgba(255,255,255,0.06);\n}",
+    "html": "<nav class=\"nav-floating-pill\">\n  <a href=\"#\" class=\"active\">Home</a>\n  <a href=\"#\">Features</a>\n  <a href=\"#\">Pricing</a>\n  <a href=\"#\">Docs</a>\n</nav>",
+    "description": "Floating Pill Nav 是一款 dark / glassmorphism 导航素材，适合 floating、pill、center、glass 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "nav-dock-macos",
+    "name": "macOS Dock",
+    "category": "navigation",
+    "themes": [
+      "glassmorphism",
+      "dark"
+    ],
+    "tags": [
+      "dock",
+      "bottom",
+      "icons",
+      "magnify",
+      "glass",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: macOS Dock\n定位: macOS Dock 是一款 glassmorphism / dark 导航素材，适合 dock、bottom、icons、magnify 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: macOS Dock — 底部放大坞。灵感直接来自 macOS dock: 底部居中玻璃条, 内含图标项(40px), hover时该项scale(1.4)+相邻项scale(1.15)(用CSS :has或JS)。容器 blur(20px) + rgba白0.04 + 0.5px border-top亮线。圆角50px。gap:4px。气质: 完全的 macOS 原生。",
+    "css": ".nav-dock {\n  position: fixed;\n  bottom: 12px;\n  left: 50%;\n  transform: translateX(-50%);\n  display: flex;\n  align-items: flex-end;\n  gap: 4px;\n  padding: 6px 10px;\n  border-radius: 18px;\n  background: rgba(255,255,255,0.04);\n  backdrop-filter: blur(20px) saturate(150%);\n  border: 0.5px solid rgba(255,255,255,0.08);\n  border-top-color: rgba(255,255,255,0.15);\n  box-shadow: 0 8px 32px rgba(0,0,0,0.3);\n}\n.nav-dock .item {\n  width: 40px;\n  height: 40px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 22px;\n  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n  cursor: pointer;\n}\n.nav-dock .item:hover { transform: scale(1.4) translateY(-8px); }\n.nav-dock .item:hover + .item,\n.nav-dock .item:has(+ .item:hover) { transform: scale(1.15) translateY(-3px); }",
+    "html": "<nav class=\"nav-dock\">\n  <div class=\"item\">◈</div>\n  <div class=\"item\">◇</div>\n  <div class=\"item\">□</div>\n  <div class=\"item\">○</div>\n  <div class=\"item\">◐</div>\n</nav>",
+    "description": "macOS Dock 是一款 glassmorphism / dark 导航素材，适合 dock、bottom、icons、magnify 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "form-search-cmd",
+    "name": "Command Search",
+    "category": "form",
+    "themes": [
+      "dark",
+      "minimal",
+      "glassmorphism"
+    ],
+    "tags": [
+      "search",
+      "command",
+      "shortcut",
+      "spotlight",
+      "dark",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Command Search\n定位: Command Search 是一款 dark / minimal / glassmorphism 表单素材，适合 search、command、shortcut、spotlight 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Command Search — 命令搜索栏。灵感: Raycast/⌘K bar。容器: #111113 + 0.5px border #27272a + 圆角 10px。左侧搜索图标(#52525b), 右侧快捷键 badge(⌘K, 小字 11px 灰色框)。placeholder #3f3f46。focus时 border→#3f3f46。字体 Inter 14px。",
+    "css": ".form-cmd-search {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 14px;\n  border-radius: 10px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  width: 320px;\n  transition: border-color 0.15s;\n}\n.form-cmd-search:focus-within { border-color: #3f3f46; }\n.form-cmd-search .icon { color: #52525b; font-size: 15px; flex-shrink: 0; }\n.form-cmd-search input {\n  flex: 1;\n  background: none;\n  border: none;\n  outline: none;\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  color: #fafafa;\n}\n.form-cmd-search input::placeholder { color: #3f3f46; }\n.form-cmd-search .shortcut {\n  padding: 2px 6px;\n  border-radius: 4px;\n  border: 0.5px solid #27272a;\n  font-family: system-ui;\n  font-size: 11px;\n  color: #52525b;\n  flex-shrink: 0;\n}",
+    "html": "<div class=\"form-cmd-search\">\n  <span class=\"icon\">⌕</span>\n  <input placeholder=\"Search...\" />\n  <span class=\"shortcut\">⌘K</span>\n</div>",
+    "description": "Command Search 是一款 dark / minimal / glassmorphism 表单素材，适合 search、command、shortcut、spotlight 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "modal-cmd-palette",
+    "name": "Command Palette",
+    "category": "modal",
+    "themes": [
+      "dark",
+      "minimal",
+      "glassmorphism"
+    ],
+    "tags": [
+      "command",
+      "palette",
+      "search",
+      "keyboard",
+      "spotlight",
+      "glassmorphism"
+    ],
+    "stylePrompt": "高级设计指令: Command Palette\n定位: Command Palette 是一款 dark / minimal / glassmorphism 弹窗素材，适合 command、palette、search、keyboard 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Command Palette — 命令面板。灵感: VS Code ⌘P / Raycast / Linear ⌘K。居上(top:20vh)的宽面板(560px)。顶部搜索输入(大字16px, 无边框), 下方结果列表(每项: icon + label + 右侧 shortcut badge)。容器 #111113 + 0.5px border + 圆角12px + 重阴影(模拟浮层)。selected项 rgba白0.04背景。",
+    "css": ".modal-cmd-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.6);\n  display: flex;\n  justify-content: center;\n  padding-top: 20vh;\n  z-index: 9999;\n}\n.modal-cmd {\n  width: min(90%, 560px);\n  border-radius: 12px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  box-shadow: 0 16px 64px rgba(0,0,0,0.5);\n  overflow: hidden;\n  color: #fafafa;\n}\n.modal-cmd .search-area {\n  padding: 16px 18px;\n  border-bottom: 0.5px solid #1a1a1a;\n}\n.modal-cmd .search-area input {\n  width: 100%;\n  background: none;\n  border: none;\n  outline: none;\n  font-family: 'Inter', system-ui;\n  font-size: 16px;\n  color: #fafafa;\n}\n.modal-cmd .search-area input::placeholder { color: #3f3f46; }\n.modal-cmd .results { padding: 6px; max-height: 320px; overflow-y: auto; }\n.modal-cmd .result {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 10px 12px;\n  border-radius: 6px;\n  font-size: 14px;\n  color: #d4d4d8;\n  cursor: pointer;\n  transition: background 0.1s;\n}\n.modal-cmd .result:hover, .modal-cmd .result.selected { background: rgba(255,255,255,0.04); color: #fafafa; }\n.modal-cmd .result .shortcut { margin-left: auto; font-size: 11px; color: #52525b; font-family: system-ui; }",
+    "html": "<div class=\"modal-cmd-overlay\">\n  <div class=\"modal-cmd\">\n    <div class=\"search-area\"><input placeholder=\"Type a command...\" autofocus /></div>\n    <div class=\"results\">\n      <div class=\"result selected\"><span>▤</span><span>Open file</span><span class=\"shortcut\">⌘O</span></div>\n      <div class=\"result\"><span>⌕</span><span>Search project</span><span class=\"shortcut\">⌘⇧F</span></div>\n      <div class=\"result\"><span>⌥</span><span>Switch branch</span><span class=\"shortcut\">⌘⇧B</span></div>\n    </div>\n  </div>\n</div>",
+    "description": "Command Palette 是一款 dark / minimal / glassmorphism 弹窗素材，适合 command、palette、search、keyboard 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "glass-modal-panel",
+    "name": "Vision Modal",
+    "category": "modal",
+    "tags": [
+      "glass",
+      "modal",
+      "vision",
+      "panel",
+      "blur",
+      "glassmorphism"
+    ],
+    "description": "Vision Modal 是一款 glassmorphism 弹窗素材，适合 glass、modal、vision、panel 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Vision Modal\n定位: visionOS级弹窗面板\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Vision Modal。rgba(255,255,255,0.02)底 + blur(40px)saturate(150%) + border-top 0.5px rgba白0.15(高光) + 圆角24px + 重阴影。内部: 标题17px 600 + 正文14px rgba白0.6。气质: Apple Vision Pro system alert。",
+    "css": ".glass-modal { width:min(90%,440px); padding:28px; border-radius:24px; background:rgba(255,255,255,0.02); backdrop-filter:blur(40px) saturate(150%); border:0.5px solid rgba(255,255,255,0.06); border-top-color:rgba(255,255,255,0.15); box-shadow:0 16px 64px rgba(0,0,0,0.4); color:rgba(255,255,255,0.92); } .glass-modal h3 { font-family:Inter,system-ui; font-size:17px; font-weight:600; margin:0 0 8px; } .glass-modal p { font-family:Inter,system-ui; font-size:14px; color:rgba(255,255,255,0.6); line-height:1.6; margin:0; }",
+    "html": "<div class=\"glass-modal\"><h3>Allow access?</h3><p>This app wants to access your spatial environment data.</p></div>",
+    "themes": [
+      "glassmorphism"
+    ],
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "glass-input-field",
+    "name": "Frost Input",
+    "category": "form",
+    "tags": [
+      "glass",
+      "input",
+      "frost",
+      "blur",
+      "field",
+      "glassmorphism"
+    ],
+    "description": "Frost Input 是一款 glassmorphism 表单素材，适合 glass、input、frost、blur 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Frost Input\n定位: 磨砂玻璃输入框\n审美系统: Frosted Atrium / layered translucent command surface。使用 #d9f3ff 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Frost Input。rgba(255,255,255,0.04)底 + blur(8px) + 0.5px border rgba白0.1。focus时 border→rgba白0.25 + 轻微 inset shadow。字体 Inter 14px rgba白0.9。圆角 10px。",
+    "css": ".glass-input { padding:11px 14px; border-radius:10px; background:rgba(255,255,255,0.04); backdrop-filter:blur(8px); border:0.5px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.9); font-family:Inter,system-ui; font-size:14px; outline:none; width:100%; transition:border-color 0.15s; } .glass-input:focus { border-color:rgba(255,255,255,0.25); box-shadow:inset 0 0 8px rgba(255,255,255,0.02); } .glass-input::placeholder { color:rgba(255,255,255,0.25); }",
+    "html": "<input class=\"glass-input\" placeholder=\"Search...\" />",
+    "themes": [
+      "glassmorphism"
+    ],
+    "designNotes": "此素材已按 Frosted Atrium 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 22% 0%, rgba(174,189,200,0.55), transparent 34%), radial-gradient(circle at 78% 10%, rgba(242,198,115,0.28), transparent 30%), linear-gradient(135deg, #102027, #d8e3e4)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

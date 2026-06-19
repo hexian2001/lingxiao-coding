@@ -1,0 +1,30 @@
+{
+  "id": "neumorphism",
+  "name": "Soft Instrument Control Room",
+  "title": "柔和仪器参数控制台",
+  "description": "面向硬件运维、音频调校与实验参数管理的完整新拟物网站主题：浅灰蓝基底、双向柔影、凹陷输入与凸起控制，让复杂阈值、状态和动作以低噪声方式被读取与调整。",
+  "version": "1.0.0",
+  "category": "instrument-control",
+  "tags": [
+    "neumorphism",
+    "soft-instrument",
+    "control-panel",
+    "parameter-tuning",
+    "dashboard",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#e8ecf0",
+    "surfaceRaised": "#eef2f4",
+    "surfaceInset": "#dce3e7",
+    "ink": "#243033",
+    "text": "#374247",
+    "muted": "#69777d",
+    "accent": "#526f7b",
+    "secondaryAccent": "#9b7c33",
+    "success": "#4f7f65",
+    "line": "rgba(255, 255, 255, 0.72)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

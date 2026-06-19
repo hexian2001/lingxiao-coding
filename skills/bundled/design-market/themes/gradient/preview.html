@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chromatic AI Engine — AI 创意色彩生成引擎</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --canvas: #030712;
+      --panel: rgba(255, 255, 255, 0.105);
+      --panel-strong: rgba(255, 255, 255, 0.16);
+      --line: rgba(255, 255, 255, 0.18);
+      --line-strong: rgba(255, 255, 255, 0.28);
+      --ink: #ffffff;
+      --muted: rgba(255, 255, 255, 0.72);
+      --soft: rgba(255, 255, 255, 0.54);
+      --gold: #f2c673;
+      --blue: #60a5fa;
+      --violet: #a855f7;
+      --cyan: #22d3ee;
+      --pink: #ec4899;
+      --green: #34d399;
+      --warn: #f59e0b;
+      --danger: #fb7185;
+      --radius: 22px;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(96, 165, 250, 0.18), transparent 34%),
+        radial-gradient(ellipse at 88% 10%, rgba(168, 85, 247, 0.16), transparent 34%),
+        radial-gradient(ellipse at 60% 52%, rgba(242, 198, 115, 0.12), transparent 38%),
+        radial-gradient(ellipse at 20% 82%, rgba(34, 211, 238, 0.10), transparent 32%),
+        var(--canvas);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 24% 34%, rgba(29, 78, 216, 0.14), transparent 48%),
+        radial-gradient(ellipse at 76% 26%, rgba(124, 58, 237, 0.10), transparent 46%),
+        radial-gradient(ellipse at 64% 78%, rgba(6, 182, 212, 0.08), transparent 46%),
+        radial-gradient(ellipse at 28% 72%, rgba(219, 39, 119, 0.06), transparent 42%);
+      animation: mesh-drift 32s ease-in-out infinite alternate;
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.72), transparent 76%);
+      z-index: -1;
+    }
+
+    a { color: inherit; }
+
+    button, input, textarea, select { font: inherit; }
+
+    button, a, input, textarea, select { outline: none; }
+
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      box-shadow: 0 0 0 3px rgba(242, 198, 115, 0.32), 0 0 0 1px var(--gold) inset;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(3, 7, 18, 0.72);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: conic-gradient(from 180deg, var(--gold), var(--cyan), var(--violet), var(--pink), var(--gold));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 12px 28px rgba(168, 85, 247, 0.28);
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .navlinks::-webkit-scrollbar { display: none; }
+
+    .navlinks a {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .navlinks a:hover, .navlinks a[aria-current="page"] {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .navlinks a:active { transform: translateY(1px); }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+    }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 999px;
+      color: rgba(220, 252, 231, 0.92);
+      background: rgba(52, 211, 153, 0.10);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .status-dot::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.65);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 850;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(242, 198, 115, 0.55);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn.primary {
+      border-color: rgba(242, 198, 115, 0.72);
+      color: #10151f;
+      background: linear-gradient(110deg, #f2c673, #fde68a 46%, #aebdc5 100%);
+      box-shadow: 0 14px 38px rgba(242, 198, 115, 0.20);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.76fr);
+      gap: 24px;
+      align-items: stretch;
+      padding: 76px 0 34px;
+    }
+
+    .hero-copy, .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.055));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 5vw, 58px);
+      min-height: 520px;
+      display: grid;
+      align-content: center;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: conic-gradient(from 145deg at 78% 24%, rgba(242,198,115,0.28), rgba(34,211,238,0.18), transparent 34%, rgba(168,85,247,0.20), rgba(242,198,115,0.28));
+      opacity: 0.82;
+      pointer-events: none;
+    }
+
+    .hero-copy > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 7px 11px;
+      border: 1px solid rgba(242, 198, 115, 0.32);
+      border-radius: 999px;
+      color: var(--gold);
+      background: rgba(3, 7, 18, 0.38);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 20px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.94;
+      letter-spacing: -0.07em;
+    }
+
+    .chrome {
+      background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 32%, #94a3b8 62%, #f2c673 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy p {
+      max-width: 650px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.78;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 650px;
+    }
+
+    .metric {
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 16px;
+      background: rgba(3, 7, 18, 0.30);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric span {
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .live-panel {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      align-content: stretch;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title { margin: 0; font-size: 18px; letter-spacing: -0.03em; }
+    .panel-subtitle { margin: 4px 0 0; color: var(--soft); font-size: 12px; line-height: 1.5; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: max-content;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(3, 7, 18, 0.28);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .spectrum-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(3, 7, 18, 0.30);
+    }
+
+    .spectrum {
+      height: 96px;
+      background: linear-gradient(90deg, #10233f, #315e9c 18%, #60a5fa 34%, #22d3ee 49%, #f2c673 67%, #fb7185 84%, #7c2d12);
+    }
+
+    .spectrum-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .spectrum-meta div {
+      padding: 12px;
+      background: rgba(3, 7, 18, 0.55);
+    }
+
+    .spectrum-meta strong { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
+    .spectrum-meta span { color: var(--soft); font-size: 11px; }
+
+    .brief-box {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .brief-box label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--ink);
+      background: rgba(3, 7, 18, 0.40);
+      line-height: 1.55;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 5px 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .section {
+      padding: 26px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 8px;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.055em;
+    }
+
+    .section-head p {
+      max-width: 690px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+      gap: 18px;
+    }
+
+    .panel { padding: 20px; }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field { display: grid; gap: 7px; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 800; }
+
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 13px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: rgba(3, 7, 18, 0.42);
+    }
+
+    .range-track {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      overflow: hidden;
+    }
+
+    .range-track span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--violet), var(--gold));
+    }
+
+    .palette-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .palette-card {
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      background: rgba(3, 7, 18, 0.30);
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .palette-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(242,198,115,0.36);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      height: 74px;
+    }
+
+    .swatches span { min-width: 0; }
+
+    .palette-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .palette-content h3 { margin: 0 0 5px; font-size: 16px; letter-spacing: -0.025em; }
+    .palette-content p { margin: 0; color: var(--soft); font-size: 12px; line-height: 1.55; }
+
+    .score {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score strong { display: block; font-size: 22px; color: var(--gold); }
+    .score span { color: var(--soft); font-size: 11px; }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .check {
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: var(--muted);
+    }
+
+    .check.pass { color: #bbf7d0; border-color: rgba(52,211,153,0.28); background: rgba(52,211,153,0.10); }
+    .check.warn { color: #fde68a; border-color: rgba(245,158,11,0.28); background: rgba(245,158,11,0.10); }
+
+    .queue-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.085);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      text-align: left;
+    }
+
+    th {
+      color: var(--soft);
+      background: rgba(3,7,18,0.42);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:hover td { background: rgba(255,255,255,0.045); }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.num { font-variant-numeric: tabular-nums; }
+
+    .state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+    .state.rendering { color: #bfdbfe; background: rgba(96,165,250,0.12); }
+    .state.rendering::before { background: var(--blue); }
+    .state.ready { color: #bbf7d0; background: rgba(52,211,153,0.12); }
+    .state.ready::before { background: var(--green); }
+    .state.review { color: #fde68a; background: rgba(245,158,11,0.12); }
+    .state.review::before { background: var(--warn); }
+
+    .application-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .mockup {
+      min-height: 340px;
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.085);
+      box-shadow: 0 18px 62px rgba(0,0,0,0.30);
+      overflow: hidden;
+    }
+
+    .poster {
+      min-height: 190px;
+      border-radius: 18px;
+      padding: 16px;
+      background:
+        linear-gradient(145deg, rgba(3,7,18,0.25), rgba(3,7,18,0.0)),
+        radial-gradient(circle at 25% 25%, #60a5fa, transparent 34%),
+        radial-gradient(circle at 72% 48%, #f2c673, transparent 30%),
+        linear-gradient(135deg, #142033, #7034a3 48%, #ec4899);
+    }
+
+    .ui-preview {
+      min-height: 190px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      padding: 14px;
+      background: #09111f;
+    }
+
+    .ui-line { height: 10px; margin-bottom: 10px; border-radius: 999px; background: rgba(255,255,255,0.15); }
+    .ui-line:nth-child(2) { width: 62%; background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .ui-line:nth-child(3) { width: 78%; }
+    .ui-block { height: 80px; margin-top: 16px; border-radius: 14px; background: linear-gradient(135deg, rgba(96,165,250,0.24), rgba(242,198,115,0.22)); }
+
+    .asset-board {
+      min-height: 190px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .asset-board span {
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.13), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .asset-board span:nth-child(2) { background: linear-gradient(135deg, #15294b, #60a5fa); }
+    .asset-board span:nth-child(3) { background: linear-gradient(135deg, #3f2147, #f2c673); }
+    .asset-board span:nth-child(4) { background: linear-gradient(135deg, #083344, #22d3ee); }
+
+    .mockup h3 { margin: 0 0 6px; font-size: 17px; letter-spacing: -0.03em; }
+    .mockup p { margin: 0; color: var(--soft); font-size: 12px; line-height: 1.6; }
+
+    .export-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 24px;
+      border: 1px solid rgba(242,198,115,0.26);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(242,198,115,0.16), rgba(96,165,250,0.08) 42%, rgba(168,85,247,0.13)),
+        rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .export-panel h2 { margin-bottom: 8px; font-size: clamp(24px, 3vw, 36px); letter-spacing: -0.045em; }
+    .export-panel p { margin: 0; color: var(--muted); line-height: 1.65; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding-top: 28px;
+      color: var(--soft);
+      font-size: 12px;
+    }
+
+    @keyframes mesh-drift {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-3%, 2%) scale(1.02); }
+      100% { transform: translate(2%, -2%) scale(0.98); }
+    }
+
+    @media (max-width: 960px) {
+      .topbar, .hero, .workspace, .export-panel { grid-template-columns: 1fr; }
+      .topbar { position: static; align-items: stretch; flex-wrap: wrap; }
+      .navlinks { order: 3; width: 100%; }
+      .hero { padding-top: 38px; }
+      .hero-copy { min-height: auto; }
+      .workspace { display: grid; }
+      .application-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 24px, 1180px); padding-top: 12px; }
+      .nav-status { width: 100%; justify-content: space-between; }
+      .hero-metrics, .control-grid, .spectrum-meta { grid-template-columns: 1fr; }
+      .palette-content { grid-template-columns: 1fr; }
+      .score { text-align: left; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .btn { width: 100%; }
+      footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="topbar" aria-label="主导航">
+      <div class="brand"><span class="mark" aria-hidden="true"></span>Chromatic AI Engine</div>
+      <div class="navlinks">
+        <a href="#brief" aria-current="page">Brief</a>
+        <a href="#engine">Palette Engine</a>
+        <a href="#queue">Queue</a>
+        <a href="#applications">Applications</a>
+      </div>
+      <div class="nav-status">
+        <span class="status-dot">Model ready</span>
+        <a class="btn primary" href="#export">Export tokens</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <span class="eyebrow">AI Creative Tool / Color Intelligence</span>
+          <h1 id="hero-title">把创意 brief 转成可解释的 <span class="chrome">品牌色彩系统</span></h1>
+          <p>Chromatic AI Engine 为 Campaign、UI token、社媒视觉和品牌资产生成可审计色板：每个渐变都对应和谐度、对比度、品牌偏移与导出状态，而不是只做漂亮背景。</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#brief">生成春季 Campaign 色板</a>
+            <a class="btn" href="#engine">查看评分逻辑</a>
+          </div>
+          <div class="hero-metrics" aria-label="当前运行指标">
+            <div class="metric"><strong>96</strong><span>平均 harmony score</span></div>
+            <div class="metric"><strong>AA</strong><span>正文 / CTA 对比度通过</span></div>
+            <div class="metric"><strong>28</strong><span>UI token 可导出</span></div>
+          </div>
+        </div>
+
+        <aside class="panel live-panel" aria-label="实时生成概览">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Live spectrum / Spring launch</h2>
+              <p class="panel-subtitle">正在为 12 张社媒视觉统一色彩情绪</p>
+            </div>
+            <span class="pill">Rendering 8/12</span>
+          </div>
+          <div class="spectrum-card">
+            <div class="spectrum" aria-label="生成色谱预览"></div>
+            <div class="spectrum-meta">
+              <div><strong>4.8%</strong><span>brand drift</span></div>
+              <div><strong>92</strong><span>mood fit</span></div>
+              <div><strong>18s</strong><span>ETA</span></div>
+            </div>
+          </div>
+          <div class="brief-box" id="brief">
+            <label for="brief-text">AI Brief</label>
+            <textarea id="brief-text">为春季新品 Campaign 生成高对比色板：保留品牌主色 #315E9C 的可信赖感，加入更轻盈的晨雾金色，用于官网 Hero、三张海报和电商详情页 CTA。</textarea>
+            <div class="tag-row">
+              <span class="tag">Brand locked: #315E9C</span>
+              <span class="tag">Contrast: AA+</span>
+              <span class="tag">Mood: Fresh / Premium</span>
+            </div>
+          </div>
+          <button class="btn primary" type="button">Run palette model</button>
+        </aside>
+      </section>
+
+      <section class="section" id="engine" aria-labelledby="engine-title">
+        <div class="section-head">
+          <div>
+            <h2 id="engine-title">Palette Engine 工作区</h2>
+            <p>左侧是业务约束，右侧是可交付结果。色彩渐变在这里代表模型判断：和谐度、风险、品牌偏移和应用优先级。</p>
+          </div>
+          <span class="pill">Model: chroma-v4.2 · Safe export on</span>
+        </div>
+
+        <div class="workspace">
+          <form class="panel controls" aria-label="色彩生成约束">
+            <div class="panel-head">
+              <div>
+                <h3 class="panel-title">Generation constraints</h3>
+                <p class="panel-subtitle">约束越明确，导出的 token 越接近业务场景。</p>
+              </div>
+              <span class="pill">Ready</span>
+            </div>
+            <div class="control-grid">
+              <div class="field">
+                <label for="brand-color">品牌主色</label>
+                <input id="brand-color" value="#315E9C">
+              </div>
+              <div class="field">
+                <label for="output-type">输出用途</label>
+                <select id="output-type">
+                  <option>Campaign + UI tokens</option>
+                  <option>Poster only</option>
+                  <option>Design system</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>商业活力 72%</label>
+              <div class="range-track" aria-hidden="true"><span style="width:72%"></span></div>
+            </div>
+            <div class="field">
+              <label>品牌保真 88%</label>
+              <div class="range-track" aria-hidden="true"><span style="width:88%"></span></div>
+            </div>
+            <div class="field">
+              <label>可访问性优先 94%</label>
+              <div class="range-track" aria-hidden="true"><span style="width:94%"></span></div>
+            </div>
+            <button class="btn primary" type="button">Generate 3 directions</button>
+          </form>
+
+          <div class="panel palette-grid" aria-label="生成色板结果">
+            <article class="palette-card">
+              <div class="swatches" aria-hidden="true">
+                <span style="background:#07111f"></span><span style="background:#315e9c"></span><span style="background:#60a5fa"></span><span style="background:#22d3ee"></span><span style="background:#f2c673"></span><span style="background:#fff7d6"></span>
+              </div>
+              <div class="palette-content">
+                <div>
+                  <h3>Morning Signal</h3>
+                  <p>适合官网首屏和新品发布海报：在保留蓝色可信赖感的同时加入晨雾金，CTA 更清晰。</p>
+                  <div class="checks"><span class="check pass">Contrast AA Passed</span><span class="check pass">Drift 4.8%</span><span class="check">Export 28 tokens</span></div>
+                </div>
+                <div class="score"><strong>96</strong><span>harmony</span></div>
+              </div>
+            </article>
+
+            <article class="palette-card">
+              <div class="swatches" aria-hidden="true">
+                <span style="background:#070816"></span><span style="background:#24306f"></span><span style="background:#7c3aed"></span><span style="background:#ec4899"></span><span style="background:#f59e0b"></span><span style="background:#fdf2f8"></span>
+              </div>
+              <div class="palette-content">
+                <div>
+                  <h3>Creator Pulse</h3>
+                  <p>适合创作者招募页和短视频封面：情绪更强，但品牌偏移需要设计负责人复核。</p>
+                  <div class="checks"><span class="check pass">CTA AA</span><span class="check warn">Drift warning 11.6%</span><span class="check">Mood fit 91</span></div>
+                </div>
+                <div class="score"><strong>88</strong><span>harmony</span></div>
+              </div>
+            </article>
+
+            <article class="palette-card">
+              <div class="swatches" aria-hidden="true">
+                <span style="background:#06121a"></span><span style="background:#0f766e"></span><span style="background:#14b8a6"></span><span style="background:#a7f3d0"></span><span style="background:#aebdc5"></span><span style="background:#f8fafc"></span>
+              </div>
+              <div class="palette-content">
+                <div>
+                  <h3>Accessible Mint</h3>
+                  <p>适合后台 UI token 和数据图表：低噪声、高可读，适配密集信息看板。</p>
+                  <div class="checks"><span class="check pass">Text AAA</span><span class="check pass">Drift 3.2%</span><span class="check">Chart-safe</span></div>
+                </div>
+                <div class="score"><strong>93</strong><span>harmony</span></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="queue" aria-labelledby="queue-title">
+        <div class="section-head">
+          <div>
+            <h2 id="queue-title">生成队列与审计状态</h2>
+            <p>任务表不是装饰：它显示每个项目的模型状态、评分、更新时间和可导出动作，便于团队协作验收。</p>
+          </div>
+          <button class="btn" type="button">Sync brand library</button>
+        </div>
+        <div class="queue-wrap">
+          <table>
+            <thead>
+              <tr><th>Project</th><th>Status</th><th>Harmony</th><th>Brand drift</th><th>Updated</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Spring launch hero</td><td><span class="state rendering">Rendering</span></td><td class="num">96</td><td class="num">4.8%</td><td>2 min ago</td><td><button class="btn" type="button">Preview</button></td></tr>
+              <tr><td>Accessible UI token set</td><td><span class="state ready">AA Passed</span></td><td class="num">93</td><td class="num">3.2%</td><td>14 min ago</td><td><button class="btn" type="button">Export</button></td></tr>
+              <tr><td>Creator recruitment posters</td><td><span class="state review">Needs review</span></td><td class="num">88</td><td class="num">11.6%</td><td>31 min ago</td><td><button class="btn" type="button">Compare</button></td></tr>
+              <tr><td>Q3 ecommerce detail page</td><td><span class="state ready">Ready</span></td><td class="num">91</td><td class="num">5.4%</td><td>46 min ago</td><td><button class="btn" type="button">Send to Figma</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="applications" aria-labelledby="applications-title">
+        <div class="section-head">
+          <div>
+            <h2 id="applications-title">从色板到真实创意资产</h2>
+            <p>同一套色彩系统落到海报、界面和品牌资产中，业务团队能看到“为什么这样配色”以及“哪里可以直接使用”。</p>
+          </div>
+        </div>
+        <div class="application-grid">
+          <article class="mockup">
+            <div class="poster"><span class="pill">Campaign Hero · 96</span></div>
+            <div><h3>春季新品 Campaign</h3><p>以蓝色保持信任基调，金色只用于主 CTA 与新品价格锚点，降低视觉噪声。</p></div>
+          </article>
+          <article class="mockup">
+            <div class="ui-preview"><div class="ui-line"></div><div class="ui-line"></div><div class="ui-line"></div><div class="ui-block"></div></div>
+            <div><h3>可访问 UI Token</h3><p>自动产出 background、surface、focus ring、chart series 共 28 个 token，并标注 AA/AAA 边界。</p></div>
+          </article>
+          <article class="mockup">
+            <div class="asset-board" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            <div><h3>社媒视觉批量统一</h3><p>为 12 张社媒图建立一致情绪曲线，避免单图好看但整组品牌割裂。</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="export" aria-labelledby="export-title">
+        <div class="export-panel">
+          <div>
+            <h2 id="export-title">导出可执行的色彩系统，而不是一张渐变截图</h2>
+            <p>包含 CSS variables、设计 token、对比度报告和品牌偏移说明，可直接交付给设计系统、营销落地页和生成式图片工作流。</p>
+          </div>
+          <button class="btn primary" type="button">Export 28 tokens</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Chromatic AI Engine · Gradient theme preview</span>
+      <span>No remote assets · Inline CSS · Responsive single page</span>
+    </footer>
+  </div>
+</body>
+</html>

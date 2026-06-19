@@ -1,0 +1,75 @@
+/* ================================================================
+   凌霄水墨背景图层
+   - 亮色背景图位于 web/public/backgrounds/亮色.png
+   - 暗色背景图位于 web/public/backgrounds/lingxiao-ink-background.png
+   - 运行时 URL: /backgrounds/亮色.png / /backgrounds/lingxiao-ink-background.png
+   - 已移除动态 SVG 祥云/山体特效，避免与正式背景图叠加冲突。
+   ================================================================ */
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ink-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  overflow: clip;
+  contain: layout paint style;
+  background: #f6f8f3;
+}
+
+.ink-background::before,
+.ink-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ink-background::before {
+  inset: -1px;
+  background-image: url('/backgrounds/亮色.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  filter: saturate(1.08) contrast(1.08) brightness(0.98);
+  opacity: 1;
+  transform: translateZ(0);
+}
+
+/* 亮色不再盖白膜：背景图本身就是浅色水墨，只保留资源层，避免首屏发白看不见图。 */
+.ink-background::after {
+  background: none;
+}
+
+[data-theme="dark"] .ink-background {
+  background: #05080b;
+}
+
+[data-theme="dark"] .ink-background::before {
+  background-image: url('/backgrounds/lingxiao-ink-background.png');
+  filter: saturate(0.96) contrast(1.03) brightness(0.96);
+  opacity: 1;
+}
+
+[data-theme="dark"] .ink-background::after {
+  background:
+    radial-gradient(ellipse 40% 28% at 50% 32%, rgba(255, 255, 255, 0.035), transparent 66%),
+    linear-gradient(90deg, rgba(2, 4, 5, 0.12) 0%, transparent 22%, transparent 76%, rgba(2, 4, 5, 0.10) 100%),
+    linear-gradient(180deg, rgba(2, 4, 5, 0.08) 0%, transparent 40%, rgba(2, 4, 5, 0.16) 100%);
+}
+
+/* 让玻璃面板和背景图融合，避免实黑块割裂画面。 */
+.bg-bg-primary,
+.bg-bg-secondary,
+.bg-bg-card,
+.bg-bg-input {
+  backdrop-filter: blur(8px) saturate(1.02);
+}

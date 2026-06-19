@@ -1,0 +1,29 @@
+{
+  "id": "organic",
+  "name": "Living Habit Field",
+  "title": "健康生活方式习惯追踪站",
+  "description": "为个人健康管理与生活方式教练设计的完整习惯追踪网站：用暖纸质感、自然绿、低幅度呼吸节奏和真实健康指标，呈现晨间计划、连续打卡、补水、睡眠、步行与情绪记录。",
+  "version": "1.0.0",
+  "category": "wellness-lifestyle",
+  "tags": [
+    "organic",
+    "wellness",
+    "habit-tracking",
+    "lifestyle",
+    "health-dashboard",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#f5f3e7",
+    "surfaceWarm": "#fdfbf7",
+    "surfaceMuted": "#dfe7d3",
+    "ink": "#233128",
+    "text": "#344238",
+    "muted": "#657263",
+    "accent": "#4f7b58",
+    "accentWarm": "#b08345",
+    "line": "rgba(79, 123, 88, 0.22)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

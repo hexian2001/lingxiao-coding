@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Frosted Atrium AI Workspace</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      color-scheme: dark;
+      --bg: #071116;
+      --deep: #102027;
+      --ink: #f8fbfa;
+      --text: #eaf7fb;
+      --muted: rgba(234, 247, 251, 0.68);
+      --faint: rgba(234, 247, 251, 0.44);
+      --line: rgba(255, 255, 255, 0.24);
+      --line-soft: rgba(255, 255, 255, 0.14);
+      --glass: rgba(255, 255, 255, 0.16);
+      --glass-quiet: rgba(255, 255, 255, 0.08);
+      --glass-deep: rgba(10, 24, 31, 0.46);
+      --accent: #d9f3ff;
+      --accent-strong: #8bd8ff;
+      --warm: #f2c673;
+      --ok: #92f2c0;
+      --warn: #ffd38a;
+      --danger: #ff9fa6;
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
+      --shadow-soft: 0 18px 44px rgba(0, 0, 0, 0.22);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 9% 16%, rgba(29, 78, 216, 0.24), transparent 30vw),
+        radial-gradient(circle at 82% 8%, rgba(242, 198, 115, 0.18), transparent 26vw),
+        radial-gradient(circle at 58% 64%, rgba(6, 182, 212, 0.15), transparent 30vw),
+        linear-gradient(135deg, #071116 0%, #102027 48%, #182c33 100%);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      width: 62vw;
+      height: 62vw;
+      left: -18vw;
+      top: -20vw;
+      background: rgba(217, 243, 255, 0.16);
+      filter: blur(120px);
+    }
+
+    body::after {
+      width: 44vw;
+      height: 44vw;
+      right: -12vw;
+      bottom: -18vw;
+      background: rgba(124, 58, 237, 0.14);
+      filter: blur(110px);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .shell {
+      min-height: calc(100vh - 48px);
+      border: 1px solid var(--line);
+      border-top-color: rgba(255,255,255,0.38);
+      border-radius: 36px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.22);
+      backdrop-filter: blur(36px) saturate(160%);
+      -webkit-backdrop-filter: blur(36px) saturate(160%);
+      overflow: hidden;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+      font-weight: 780;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(255,255,255,0.82), transparent 18%),
+        linear-gradient(135deg, rgba(217,243,255,0.9), rgba(242,198,115,0.7));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.34), 0 12px 28px rgba(139,216,255,0.18);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 5px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow-x: auto;
+    }
+
+    .nav-links a {
+      white-space: nowrap;
+      padding: 9px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 680;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .nav-links a.active {
+      outline: none;
+      color: var(--ink);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+    }
+
+    .status-pill,
+    .btn,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-top-color: rgba(255,255,255,0.32);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .status-pill {
+      padding: 9px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 18px rgba(146,242,192,0.7);
+    }
+
+    .btn {
+      min-height: 40px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 760;
+      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms, border-color 180ms;
+    }
+
+    .btn.primary {
+      border-color: rgba(217,243,255,0.56);
+      background: var(--accent);
+      color: var(--deep);
+      box-shadow: 0 18px 38px rgba(139,216,255,0.16), inset 0 1px 0 rgba(255,255,255,0.42);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      outline: none;
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.36);
+      background: rgba(255,255,255,0.14);
+    }
+
+    .btn.primary:hover,
+    .btn.primary:focus-visible { background: #eefaff; }
+    .btn:active { transform: translateY(0) scale(0.98); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+      gap: 28px;
+      padding: 32px;
+    }
+
+    .hero-copy {
+      display: grid;
+      align-content: space-between;
+      gap: 28px;
+      min-height: 590px;
+      padding: 8px 0;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      padding: 7px 11px;
+      border: 1px solid rgba(217,243,255,0.38);
+      border-radius: 999px;
+      background: rgba(217,243,255,0.1);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 860;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin: 16px 0 0;
+      font-size: clamp(44px, 7vw, 94px);
+      line-height: 0.94;
+      letter-spacing: -0.07em;
+      font-weight: 820;
+    }
+
+    .hero-copy p {
+      max-width: 600px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.6vw, 18px);
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 18px;
+      border: 1px solid var(--line-soft);
+      border-top-color: rgba(255,255,255,0.28);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px) saturate(150%);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 27px;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 5px;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .workspace {
+      position: relative;
+      min-height: 590px;
+      border: 1px solid var(--line);
+      border-top-color: rgba(255,255,255,0.42);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(255,255,255,0.16), rgba(255,255,255,0.07));
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,0.18);
+      backdrop-filter: blur(30px) saturate(150%);
+      overflow: hidden;
+    }
+
+    .workspace::before {
+      content: "";
+      position: absolute;
+      inset: -25% -18% auto auto;
+      width: 54%;
+      height: 48%;
+      border-radius: 50%;
+      background: rgba(217,243,255,0.18);
+      filter: blur(74px);
+    }
+
+    .workspace-top {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .window-dots { display: flex; gap: 7px; }
+    .window-dots i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+    }
+    .window-dots i:nth-child(1) { background: var(--danger); }
+    .window-dots i:nth-child(2) { background: var(--warn); }
+    .window-dots i:nth-child(3) { background: var(--ok); }
+
+    .cmd-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: min(360px, 100%);
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 13px;
+      background: rgba(6,14,18,0.28);
+      color: var(--faint);
+      font-size: 13px;
+    }
+
+    .cmd-search kbd {
+      margin-left: auto;
+      padding: 2px 6px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 6px;
+      color: var(--faint);
+      font-size: 11px;
+      font-family: inherit;
+    }
+
+    .workspace-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) 210px;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .rail,
+    .preview,
+    .inspector,
+    .panel {
+      border: 1px solid rgba(255,255,255,0.16);
+      border-top-color: rgba(255,255,255,0.3);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+      backdrop-filter: blur(22px) saturate(150%);
+    }
+
+    .rail { padding: 12px; }
+    .rail-title, .panel-title, .inspector-title {
+      color: var(--faint);
+      font-size: 11px;
+      font-weight: 820;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .layer-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .layer {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .layer.active {
+      border-color: rgba(217,243,255,0.34);
+      background: rgba(217,243,255,0.12);
+    }
+
+    .layer strong { font-size: 13px; }
+    .layer span { color: var(--faint); font-size: 11px; }
+
+    .preview {
+      min-height: 380px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .preview-stage {
+      position: relative;
+      min-height: 352px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 24% 22%, rgba(217,243,255,0.24), transparent 26%),
+        radial-gradient(circle at 72% 58%, rgba(242,198,115,0.18), transparent 24%),
+        linear-gradient(145deg, rgba(8,19,25,0.82), rgba(23,51,61,0.56));
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .preview-card {
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      top: 12%;
+      padding: 24px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-top-color: rgba(255,255,255,0.38);
+      background: rgba(255,255,255,0.13);
+      box-shadow: 0 26px 70px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.18);
+      backdrop-filter: blur(28px) saturate(165%);
+    }
+
+    .preview-card h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 50px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .preview-card p {
+      max-width: 420px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .control-bar {
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 8%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .control {
+      min-height: 72px;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .control b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+    .control span { display: block; margin-top: 4px; color: var(--faint); font-size: 11px; }
+
+    .inspector {
+      padding: 14px;
+    }
+
+    .quality-ring {
+      width: 132px;
+      height: 132px;
+      display: grid;
+      place-items: center;
+      margin: 18px auto;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(6,14,18,0.72) 0 54%, transparent 55%),
+        conic-gradient(var(--accent) 0 84%, rgba(255,255,255,0.12) 84% 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    .quality-ring strong { font-size: 30px; letter-spacing: -0.04em; }
+
+    .check-list { display: grid; gap: 9px; }
+    .check {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 13px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .check b { color: var(--text); font-size: 12px; }
+
+    .sections {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+      padding: 0 32px 32px;
+    }
+
+    .panel { padding: 20px; }
+    .panel-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2 {
+      margin: 8px 0 0;
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: -0.04em;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .event-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 20px rgba(217,243,255,0.55);
+    }
+
+    .event.warn .event-dot { background: var(--warm); box-shadow: 0 0 18px rgba(242,198,115,0.5); }
+    .event.ok .event-dot { background: var(--ok); box-shadow: 0 0 18px rgba(146,242,192,0.45); }
+    .event strong { display: block; font-size: 13px; }
+    .event span { color: var(--faint); font-size: 12px; }
+    .event time { color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+    .control-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .slider-row {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .slider {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    .slider i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--warm));
+    }
+
+    .footer-note {
+      padding: 16px 32px 28px;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1120px) {
+      .hero,
+      .sections { grid-template-columns: 1fr; }
+      .hero-copy { min-height: auto; }
+      .workspace-grid { grid-template-columns: 150px minmax(0, 1fr); }
+      .inspector { grid-column: 1 / -1; }
+      .inspector-inner { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+      .quality-ring { margin: 0; }
+    }
+
+    @media (max-width: 760px) {
+      .page { padding: 12px; }
+      .shell { border-radius: 24px; min-height: calc(100vh - 24px); }
+      .nav { align-items: stretch; flex-direction: column; }
+      .nav-actions { min-width: 0; flex-wrap: wrap; }
+      .hero { padding: 20px; }
+      .metric-strip,
+      .workspace-grid,
+      .control-bar,
+      .inspector-inner { grid-template-columns: 1fr; }
+      .workspace { min-height: auto; }
+      .preview-stage { min-height: 520px; }
+      .preview-card { left: 14px; right: 14px; top: 18px; }
+      .control-bar { left: 14px; right: 14px; bottom: 14px; }
+      .sections { padding: 0 20px 20px; }
+      .footer-note { padding: 12px 20px 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="shell">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="#">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Frosted Atrium</span>
+        </a>
+        <div class="nav-links" aria-label="工作台视图">
+          <a class="active" href="#preview">Live Preview</a>
+          <a href="#layers">Layers</a>
+          <a href="#reviews">Review Queue</a>
+          <a href="#release">Release Gate</a>
+        </div>
+        <div class="nav-actions">
+          <span class="status-pill">preview synced</span>
+          <button class="btn primary" type="button">Freeze frame</button>
+        </div>
+      </nav>
+
+      <section class="hero" id="preview">
+        <div class="hero-copy">
+          <div>
+            <div class="eyebrow">Spatial AI Workspace</div>
+            <h1>把 AI 生成、预览和评审放进同一个透明控制层。</h1>
+            <p>为品牌运营、设计审核和上线前校准设计的玻璃态工作台。左侧管理生成层，中央锁定真实页面预览，右侧用质量指标决定是否推进发布。</p>
+            <div class="hero-actions">
+              <button class="btn primary" type="button">Open live brief</button>
+              <button class="btn" type="button">Compare variants</button>
+            </div>
+          </div>
+          <div class="metric-strip" aria-label="关键指标">
+            <div class="metric"><strong>18</strong><span>active preview panes</span></div>
+            <div class="metric"><strong>84%</strong><span>release clarity score</span></div>
+            <div class="metric"><strong>06</strong><span>queued edits before handoff</span></div>
+          </div>
+        </div>
+
+        <div class="workspace" aria-label="AI 预览控制工作台">
+          <div class="workspace-top">
+            <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="cmd-search"><span>⌕</span><span>Ask AI to tune preview density</span><kbd>⌘K</kbd></div>
+          </div>
+          <div class="workspace-grid">
+            <aside class="rail" id="layers">
+              <div class="rail-title">Layer Stack</div>
+              <div class="layer-list">
+                <div class="layer active"><strong>Hero glass copy</strong><span>locked · 94% fit</span></div>
+                <div class="layer"><strong>Metric cards</strong><span>review · 3 notes</span></div>
+                <div class="layer"><strong>CTA contrast</strong><span>ready · AA</span></div>
+                <div class="layer"><strong>Mobile crop</strong><span>pending · 2 widths</span></div>
+              </div>
+            </aside>
+
+            <section class="preview" aria-label="页面预览">
+              <div class="preview-stage">
+                <article class="preview-card">
+                  <span class="chip">Campaign preview · Autumn launch</span>
+                  <h2>产品故事已聚焦，等待最终投放窗口。</h2>
+                  <p>AI 已把海报、落地页首屏和渠道短文统一到同一叙事密度；当前差异集中在按钮层级与移动端安全区。</p>
+                </article>
+                <div class="control-bar" aria-label="预览控制">
+                  <div class="control"><b>1.18×</b><span>depth scale</span></div>
+                  <div class="control"><b>42%</b><span>glass opacity</span></div>
+                  <div class="control"><b>AA</b><span>contrast gate</span></div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="inspector">
+              <div class="inspector-inner">
+                <div>
+                  <div class="inspector-title">Release Quality</div>
+                  <div class="quality-ring"><strong>84</strong></div>
+                </div>
+                <div class="check-list">
+                  <div class="check"><span>Business copy</span><b>clear</b></div>
+                  <div class="check"><span>Preview drift</span><b>low</b></div>
+                  <div class="check"><span>Mobile safety</span><b>needs pass</b></div>
+                  <div class="check"><span>Token brief</span><b>synced</b></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="sections" id="reviews">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Review Queue</div>
+              <h2>评审不是堆卡片，而是按发布风险排序。</h2>
+            </div>
+            <span class="chip">6 open</span>
+          </div>
+          <div class="timeline">
+            <div class="event warn"><i class="event-dot"></i><div><strong>移动端首屏按钮可能落入安全区边缘</strong><span>需要重新确认 390px 与 430px 宽度</span></div><time>09:42</time></div>
+            <div class="event"><i class="event-dot"></i><div><strong>AI 改写后的副标题已通过业务语义检查</strong><span>保留“上线前校准”，删除空泛高级感描述</span></div><time>09:31</time></div>
+            <div class="event ok"><i class="event-dot"></i><div><strong>对比度门禁通过</strong><span>主按钮、状态胶囊和表格字段均满足 AA</span></div><time>09:18</time></div>
+          </div>
+        </article>
+
+        <article class="panel" id="release">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Preview Controls</div>
+              <h2>每个控制项都对应一个真实判断。</h2>
+            </div>
+            <button class="btn" type="button">Apply preset</button>
+          </div>
+          <div class="control-panel">
+            <div class="slider-row"><div class="slider-label"><span>Glass opacity</span><b>42%</b></div><div class="slider"><i style="width:42%"></i></div></div>
+            <div class="slider-row"><div class="slider-label"><span>Information density</span><b>68%</b></div><div class="slider"><i style="width:68%"></i></div></div>
+            <div class="slider-row"><div class="slider-label"><span>Background depth</span><b>57%</b></div><div class="slider"><i style="width:57%"></i></div></div>
+            <div class="slider-row"><div class="slider-label"><span>Review confidence</span><b>84%</b></div><div class="slider"><i style="width:84%"></i></div></div>
+          </div>
+        </article>
+      </section>
+
+      <p class="footer-note">Frosted Atrium 的玻璃感来自多层透明表面、克制高光和可读业务状态；页面没有依赖远程资源，适合直接作为主题参考站预览。</p>
+    </div>
+  </main>
+</body>
+</html>

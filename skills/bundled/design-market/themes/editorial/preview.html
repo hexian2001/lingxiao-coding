@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Index Research Journal · 数字杂志研究报告发布页</title>
+  <style>
+    :root {
+      --surface: #fbfaf7;
+      --paper: #f1ede4;
+      --ink: #151515;
+      --muted: #6f6b63;
+      --accent: #b03d2d;
+      --line: rgba(21, 21, 21, 0.18);
+      --line-strong: rgba(21, 21, 21, 0.34);
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(21, 21, 21, 0.035) 1px, transparent 1px) 0 0 / 7.5vw 100%,
+        var(--surface);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .page { min-height: 100vh; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 250, 247, 0.94);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto minmax(150px, 1fr);
+      align-items: center;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+      font: 800 16px/1 Georgia, "Times New Roman", serif;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 3px;
+      border: 1px solid var(--line);
+      padding: 4px;
+      background: var(--paper);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .nav-links a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a[aria-current="page"] {
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    .nav-action { justify-self: end; }
+
+    .button {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--ink);
+      padding: 0 15px;
+      background: var(--ink);
+      color: var(--surface);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+
+    .button:hover { transform: translateY(-1px); background: var(--accent); border-color: var(--accent); }
+    .button:active { transform: translateY(0); }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line-strong);
+    }
+
+    .button.secondary:hover {
+      background: var(--ink);
+      color: var(--surface);
+      border-color: var(--ink);
+    }
+
+    .hero {
+      width: min(100% - 32px, var(--max));
+      margin: 34px auto 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(310px, 0.8fr);
+      gap: 28px;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 34px;
+    }
+
+    .cover {
+      min-height: 620px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      border: 1px solid var(--ink);
+      background: var(--surface);
+    }
+
+    .issue-bar,
+    .cover-footer {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cover-footer { border-top: 1px solid var(--line); border-bottom: 0; }
+    .issue-bar span:nth-child(2), .cover-footer span:nth-child(2) { color: var(--accent); }
+    .issue-bar span:last-child, .cover-footer span:last-child { text-align: right; }
+
+    .cover-body {
+      display: grid;
+      grid-template-columns: 0.24fr 1fr;
+      gap: 24px;
+      padding: clamp(28px, 5vw, 58px);
+    }
+
+    .spine {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-left: 1px solid var(--line);
+      padding-left: 18px;
+    }
+
+    .headline { align-self: center; }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, blockquote {
+      font-family: Georgia, "Times New Roman", serif;
+      letter-spacing: -0.055em;
+    }
+
+    h1 {
+      margin: 16px 0 20px;
+      max-width: 760px;
+      font-size: clamp(54px, 9vw, 118px);
+      line-height: 0.88;
+      font-weight: 760;
+    }
+
+    .deck {
+      max-width: 620px;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.62;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .brief-card {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .brief-top {
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brief-top h2 {
+      margin: 8px 0 10px;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 0.96;
+    }
+
+    .brief-top p { margin: 0; color: var(--muted); }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .meta-item {
+      min-height: 112px;
+      padding: 17px;
+      border-right: 1px solid var(--line);
+    }
+
+    .meta-item:nth-child(2n) { border-right: 0; }
+    .meta-item:nth-child(n + 3) { border-top: 1px solid var(--line); }
+
+    .meta-item strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .meta-item span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .editor-note {
+      padding: 20px;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .editor-note p { margin: 0; }
+
+    .download-panel {
+      margin: 20px;
+      padding: 16px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+    }
+
+    .download-panel label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .input-row { display: flex; gap: 8px; }
+
+    input, select {
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--ink);
+      padding: 0 11px;
+      font: inherit;
+    }
+
+    .input-row input { flex: 1; }
+
+    .section {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+      padding: 54px 0;
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) minmax(220px, 0.44fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .section-number {
+      color: var(--accent);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 72px);
+      line-height: 0.94;
+    }
+
+    .section-heading p { margin: 0; color: var(--muted); }
+
+    .brief-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--ink);
+    }
+
+    .brief-item {
+      min-height: 260px;
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      display: grid;
+      align-content: space-between;
+      gap: 30px;
+      background: rgba(251, 250, 247, 0.72);
+    }
+
+    .brief-item:last-child { border-right: 0; }
+    .brief-item h3 { margin: 0; font-size: 32px; line-height: 1; }
+    .brief-item p { margin: 0; color: var(--muted); }
+
+    .evidence {
+      display: grid;
+      grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .figure-card {
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      padding: 20px;
+    }
+
+    .figure-card strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(72px, 11vw, 136px);
+      line-height: 0.88;
+      letter-spacing: -0.08em;
+      color: var(--accent);
+    }
+
+    .figure-card span {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+    }
+
+    .signal-table {
+      border: 1px solid var(--ink);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px 16px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; background: var(--paper); }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr { transition: background 160ms ease; }
+    tbody tr:hover { background: rgba(176, 61, 45, 0.065); }
+    .mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .status { color: var(--accent); font-weight: 850; }
+
+    .chapter-list {
+      border-top: 2px solid var(--ink);
+    }
+
+    .chapter {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr) 150px 130px;
+      gap: 22px;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chapter-num {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 38px;
+      letter-spacing: -0.06em;
+      color: var(--accent);
+    }
+
+    .chapter h3 { margin: 0 0 7px; font-size: 28px; line-height: 1; }
+    .chapter p { margin: 0; color: var(--muted); }
+    .chapter small { color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .feature {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.66fr);
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    .feature-copy { padding: clamp(28px, 5vw, 54px); }
+
+    blockquote {
+      margin: 0;
+      font-size: clamp(36px, 5.4vw, 70px);
+      line-height: 0.96;
+    }
+
+    .feature-copy p { max-width: 620px; color: rgba(251, 250, 247, 0.72); font-size: 17px; }
+
+    .chart {
+      min-height: 430px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      border-left: 1px solid rgba(251, 250, 247, 0.24);
+      background:
+        linear-gradient(180deg, transparent 24%, rgba(251, 250, 247, 0.12) 24% 25%, transparent 25% 49%, rgba(251, 250, 247, 0.12) 49% 50%, transparent 50% 74%, rgba(251, 250, 247, 0.12) 74% 75%, transparent 75%),
+        var(--accent);
+      padding: 24px;
+    }
+
+    .bars {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .bar {
+      border: 1px solid rgba(251, 250, 247, 0.8);
+      background: rgba(251, 250, 247, 0.84);
+      min-height: var(--h);
+    }
+
+    .caption {
+      margin-top: 18px;
+      color: rgba(251, 250, 247, 0.84);
+      font-size: 12px;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .method {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+    }
+
+    .method-card,
+    .limits-card {
+      border: 1px solid var(--ink);
+      padding: 24px;
+      background: var(--surface);
+    }
+
+    .method-card h3,
+    .limits-card h3 { margin: 0 0 16px; font-size: 32px; }
+    .method-card ul, .limits-card ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .method-card li, .limits-card li { margin: 10px 0; }
+
+    .footer-cta {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+      padding: 54px 0 42px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.52fr);
+      gap: 30px;
+      align-items: stretch;
+    }
+
+    .footer-cta h2 {
+      margin: 0 0 16px;
+      font-size: clamp(42px, 6vw, 82px);
+      line-height: 0.94;
+    }
+
+    .footer-cta p { max-width: 720px; color: var(--muted); font-size: 18px; }
+
+    .subscribe {
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      padding: 22px;
+      align-self: start;
+    }
+
+    .subscribe h3 { margin: 0 0 14px; font-size: 30px; }
+    .subscribe .input-row { margin-top: 14px; }
+
+    .legal {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+      padding: 18px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 12px;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 960px) {
+      .nav { grid-template-columns: 1fr; padding: 14px 0; }
+      .nav-action { justify-self: start; }
+      .hero, .evidence, .feature, .method, .footer-cta { grid-template-columns: 1fr; }
+      .section-heading { grid-template-columns: 1fr; gap: 12px; }
+      .brief-grid { grid-template-columns: 1fr; }
+      .brief-item { border-right: 0; border-bottom: 1px solid var(--line); }
+      .brief-item:last-child { border-bottom: 0; }
+      .chapter { grid-template-columns: 68px 1fr; }
+      .chapter small { grid-column: 2; }
+      .chart { border-left: 0; border-top: 1px solid rgba(251, 250, 247, 0.24); }
+    }
+
+    @media (max-width: 620px) {
+      body { background: var(--surface); }
+      .cover { min-height: auto; }
+      .cover-body { grid-template-columns: 1fr; padding: 26px; }
+      .spine { writing-mode: initial; transform: none; border-left: 0; border-bottom: 1px solid var(--line); padding: 0 0 12px; }
+      .issue-bar, .cover-footer { grid-template-columns: 1fr; }
+      .issue-bar span:last-child, .cover-footer span:last-child { text-align: left; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .meta-item, .meta-item:nth-child(2n) { border-right: 0; }
+      .meta-item:nth-child(n + 2) { border-top: 1px solid var(--line); }
+      .input-row { flex-direction: column; }
+      .chapter { grid-template-columns: 1fr; gap: 10px; }
+      .chapter small { grid-column: auto; }
+      th, td { display: block; width: 100%; border-bottom: 0; padding: 8px 14px; }
+      tr { display: block; border-bottom: 1px solid var(--line); padding: 8px 0; }
+      thead { display: none; }
+      .legal { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <nav class="nav" aria-label="出版导航">
+        <a class="brand" href="#top" aria-label="Index Research Journal 首页">
+          <span class="brand-mark">I</span>
+          <span>Index Research Journal</span>
+        </a>
+        <div class="nav-links" aria-label="章节入口">
+          <a href="#brief" aria-current="page">Brief</a>
+          <a href="#evidence">Evidence</a>
+          <a href="#chapters">Chapters</a>
+          <a href="#method">Method</a>
+        </div>
+        <div class="nav-action"><a class="button" href="#subscribe">获取完整报告</a></div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="report-title">
+        <article class="cover">
+          <div class="issue-bar"><span>Issue 08</span><span>2026 Spring</span><span>Retail Systems Desk</span></div>
+          <div class="cover-body">
+            <aside class="spine">Digital magazine · Research report · Publication page</aside>
+            <div class="headline">
+              <div class="kicker">年度研究发布</div>
+              <h1 id="report-title">从流量增长到信任增长</h1>
+              <p class="deck">一份面向消费品牌增长团队的研究报告，追踪 64 个数字会员项目、18 次深度访谈与 9 个月复购数据，解释为什么下一轮增长更依赖内容可信度、服务节奏与可解释的会员权益。</p>
+              <div class="hero-actions">
+                <a class="button" href="#subscribe">下载 PDF 简报</a>
+                <a class="button secondary" href="#chapters">阅读章节目录</a>
+              </div>
+            </div>
+          </div>
+          <div class="cover-footer"><span>Research window: 2025.07—2026.03</span><span>CN / EN Abstract</span><span>Confidence: 0.82</span></div>
+        </article>
+
+        <aside class="brief-card" aria-label="报告状态摘要">
+          <div class="brief-top">
+            <div class="kicker">Editor’s brief</div>
+            <h2>可读、可引用、可转化的研究入口。</h2>
+            <p>页面不是把报告拆成卡片，而是让读者先获得判断，再进入证据、章节和业务动作。</p>
+          </div>
+          <div class="meta-grid">
+            <div class="meta-item"><strong>64</strong><span>会员项目样本</span></div>
+            <div class="meta-item"><strong>18</strong><span>增长负责人访谈</span></div>
+            <div class="meta-item"><strong>9m</strong><span>行为追踪周期</span></div>
+            <div class="meta-item"><strong>4.7%</strong><span>复购提升中位数</span></div>
+          </div>
+          <div class="editor-note">
+            <p>首发版本包含 42 页主报告、9 页方法附录与一份可供增长团队复盘的指标清单。公开页只展示核心结论与下载入口。</p>
+          </div>
+          <form class="download-panel">
+            <label for="workmail">发送给工作邮箱</label>
+            <div class="input-row">
+              <input id="workmail" name="workmail" type="email" value="strategy@northline.cn" aria-label="工作邮箱" />
+              <button class="button" type="button">发送</button>
+            </div>
+          </form>
+        </aside>
+      </section>
+
+      <section class="section" id="brief" aria-labelledby="brief-title">
+        <div class="section-heading">
+          <div class="section-number">01</div>
+          <h2 id="brief-title">Executive brief</h2>
+          <p>把报告的核心判断压缩成三条可以被管理层讨论的命题。</p>
+        </div>
+        <div class="brief-grid">
+          <article class="brief-item">
+            <div class="kicker">Finding A</div>
+            <div>
+              <h3>会员增长的瓶颈正在从触达成本转向信任成本。</h3>
+              <p>样本中 71% 的品牌已经能稳定触达用户，但仅 29% 的会员能清晰说明权益价值。</p>
+            </div>
+          </article>
+          <article class="brief-item">
+            <div class="kicker">Finding B</div>
+            <div>
+              <h3>高复购项目更像编辑部，而不是促销机器。</h3>
+              <p>内容发布节奏、服务解释和权益更新被统一排期后，复购率中位数提升 4.7%。</p>
+            </div>
+          </article>
+          <article class="brief-item">
+            <div class="kicker">Finding C</div>
+            <div>
+              <h3>折扣不再是主要答案，解释权才是。</h3>
+              <p>用户更愿意为可理解、可追踪、可被引用的会员价值留下，而不是一次性优惠。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-heading">
+          <div class="section-number">02</div>
+          <h2 id="evidence-title">Evidence board</h2>
+          <p>以少量高置信指标展示研究证据，避免把报告页做成仪表盘。</p>
+        </div>
+        <div class="evidence">
+          <aside class="figure-card">
+            <strong>82%</strong>
+            <span>受访团队认为“权益解释不清”比“曝光不足”更影响 2026 年会员增长质量。</span>
+          </aside>
+          <div class="signal-table" role="region" aria-label="关键证据表">
+            <table>
+              <thead><tr><th>信号</th><th>证据来源</th><th>变化</th><th>置信</th></tr></thead>
+              <tbody>
+                <tr><td>会员说明页停留</td><td>32 个品牌站点事件</td><td class="mono">+18.4%</td><td class="status">High</td></tr>
+                <tr><td>权益二次查看率</td><td>9 个月行为追踪</td><td class="mono">+11.2%</td><td class="status">High</td></tr>
+                <tr><td>纯折扣点击率</td><td>邮件与小程序触点</td><td class="mono">-6.8%</td><td class="status">Medium</td></tr>
+                <tr><td>人工客服解释请求</td><td>18 次运营访谈</td><td class="mono">+23.0%</td><td class="status">Medium</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="chapters" aria-labelledby="chapters-title">
+        <div class="section-heading">
+          <div class="section-number">03</div>
+          <h2 id="chapters-title">Chapter index</h2>
+          <p>目录像杂志一样组织阅读路径，同时保留页码、耗时和发布状态。</p>
+        </div>
+        <div class="chapter-list">
+          <article class="chapter"><div class="chapter-num">01</div><div><h3>增长质量的新定义</h3><p>从新增会员数转向信任、解释与复购的组合指标。</p></div><small>pp. 04—11</small><small>8 min read</small></article>
+          <article class="chapter"><div class="chapter-num">02</div><div><h3>权益如何被理解</h3><p>拆解 64 个会员项目中最常见的信息断点。</p></div><small>pp. 12—23</small><small>16 min read</small></article>
+          <article class="chapter"><div class="chapter-num">03</div><div><h3>像编辑部一样运营</h3><p>用发布节奏、证据说明和复盘机制替代活动堆叠。</p></div><small>pp. 24—35</small><small>14 min read</small></article>
+          <article class="chapter"><div class="chapter-num">04</div><div><h3>增长团队的行动清单</h3><p>为产品、运营、内容和客服设定 30 天协同实验。</p></div><small>pp. 36—42</small><small>9 min read</small></article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="feature-title">
+        <div class="feature">
+          <div class="feature-copy">
+            <div class="kicker">Featured insight</div>
+            <blockquote id="feature-title">“当会员权益需要被反复解释，问题通常不在客服，而在产品叙事。”</blockquote>
+            <p>研究中表现最好的品牌并没有增加更多权益，而是把权益拆成可被验证的承诺：何时生效、如何使用、为什么值得、哪些限制必须提前说明。</p>
+          </div>
+          <div class="chart" aria-label="内容解释充分度与复购表现示意图">
+            <div class="bars" aria-hidden="true">
+              <div class="bar" style="--h: 22%"></div>
+              <div class="bar" style="--h: 38%"></div>
+              <div class="bar" style="--h: 54%"></div>
+              <div class="bar" style="--h: 71%"></div>
+              <div class="bar" style="--h: 88%"></div>
+            </div>
+            <div class="caption">解释充分度分组越高，90 天复购表现越稳定。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="method" aria-labelledby="method-title">
+        <div class="section-heading">
+          <div class="section-number">04</div>
+          <h2 id="method-title">Methodology</h2>
+          <p>公开方法边界，让报告既有编辑感，也能被审阅、引用和复盘。</p>
+        </div>
+        <div class="method">
+          <article class="method-card">
+            <h3>数据来源</h3>
+            <ul>
+              <li>64 个消费品牌会员项目公开页与私域触点抽样。</li>
+              <li>18 位增长、CRM、内容与客服负责人半结构访谈。</li>
+              <li>2025 年 7 月至 2026 年 3 月的匿名行为指标。</li>
+              <li>复购率、权益查看、咨询请求、内容互动四类核心信号。</li>
+            </ul>
+          </article>
+          <article class="limits-card">
+            <h3>研究限制</h3>
+            <ul>
+              <li>样本集中在年营收 2 亿以上消费品牌，不代表早期项目。</li>
+              <li>部分数据由企业按统一模板脱敏提供，无法还原单个用户路径。</li>
+              <li>报告不评价短期促销 ROI，只观察会员关系质量变化。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer id="subscribe">
+      <div class="footer-cta">
+        <div>
+          <div class="kicker">Conversion footer</div>
+          <h2>把报告带回你的增长例会。</h2>
+          <p>下载完整 PDF、订阅季度更新，或预约 30 分钟研究解读。我们会按行业、会员规模和增长阶段提供阅读建议。</p>
+          <div class="hero-actions">
+            <a class="button" href="#top">下载完整报告</a>
+            <a class="button secondary" href="#method">查看方法说明</a>
+          </div>
+        </div>
+        <form class="subscribe">
+          <h3>预约研究解读</h3>
+          <label for="role">选择你的团队角色</label>
+          <select id="role" name="role" aria-label="团队角色">
+            <option>品牌增长负责人</option>
+            <option>会员产品经理</option>
+            <option>内容运营负责人</option>
+          </select>
+          <div class="input-row">
+            <input type="email" value="insight@northline.cn" aria-label="预约邮箱" />
+            <button class="button" type="button">预约</button>
+          </div>
+        </form>
+      </div>
+      <div class="legal">
+        <span>Index Research Journal · Retail Systems Desk</span>
+        <span>纯前端内联预览 · 无远程资源</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

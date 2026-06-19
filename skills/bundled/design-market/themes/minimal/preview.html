@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>极简 SaaS 产品决策台</title>
+  <style>
+    :root {
+      --surface: #f7f8f5;
+      --surface-2: #ecefeb;
+      --ink: #111719;
+      --text: #151b1d;
+      --muted: #667174;
+      --accent: #526f7b;
+      --line: rgba(21, 27, 29, 0.16);
+      --line-soft: rgba(21, 27, 29, 0.09);
+      --ok: #2f6f5e;
+      --warn: #8a6334;
+      --risk: #8a4b45;
+      --radius: 10px;
+      --shadow: 0 24px 64px rgba(17, 23, 25, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, rgba(82, 111, 123, 0.10), transparent 340px),
+        var(--surface);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, select { font: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 42px;
+    }
+
+    .topbar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(247, 248, 245, 0.86);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 36px rgba(17, 23, 25, 0.08);
+      position: sticky;
+      top: 14px;
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 820;
+      letter-spacing: -0.02em;
+    }
+
+    .mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background:
+        linear-gradient(135deg, var(--ink), var(--accent));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav::-webkit-scrollbar { display: none; }
+
+    .nav a {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 680;
+      white-space: nowrap;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible,
+    .nav a.active {
+      color: var(--text);
+      background: var(--surface-2);
+      outline: none;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: max-content;
+    }
+
+    .btn {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 760;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .btn.primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--surface);
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: rgba(17, 23, 25, 0.34); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 3px solid rgba(82, 111, 123, 0.28); outline-offset: 2px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+      gap: 22px;
+      margin-top: 22px;
+      align-items: stretch;
+    }
+
+    .decision-card,
+    .panel,
+    .metric,
+    .workstream,
+    .note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(247, 248, 245, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .decision-card {
+      min-height: 470px;
+      padding: clamp(26px, 5vw, 52px);
+      display: grid;
+      align-content: space-between;
+      gap: 38px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .decision-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -110px auto;
+      width: 280px;
+      height: 280px;
+      border: 1px solid var(--line-soft);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .kicker {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 860;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 18px 0 16px;
+      font-size: clamp(42px, 7vw, 84px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 780;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.7vw, 18px);
+      line-height: 1.82;
+    }
+
+    .decision-footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      position: relative;
+      z-index: 1;
+    }
+
+    .next-step {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .next-step strong {
+      color: var(--text);
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel { padding: 20px; }
+
+    .panel-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 780;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    h2, h3 { margin: 0; letter-spacing: -0.035em; line-height: 1.08; }
+    h2 { font-size: 28px; }
+    h3 { font-size: 18px; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .status-pill.warn .dot { background: var(--warn); }
+    .status-pill.risk .dot { background: var(--risk); }
+    .status-pill.ok .dot { background: var(--ok); }
+
+    .confidence {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric {
+      padding: 14px;
+      box-shadow: none;
+      background: var(--surface-2);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 27px;
+      line-height: 1;
+      letter-spacing: -0.045em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .rail {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .rail-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--line-soft);
+      font-size: 13px;
+    }
+
+    .rail-item b { font-weight: 780; }
+    .rail-item small { color: var(--muted); }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1fr);
+      gap: 22px;
+      margin-top: 22px;
+      align-items: start;
+    }
+
+    .workstream { padding: 20px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--surface-2);
+      font-size: 11px;
+      font-weight: 860;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr:hover td { background: rgba(236, 239, 235, 0.62); }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .owner {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--text);
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .notes {
+      display: grid;
+      gap: 12px;
+    }
+
+    .note {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .note p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.72;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    input, select {
+      min-width: 0;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    input:focus-visible, select:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(82, 111, 123, 0.22);
+    }
+
+    .footer-summary {
+      margin-top: 22px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    .footer-summary p { margin: 6px 0 0; color: rgba(247, 248, 245, 0.68); }
+    .footer-summary .btn { color: var(--surface); border-color: rgba(247, 248, 245, 0.26); }
+    .footer-summary .btn.primary { color: var(--ink); background: var(--surface); border-color: var(--surface); }
+
+    @media (max-width: 920px) {
+      .topbar { align-items: stretch; flex-direction: column; position: static; }
+      .nav { justify-content: flex-start; }
+      .actions { min-width: 0; }
+      .hero, .main-grid { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .decision-card { min-height: auto; padding: 24px; }
+      .decision-footer, .footer-summary, .input-row { grid-template-columns: 1fr; }
+      .actions, .decision-footer .actions { flex-wrap: wrap; }
+      .side-stack, .confidence { grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      h1 { letter-spacing: -0.05em; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+      .btn:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="产品决策台导航">
+      <a class="brand" href="#top" aria-label="Plainform 产品决策台首页">
+        <span class="mark" aria-hidden="true"></span>
+        <span>Plainform Decision</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="active" href="#decision">今日判断</a>
+        <a href="#signals">风险信号</a>
+        <a href="#pipeline">发布排期</a>
+        <a href="#notes">决策记录</a>
+      </nav>
+      <div class="actions">
+        <button class="btn" type="button">同步 Linear</button>
+        <button class="btn primary" type="button">确认发布</button>
+      </div>
+    </header>
+
+    <section id="decision" class="hero" aria-labelledby="decision-title">
+      <article class="decision-card">
+        <div>
+          <span class="kicker"><span class="dot"></span> Release gate · 2026 Q2</span>
+          <h1 id="decision-title">把账单重构放进本周发布，但延后自动迁移。</h1>
+          <p class="lead">产品、增长和支持数据指向同一个结论：新账单页能降低企业客户开票工单，但自动迁移仍缺少失败回滚样本。今天只需要决定范围，不需要重开路线图。</p>
+        </div>
+        <div class="decision-footer">
+          <div class="next-step">
+            <strong>下一步：发布账单视图，迁移开关保持关闭</strong>
+            <span>负责人 Ming，今晚 20:00 前补齐 3 个异常账期的人工验收记录。</span>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button">查看证据</button>
+            <button class="btn primary" type="button">记录决定</button>
+          </div>
+        </div>
+      </article>
+
+      <aside class="side-stack" id="signals" aria-label="关键决策信号">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Confidence</p>
+              <h2>72%</h2>
+            </div>
+            <span class="status-pill warn"><span class="dot"></span>需要收窄范围</span>
+          </div>
+          <div class="confidence">
+            <div class="metric"><strong>18</strong><span>企业客户请求新账单页</span></div>
+            <div class="metric"><strong>4.6h</strong><span>月末开票平均处理时长</span></div>
+            <div class="metric"><strong>3</strong><span>迁移回滚样本缺口</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Risk register</p>
+              <h2>阻塞项</h2>
+            </div>
+            <span class="status-pill risk"><span class="dot"></span>1 个高风险</span>
+          </div>
+          <div class="rail">
+            <div class="rail-item"><span class="dot" style="background: var(--risk)"></span><b>自动迁移</b><small>回滚路径未验收</small></div>
+            <div class="rail-item"><span class="dot" style="background: var(--ok)"></span><b>账单视图</b><small>12 个用例通过</small></div>
+            <div class="rail-item"><span class="dot" style="background: var(--accent)"></span><b>客服脚本</b><small>待补截图说明</small></div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="main-grid" id="pipeline" aria-label="发布排期与决策记录">
+      <article class="workstream">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Release pipeline</p>
+            <h2>本周发布候选</h2>
+          </div>
+          <select aria-label="筛选发布范围">
+            <option>仅显示需决策项</option>
+            <option>全部候选</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>事项</th>
+                <th>判断</th>
+                <th>负责人</th>
+                <th class="num">证据数</th>
+                <th>日期</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>新账单页</strong><br><span class="owner">开票工单下降目标 18%</span></td>
+                <td><span class="status-pill ok"><span class="dot"></span>放行</span></td>
+                <td><span class="owner"><span class="avatar">M</span>Ming</span></td>
+                <td class="num">12</td>
+                <td>06-12</td>
+              </tr>
+              <tr>
+                <td><strong>自动账期迁移</strong><br><span class="owner">缺少异常账期回滚验证</span></td>
+                <td><span class="status-pill risk"><span class="dot"></span>延后</span></td>
+                <td><span class="owner"><span class="avatar">R</span>Rae</span></td>
+                <td class="num">5</td>
+                <td>06-18</td>
+              </tr>
+              <tr>
+                <td><strong>企业税号校验</strong><br><span class="owner">减少人工复核次数</span></td>
+                <td><span class="status-pill warn"><span class="dot"></span>补证据</span></td>
+                <td><span class="owner"><span class="avatar">L</span>Lin</span></td>
+                <td class="num">7</td>
+                <td>06-14</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="notes" id="notes">
+        <article class="note">
+          <p class="eyebrow">Decision note</p>
+          <h3>为什么不是全量发布？</h3>
+          <p>核心收益来自账单可读性，不来自自动迁移。把两者拆开能保留客户价值，同时避免把回滚风险压给客服团队。</p>
+        </article>
+        <article class="note">
+          <p class="eyebrow">Customer signal</p>
+          <h3>来自 6 个高价值账户的共同请求</h3>
+          <p>他们都要求财务人员无需进入设置页即可下载历史账单。该需求与新账单页直接相关，与迁移开关无关。</p>
+        </article>
+        <article class="note">
+          <p class="eyebrow">Add evidence</p>
+          <h3>补充一条验收记录</h3>
+          <div class="input-row">
+            <input aria-label="验收记录" value="异常账期 2025-11 回滚截图已上传" />
+            <button class="btn primary" type="button">加入记录</button>
+          </div>
+        </article>
+      </aside>
+    </section>
+
+    <section class="footer-summary" aria-label="最终建议">
+      <div>
+        <h2>建议：发布视图，不发布迁移。</h2>
+        <p>这个决定最大化本周客户价值，同时把不可逆风险留在可验证范围内。</p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button">导出纪要</button>
+        <button class="btn primary" type="button">发送给发布群</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Retro Memory Terminal</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #160f1d;
+      --panel: #22172b;
+      --panel-2: #2f2038;
+      --ink: #fff2d2;
+      --text: #f7e2ad;
+      --muted: #d8b983;
+      --line: rgba(242, 198, 115, 0.34);
+      --line-soft: rgba(242, 198, 115, 0.18);
+      --accent: #f2c673;
+      --warm: #ff8c6a;
+      --ok: #8fd6a4;
+      --warn: #ffd27a;
+      --danger: #ff9a90;
+      --shadow: rgba(13, 7, 18, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255, 140, 106, 0.15), transparent 32rem),
+        radial-gradient(circle at 82% 0%, rgba(242, 198, 115, 0.14), transparent 30rem),
+        linear-gradient(135deg, #160f1d 0%, #24162c 52%, #4d3728 100%);
+      color: var(--ink);
+      font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(255, 242, 210, 0.035) 0 1px, transparent 1px 5px);
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      z-index: 3;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(34, 23, 43, 0.86);
+      box-shadow: 0 18px 55px var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--panel);
+      box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.2);
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav a {
+      padding: 7px 11px;
+      border-radius: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .nav a[aria-current="page"], .nav a:hover, .nav a:focus-visible {
+      color: var(--ink);
+      background: rgba(242, 198, 115, 0.13);
+      outline: none;
+    }
+
+    .sync-pill {
+      min-width: max-content;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(242, 198, 115, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(310px, 0.98fr);
+      gap: 26px;
+      align-items: stretch;
+      margin-top: 24px;
+    }
+
+    .terminal, .card, .logbook {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(34, 23, 43, 0.97), rgba(47, 32, 56, 0.92));
+      box-shadow: 0 28px 76px var(--shadow);
+    }
+
+    .terminal::after, .card::after, .logbook::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(255, 242, 210, 0.025) 0 1px, transparent 1px 4px);
+    }
+
+    .hero-copy {
+      padding: clamp(28px, 5vw, 52px);
+      z-index: 1;
+      position: relative;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(242, 198, 115, 0.1);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(38px, 7vw, 78px);
+      line-height: 0.98;
+      letter-spacing: -0.08em;
+    }
+
+    .lead {
+      max-width: 620px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    button, .button {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--panel);
+    }
+
+    button:hover, .button:hover, button:focus-visible, .button:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    button:active, .button:active { transform: translateY(1px); }
+
+    .console {
+      padding: 18px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .window-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: rgba(22, 15, 29, 0.7);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .lights { display: flex; gap: 6px; }
+    .lights i { width: 8px; height: 8px; border-radius: 50%; background: var(--warm); box-shadow: 0 0 10px rgba(255, 140, 106, 0.35); }
+    .lights i:nth-child(2) { background: var(--warn); }
+    .lights i:nth-child(3) { background: var(--ok); }
+
+    .boot-lines {
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .boot-lines li {
+      display: grid;
+      grid-template-columns: 78px 1fr auto;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--line-soft);
+    }
+
+    .boot-lines li:last-child { border-bottom: 0; }
+    .time { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .status { color: var(--accent); font-weight: 800; }
+    .status.ok { color: var(--ok); }
+    .status.warn { color: var(--warn); }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 34px 0 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+    }
+
+    .section-title p {
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric em {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--accent);
+      font-style: normal;
+      font-size: 12px;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .card { padding: 20px; }
+    .card > * { position: relative; z-index: 1; }
+
+    .tape-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .tape {
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 9px;
+      background: rgba(242, 198, 115, 0.08);
+    }
+
+    .reel {
+      width: 42px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--panel);
+      background: var(--accent);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .tape b { display: block; }
+    .tape small { color: var(--muted); }
+    .tag {
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .logbook { padding: 0; }
+    .logbook table {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: rgba(242, 198, 115, 0.1);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(242, 198, 115, 0.07); }
+    .mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      background: rgba(22, 15, 29, 0.46);
+    }
+
+    .event time { color: var(--accent); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .event p { margin: 0; color: var(--muted); }
+    .event b { color: var(--ink); }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 28px;
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      color: var(--muted);
+      background: rgba(22, 15, 29, 0.45);
+      font-size: 12px;
+    }
+
+    @media (max-width: 920px) {
+      .hero, .workbench { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .section-title { align-items: start; flex-direction: column; }
+      .section-title p { text-align: left; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .sync-pill { width: fit-content; }
+      .hero-copy, .console, .card { padding: 16px; }
+      .metrics { grid-template-columns: 1fr; }
+      .boot-lines li, .tape, .event { grid-template-columns: 1fr; }
+      .logbook table, .logbook thead, .logbook tbody, .logbook tr, .logbook th, .logbook td { display: block; }
+      .logbook thead { display: none; }
+      .logbook tr { padding: 12px 14px; border-bottom: 1px solid var(--line-soft); }
+      .logbook td { padding: 4px 0; border: 0; }
+      .logbook td::before { content: attr(data-label) ": "; color: var(--accent); font-weight: 800; }
+      .footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="topbar" aria-label="主导航">
+      <div class="brand"><span class="brand-mark">M</span> MEMORY/TAPE-09</div>
+      <div class="nav">
+        <a href="#" aria-current="page">Archive</a>
+        <a href="#">Sessions</a>
+        <a href="#">Policies</a>
+        <a href="#">Replay</a>
+      </div>
+      <div class="sync-pill">SYNC OK · 18s ago</div>
+    </nav>
+
+    <section class="hero">
+      <div class="terminal">
+        <div class="hero-copy">
+          <div class="kicker">RETRO MEMORY TERMINAL</div>
+          <h1>把每一次长跑记忆写进可回放的终端档案。</h1>
+          <p class="lead">为 Agent session、worknote、权限审批和发布日志建立一座温暖的记忆库：能检索、能校验、能回放，也能在异常时告诉你哪一段信号正在衰减。</p>
+          <div class="actions">
+            <a class="button primary" href="#">记录新批次</a>
+            <a class="button" href="#">回放 05:31 事件</a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="terminal console" aria-label="实时写入控制台">
+        <div class="window-bar"><span class="lights"><i></i><i></i><i></i></span><span>/var/memory/tape-09/live.log</span></div>
+        <ul class="boot-lines">
+          <li><span class="time">09:42:11</span><span>session LX-2047 已附加到长期记忆索引</span><span class="status ok">OK</span></li>
+          <li><span class="time">09:42:18</span><span>worknote 增量写入 32 条，校验 hash 完成</span><span class="status ok">OK</span></li>
+          <li><span class="time">09:43:02</span><span>权限事件等待人工复核，保留策略 90 天</span><span class="status warn">WAIT</span></li>
+          <li><span class="time">09:43:19</span><span>日志回放指针已移动到 checkpoint-117</span><span class="status">LIVE</span></li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="section-title">
+      <h2>今日归档状态</h2>
+      <p>复古终端不是装饰，而是把复杂系统压缩成可读批次、明确状态和可追溯操作。</p>
+    </section>
+
+    <section class="metrics" aria-label="关键指标">
+      <article class="card metric"><span>已挂载磁带</span><strong>09</strong><em>2 个等待封存</em></article>
+      <article class="card metric"><span>记忆片段</span><strong>7,428</strong><em>99.4% 可检索</em></article>
+      <article class="card metric"><span>异常日志</span><strong>13</strong><em>4 条需复核</em></article>
+      <article class="card metric"><span>回放延迟</span><strong>1.8s</strong><em>低于 3s 阈值</em></article>
+    </section>
+
+    <section class="workbench">
+      <article class="card">
+        <div class="window-bar"><span>Mounted tapes</span><span>RETENTION: 90D</span></div>
+        <div class="tape-list">
+          <div class="tape"><span class="reel">A1</span><span><b>leader-loop-fix</b><small>会话续跑、空转熔断、压缩摘要</small></span><span class="tag">sealed</span></div>
+          <div class="tape"><span class="reel">B7</span><span><b>permission-audit</b><small>网络审批、bypass 审计、用户确认链</small></span><span class="tag">review</span></div>
+          <div class="tape"><span class="reel">C3</span><span><b>state-sync-chain</b><small>SSE 桥接、延迟源、前端快照</small></span><span class="tag">live</span></div>
+        </div>
+      </article>
+
+      <section class="logbook" aria-label="日志表">
+        <table>
+          <thead><tr><th>时间</th><th>来源</th><th>事件</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td data-label="时间" class="mono">09:44:01</td><td data-label="来源">agent-panel</td><td data-label="事件">收到 roster 快照并刷新 12 个成员状态</td><td data-label="状态"><span class="status ok">正常</span></td></tr>
+            <tr><td data-label="时间" class="mono">09:45:26</td><td data-label="来源">memory-index</td><td data-label="事件">检测到 3 条新 worknote，等待写入摘要</td><td data-label="状态"><span class="status warn">等待</span></td></tr>
+            <tr><td data-label="时间" class="mono">09:46:10</td><td data-label="来源">replay-engine</td><td data-label="事件">checkpoint-117 已生成可分享回放片段</td><td data-label="状态"><span class="status">可回放</span></td></tr>
+            <tr><td data-label="时间" class="mono">09:47:33</td><td data-label="来源">retention-job</td><td data-label="事件">过期草稿 18 条已转入冷存储队列</td><td data-label="状态"><span class="status ok">完成</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+    </section>
+
+    <section class="section-title">
+      <h2>事件回放轨道</h2>
+      <p>每条记录都保留业务原因，避免只剩下不可解释的系统噪声。</p>
+    </section>
+
+    <section class="card timeline" aria-label="回放时间线">
+      <div class="event"><time>05-31 21:14</time><p><b>健康监控降噪：</b>重复“正在重定向”提示被冷却策略折叠，保留首条告警和最终处置。</p></div>
+      <div class="event"><time>05-31 22:08</time><p><b>成员名复用：</b>终态 worker slot 被安全复用，避免 already exists 阻断报告链。</p></div>
+      <div class="event"><time>06-01 00:42</time><p><b>索引校验：</b>记忆文件和索引入口完成一致性检查，缺失条目进入人工队列。</p></div>
+    </section>
+
+    <footer class="footer">
+      <span>RETRO MEMORY TERMINAL · no remote assets · inline CSS</span>
+      <span>Last sealed tape: TAPE-09 / checksum 4F2C-673A</span>
+    </footer>
+  </main>
+</body>
+</html>

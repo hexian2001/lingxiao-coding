@@ -1,0 +1,630 @@
+[
+  {
+    "id": "signature-luxury-hero",
+    "name": "Atelier Reserve 首屏",
+    "category": "hero",
+    "themes": [
+      "luxury",
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "luxury",
+      "静奢编辑电商"
+    ],
+    "description": "Atelier Reserve 的首屏素材，服务于静奢编辑电商，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Atelier Reserve 首屏\n定位: 静奢编辑电商，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbf8f1，主强调 #9a7738，辅助强调 #2f2520。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-luxury-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(154,119,56,0.34);\n  border-radius: 8px;\n  background: linear-gradient(145deg, #fbf8f1, #efe4d2);\n  color: #211b16;\n  box-shadow: 0 34px 80px rgba(62,44,28,0.16);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-luxury-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(154,119,56,0.20), transparent 28%, transparent 72%, rgba(47,37,32,0.12)); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-luxury-hero > * { position: relative; z-index: 1; }\n.sig-luxury-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-luxury-hero .kicker { width: fit-content; border: 1px solid rgba(154,119,56,0.34); border-radius: 999px; padding: 6px 10px; color: #9a7738; background: #efe4d2; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-luxury-hero h1 { margin: 0; max-width: 620px; font-family: Georgia, Times New Roman, serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-luxury-hero p { margin: 0; max-width: 560px; color: #7a6b5d; font-size: 15px; line-height: 1.78; }\n.sig-luxury-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-luxury-hero button { height: 40px; padding: 0 16px; border-radius: calc(8px / 2 + 4px); border: 1px solid rgba(154,119,56,0.34); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-luxury-hero .primary { background: #9a7738; color: #fbf8f1; border-color: #9a7738; }\n.sig-luxury-hero .secondary { background: transparent; color: #211b16; }\n.sig-luxury-hero button:hover { transform: translateY(-1px); border-color: #9a7738; }\n.sig-luxury-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(154,119,56,0.34); border-radius: calc(8px - 2px); background: #efe4d2; backdrop-filter: blur(18px) saturate(140%); }\n.sig-luxury-hero .artifact h2 { margin: 0; font-size: 13px; color: #9a7738; text-transform: uppercase; letter-spacing: 0; }\n.sig-luxury-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-luxury-hero .metric { padding: 14px; border: 1px solid rgba(154,119,56,0.34); border-radius: calc(8px - 4px); background: color-mix(in srgb, #fbf8f1 76%, transparent); }\n.sig-luxury-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-luxury-hero .metric span { display: block; margin-top: 6px; color: #7a6b5d; font-size: 11px; }\n.sig-luxury-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #9a7738, #2f2520); }\n@media (max-width: 780px) { .sig-luxury-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-luxury-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">静奢编辑电商</div>\n    <h1>Reserve the object, not the noise.</h1>\n    <p>An editorial commerce system for limited releases, appointments, and quiet conversion.</p>\n    <div class=\"actions\"><button class=\"primary\">Reserve</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Maison Reserve / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>18</strong><span>pieces remaining</span></div>\n      <div class=\"metric\"><strong>04</strong><span>private viewings</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Atelier Reserve 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-luxury-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 420,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-luxury-card",
+    "name": "Atelier Reserve 洞察卡片",
+    "category": "card",
+    "themes": [
+      "luxury",
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "luxury",
+      "静奢编辑电商"
+    ],
+    "description": "Atelier Reserve 的洞察卡片素材，服务于静奢编辑电商，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Atelier Reserve 洞察卡片\n定位: 静奢编辑电商，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbf8f1，主强调 #9a7738，辅助强调 #2f2520。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-luxury-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(154,119,56,0.34); border-radius: 8px; background: #fbf8f1; color: #211b16; box-shadow: 0 34px 80px rgba(62,44,28,0.16); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-luxury-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-luxury-card .label { color: #9a7738; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-luxury-card .pill { border: 1px solid rgba(154,119,56,0.34); border-radius: 999px; padding: 5px 9px; color: #7a6b5d; background: #efe4d2; font-size: 11px; }\n.sig-luxury-card h3 { margin: 0 0 10px; font-family: Georgia, Times New Roman, serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-luxury-card p { margin: 0; color: #7a6b5d; font-size: 13px; line-height: 1.7; }\n.sig-luxury-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(154,119,56,0.34); }\n.sig-luxury-card .strip strong { font-variant-numeric: tabular-nums; color: #211b16; }\n.sig-luxury-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(8px - 4px); background: #9a7738; color: #fbf8f1; font-weight: 900; }",
+    "html": "<article class=\"sig-luxury-card\">\n  <div class=\"top\"><div><div class=\"label\">Maison Reserve</div><h3>18</h3></div><span class=\"pill\">pieces remaining</span></div>\n  <p>An editorial commerce system for limited releases, appointments, and quiet conversion.</p>\n  <div class=\"strip\"><span>private viewings</span><strong>04</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Atelier Reserve 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-luxury-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-luxury-nav",
+    "name": "Atelier Reserve 导航",
+    "category": "navigation",
+    "themes": [
+      "luxury",
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "luxury",
+      "静奢编辑电商"
+    ],
+    "description": "Atelier Reserve 的导航素材，服务于静奢编辑电商，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Atelier Reserve 导航\n定位: 静奢编辑电商，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbf8f1，主强调 #9a7738，辅助强调 #2f2520。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-luxury-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(154,119,56,0.34); border-radius: 8px; background: #fbf8f1; color: #211b16; box-shadow: 0 34px 80px rgba(62,44,28,0.16); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-luxury-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Georgia, Times New Roman, serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-luxury-nav .mark { width: 30px; height: 30px; border-radius: calc(8px - 4px); background: linear-gradient(135deg, #9a7738, #2f2520); box-shadow: inset 0 0 0 1px rgba(154,119,56,0.34); }\n.sig-luxury-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-luxury-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(8px - 6px); color: #7a6b5d; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-luxury-nav a:hover, .sig-luxury-nav a.active { color: #211b16; background: #efe4d2; }\n.sig-luxury-nav button { height: 34px; padding: 0 13px; border-radius: calc(8px - 6px); border: 1px solid #9a7738; background: #9a7738; color: #fbf8f1; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-luxury-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-luxury-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Maison Reserve</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Objects</a><a href=\"#\">Atelier</a><a href=\"#\">Appointments</a><a href=\"#\">Journal</a></div>\n  <button>Reserve</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Atelier Reserve 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-luxury-hero",
+      "signature-luxury-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-luxury-form",
+    "name": "Atelier Reserve 表单",
+    "category": "form",
+    "themes": [
+      "luxury",
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "luxury",
+      "静奢编辑电商"
+    ],
+    "description": "Atelier Reserve 的表单素材，服务于静奢编辑电商，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Atelier Reserve 表单\n定位: 静奢编辑电商，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbf8f1，主强调 #9a7738，辅助强调 #2f2520。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-luxury-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(154,119,56,0.34); border-radius: 8px; background: #fbf8f1; color: #211b16; box-shadow: 0 34px 80px rgba(62,44,28,0.16); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-luxury-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #211b16; }\n.sig-luxury-form small { color: #7a6b5d; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-luxury-form .row { display: flex; gap: 10px; }\n.sig-luxury-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(8px - 6px); border: 1px solid rgba(154,119,56,0.34); background: #efe4d2; color: #211b16; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-luxury-form input:focus { border-color: #9a7738; box-shadow: 0 0 0 3px color-mix(in srgb, #9a7738 18%, transparent); }\n.sig-luxury-form button { height: 42px; padding: 0 14px; border-radius: calc(8px - 6px); border: 1px solid #9a7738; background: #9a7738; color: #fbf8f1; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-luxury-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-luxury-form\">\n  <label>Appointment note<small>Use precise, calm language. Luxury UI should never sound urgent.</small></label>\n  <div class=\"row\"><input value=\"Florentine leather review\" aria-label=\"Appointment note\" /><button type=\"button\">Reserve</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Atelier Reserve 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-luxury-hero",
+      "signature-luxury-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-luxury-table",
+    "name": "Atelier Reserve 数据表",
+    "category": "table",
+    "themes": [
+      "luxury",
+      "editorial"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "luxury",
+      "静奢编辑电商"
+    ],
+    "description": "Atelier Reserve 的数据表素材，服务于静奢编辑电商，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Atelier Reserve 数据表\n定位: 静奢编辑电商，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #fbf8f1，主强调 #9a7738，辅助强调 #2f2520。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-luxury-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(154,119,56,0.34); border-radius: 8px; background: #fbf8f1; color: #211b16; box-shadow: 0 34px 80px rgba(62,44,28,0.16); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-luxury-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-luxury-table th, .sig-luxury-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(154,119,56,0.34); }\n.sig-luxury-table th { color: #7a6b5d; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #efe4d2; }\n.sig-luxury-table td { color: #211b16; }\n.sig-luxury-table tr:last-child td { border-bottom: 0; }\n.sig-luxury-table tbody tr:hover td { background: #efe4d2; }\n.sig-luxury-table .mono { font-variant-numeric: tabular-nums; }\n.sig-luxury-table .status { display: inline-flex; align-items: center; gap: 6px; color: #9a7738; font-weight: 800; }\n.sig-luxury-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #9a7738; }",
+    "html": "<div class=\"sig-luxury-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>No. 18</td><td><span class=\"status\">Reserved</span></td><td class=\"mono\">A</td></tr><tr><td>No. 21</td><td><span class=\"status\">Viewing</span></td><td class=\"mono\">B</td></tr><tr><td>No. 24</td><td><span class=\"status\">Available</span></td><td class=\"mono\">A</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Atelier Reserve 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-luxury-hero",
+      "signature-luxury-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 320,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-silk-flow",
+    "name": "Silk Flow",
+    "category": "background",
+    "themes": [
+      "dark",
+      "luxury",
+      "gradient"
+    ],
+    "tags": [
+      "silk",
+      "animated",
+      "gradient",
+      "luxury",
+      "slow"
+    ],
+    "stylePrompt": "高级设计指令: Silk Flow\n定位: Silk Flow 是一款 dark / luxury / gradient 背景素材，适合 silk、animated、gradient、luxury 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Silk Flow — 丝绸流动背景。两个超大(150vw)模糊圆形色块在深色底上极缓慢漂移(30s周期)。色块: 深靛蓝(#1e3a5f opacity:0.4) + 深紫(#2d1b4e opacity:0.3)。模糊120px。底色 #050507。动画如此缓慢以至于用户不会注意到它在动——但会无意识感到画面'活着'。",
+    "css": ".bg-silk-flow {\n  min-height: 100vh;\n  background: #050507;\n  position: relative;\n  overflow: hidden;\n}\n.bg-silk-flow::before,\n.bg-silk-flow::after {\n  content: '';\n  position: absolute;\n  border-radius: 50%;\n  filter: blur(120px);\n}\n.bg-silk-flow::before {\n  width: 150vw;\n  height: 80vh;\n  background: rgba(30, 58, 95, 0.35);\n  top: -30%;\n  left: -25%;\n  animation: silk-a 30s ease-in-out infinite alternate;\n}\n.bg-silk-flow::after {\n  width: 120vw;\n  height: 70vh;\n  background: rgba(45, 27, 78, 0.25);\n  bottom: -20%;\n  right: -20%;\n  animation: silk-b 34s ease-in-out infinite alternate;\n}\n@keyframes silk-a { to { transform: translate(8%, 5%) scale(1.05); } }\n@keyframes silk-b { to { transform: translate(-6%, -4%) scale(0.95); } }",
+    "description": "Silk Flow 是一款 dark / luxury / gradient 背景素材，适合 silk、animated、gradient、luxury 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "rich"
+    },
+    "sourceOrder": 0,
+    "html": "<section class=\"bg-silk-flow\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(154,119,56,0.34);border-radius:8px;background:#efe4d2;color:#211b16;box-shadow:0 28px 70px rgba(62,44,28,0.14);\">\n    <div style=\"color:#9a7738;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Silk Flow</h2>\n    <p style=\"margin:0;color:#7a6b5d;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "bg-noise-iridescent",
+    "name": "Iridescent Noise",
+    "category": "background",
+    "themes": [
+      "dark",
+      "gradient",
+      "luxury"
+    ],
+    "tags": [
+      "iridescent",
+      "noise",
+      "holographic",
+      "premium",
+      "animated",
+      "luxury"
+    ],
+    "stylePrompt": "高级设计指令: Iridescent Noise\n定位: Iridescent Noise 是一款 dark / gradient / luxury 背景素材，适合 iridescent、noise、holographic、premium 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Iridescent Noise — 虹彩噪点背景。深色底(#09090b)上叠加一层极低 opacity(0.03-0.04) 的 conic-gradient 彩虹色噪点——模拟钛合金/全息膜的虹彩效果。静态时几乎不可见，但随鼠标移动(用 CSS var 或微动画) hue 缓慢变化。气质: iPhone 钛金属广告、Dieter Rams。",
+    "css": ".bg-iridescent {\n  min-height: 100vh;\n  background: #09090b;\n  position: relative;\n}\n.bg-iridescent::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: conic-gradient(from 0deg at 50% 50%, #ef4444, #f59e0b, #22c55e, #06b6d4, #8b5cf6, #ec4899, #ef4444);\n  opacity: 0.03;\n  filter: blur(1px);\n  animation: hue-spin 20s linear infinite;\n}\n@keyframes hue-spin {\n  to { filter: blur(1px) hue-rotate(360deg); }\n}\n.bg-iridescent::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23i)'/%3E%3C/svg%3E\");\n  opacity: 0.015;\n  pointer-events: none;\n}",
+    "description": "Iridescent Noise 是一款 dark / gradient / luxury 背景素材，适合 iridescent、noise、holographic、premium 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "rich"
+    },
+    "sourceOrder": 1,
+    "html": "<section class=\"bg-iridescent\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(154,119,56,0.34);border-radius:8px;background:#efe4d2;color:#211b16;box-shadow:0 28px 70px rgba(62,44,28,0.14);\">\n    <div style=\"color:#9a7738;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Iridescent Noise</h2>\n    <p style=\"margin:0;color:#7a6b5d;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "btn-mercury-liquid",
+    "name": "Mercury",
+    "category": "button",
+    "themes": [
+      "dark",
+      "luxury"
+    ],
+    "tags": [
+      "luxury",
+      "metallic",
+      "animated",
+      "dark",
+      "premium"
+    ],
+    "stylePrompt": "高级设计指令: Mercury\n定位: Mercury 是一款 dark / luxury 按钮素材，适合 luxury、metallic、animated、dark 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Mercury — 水银液态金属按钮。深色背景(#09090b)上的银色液态质感。背景是极细微的银灰渐变(#d4d4d8→#a1a1aa)模拟金属反射。hover时渐变角度旋转(模拟光照变化)+极轻微的scale(1.01)。字体 Inter 500 #09090b。整体气质: 高定珠宝广告、Dieter Rams 工业设计。border 0.5px rgba白。",
+    "css": ".btn-mercury {\n  padding: 13px 30px;\n  background: linear-gradient(165deg, #e4e4e7 0%, #a1a1aa 50%, #d4d4d8 100%);\n  color: #09090b;\n  font-family: 'Inter', system-ui, sans-serif;\n  font-size: 13px;\n  font-weight: 500;\n  letter-spacing: 0.02em;\n  border: 0.5px solid rgba(255,255,255,0.6);\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);\n  box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4);\n}\n.btn-mercury:hover {\n  background: linear-gradient(195deg, #e4e4e7 0%, #a1a1aa 50%, #d4d4d8 100%);\n  transform: scale(1.01);\n  box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5);\n}\n.btn-mercury:active {\n  transform: scale(0.98);\n  box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.1);\n}",
+    "html": "<button class=\"btn-mercury\">Purchase</button>",
+    "description": "Mercury 是一款 dark / luxury 按钮素材，适合 luxury、metallic、animated、dark 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "fx-spotlight-cursor",
+    "name": "Cursor Spotlight",
+    "category": "effect",
+    "themes": [
+      "dark",
+      "luxury"
+    ],
+    "tags": [
+      "cursor",
+      "spotlight",
+      "interactive",
+      "follow",
+      "ambient",
+      "luxury"
+    ],
+    "stylePrompt": "高级设计指令: Cursor Spotlight\n定位: Cursor Spotlight 是一款 dark / luxury 特效素材，适合 cursor、spotlight、interactive、follow 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Cursor Spotlight — 光标追踪聚光灯。容器上跟随鼠标位置的柔和光斑(radial-gradient 300px 圆, rgba白 0.03→transparent)。用 CSS custom properties --mx/--my 接收鼠标坐标(需极少JS: mousemove设置CSS变量)。光斑如此subtle以至于只在纯黑区域可感知。气质: Stripe 官网的交互质感。",
+    "css": ".fx-cursor-spot {\n  position: relative;\n  overflow: hidden;\n}\n.fx-cursor-spot::before {\n  content: '';\n  position: absolute;\n  width: 600px;\n  height: 600px;\n  border-radius: 50%;\n  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);\n  left: var(--mx, 50%);\n  top: var(--my, 50%);\n  transform: translate(-50%, -50%);\n  pointer-events: none;\n  transition: left 0.05s linear, top 0.05s linear;\n}",
+    "html": "<!-- JS: el.onmousemove = e => { el.style.setProperty('--mx', e.offsetX+'px'); el.style.setProperty('--my', e.offsetY+'px'); } -->\n<div class=\"fx-cursor-spot\" style=\"min-height:300px;background:#09090b\"></div>",
+    "description": "Cursor Spotlight 是一款 dark / luxury 特效素材，适合 cursor、spotlight、interactive、follow 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "hero-luxury-editorial",
+    "name": "Luxury Editorial",
+    "category": "hero",
+    "themes": [
+      "luxury",
+      "editorial",
+      "light"
+    ],
+    "tags": [
+      "luxury",
+      "editorial",
+      "serif",
+      "gold",
+      "fashion"
+    ],
+    "stylePrompt": "高级设计指令: Luxury Editorial\n定位: Luxury Editorial 是一款 luxury / editorial / light 首屏素材，适合 luxury、editorial、serif、gold 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Luxury Editorial — 奢华杂志 Hero。灵感: LVMH / Bottega Veneta 官网。极大留白(min-height:100vh), 居中一行衬线字(Playfair Display 72px+ italic), 下方极小sans-serif正文(13px tracking 0.1em)。色彩: 暖奶白底(#faf8f5) + 深棕文字(#1c1917)。无按钮——品牌广告风。",
+    "css": ".hero-luxury-edit {\n  min-height: 100vh;\n  background: #faf8f5;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  padding: 60px 24px;\n}\n.hero-luxury-edit h1 {\n  font-family: 'Playfair Display', serif;\n  font-size: clamp(48px, 10vw, 84px);\n  font-weight: 400;\n  font-style: italic;\n  color: #1c1917;\n  letter-spacing: -0.02em;\n  line-height: 1.1;\n  margin: 0 0 32px;\n}\n.hero-luxury-edit p {\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  letter-spacing: 0.1em;\n  text-transform: uppercase;\n  color: #a8a29e;\n  margin: 0;\n}",
+    "html": "<section class=\"hero-luxury-edit\">\n  <h1>The Art of<br>Quiet Luxury</h1>\n  <p>Spring / Summer 2026</p>\n</section>",
+    "description": "Luxury Editorial 是一款 luxury / editorial / light 首屏素材，适合 luxury、editorial、serif、gold 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 340,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "footer-luxury-minimal",
+    "name": "Luxury Minimal Footer",
+    "category": "footer",
+    "themes": [
+      "luxury",
+      "light"
+    ],
+    "tags": [
+      "luxury",
+      "minimal",
+      "serif",
+      "elegant",
+      "centered"
+    ],
+    "stylePrompt": "高级设计指令: Luxury Minimal Footer\n定位: Luxury Minimal Footer 是一款 luxury / light 页脚素材，适合 luxury、minimal、serif、elegant 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Luxury Minimal Footer — 奢华极简页脚。暖白底(#faf8f5)。居中: 品牌名(衬线 Playfair 16px) + 细线分隔(40px宽 0.5px #d6d3d1) + 一行链接(Inter 11px uppercase tracking wide #a8a29e)。整体极轻——品牌存在感来自留白。气质: Celine / The Row。",
+    "css": ".footer-luxury {\n  background: #faf8f5;\n  text-align: center;\n  padding: 48px 24px;\n}\n.footer-luxury .brand {\n  font-family: 'Playfair Display', serif;\n  font-size: 16px;\n  color: #1c1917;\n  margin-bottom: 16px;\n}\n.footer-luxury .line {\n  width: 40px;\n  height: 0.5px;\n  background: #d6d3d1;\n  margin: 0 auto 16px;\n}\n.footer-luxury .links {\n  display: flex;\n  justify-content: center;\n  gap: 24px;\n}\n.footer-luxury .links a {\n  font-family: 'Inter', system-ui;\n  font-size: 11px;\n  letter-spacing: 0.1em;\n  text-transform: uppercase;\n  color: #a8a29e;\n  text-decoration: none;\n  transition: color 0.2s;\n}\n.footer-luxury .links a:hover { color: #57534e; }",
+    "html": "<footer class=\"footer-luxury\">\n  <div class=\"brand\">Maison</div>\n  <div class=\"line\"></div>\n  <div class=\"links\"><a href=\"#\">Collections</a><a href=\"#\">Stores</a><a href=\"#\">Contact</a></div>\n</footer>",
+    "description": "Luxury Minimal Footer 是一款 luxury / light 页脚素材，适合 luxury、minimal、serif、elegant 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "lux-card-gold",
+    "name": "Gold Accent Card",
+    "category": "card",
+    "tags": [
+      "luxury",
+      "gold",
+      "accent",
+      "serif"
+    ],
+    "description": "Gold Accent Card 是一款 luxury 卡片素材，适合 luxury、gold、accent、serif 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Gold Accent Card\n定位: Card with gold top accent bar\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gold Accent Card。暖白底#faf8f5 + 顶部3px gold bar(#c9a84c)。标题 Playfair 20px。正文 Inter 14px #78716c。圆角0。",
+    "css": ".lux-card-gold { width:320px; background:#faf8f5; border-top:3px solid #c9a84c; padding:28px 24px; } .lux-card-gold h3 { font-family:'Playfair Display',serif; font-size:20px; color:#1c1917; margin:0 0 10px; } .lux-card-gold p { font-family:Inter,system-ui; font-size:14px; color:#78716c; line-height:1.7; margin:0; }",
+    "html": "<div class=\"lux-card-gold\"><h3>Artisan Crafted</h3><p>Each piece handmade in our Florentine atelier.</p></div>",
+    "themes": [
+      "luxury"
+    ],
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "lux-nav-serif",
+    "name": "Serif Navigation",
+    "category": "navigation",
+    "tags": [
+      "luxury",
+      "serif",
+      "elegant",
+      "fashion"
+    ],
+    "description": "Serif Navigation 是一款 luxury 导航素材，适合 luxury、serif、elegant、fashion 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Serif Navigation\n定位: Italic serif navigation\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Serif Navigation。Playfair italic 15px, gap:40px。#57534e on 暖白。hover opacity变化。",
+    "css": ".lux-nav { display:flex; gap:40px; padding:20px 40px; background:#faf8f5; } .lux-nav a { font-family:'Playfair Display',serif; font-size:15px; font-style:italic; color:#57534e; text-decoration:none; transition:opacity 0.2s; } .lux-nav a:hover { opacity:0.6; } .lux-nav a.active { color:#1c1917; }",
+    "html": "<nav class=\"lux-nav\"><a href=\"#\" class=\"active\">Collections</a><a href=\"#\">Maison</a><a href=\"#\">Savoir-faire</a></nav>",
+    "themes": [
+      "luxury"
+    ],
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "lux-btn-gold",
+    "name": "Gold Outline",
+    "category": "button",
+    "tags": [
+      "luxury",
+      "gold",
+      "outline",
+      "serif"
+    ],
+    "description": "Gold Outline 是一款 luxury 按钮素材，适合 luxury、gold、outline、serif 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Gold Outline\n定位: Gold border button\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gold Outline。1px border #c9a84c + 文字#c9a84c。hover时 fill gold bg。Playfair 13px uppercase。",
+    "css": ".lux-btn-gold { padding:12px 28px; background:transparent; border:1px solid #c9a84c; color:#c9a84c; font-family:'Playfair Display',serif; font-size:13px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.3s; } .lux-btn-gold:hover { background:#c9a84c; color:#1c1917; }",
+    "html": "<button class=\"lux-btn-gold\">Discover</button>",
+    "themes": [
+      "luxury"
+    ],
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "lux-divider",
+    "name": "Ornamental Divider",
+    "category": "effect",
+    "tags": [
+      "luxury",
+      "divider",
+      "ornament",
+      "gold"
+    ],
+    "description": "Ornamental Divider 是一款 luxury 特效素材，适合 luxury、divider、ornament、gold 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Ornamental Divider\n定位: Decorative divider with diamond\n审美系统: Atelier Reserve / quiet luxury editorial commerce。使用 #9a7738 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Ornamental Divider。中间小菱形◆(#c9a84c) + 两侧渐隐细线。居中。",
+    "css": ".lux-divider { display:flex; align-items:center; gap:16px; margin:32px 0; } .lux-divider::before,.lux-divider::after { content:''; flex:1; height:0.5px; background:linear-gradient(90deg,transparent,#d6d3d1,transparent); } .lux-divider .sym { color:#c9a84c; font-size:12px; }",
+    "html": "<div class=\"lux-divider\"><span class=\"sym\">◆</span></div>",
+    "themes": [
+      "luxury"
+    ],
+    "designNotes": "此素材已按 Atelier Reserve 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #fbf8f1 0%, #e6dac8 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 9
+  }
+]

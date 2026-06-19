@@ -1,0 +1,1039 @@
+[
+  {
+    "id": "signature-xianxia-hero",
+    "name": "Celestial Jade 首屏",
+    "category": "hero",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "xianxia",
+      "克制东方玄幻界面"
+    ],
+    "description": "Celestial Jade 的首屏素材，服务于克制东方玄幻界面，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Celestial Jade 首屏\n定位: 克制东方玄幻界面，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(16,29,25,0.88)，主强调 #dabf7c，辅助强调 #8fc7aa。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-xianxia-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(218,191,124,0.30);\n  border-radius: 16px;\n  background: linear-gradient(145deg, rgba(16,29,25,0.88), rgba(218,191,124,0.10));\n  color: #f3ead2;\n  box-shadow: 0 32px 82px rgba(4,8,7,0.40);\n  font-family: Inter, \"Noto Sans SC\", ui-sans-serif, system-ui, sans-serif;\n}\n.sig-xianxia-hero::before { content: \"\"; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(218,191,124,0.22), transparent 30%), linear-gradient(90deg, rgba(143,199,170,0.10), transparent); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-xianxia-hero > * { position: relative; z-index: 1; }\n.sig-xianxia-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-xianxia-hero .kicker { width: fit-content; border: 1px solid rgba(218,191,124,0.30); border-radius: 999px; padding: 6px 10px; color: #dabf7c; background: rgba(218,191,124,0.10); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-xianxia-hero h1 { margin: 0; max-width: 620px; font-family: \"Noto Serif SC\", Georgia, serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-xianxia-hero p { margin: 0; max-width: 560px; color: #b7c3aa; font-size: 15px; line-height: 1.78; }\n.sig-xianxia-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-xianxia-hero button { height: 40px; padding: 0 16px; border-radius: calc(16px / 2 + 4px); border: 1px solid rgba(218,191,124,0.30); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-xianxia-hero .primary { background: #dabf7c; color: #101d19; border-color: #dabf7c; }\n.sig-xianxia-hero .secondary { background: transparent; color: #f3ead2; }\n.sig-xianxia-hero button:hover { transform: translateY(-1px); border-color: #dabf7c; }\n.sig-xianxia-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(218,191,124,0.30); border-radius: calc(16px - 2px); background: rgba(218,191,124,0.10); backdrop-filter: blur(18px) saturate(140%); }\n.sig-xianxia-hero .artifact h2 { margin: 0; font-size: 13px; color: #dabf7c; text-transform: uppercase; letter-spacing: 0; }\n.sig-xianxia-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-xianxia-hero .metric { padding: 14px; border: 1px solid rgba(218,191,124,0.30); border-radius: calc(16px - 4px); background: color-mix(in srgb, rgba(16,29,25,0.88) 76%, transparent); }\n.sig-xianxia-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-xianxia-hero .metric span { display: block; margin-top: 6px; color: #b7c3aa; font-size: 11px; }\n.sig-xianxia-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #dabf7c, #8fc7aa); }\n@media (max-width: 780px) { .sig-xianxia-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-xianxia-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">克制东方玄幻界面</div>\n    <h1>以玉为界，以气为序。</h1>\n    <p>为宗门面板、修行任务、秘境状态和东方幻想产品建立克制而可信的界面秩序。</p>\n    <div class=\"actions\"><button class=\"primary\">入境</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>凌霄录 / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>九</strong><span>重天阙</span></div>\n      <div class=\"metric\"><strong>72</strong><span>灵脉稳定</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Celestial Jade 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-xianxia-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-xianxia-card",
+    "name": "Celestial Jade 洞察卡片",
+    "category": "card",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "xianxia",
+      "克制东方玄幻界面"
+    ],
+    "description": "Celestial Jade 的洞察卡片素材，服务于克制东方玄幻界面，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Celestial Jade 洞察卡片\n定位: 克制东方玄幻界面，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(16,29,25,0.88)，主强调 #dabf7c，辅助强调 #8fc7aa。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-xianxia-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(218,191,124,0.30); border-radius: 16px; background: rgba(16,29,25,0.88); color: #f3ead2; box-shadow: 0 32px 82px rgba(4,8,7,0.40); font-family: Inter, \"Noto Sans SC\", ui-sans-serif, system-ui, sans-serif; }\n.sig-xianxia-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-xianxia-card .label { color: #dabf7c; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-xianxia-card .pill { border: 1px solid rgba(218,191,124,0.30); border-radius: 999px; padding: 5px 9px; color: #b7c3aa; background: rgba(218,191,124,0.10); font-size: 11px; }\n.sig-xianxia-card h3 { margin: 0 0 10px; font-family: \"Noto Serif SC\", Georgia, serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-xianxia-card p { margin: 0; color: #b7c3aa; font-size: 13px; line-height: 1.7; }\n.sig-xianxia-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(218,191,124,0.30); }\n.sig-xianxia-card .strip strong { font-variant-numeric: tabular-nums; color: #f3ead2; }\n.sig-xianxia-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(16px - 4px); background: #dabf7c; color: #101d19; font-weight: 900; }",
+    "html": "<article class=\"sig-xianxia-card\">\n  <div class=\"top\"><div><div class=\"label\">凌霄录</div><h3>九</h3></div><span class=\"pill\">重天阙</span></div>\n  <p>为宗门面板、修行任务、秘境状态和东方幻想产品建立克制而可信的界面秩序。</p>\n  <div class=\"strip\"><span>灵脉稳定</span><strong>72</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Celestial Jade 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-xianxia-hero"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-xianxia-nav",
+    "name": "Celestial Jade 导航",
+    "category": "navigation",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "xianxia",
+      "克制东方玄幻界面"
+    ],
+    "description": "Celestial Jade 的导航素材，服务于克制东方玄幻界面，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Celestial Jade 导航\n定位: 克制东方玄幻界面，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(16,29,25,0.88)，主强调 #dabf7c，辅助强调 #8fc7aa。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-xianxia-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(218,191,124,0.30); border-radius: 16px; background: rgba(16,29,25,0.88); color: #f3ead2; box-shadow: 0 32px 82px rgba(4,8,7,0.40); font-family: Inter, \"Noto Sans SC\", ui-sans-serif, system-ui, sans-serif; }\n.sig-xianxia-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: \"Noto Serif SC\", Georgia, serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-xianxia-nav .mark { width: 30px; height: 30px; border-radius: calc(16px - 4px); background: linear-gradient(135deg, #dabf7c, #8fc7aa); box-shadow: inset 0 0 0 1px rgba(218,191,124,0.30); }\n.sig-xianxia-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-xianxia-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(16px - 6px); color: #b7c3aa; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-xianxia-nav a:hover, .sig-xianxia-nav a.active { color: #f3ead2; background: rgba(218,191,124,0.10); }\n.sig-xianxia-nav button { height: 34px; padding: 0 13px; border-radius: calc(16px - 6px); border: 1px solid #dabf7c; background: #dabf7c; color: #101d19; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-xianxia-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-xianxia-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>凌霄录</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">宗门</a><a href=\"#\">秘境</a><a href=\"#\">法器</a><a href=\"#\">卷宗</a></div>\n  <button>入境</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Celestial Jade 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-xianxia-hero",
+      "signature-xianxia-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-xianxia-form",
+    "name": "Celestial Jade 表单",
+    "category": "form",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "xianxia",
+      "克制东方玄幻界面"
+    ],
+    "description": "Celestial Jade 的表单素材，服务于克制东方玄幻界面，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Celestial Jade 表单\n定位: 克制东方玄幻界面，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(16,29,25,0.88)，主强调 #dabf7c，辅助强调 #8fc7aa。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-xianxia-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(218,191,124,0.30); border-radius: 16px; background: rgba(16,29,25,0.88); color: #f3ead2; box-shadow: 0 32px 82px rgba(4,8,7,0.40); font-family: Inter, \"Noto Sans SC\", ui-sans-serif, system-ui, sans-serif; }\n.sig-xianxia-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #f3ead2; }\n.sig-xianxia-form small { color: #b7c3aa; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-xianxia-form .row { display: flex; gap: 10px; }\n.sig-xianxia-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(16px - 6px); border: 1px solid rgba(218,191,124,0.30); background: rgba(218,191,124,0.10); color: #f3ead2; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-xianxia-form input:focus { border-color: #dabf7c; box-shadow: 0 0 0 3px color-mix(in srgb, #dabf7c 18%, transparent); }\n.sig-xianxia-form button { height: 42px; padding: 0 14px; border-radius: calc(16px - 6px); border: 1px solid #dabf7c; background: #dabf7c; color: #101d19; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-xianxia-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-xianxia-form\">\n  <label>秘境名<small>仙侠界面要有东方秩序和留白，不能变成廉价游戏皮肤。</small></label>\n  <div class=\"row\"><input value=\"青冥玉台\" aria-label=\"秘境名\" /><button type=\"button\">入境</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Celestial Jade 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-xianxia-hero",
+      "signature-xianxia-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-xianxia-table",
+    "name": "Celestial Jade 数据表",
+    "category": "table",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "xianxia",
+      "克制东方玄幻界面"
+    ],
+    "description": "Celestial Jade 的数据表素材，服务于克制东方玄幻界面，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Celestial Jade 数据表\n定位: 克制东方玄幻界面，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(16,29,25,0.88)，主强调 #dabf7c，辅助强调 #8fc7aa。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-xianxia-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(218,191,124,0.30); border-radius: 16px; background: rgba(16,29,25,0.88); color: #f3ead2; box-shadow: 0 32px 82px rgba(4,8,7,0.40); font-family: Inter, \"Noto Sans SC\", ui-sans-serif, system-ui, sans-serif; }\n.sig-xianxia-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-xianxia-table th, .sig-xianxia-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(218,191,124,0.30); }\n.sig-xianxia-table th { color: #b7c3aa; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(218,191,124,0.10); }\n.sig-xianxia-table td { color: #f3ead2; }\n.sig-xianxia-table tr:last-child td { border-bottom: 0; }\n.sig-xianxia-table tbody tr:hover td { background: rgba(218,191,124,0.10); }\n.sig-xianxia-table .mono { font-variant-numeric: tabular-nums; }\n.sig-xianxia-table .status { display: inline-flex; align-items: center; gap: 6px; color: #dabf7c; font-weight: 800; }\n.sig-xianxia-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #dabf7c; }",
+    "html": "<div class=\"sig-xianxia-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>青冥台</td><td><span class=\"status\">开启</span></td><td class=\"mono\">72</td></tr><tr><td>玉简</td><td><span class=\"status\">已录</span></td><td class=\"mono\">18</td></tr><tr><td>剑阵</td><td><span class=\"status\">安定</span></td><td class=\"mono\">09</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Celestial Jade 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-xianxia-hero",
+      "signature-xianxia-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "xian-btn-jade-glow",
+    "name": "Jade Glow Button",
+    "category": "button",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "jade",
+      "glow",
+      "primary",
+      "luminous"
+    ],
+    "stylePrompt": "高级设计指令: Jade Glow Button\n定位: Jade Glow Button 是一款 xianxia 按钮素材，适合 xianxia、jade、glow、primary 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Jade Glow Button。深渊底(#03060d)上的玉光主按钮。背景: rgba(126,226,196,0.08)。border: 1px solid rgba(126,226,196,0.25)。文字: #7ee2c4 Inter 13px 500 uppercase tracking 0.08em。hover时 glow 扩散(box-shadow: 0 0 24px rgba(126,226,196,0.2)) + 背景加深到0.12。气质: 凌霄/projectB 原生控件。",
+    "css": ".xian-btn-jade {\n  padding: 10px 20px;\n  background: rgba(126, 226, 196, 0.06);\n  color: #7ee2c4;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  font-weight: 500;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  border: 1px solid rgba(126, 226, 196, 0.2);\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);\n}\n.xian-btn-jade:hover {\n  background: rgba(126, 226, 196, 0.1);\n  border-color: rgba(126, 226, 196, 0.4);\n  box-shadow: 0 0 24px rgba(126, 226, 196, 0.15);\n}\n.xian-btn-jade:active {\n  background: rgba(126, 226, 196, 0.14);\n}",
+    "html": "<button class=\"xian-btn-jade\">Deploy</button>",
+    "description": "Jade Glow Button 是一款 xianxia 按钮素材，适合 xianxia、jade、glow、primary 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "xian-btn-gold-seal",
+    "name": "Gold Seal Button",
+    "category": "button",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "gold",
+      "seal",
+      "secondary",
+      "accent"
+    ],
+    "stylePrompt": "高级设计指令: Gold Seal Button\n定位: Gold Seal Button 是一款 xianxia 按钮素材，适合 xianxia、gold、seal、secondary 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gold Seal Button。金丹金(#f5c66b)描边按钮。透明底 + 1px border rgba(245,198,107,0.4) + 文字 #f5c66b。hover时微发光(0 0 16px rgba金0.2)。Cinzel display font 12px tracking 0.2em uppercase。气质: 诏书封印。",
+    "css": ".xian-btn-gold {\n  padding: 9px 20px;\n  background: transparent;\n  color: #f5c66b;\n  font-family: 'Cinzel', serif;\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: 0.2em;\n  text-transform: uppercase;\n  border: 1px solid rgba(245, 198, 107, 0.35);\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.3s;\n}\n.xian-btn-gold:hover {\n  border-color: rgba(245, 198, 107, 0.6);\n  box-shadow: 0 0 16px rgba(245, 198, 107, 0.15);\n}",
+    "html": "<button class=\"xian-btn-gold\">Confirm</button>",
+    "description": "Gold Seal Button 是一款 xianxia 按钮素材，适合 xianxia、gold、seal、secondary 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "xian-btn-void",
+    "name": "Void Button",
+    "category": "button",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "void",
+      "ghost",
+      "minimal",
+      "subtle"
+    ],
+    "stylePrompt": "高级设计指令: Void Button\n定位: Void Button 是一款 xianxia 按钮素材，适合 xianxia、void、ghost、minimal 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Void Button。几乎不可见的幽灵按钮——纯文字+极淡hairline border(rgba(203,213,245,0.1))。文字 #cbd5f5 opacity 0.7。hover时 opacity→1 + border略亮。用于次要操作。Inter 13px 400。",
+    "css": ".xian-btn-void {\n  padding: 8px 16px;\n  background: transparent;\n  color: rgba(203, 213, 245, 0.7);\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  border: 1px solid rgba(203, 213, 245, 0.08);\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.2s;\n}\n.xian-btn-void:hover {\n  color: #cbd5f5;\n  border-color: rgba(203, 213, 245, 0.18);\n  background: rgba(255, 255, 255, 0.02);\n}",
+    "html": "<button class=\"xian-btn-void\">Cancel</button>",
+    "description": "Void Button 是一款 xianxia 按钮素材，适合 xianxia、void、ghost、minimal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "xian-bg-xuan",
+    "name": "Xuan Night Base",
+    "category": "background",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "dark",
+      "base",
+      "noise",
+      "glow"
+    ],
+    "stylePrompt": "高级设计指令: Xuan Night Base\n定位: Xuan Night Base 是一款 xianxia 背景素材，适合 xianxia、dark、base、noise 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Xuan Night Base — 玄夜底色。#03060d 主底 + 三个偏移径向光晕(金/玉/朱各opacity 0.04-0.05, 900-1100px, 分布在左上/右中/下方) + SVG fractalNoise 噪点(opacity 0.06)。background-attachment:fixed。这是整个修仙主题的标准底色。",
+    "css": ".xian-bg-xuan {\n  min-height: 100vh;\n  background-color: #03060d;\n  background-image:\n    radial-gradient(900px 600px at 12% -8%, rgba(245, 198, 107, 0.05), transparent 60%),\n    radial-gradient(1100px 700px at 110% 20%, rgba(126, 226, 196, 0.045), transparent 65%),\n    radial-gradient(700px 500px at 50% 120%, rgba(232, 85, 109, 0.035), transparent 70%),\n    url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.6  0 0 0 0 0.7  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\");\n  background-attachment: fixed;\n  background-size: auto, auto, auto, 180px 180px;\n}",
+    "description": "Xuan Night Base 是一款 xianxia 背景素材，适合 xianxia、dark、base、noise 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 3,
+    "html": "<section class=\"xian-bg-xuan\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(218,191,124,0.30);border-radius:16px;background:rgba(218,191,124,0.10);color:#f3ead2;box-shadow:0 28px 74px rgba(4,8,7,0.36);\">\n    <div style=\"color:#dabf7c;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Xuan Night Base</h2>\n    <p style=\"margin:0;color:#b7c3aa;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "xian-bg-ink-deep",
+    "name": "Ink Deep Field",
+    "category": "background",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "ink",
+      "deep",
+      "card-base",
+      "panel"
+    ],
+    "stylePrompt": "高级设计指令: Ink Deep Field\n定位: Ink Deep Field 是一款 xianxia 背景素材，适合 xianxia、ink、deep、card-base 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Ink Deep Field — 墨青卡片底。用于面板/卡片内部。linear-gradient(180deg, #0a1020, #0d1424)。这是 --ink 到 --ink-2 的标准卡片渐变。",
+    "css": ".xian-bg-ink {\n  background: linear-gradient(180deg, #0a1020 0%, #0d1424 100%);\n}",
+    "description": "Ink Deep Field 是一款 xianxia 背景素材，适合 xianxia、ink、deep、card-base 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 4,
+    "html": "<section class=\"xian-bg-ink\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(218,191,124,0.30);border-radius:16px;background:rgba(218,191,124,0.10);color:#f3ead2;box-shadow:0 28px 74px rgba(4,8,7,0.36);\">\n    <div style=\"color:#dabf7c;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Ink Deep Field</h2>\n    <p style=\"margin:0;color:#b7c3aa;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "xian-card-panel",
+    "name": "Xuan Panel",
+    "category": "card",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "panel",
+      "card",
+      "hairline",
+      "standard"
+    ],
+    "stylePrompt": "高级设计指令: Xuan Panel\n定位: Xuan Panel 是一款 xianxia 卡片素材，适合 xianxia、panel、card、hairline 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Xuan Panel — 标准玄夜面板。background: linear-gradient(180deg, #0a1020, #0d1424)。border: 1px solid rgba(203,213,245,0.10)。border-radius: 14px(--r-lg)。position relative(为篆刻角标预留)。这是修仙主题所有卡片的基础容器。",
+    "css": ".xian-card {\n  padding: 24px;\n  background: linear-gradient(180deg, #0a1020 0%, #0d1424 100%);\n  border: 1px solid rgba(203, 213, 245, 0.10);\n  border-radius: 14px;\n  color: #cbd5f5;\n  position: relative;\n}",
+    "html": "<div class=\"xian-card\">\n  <h3 style=\"font-family:Cinzel,serif;font-size:15px;letter-spacing:0.12em;color:#f5c66b;margin:0 0 10px\">Status</h3>\n  <p style=\"font-family:Inter,system-ui;font-size:14px;opacity:0.7;margin:0;line-height:1.6\">All systems nominal. Cultivation cycle 81 complete.</p>\n</div>",
+    "description": "Xuan Panel 是一款 xianxia 卡片素材，适合 xianxia、panel、card、hairline 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "xian-card-seal",
+    "name": "Seal Card",
+    "category": "card",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "seal",
+      "corners",
+      "gold",
+      "evidence"
+    ],
+    "stylePrompt": "高级设计指令: Seal Card\n定位: Seal Card 是一款 xianxia 卡片素材，适合 xianxia、seal、corners、gold 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Seal Card — 篆刻角标卡片。基于 Xuan Panel + 四角金色L形装饰(::before左上 + ::after右下, 14px, border 1px solid rgba金0.32)。背景附加金色微渐变(rgba金0.04→transparent)。用于重要内容/evidence展示。",
+    "css": ".xian-card-seal {\n  padding: 24px;\n  background: linear-gradient(180deg, rgba(245,198,107,0.04) 0%, rgba(245,198,107,0) 100%), linear-gradient(180deg, #0a1020, #0d1424);\n  border: 1px solid rgba(203, 213, 245, 0.10);\n  border-radius: 10px;\n  color: #cbd5f5;\n  position: relative;\n}\n.xian-card-seal::before,\n.xian-card-seal::after {\n  content: '';\n  position: absolute;\n  width: 14px;\n  height: 14px;\n  border-color: rgba(245, 198, 107, 0.32);\n  border-style: solid;\n}\n.xian-card-seal::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }\n.xian-card-seal::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }",
+    "html": "<div class=\"xian-card-seal\">\n  <div style=\"font-family:Cinzel,serif;font-size:13px;letter-spacing:0.15em;color:#f5c66b;margin-bottom:10px\">EVIDENCE</div>\n  <div style=\"font-family:'JetBrains Mono',monospace;font-size:12px;opacity:0.7;line-height:1.7\">CVE-2024-xxxx confirmed via whitebox taint analysis. Source: req.body.id → sink: db.query()</div>\n</div>",
+    "description": "Seal Card 是一款 xianxia 卡片素材，适合 xianxia、seal、corners、gold 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "xian-card-metric",
+    "name": "Qi Metric Card",
+    "category": "card",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "metric",
+      "number",
+      "data",
+      "dashboard"
+    ],
+    "stylePrompt": "高级设计指令: Qi Metric Card\n定位: Qi Metric Card 是一款 xianxia 卡片素材，适合 xianxia、metric、number、data 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Qi Metric Card。标准 Xuan Panel 内: 标签(JetBrains Mono 10px uppercase tracking 0.2em rgba银0.5) + 大数字(Inter 28px 700 #cbd5f5 tabular-nums) + 状态指示(jade/gold/zhu色小点+文字)。紧凑。",
+    "css": ".xian-metric {\n  padding: 18px 20px;\n  background: linear-gradient(180deg, #0a1020, #0d1424);\n  border: 1px solid rgba(203, 213, 245, 0.10);\n  border-radius: 10px;\n}\n.xian-metric .label {\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 10px;\n  letter-spacing: 0.2em;\n  text-transform: uppercase;\n  color: rgba(203, 213, 245, 0.5);\n  margin-bottom: 6px;\n}\n.xian-metric .value {\n  font-family: 'Inter', system-ui;\n  font-size: 28px;\n  font-weight: 700;\n  color: #cbd5f5;\n  font-variant-numeric: tabular-nums;\n}\n.xian-metric .status {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  margin-top: 6px;\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 11px;\n  color: #7ee2c4;\n}\n.xian-metric .status .dot {\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n  background: #7ee2c4;\n  box-shadow: 0 0 8px #7ee2c4;\n}",
+    "html": "<div class=\"xian-metric\">\n  <div class=\"label\">Cycles</div>\n  <div class=\"value\">81</div>\n  <div class=\"status\"><span class=\"dot\"></span>Running</div>\n</div>",
+    "description": "Qi Metric Card 是一款 xianxia 卡片素材，适合 xianxia、metric、number、data 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "xian-nav-sidebar",
+    "name": "Sect Sidebar",
+    "category": "navigation",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "sidebar",
+      "vertical",
+      "gold-accent",
+      "app"
+    ],
+    "stylePrompt": "高级设计指令: Sect Sidebar\n定位: Sect Sidebar 是一款 xianxia 导航素材，适合 xianxia、sidebar、vertical、gold-accent 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Sect Sidebar — 宗门侧栏。width:224px, bg:rgba(#0a1020,0.3)+backdrop-blur-sm, right border hairline。logo区: Cinzel 18px tracking 0.22em 金色 + 下方mono小字。nav items: Cinzel 13px tracking 0.18em, active态左侧2px金色竖条+bg:ink-2+文字金色。分隔用 gold-line(渐变淡入淡出金线)。",
+    "css": ".xian-sidebar {\n  width: 224px;\n  display: flex;\n  flex-direction: column;\n  background: rgba(10, 16, 32, 0.3);\n  backdrop-filter: blur(4px);\n  border-right: 1px solid rgba(203, 213, 245, 0.10);\n  height: 100vh;\n}\n.xian-sidebar .logo {\n  padding: 28px 20px 16px;\n}\n.xian-sidebar .logo .name {\n  font-family: 'Cinzel', serif;\n  font-size: 18px;\n  letter-spacing: 0.22em;\n  color: #f5c66b;\n}\n.xian-sidebar .logo .sub {\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 10px;\n  letter-spacing: 0.32em;\n  text-transform: uppercase;\n  color: rgba(203, 213, 245, 0.5);\n}\n.xian-sidebar .gold-line {\n  height: 1px;\n  margin: 0 20px;\n  background: linear-gradient(90deg, transparent, rgba(245,198,107,0.4), transparent);\n}\n.xian-sidebar nav {\n  padding: 16px 12px;\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n.xian-sidebar nav a {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 10px 12px;\n  border-radius: 6px;\n  font-family: 'Cinzel', serif;\n  font-size: 13px;\n  letter-spacing: 0.18em;\n  color: rgba(203, 213, 245, 0.65);\n  text-decoration: none;\n  position: relative;\n  transition: all 0.2s;\n}\n.xian-sidebar nav a:hover {\n  color: #cbd5f5;\n  background: rgba(255, 255, 255, 0.02);\n}\n.xian-sidebar nav a.active {\n  color: #f5c66b;\n  background: #0d1424;\n}\n.xian-sidebar nav a.active::before {\n  content: '';\n  position: absolute;\n  left: 0;\n  top: 8px;\n  bottom: 8px;\n  width: 2px;\n  border-radius: 1px;\n  background: #f5c66b;\n  box-shadow: 0 0 8px #f5c66b;\n}",
+    "html": "<aside class=\"xian-sidebar\">\n  <div class=\"logo\"><div class=\"name\">凌霄</div><div class=\"sub\">Tribulation</div></div>\n  <div class=\"gold-line\"></div>\n  <nav>\n    <a href=\"#\" class=\"active\">灵台</a>\n    <a href=\"#\">道藏</a>\n    <a href=\"#\">试剑场</a>\n  </nav>\n</aside>",
+    "description": "Sect Sidebar 是一款 xianxia 导航素材，适合 xianxia、sidebar、vertical、gold-accent 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "xian-badge-tone",
+    "name": "Tone Badge",
+    "category": "badge",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "badge",
+      "status",
+      "tone",
+      "glow"
+    ],
+    "stylePrompt": "高级设计指令: Tone Badge\n定位: Tone Badge 是一款 xianxia 徽章素材，适合 xianxia、badge、status、tone 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Tone Badge — 五行色调徽章。pill形(border-radius:999px), 1px border + 同色6px圆点(带glow)。JetBrains Mono 11px uppercase tracking 0.06em。色调变体: yu(玉绿#7ee2c4) / jin(金#f5c66b) / zhu(朱#e8556d) / yin(银#cbd5f5) / dim(暗灰)。",
+    "css": ".xian-badge {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 2px 10px;\n  border-radius: 999px;\n  border: 1px solid rgba(203,213,245,0.1);\n  background: rgba(255,255,255,0.02);\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 11px;\n  letter-spacing: 0.06em;\n  text-transform: uppercase;\n}\n.xian-badge .dot { width: 6px; height: 6px; border-radius: 999px; }\n.xian-badge[data-tone='yu'] { color: #7ee2c4; border-color: rgba(126,226,196,0.35); }\n.xian-badge[data-tone='yu'] .dot { background: #7ee2c4; box-shadow: 0 0 8px #7ee2c4; }\n.xian-badge[data-tone='jin'] { color: #f5c66b; border-color: rgba(245,198,107,0.45); }\n.xian-badge[data-tone='jin'] .dot { background: #f5c66b; box-shadow: 0 0 8px #f5c66b; }\n.xian-badge[data-tone='zhu'] { color: #e8556d; border-color: rgba(232,85,109,0.40); }\n.xian-badge[data-tone='zhu'] .dot { background: #e8556d; box-shadow: 0 0 8px #e8556d; }",
+    "html": "<span class=\"xian-badge\" data-tone=\"yu\"><span class=\"dot\"></span>Running</span>\n<span class=\"xian-badge\" data-tone=\"jin\"><span class=\"dot\"></span>Complete</span>\n<span class=\"xian-badge\" data-tone=\"zhu\"><span class=\"dot\"></span>Failed</span>",
+    "description": "Tone Badge 是一款 xianxia 徽章素材，适合 xianxia、badge、status、tone 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  },
+  {
+    "id": "xian-effect-gold-line",
+    "name": "Gold Divider Line",
+    "category": "effect",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "divider",
+      "gold",
+      "gradient",
+      "subtle"
+    ],
+    "stylePrompt": "高级设计指令: Gold Divider Line\n定位: Gold Divider Line 是一款 xianxia 特效素材，适合 xianxia、divider、gold、gradient 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gold Divider Line — 金线分隔。1px高, background: linear-gradient(90deg, transparent 0%, transparent 6%, rgba(245,198,107,0.55) 50%, rgba(245,198,107,0) 94%, transparent 100%)。居中渐变金色——两端自然消失。",
+    "css": ".xian-gold-line {\n  height: 1px;\n  background: linear-gradient(\n    90deg,\n    transparent 0%,\n    rgba(245, 198, 107, 0) 6%,\n    rgba(245, 198, 107, 0.55) 50%,\n    rgba(245, 198, 107, 0) 94%,\n    transparent 100%\n  );\n}",
+    "html": "<div class=\"xian-gold-line\"></div>",
+    "description": "Gold Divider Line 是一款 xianxia 特效素材，适合 xianxia、divider、gold、gradient 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 10
+  },
+  {
+    "id": "xian-effect-pulse-yu",
+    "name": "Jade Pulse",
+    "category": "effect",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "pulse",
+      "jade",
+      "glow",
+      "running"
+    ],
+    "stylePrompt": "高级设计指令: Jade Pulse\n定位: Jade Pulse 是一款 xianxia 特效素材，适合 xianxia、pulse、jade、glow 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Jade Pulse — 玉光脉冲。元素的 box-shadow 在 inset 1px 玉色 和 外扩24px玉色光晕之间脉动(2.4s周期)。用于表示'运行中/激活'状态。cubic-bezier(0.22,0.61,0.36,1)。",
+    "css": ".xian-pulse-yu {\n  animation: xian-yupulse 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;\n}\n@keyframes xian-yupulse {\n  0%, 100% { box-shadow: 0 0 0 1px #7ee2c4 inset, 0 0 0 0 rgba(126,226,196,0); }\n  50% { box-shadow: 0 0 0 1px #7ee2c4 inset, 0 0 24px 2px rgba(126,226,196,0.45); }\n}",
+    "description": "Jade Pulse 是一款 xianxia 特效素材，适合 xianxia、pulse、jade、glow 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 81,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 11,
+    "html": "<article class=\"xian-pulse-yu\" style=\"width:min(100%,390px);padding:24px;border:1px solid rgba(218,191,124,0.30);border-radius:16px;background:rgba(16,29,25,0.88);color:#f3ead2;box-shadow:0 28px 74px rgba(4,8,7,0.36);\">\n  <div style=\"display:flex;align-items:center;justify-content:space-between;gap:18px;\">\n    <div>\n      <div style=\"color:#dabf7c;font-size:12px;font-weight:700;text-transform:uppercase;\">Effect Case</div>\n      <h3 style=\"margin:8px 0 6px;font-size:24px;line-height:1.15;\">Jade Pulse</h3>\n      <p style=\"margin:0;color:#b7c3aa;font-size:13px;line-height:1.6;\">Applied to a live status card, not as isolated decoration.</p>\n    </div>\n    <span style=\"width:42px;height:42px;border-radius:999px;background:#dabf7c;color:#101d19;display:grid;place-items:center;font-weight:800;\">✓</span>\n  </div>\n</article>"
+  },
+  {
+    "id": "xian-effect-halo-jin",
+    "name": "Gold Halo",
+    "category": "effect",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "halo",
+      "gold",
+      "success",
+      "glow"
+    ],
+    "stylePrompt": "高级设计指令: Gold Halo\n定位: Gold Halo 是一款 xianxia 特效素材，适合 xianxia、halo、gold、success 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gold Halo — 金丹光晕。三层 box-shadow: inset 1px金色 + 外18px金色 + 远60px金色(spread负值)。用于表示'成功/完成'状态。静态不动画——持续发光。",
+    "css": ".xian-halo-jin {\n  box-shadow:\n    0 0 0 1px rgba(245, 198, 107, 0.55) inset,\n    0 0 18px 2px rgba(245, 198, 107, 0.35),\n    0 0 60px -10px rgba(245, 198, 107, 0.55);\n}",
+    "description": "Gold Halo 是一款 xianxia 特效素材，适合 xianxia、halo、gold、success 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 81,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 12,
+    "html": "<article class=\"xian-halo-jin\" style=\"width:min(100%,390px);padding:24px;border:1px solid rgba(218,191,124,0.30);border-radius:16px;background:rgba(16,29,25,0.88);color:#f3ead2;box-shadow:0 28px 74px rgba(4,8,7,0.36);\">\n  <div style=\"display:flex;align-items:center;justify-content:space-between;gap:18px;\">\n    <div>\n      <div style=\"color:#dabf7c;font-size:12px;font-weight:700;text-transform:uppercase;\">Effect Case</div>\n      <h3 style=\"margin:8px 0 6px;font-size:24px;line-height:1.15;\">Gold Halo</h3>\n      <p style=\"margin:0;color:#b7c3aa;font-size:13px;line-height:1.6;\">Applied to a live status card, not as isolated decoration.</p>\n    </div>\n    <span style=\"width:42px;height:42px;border-radius:999px;background:#dabf7c;color:#101d19;display:grid;place-items:center;font-weight:800;\">✓</span>\n  </div>\n</article>"
+  },
+  {
+    "id": "xian-form-input",
+    "name": "Void Input",
+    "category": "form",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "input",
+      "dark",
+      "hairline",
+      "focus"
+    ],
+    "stylePrompt": "高级设计指令: Void Input\n定位: Void Input 是一款 xianxia 表单素材，适合 xianxia、input、dark、hairline 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Void Input — 虚空输入框。bg: #0a1020。border: 1px solid rgba银0.1。圆角6px。focus时 border-color→rgba玉0.4 + 轻微glow(0 0 12px rgba玉0.1)。文字 Inter 14px #cbd5f5。placeholder rgba银0.3。",
+    "css": ".xian-input {\n  width: 100%;\n  padding: 10px 14px;\n  background: #0a1020;\n  border: 1px solid rgba(203, 213, 245, 0.10);\n  border-radius: 6px;\n  color: #cbd5f5;\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  outline: none;\n  transition: border-color 0.2s, box-shadow 0.2s;\n}\n.xian-input:focus {\n  border-color: rgba(126, 226, 196, 0.4);\n  box-shadow: 0 0 12px rgba(126, 226, 196, 0.08);\n}\n.xian-input::placeholder { color: rgba(203, 213, 245, 0.3); }",
+    "html": "<input class=\"xian-input\" placeholder=\"Search dao records...\" />",
+    "description": "Void Input 是一款 xianxia 表单素材，适合 xianxia、input、dark、hairline 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 13
+  },
+  {
+    "id": "xian-table-dao",
+    "name": "Dao Record Table",
+    "category": "table",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "table",
+      "records",
+      "data",
+      "minimal"
+    ],
+    "stylePrompt": "高级设计指令: Dao Record Table\n定位: Dao Record Table 是一款 xianxia 表格素材，适合 xianxia、table、records、data 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Dao Record Table — 道藏记录表。bg透明(在xuan底上)。th: JetBrains Mono 10px uppercase tracking 0.1em rgba银0.4, border-bottom hairline。td: Inter 13px #cbd5f5, border-bottom hairline更淡。hover行 bg rgba白0.02。极紧凑。",
+    "css": ".xian-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-family: 'Inter', system-ui;\n}\n.xian-table th {\n  padding: 8px 14px;\n  text-align: left;\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 10px;\n  font-weight: 500;\n  letter-spacing: 0.1em;\n  text-transform: uppercase;\n  color: rgba(203, 213, 245, 0.4);\n  border-bottom: 1px solid rgba(203, 213, 245, 0.08);\n}\n.xian-table td {\n  padding: 10px 14px;\n  font-size: 13px;\n  color: #cbd5f5;\n  border-bottom: 1px solid rgba(203, 213, 245, 0.05);\n}\n.xian-table tr:hover td { background: rgba(255, 255, 255, 0.015); }\n.xian-table tr:last-child td { border-bottom: none; }",
+    "html": "<table class=\"xian-table\">\n  <thead><tr><th>ID</th><th>Task</th><th>Status</th><th>Duration</th></tr></thead>\n  <tbody>\n    <tr><td style=\"color:#f5c66b;font-family:'JetBrains Mono',monospace;font-size:12px\">RUN-042</td><td>SQL Injection scan</td><td style=\"color:#7ee2c4\">Complete</td><td style=\"opacity:0.5\">3m 22s</td></tr>\n    <tr><td style=\"color:#f5c66b;font-family:'JetBrains Mono',monospace;font-size:12px\">RUN-041</td><td>XSS enumeration</td><td style=\"color:#e8556d\">Failed</td><td style=\"opacity:0.5\">1m 08s</td></tr>\n  </tbody>\n</table>",
+    "description": "Dao Record Table 是一款 xianxia 表格素材，适合 xianxia、table、records、data 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 14
+  },
+  {
+    "id": "xian-modal-decree",
+    "name": "Decree Modal",
+    "category": "modal",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "modal",
+      "dialog",
+      "seal",
+      "confirmation"
+    ],
+    "stylePrompt": "高级设计指令: Decree Modal\n定位: Decree Modal 是一款 xianxia 弹窗素材，适合 xianxia、modal、dialog、seal 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Decree Modal — 诏令弹窗。overlay: rgba(3,6,13,0.7)。面板: ink gradient底 + hairline border + 圆角10px + seal角标。标题 Cinzel 16px 金色。正文 Inter 14px rgba银0.7。底部按钮: 左ghost(void btn) 右primary(jade glow btn)。",
+    "css": ".xian-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(3, 6, 13, 0.75);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 9999;\n}\n.xian-modal {\n  width: min(90%, 420px);\n  padding: 28px;\n  background: linear-gradient(180deg, #0a1020, #0d1424);\n  border: 1px solid rgba(203, 213, 245, 0.10);\n  border-radius: 10px;\n  position: relative;\n}\n.xian-modal::before, .xian-modal::after {\n  content: '';\n  position: absolute;\n  width: 12px;\n  height: 12px;\n  border-color: rgba(245, 198, 107, 0.3);\n  border-style: solid;\n}\n.xian-modal::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }\n.xian-modal::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }\n.xian-modal h3 {\n  font-family: 'Cinzel', serif;\n  font-size: 16px;\n  letter-spacing: 0.12em;\n  color: #f5c66b;\n  margin: 0 0 10px;\n}\n.xian-modal p {\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  color: rgba(203, 213, 245, 0.7);\n  line-height: 1.6;\n  margin: 0 0 20px;\n}\n.xian-modal .actions { display: flex; justify-content: flex-end; gap: 10px; }",
+    "html": "<div class=\"xian-modal-overlay\"><div class=\"xian-modal\">\n  <h3>Terminate Run?</h3>\n  <p>This will abort the current cultivation cycle. Progress will be lost.</p>\n  <div class=\"actions\">\n    <button class=\"xian-btn-void\">Cancel</button>\n    <button class=\"xian-btn-jade\">Confirm</button>\n  </div>\n</div></div>",
+    "description": "Decree Modal 是一款 xianxia 弹窗素材，适合 xianxia、modal、dialog、seal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 15
+  },
+  {
+    "id": "xian-footer-bottom",
+    "name": "Xuan Footer",
+    "category": "footer",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "footer",
+      "minimal",
+      "gold-line",
+      "mono"
+    ],
+    "stylePrompt": "高级设计指令: Xuan Footer\n定位: Xuan Footer 是一款 xianxia 页脚素材，适合 xianxia、footer、minimal、gold-line 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Xuan Footer — 玄底页脚。gold-line分隔 + 下方 JetBrains Mono 10px uppercase tracking 0.28em rgba银0.5。可加'炁'字或周天数据。极简——一行小字足矣。",
+    "css": ".xian-footer {\n  padding: 16px 20px;\n}\n.xian-footer .gold-line {\n  height: 1px;\n  background: linear-gradient(90deg, transparent, rgba(245,198,107,0.35), transparent);\n  margin-bottom: 12px;\n}\n.xian-footer .text {\n  font-family: 'JetBrains Mono', monospace;\n  font-size: 10px;\n  letter-spacing: 0.28em;\n  text-transform: uppercase;\n  color: rgba(203, 213, 245, 0.45);\n}",
+    "html": "<footer class=\"xian-footer\">\n  <div class=\"gold-line\"></div>\n  <div class=\"text\">Zhou Tian Cycle 81 · v1.0.0</div>\n</footer>",
+    "description": "Xuan Footer 是一款 xianxia 页脚素材，适合 xianxia、footer、minimal、gold-line 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 16
+  },
+  {
+    "id": "xian-layout-app",
+    "name": "Xuan App Layout",
+    "category": "layout",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "layout",
+      "sidebar",
+      "app",
+      "standard"
+    ],
+    "stylePrompt": "高级设计指令: Xuan App Layout\n定位: Xuan App Layout 是一款 xianxia 布局素材，适合 xianxia、layout、sidebar、app 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Xuan App Layout — 玄夜应用布局。grid: sidebar(224px) + content(1fr)。全高100vh。底色 #03060d(在 body 上)。sidebar 有 blur + 右边 hairline。content 区域 padding 32px, overflow-y auto。",
+    "css": ".xian-layout {\n  display: grid;\n  grid-template-columns: 224px 1fr;\n  height: 100vh;\n  background: #03060d;\n  color: #cbd5f5;\n}\n.xian-layout .sidebar {\n  border-right: 1px solid rgba(203, 213, 245, 0.08);\n  background: rgba(10, 16, 32, 0.3);\n  backdrop-filter: blur(4px);\n}\n.xian-layout .content {\n  padding: 32px;\n  overflow-y: auto;\n}",
+    "html": "<div class=\"xian-layout\">\n  <aside class=\"sidebar\">Sidebar</aside>\n  <main class=\"content\">Content</main>\n</div>",
+    "description": "Xuan App Layout 是一款 xianxia 布局素材，适合 xianxia、layout、sidebar、app 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 17
+  },
+  {
+    "id": "xian-hero-title",
+    "name": "Tribulation Hero",
+    "category": "hero",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "hero",
+      "title",
+      "display",
+      "centered"
+    ],
+    "stylePrompt": "高级设计指令: Tribulation Hero\n定位: Tribulation Hero 是一款 xianxia 首屏素材，适合 xianxia、hero、title、display 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Tribulation Hero — 渡劫首屏。居中: Cinzel display 字体超大(clamp 48-80px) tracking 0.08em 金色(#f5c66b)。下方 Inter 15px rgba银0.6 说明文字。底色 xuan + 光晕。无多余——字体本身就是设计。",
+    "css": ".xian-hero {\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  padding: 40px;\n  background: #03060d;\n}\n.xian-hero h1 {\n  font-family: 'Cinzel', serif;\n  font-size: clamp(48px, 10vw, 80px);\n  font-weight: 400;\n  letter-spacing: 0.08em;\n  color: #f5c66b;\n  margin: 0 0 20px;\n  text-shadow: 0 0 40px rgba(245, 198, 107, 0.2);\n}\n.xian-hero p {\n  font-family: 'Inter', system-ui;\n  font-size: 15px;\n  color: rgba(203, 213, 245, 0.6);\n  max-width: 480px;\n  line-height: 1.7;\n  margin: 0;\n}",
+    "html": "<section class=\"xian-hero\">\n  <h1>Lingxiao</h1>\n  <p>Autonomous security tribulation engine. Finding vulnerabilities through cultivation.</p>\n</section>",
+    "description": "Tribulation Hero 是一款 xianxia 首屏素材，适合 xianxia、hero、title、display 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 18
+  },
+  {
+    "id": "xian-anim-rise",
+    "name": "Rise In",
+    "category": "animation",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "animation",
+      "rise",
+      "entrance",
+      "subtle"
+    ],
+    "stylePrompt": "高级设计指令: Rise In\n定位: Rise In 是一款 xianxia 动画素材，适合 xianxia、animation、rise、entrance 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Rise In — 升起入场。从 opacity:0 + translateY(8px) 到正常。320ms, cubic-bezier(0.22,0.61,0.36,1)。极subtle——几乎感觉不到但少了就cheap。所有元素的标准入场动画。",
+    "css": ".xian-rise {\n  animation: xian-rise 320ms cubic-bezier(0.22, 0.61, 0.36, 1) both;\n}\n@keyframes xian-rise {\n  from { opacity: 0; transform: translateY(8px); }\n  to { opacity: 1; transform: translateY(0); }\n}",
+    "description": "Rise In 是一款 xianxia 动画素材，适合 xianxia、animation、rise、entrance 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 19,
+    "html": "<article class=\"xian-rise\" style=\"width:min(100%,420px);padding:24px;border:1px solid rgba(218,191,124,0.30);border-radius:16px;background:rgba(16,29,25,0.88);color:#f3ead2;box-shadow:0 28px 74px rgba(4,8,7,0.36);\">\n  <div style=\"color:#dabf7c;font-size:12px;font-weight:700;text-transform:uppercase;\">Motion Case</div>\n  <h3 style=\"margin:10px 0 8px;font-size:24px;line-height:1.15;\">Rise In</h3>\n  <p style=\"margin:0;color:#b7c3aa;font-size:14px;line-height:1.7;\">Used as a product-state transition with a clear message and stable layout.</p>\n</article>"
+  },
+  {
+    "id": "xian-anim-sword-flow",
+    "name": "Sword Flow Edge",
+    "category": "animation",
+    "themes": [
+      "xianxia"
+    ],
+    "tags": [
+      "xianxia",
+      "animation",
+      "sword",
+      "dash",
+      "edge"
+    ],
+    "stylePrompt": "高级设计指令: Sword Flow Edge\n定位: Sword Flow Edge 是一款 xianxia 动画素材，适合 xianxia、animation、sword、dash 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Celestial Jade / eastern fantasy interface with restraint。使用 #dabf7c 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Sword Flow Edge — 剑气拖尾。用于 DAG 连线/边: stroke-dasharray:4 8, animation: dashoffset从0到-120, 1.2s linear infinite。模拟灵力在连线上流动。配合 stroke #7ee2c4 opacity 0.6。",
+    "css": ".xian-sword-flow {\n  stroke-dasharray: 4 8;\n  animation: xian-sword-dash 1.2s linear infinite;\n}\n@keyframes xian-sword-dash {\n  to { stroke-dashoffset: -120; }\n}",
+    "description": "Sword Flow Edge 是一款 xianxia 动画素材，适合 xianxia、animation、sword、dash 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Celestial Jade 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(218,191,124,0.32), transparent 34%), linear-gradient(160deg, #0f1518 0%, #20332e 58%, #111719 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 20,
+    "html": "<svg viewBox=\"0 0 520 180\" role=\"img\" aria-label=\"Sword Flow Edge path animation\" style=\"width:min(100%,520px);height:auto;overflow:visible;\">\n  <path d=\"M24 120 C116 34, 208 156, 300 72 S432 30, 496 104\" fill=\"none\" stroke=\"#dabf7c\" stroke-width=\"2.5\" stroke-linecap=\"round\" class=\"xian-sword-flow\" />\n  <circle cx=\"24\" cy=\"120\" r=\"4\" fill=\"#dabf7c\" />\n  <circle cx=\"496\" cy=\"104\" r=\"4\" fill=\"#8fc7aa\" />\n</svg>"
+  }
+]

@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signal Router Telemetry</title>
+  <style>
+    :root {
+      --bg: #060817;
+      --panel: #090b1a;
+      --panel-2: #0d1224;
+      --ink: #f8fbff;
+      --text: #dbeafe;
+      --muted: #8da3b8;
+      --line: rgba(34, 211, 238, 0.28);
+      --line-soft: rgba(141, 163, 184, 0.16);
+      --cyan: #22d3ee;
+      --magenta: #ff2bd6;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #fb7185;
+      --shadow: 0 30px 90px rgba(34, 211, 238, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 76% 6%, rgba(255, 43, 214, 0.20), transparent 26%),
+        radial-gradient(circle at 12% 82%, rgba(34, 211, 238, 0.18), transparent 34%),
+        linear-gradient(145deg, #030613 0%, var(--bg) 48%, #101827 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(34, 211, 238, 0.055) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(34, 211, 238, 0.038) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent 86%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    .site {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      position: relative;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.28), rgba(255, 43, 214, 0.18));
+      box-shadow: inset 0 0 18px rgba(34, 211, 238, 0.16), 0 0 24px rgba(34, 211, 238, 0.14);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      background: var(--cyan);
+    }
+
+    .brand-mark::before { width: 18px; height: 1px; left: 7px; top: 16px; }
+    .brand-mark::after { width: 1px; height: 18px; left: 16px; top: 7px; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .nav-links a {
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px solid transparent;
+      transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .nav-links a.active {
+      color: var(--ink);
+      border-color: var(--line);
+      background: rgba(34, 211, 238, 0.07);
+      outline: none;
+    }
+
+    .nav-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: max-content;
+      padding: 8px 11px;
+      border: 1px solid rgba(74, 222, 128, 0.28);
+      color: var(--green);
+      background: rgba(74, 222, 128, 0.07);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 16px currentColor;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 46px 0 38px;
+    }
+
+    .hero-copy,
+    .telemetry-panel,
+    .card,
+    .route-map,
+    .incident-panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(9, 11, 26, 0.95), rgba(13, 18, 36, 0.76));
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-copy::before,
+    .telemetry-panel::before,
+    .card::before,
+    .route-map::before,
+    .incident-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.08), transparent);
+      transform: translateX(-120%);
+      transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-copy:hover::before,
+    .telemetry-panel:hover::before,
+    .card:hover::before,
+    .route-map:hover::before,
+    .incident-panel:hover::before { transform: translateX(120%); }
+
+    .hero-copy {
+      padding: clamp(26px, 5vw, 48px);
+      min-height: 520px;
+      display: grid;
+      align-content: center;
+    }
+
+    .kicker {
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.07);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 680px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.92;
+      letter-spacing: -0.07em;
+    }
+
+    .hero-copy p {
+      max-width: 610px;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 1.85;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      min-height: 43px;
+      padding: 0 17px;
+      border: 1px solid var(--line);
+      background: rgba(34, 211, 238, 0.08);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 760;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    .btn.primary {
+      border-color: rgba(34, 211, 238, 0.72);
+      background: var(--cyan);
+      color: #041018;
+      box-shadow: 0 0 34px rgba(34, 211, 238, 0.18);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--cyan);
+      box-shadow: 0 0 32px rgba(34, 211, 238, 0.16);
+      outline: none;
+    }
+
+    .btn:active { transform: translateY(0) scale(0.98); }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 34px;
+      border: 1px solid var(--line-soft);
+      background: var(--line-soft);
+    }
+
+    .hero-meta div {
+      padding: 15px;
+      background: rgba(6, 8, 23, 0.82);
+    }
+
+    .hero-meta strong {
+      display: block;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-meta span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .telemetry-panel {
+      min-height: 520px;
+      padding: 22px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .label {
+      color: var(--cyan);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .panel-head h2,
+    .section-head h2 { margin-top: 6px; font-size: 24px; letter-spacing: -0.04em; }
+
+    .timecode {
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .map-grid {
+      position: relative;
+      min-height: 280px;
+      border: 1px solid var(--line-soft);
+      background:
+        linear-gradient(90deg, rgba(34, 211, 238, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 48% 48%, rgba(34, 211, 238, 0.14), transparent 34%);
+      background-size: 32px 32px, 32px 32px, auto;
+      overflow: hidden;
+    }
+
+    .map-grid::after {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: -12%;
+      height: 52%;
+      background:
+        linear-gradient(to right, rgba(34, 211, 238, 0.18) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(34, 211, 238, 0.12) 1px, transparent 1px);
+      background-size: 46px 26px;
+      transform: perspective(420px) rotateX(62deg);
+      transform-origin: bottom center;
+      mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent 86%);
+    }
+
+    .route-line {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), transparent);
+      box-shadow: 0 0 16px rgba(34, 211, 238, 0.42);
+      transform-origin: left center;
+    }
+
+    .line-a { width: 58%; left: 19%; top: 38%; transform: rotate(13deg); }
+    .line-b { width: 43%; left: 24%; top: 61%; transform: rotate(-24deg); }
+    .line-c { width: 34%; left: 48%; top: 50%; transform: rotate(39deg); }
+
+    .node {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 1px solid currentColor;
+      background: var(--panel);
+      box-shadow: 0 0 20px currentColor;
+      transform: translate(-50%, -50%);
+    }
+
+    .node::after {
+      content: attr(data-node);
+      position: absolute;
+      left: 18px;
+      top: -5px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .n1 { color: var(--green); left: 18%; top: 35%; }
+    .n2 { color: var(--cyan); left: 45%; top: 45%; }
+    .n3 { color: var(--yellow); left: 69%; top: 30%; }
+    .n4 { color: var(--magenta); left: 78%; top: 68%; }
+    .n5 { color: var(--cyan); left: 32%; top: 72%; }
+
+    .telemetry-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .telemetry-row:last-child { border-bottom: 0; }
+    .telemetry-row strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .status-ok { color: var(--green); }
+    .status-watch { color: var(--yellow); }
+    .status-hot { color: var(--magenta); }
+
+    .section {
+      padding: 38px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .section-head p {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      min-height: 180px;
+      padding: 18px;
+    }
+
+    .card small {
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .metric {
+      margin-top: 18px;
+      font-size: 35px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card p {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .spark {
+      height: 34px;
+      margin-top: 18px;
+      background: linear-gradient(90deg, rgba(34, 211, 238, 0.12), rgba(255, 43, 214, 0.18));
+      clip-path: polygon(0 80%, 12% 48%, 25% 58%, 38% 28%, 50% 44%, 63% 20%, 76% 36%, 88% 16%, 100% 26%, 100% 100%, 0 100%);
+      border-bottom: 1px solid rgba(34, 211, 238, 0.42);
+    }
+
+    .ops-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
+      gap: 14px;
+    }
+
+    .route-map,
+    .incident-panel { padding: 20px; }
+
+    .table-wrap {
+      margin-top: 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line-soft);
+    }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    th {
+      color: var(--muted);
+      background: rgba(34, 211, 238, 0.06);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    td { color: var(--text); }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(34, 211, 238, 0.055); }
+    .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-variant-numeric: tabular-nums; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 8px;
+      border: 1px solid currentColor;
+      background: color-mix(in srgb, currentColor 9%, transparent);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .incident-list {
+      display: grid;
+      gap: 11px;
+      margin-top: 18px;
+    }
+
+    .incident {
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      background: rgba(6, 8, 23, 0.62);
+    }
+
+    .incident-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .incident p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .terminal {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(74, 222, 128, 0.22);
+      background: #020403;
+      color: rgba(74, 222, 128, 0.86);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.75;
+      overflow-x: auto;
+    }
+
+    .cta {
+      margin: 40px 0 52px;
+      padding: clamp(24px, 5vw, 38px);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(34, 211, 238, 0.10), transparent 38%),
+        linear-gradient(225deg, rgba(255, 43, 214, 0.11), transparent 44%),
+        rgba(9, 11, 26, 0.88);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .cta h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .cta p {
+      max-width: 680px;
+      margin-top: 13px;
+      color: var(--muted);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 0 34px;
+      border-top: 1px solid var(--line-soft);
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+    }
+
+    @media (max-width: 940px) {
+      .hero,
+      .ops-grid,
+      .cta { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .hero-copy,
+      .telemetry-panel { min-height: auto; }
+      .cta .actions { margin-top: 0; }
+    }
+
+    @media (max-width: 680px) {
+      .site { width: min(100% - 24px, 1180px); }
+      .nav { align-items: stretch; flex-direction: column; }
+      .nav-links { justify-content: flex-start; overflow-x: auto; padding-bottom: 2px; }
+      .hero { padding-top: 18px; }
+      .hero-meta,
+      .cards { grid-template-columns: 1fr; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .telemetry-row { grid-template-columns: 1fr; gap: 4px; }
+      footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav class="nav" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="Signal Router Telemetry 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Signal Router</span>
+      </a>
+      <div class="nav-links" role="list">
+        <a class="active" href="#top">Overview</a>
+        <a href="#telemetry">Telemetry</a>
+        <a href="#routes">Routes</a>
+        <a href="#incidents">Incidents</a>
+      </div>
+      <div class="nav-status"><span class="dot"></span> backbone nominal</div>
+    </nav>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="kicker">BGP / EDGE / TELEMETRY</div>
+          <h1 id="hero-title">把城市级路由异常压缩到一条清晰信号。</h1>
+          <p>Signal Router 为 NOC 团队聚合边缘 POP、BGP 会话、链路延迟与丢包趋势，在故障扩散前给出可执行的路由处置建议。</p>
+          <div class="actions">
+            <button class="btn primary" type="button">Trace route</button>
+            <button class="btn" type="button">Open NOC view</button>
+          </div>
+          <div class="hero-meta" aria-label="核心路由指标">
+            <div><strong>31ms</strong><span>global p95 latency</span></div>
+            <div><strong>0.018%</strong><span>packet loss</span></div>
+            <div><strong>17s</strong><span>route convergence</span></div>
+          </div>
+        </div>
+
+        <aside class="telemetry-panel" id="telemetry" aria-label="实时链路遥测">
+          <div class="panel-head">
+            <div>
+              <div class="label">LIVE ROUTE GRAPH</div>
+              <h2>APAC edge mesh</h2>
+            </div>
+            <div class="timecode">2026-06-09<br />04:12:33 UTC</div>
+          </div>
+          <div class="map-grid" aria-label="路由拓扑示意">
+            <span class="route-line line-a"></span>
+            <span class="route-line line-b"></span>
+            <span class="route-line line-c"></span>
+            <span class="node n1" data-node="HKG-02"></span>
+            <span class="node n2" data-node="SHA-07"></span>
+            <span class="node n3" data-node="TYO-11"></span>
+            <span class="node n4" data-node="SIN-04"></span>
+            <span class="node n5" data-node="TPE-03"></span>
+          </div>
+          <div class="telemetry-list">
+            <div class="telemetry-row"><span>HKG-02 → SHA-07</span><strong>18ms</strong><span class="status-ok">stable</span></div>
+            <div class="telemetry-row"><span>SHA-07 → TYO-11</span><strong>42ms</strong><span class="status-watch">watch</span></div>
+            <div class="telemetry-row"><span>SIN-04 → TPE-03</span><strong>0.11% loss</strong><span class="status-hot">reroute</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="metrics-title">
+        <div class="section-head">
+          <div>
+            <div class="label">ROUTING HEALTH</div>
+            <h2 id="metrics-title">从噪声里提取可处置指标</h2>
+          </div>
+          <p>所有信号按业务影响排序：先看用户流量、再看路由收敛、最后进入节点级排障，避免 NOC 在告警流中反复切换上下文。</p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <small>active POPs</small>
+            <div class="metric">84</div>
+            <p>覆盖 21 个城域入口，6 个边缘节点处于维护窗口。</p>
+            <div class="spark"></div>
+          </article>
+          <article class="card">
+            <small>BGP sessions</small>
+            <div class="metric">1,248</div>
+            <p>12 条会话 flap 被合并为 2 个故障域。</p>
+            <div class="spark"></div>
+          </article>
+          <article class="card">
+            <small>incident MTTR</small>
+            <div class="metric">9m</div>
+            <p>自动附带 traceroute、ASN 变更与影响面。</p>
+            <div class="spark"></div>
+          </article>
+          <article class="card">
+            <small>SLA risk</small>
+            <div class="metric">low</div>
+            <p>只有 SIN-04 出口队列接近容量阈值。</p>
+            <div class="spark"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section ops-grid" id="routes" aria-label="路由与事故工作台">
+        <div class="route-map">
+          <div class="section-head">
+            <div>
+              <div class="label">ROUTE TABLE</div>
+              <h2>关键路径巡检</h2>
+            </div>
+            <p>以路径为单位展示风险，而不是用孤立节点淹没操作者。</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>p95</th>
+                  <th>Loss</th>
+                  <th>State</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">SHA-07 / TYO-11</td>
+                  <td class="mono">42ms</td>
+                  <td class="mono">0.031%</td>
+                  <td><span class="pill status-watch"><span class="dot"></span>watch</span></td>
+                  <td>edge-apac</td>
+                </tr>
+                <tr>
+                  <td class="mono">HKG-02 / SHA-07</td>
+                  <td class="mono">18ms</td>
+                  <td class="mono">0.004%</td>
+                  <td><span class="pill status-ok"><span class="dot"></span>stable</span></td>
+                  <td>backbone-cn</td>
+                </tr>
+                <tr>
+                  <td class="mono">SIN-04 / TPE-03</td>
+                  <td class="mono">67ms</td>
+                  <td class="mono">0.110%</td>
+                  <td><span class="pill status-hot"><span class="dot"></span>reroute</span></td>
+                  <td>traffic-eng</td>
+                </tr>
+                <tr>
+                  <td class="mono">ICN-09 / TYO-11</td>
+                  <td class="mono">24ms</td>
+                  <td class="mono">0.009%</td>
+                  <td><span class="pill status-ok"><span class="dot"></span>stable</span></td>
+                  <td>edge-apac</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="incident-panel" id="incidents">
+          <div class="label">INCIDENT QUEUE</div>
+          <h2>处置队列</h2>
+          <div class="incident-list">
+            <article class="incident">
+              <div class="incident-top"><span>SIN-04 egress saturation</span><span class="status-hot">P1</span></div>
+              <p>建议将 18% 视频流量迁移至 HKG-02，预计 p95 下降 21ms。</p>
+            </article>
+            <article class="incident">
+              <div class="incident-top"><span>TYO-11 BGP flap cluster</span><span class="status-watch">P2</span></div>
+              <p>同 ASN 的 7 次 flap 已归并，等待上游确认维护窗口。</p>
+            </article>
+            <article class="incident">
+              <div class="incident-top"><span>HKG-02 route leak guard</span><span class="status-ok">guarded</span></div>
+              <p>前缀过滤规则已生效，未观察到用户侧错误率上升。</p>
+            </article>
+          </div>
+          <div class="terminal" aria-label="诊断命令输出">
+            $ trace --route SIN-04/TPE-03<br />
+            hop[03] queue_depth=84% loss=0.110%<br />
+            advise: drain 18% traffic to HKG-02<br />
+            confidence: 0.91 / blast-radius: low
+          </div>
+        </aside>
+      </section>
+
+      <section class="cta" aria-labelledby="cta-title">
+        <div>
+          <div class="label">NOC READY</div>
+          <h2 id="cta-title">让每次路由变更都有证据链。</h2>
+          <p>把遥测、拓扑、事故和处置建议放进同一个低噪声界面，减少跨工具排障和无效升级。</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button">Inspect incidents</button>
+          <button class="btn" type="button">Export route brief</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>ASN 64512 / route telemetry fabric</span>
+      <span>last sync 2026-06-09 04:12:33 UTC</span>
+      <span>status: nominal</span>
+    </footer>
+  </div>
+</body>
+</html>

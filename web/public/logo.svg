@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lingxiao">
+  <defs>
+    <linearGradient id="dark" x1="256" y1="34" x2="256" y2="458" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.45" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="168" y1="366" x2="304" y2="238" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9d682d"/>
+      <stop offset="0.54" stop-color="#e6b84c"/>
+      <stop offset="1" stop-color="#fff0b8"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="14" width="476" height="484" rx="72" fill="#fbfdff"/>
+  <rect x="25" y="21" width="462" height="470" rx="66" fill="none" stroke="#e3e8ed" stroke-width="8"/>
+
+  <path
+    d="M256 34
+      L331 252
+      C323 281 312 313 292 344
+      L256 391
+      L220 344
+      C200 313 189 281 181 252
+      Z"
+    fill="url(#dark)"
+  />
+
+  <path
+    d="M256 61
+      V164
+      M256 288
+      V387"
+    fill="none"
+    stroke="#c8d0d7"
+    stroke-width="15"
+    stroke-linecap="round"
+  />
+
+  <path
+    d="M256 165
+      C242 165 235 182 231 208
+      C221 269 203 313 160 335
+      C139 346 116 344 108 359
+      C101 373 113 384 135 384
+      H207
+      L242 350
+      C250 342 262 342 270 350
+      L305 384
+      H377
+      C399 384 411 373 404 359
+      C396 344 373 346 352 335
+      C309 313 291 269 281 208
+      C277 182 270 165 256 165Z"
+    fill="url(#dark)"
+  />
+
+  <path
+    d="M221 239
+      C217 288 196 326 162 353"
+    fill="none"
+    stroke="#0b3f42"
+    stroke-opacity="0.45"
+    stroke-width="38"
+    stroke-linecap="round"
+  />
+  <path
+    d="M291 239
+      C295 288 316 326 350 353"
+    fill="none"
+    stroke="#0b3f42"
+    stroke-opacity="0.45"
+    stroke-width="38"
+    stroke-linecap="round"
+  />
+  <path
+    d="M221 239
+      C217 288 196 326 162 353
+      M291 239
+      C295 288 316 326 350 353"
+    fill="none"
+    stroke="url(#gold)"
+    stroke-width="27"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <path d="M96 408 H416" fill="none" stroke="#030712" stroke-width="28" stroke-linecap="round"/>
+  <path
+    d="M230 408
+      H282
+      L269 456
+      C265 471 247 471 243 456
+      Z"
+    fill="#030712"
+  />
+</svg>

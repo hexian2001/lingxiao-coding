@@ -1,0 +1,42 @@
+{
+  "id": "dark",
+  "name": "Nocturne Incident Ops",
+  "description": "深色工程控制台主题，用于 incident response、release health、SRE 值守与自动化运行观察。",
+  "preview": "preview.html",
+  "prompt": "prompt.md",
+  "tags": [
+    "dark",
+    "incident-ops",
+    "engineering-console",
+    "sre",
+    "observability"
+  ],
+  "style": {
+    "surface": "#0f1416",
+    "surfaceElevated": "#161d20",
+    "text": "#eff2f1",
+    "muted": "#8c989a",
+    "primary": "#aebdc5",
+    "warning": "#f2c673",
+    "danger": "#ef6f6c",
+    "success": "#7fd6a7"
+  },
+  "palette": {
+    "surface": "#0f1416",
+    "surfaceElevated": "#161d20",
+    "text": "#eff2f1",
+    "muted": "#8c989a",
+    "primary": "#aebdc5",
+    "warning": "#f2c673",
+    "danger": "#ef6f6c",
+    "success": "#7fd6a7"
+  },
+  "constraints": [
+    "完整纯前端静态站点",
+    "内联 CSS",
+    "无远程资源",
+    "响应式布局",
+    "不是组件库示例",
+    "必须结合真实业务场景"
+  ]
+}

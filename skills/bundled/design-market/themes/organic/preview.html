@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Living Habit Field</title>
+  <style>
+    :root {
+      --surface: #f5f3e7;
+      --surface-warm: #fdfbf7;
+      --surface-soft: #eef1df;
+      --surface-muted: #dfe7d3;
+      --ink: #233128;
+      --text: #344238;
+      --muted: #657263;
+      --accent: #4f7b58;
+      --accent-deep: #31543a;
+      --accent-warm: #b08345;
+      --line: rgba(79, 123, 88, 0.22);
+      --shadow: 0 30px 70px rgba(68, 92, 68, 0.16);
+      --soft-shadow: 0 14px 34px rgba(68, 92, 68, 0.1);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--surface-warm);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(79, 123, 88, 0.16), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(176, 131, 69, 0.12), transparent 30%),
+        radial-gradient(ellipse at 50% 20%, #fff 0%, var(--surface-warm) 44%, #faf5eb 100%);
+      color: var(--text);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.018;
+      background-image: radial-gradient(circle at 30% 30%, rgba(68, 105, 76, 0.18) 0 1px, transparent 1px), radial-gradient(circle at 70% 65%, rgba(176, 131, 69, 0.14) 0 1px, transparent 1px);
+      background-size: 18px 18px, 24px 24px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(79, 123, 88, 0.28);
+      outline-offset: 3px;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 46px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 14px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(245, 243, 231, 0.88);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 58% 42% 64% 36% / 44% 56% 38% 62%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+      animation: living-blob 8s ease-in-out infinite;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--ink);
+      background: var(--surface-muted);
+    }
+
+    .nav-action,
+    .primary-action,
+    .secondary-action {
+      min-height: 40px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      white-space: nowrap;
+    }
+
+    .nav-action,
+    .primary-action {
+      background: var(--accent);
+      color: var(--surface);
+      box-shadow: 0 10px 20px rgba(79, 123, 88, 0.18);
+    }
+
+    .secondary-action {
+      background: rgba(245, 243, 231, 0.72);
+      color: var(--accent-deep);
+    }
+
+    .nav-action:hover,
+    .primary-action:hover,
+    .secondary-action:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-action:active,
+    .primary-action:active,
+    .secondary-action:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: 30px;
+      align-items: stretch;
+      margin-top: 34px;
+      padding: clamp(28px, 5vw, 52px);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background: linear-gradient(145deg, var(--surface), var(--surface-muted));
+      box-shadow: var(--shadow);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    .hero::before {
+      width: 360px;
+      height: 360px;
+      left: -160px;
+      top: -140px;
+      background: rgba(79, 123, 88, 0.13);
+    }
+
+    .hero::after {
+      width: 300px;
+      height: 300px;
+      right: -130px;
+      bottom: -130px;
+      background: rgba(176, 131, 69, 0.12);
+    }
+
+    .hero > * { position: relative; z-index: 1; }
+
+    .kicker {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(245, 243, 231, 0.58);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(79, 123, 88, 0.12);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 680px;
+      margin-bottom: 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+      color: var(--ink);
+    }
+
+    .hero-copy p {
+      max-width: 610px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.78;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .daily-window {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 650px;
+    }
+
+    .window-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(253, 251, 247, 0.62);
+    }
+
+    .window-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .window-card span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .today-panel {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: rgba(253, 251, 247, 0.72);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .panel-head,
+    .section-head,
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .eyebrow {
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .today-panel h2,
+    .section-head h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.04;
+      color: var(--ink);
+      letter-spacing: -0.035em;
+    }
+
+    .date-pill,
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .breath-ring {
+      width: min(100%, 300px);
+      aspect-ratio: 1;
+      justify-self: center;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(253,251,247,0.96) 0 38%, transparent 39%),
+        conic-gradient(var(--accent) 0 72%, rgba(79, 123, 88, 0.16) 72% 100%);
+      box-shadow: inset 0 0 0 16px rgba(245, 243, 231, 0.72), var(--soft-shadow);
+      animation: soft-breathe 7s ease-in-out infinite;
+    }
+
+    .breath-ring .ring-copy {
+      width: 150px;
+      text-align: center;
+    }
+
+    .ring-copy strong {
+      display: block;
+      margin-bottom: 4px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 44px;
+      line-height: 1;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ring-copy span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .habit-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .habit-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(79, 123, 88, 0.16);
+      border-radius: 20px;
+      background: rgba(223, 231, 211, 0.44);
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .habit-row:hover {
+      transform: translateY(-1px);
+      background: rgba(223, 231, 211, 0.7);
+    }
+
+    .check {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--surface);
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .check.pending {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--accent);
+    }
+
+    .habit-row strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .habit-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .habit-row time,
+    .habit-row .count {
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .section {
+      margin-top: 26px;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background: rgba(245, 243, 231, 0.64);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .section-head {
+      margin-bottom: 22px;
+    }
+
+    .section-head p {
+      max-width: 600px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      min-height: 170px;
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--surface-warm);
+      box-shadow: 0 10px 22px rgba(68, 92, 68, 0.06);
+    }
+
+    .metric-card:nth-child(2) { border-radius: 34px 24px 34px 24px; }
+    .metric-card:nth-child(3) { border-radius: 24px 38px 24px 38px; }
+
+    .metric-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      line-height: 1;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-card span,
+    .metric-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(79, 123, 88, 0.14);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    }
+
+    .ritual-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(320px, 1.18fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .journal-card,
+    .week-card {
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--surface-warm);
+      box-shadow: 0 12px 28px rgba(68, 92, 68, 0.08);
+    }
+
+    .journal-card {
+      padding: 22px;
+    }
+
+    .journal-card label {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .journal-card input,
+    .journal-card select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      padding: 0 12px;
+    }
+
+    .journal-card small {
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .week-card {
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(79, 123, 88, 0.14);
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(223, 231, 211, 0.38); }
+
+    .mood {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-deep);
+      font-weight: 900;
+    }
+
+    .mood::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(79, 123, 88, 0.12);
+    }
+
+    .mono { font-variant-numeric: tabular-nums; }
+
+    .coach-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+      gap: 18px;
+    }
+
+    .coach-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background: linear-gradient(145deg, var(--surface-warm), var(--surface-soft));
+    }
+
+    .coach-card h3,
+    .journal-card h3 {
+      margin-bottom: 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 28px;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+    }
+
+    .coach-card p {
+      color: var(--muted);
+      line-height: 1.72;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .note {
+      padding: 13px 14px;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 18px 18px 0;
+      background: rgba(245, 243, 231, 0.74);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--surface-warm);
+    }
+
+    .day {
+      aspect-ratio: 1;
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(79, 123, 88, 0.14);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .day.done {
+      background: var(--accent);
+      color: var(--surface);
+      border-color: var(--accent);
+    }
+
+    .day.soft {
+      background: var(--surface-muted);
+      color: var(--accent-deep);
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 26px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--ink);
+      color: var(--surface);
+    }
+
+    .footer strong {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px;
+    }
+
+    .footer span {
+      color: rgba(245, 243, 231, 0.72);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @keyframes living-blob {
+      0%, 100% { border-radius: 58% 42% 64% 36% / 44% 56% 38% 62%; }
+      33% { border-radius: 42% 58% 36% 64% / 58% 42% 62% 38%; }
+      66% { border-radius: 64% 36% 52% 48% / 38% 62% 44% 56%; }
+    }
+
+    @keyframes soft-breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.018); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .nav {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .nav-action {
+        width: 100%;
+      }
+
+      .hero,
+      .ritual-layout,
+      .coach-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .today-panel {
+        order: -1;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        padding-top: 10px;
+      }
+
+      .hero,
+      .section {
+        border-radius: 24px;
+      }
+
+      .daily-window,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-head,
+      .section-head,
+      .card-head,
+      .footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-actions {
+        display: grid;
+      }
+
+      .primary-action,
+      .secondary-action {
+        width: 100%;
+      }
+
+      .week-card {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 560px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="Living Habit Field 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Living Habit Field
+      </a>
+      <div class="nav-links" aria-label="页面分区">
+        <a class="active" href="#today">今日节律</a>
+        <a href="#metrics">健康指标</a>
+        <a href="#rituals">习惯日志</a>
+        <a href="#coach">教练建议</a>
+      </div>
+      <button class="nav-action" type="button">记录今天</button>
+    </nav>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="kicker">健康生活方式 / 习惯追踪</div>
+          <h1 id="hero-title">让每一天的健康选择，像田野一样慢慢生长。</h1>
+          <p>Living Habit Field 帮助你把补水、睡眠、步行、呼吸和情绪记录放在同一张温和的日程里。界面不催促，只把最该行动的下一步呈现清楚。</p>
+          <div class="hero-actions">
+            <button class="primary-action" type="button">开始晨间计划</button>
+            <button class="secondary-action" type="button">查看本周趋势</button>
+          </div>
+          <div class="daily-window" aria-label="今日关键窗口">
+            <div class="window-card"><strong>06:40</strong><span>晨间呼吸窗口，建议 4 分钟</span></div>
+            <div class="window-card"><strong>1.8 L</strong><span>今日补水目标，已完成 61%</span></div>
+            <div class="window-card"><strong>22:30</strong><span>睡前离屏提醒，保留 45 分钟缓冲</span></div>
+          </div>
+        </div>
+
+        <aside class="today-panel" id="today" aria-labelledby="today-title">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Today / Tuesday</div>
+              <h2 id="today-title">今日完成度</h2>
+            </div>
+            <span class="date-pill">72% 稳定</span>
+          </div>
+          <div class="breath-ring" aria-label="今日习惯完成度 72%">
+            <div class="ring-copy">
+              <strong>72%</strong>
+              <span>5 项习惯已完成，晚间还有 2 项待记录</span>
+            </div>
+          </div>
+          <div class="habit-list" aria-label="今日习惯列表">
+            <div class="habit-row">
+              <span class="check">✓</span>
+              <div><strong>晨间呼吸</strong><span>4 分钟，心率回落 8 bpm</span></div>
+              <time>06:44</time>
+            </div>
+            <div class="habit-row">
+              <span class="check">✓</span>
+              <div><strong>午后步行</strong><span>2,850 步，光照 18 分钟</span></div>
+              <time>12:36</time>
+            </div>
+            <div class="habit-row">
+              <span class="check pending">•</span>
+              <div><strong>睡前记录</strong><span>写下能量、情绪和明日阻碍</span></div>
+              <span class="count">21:50</span>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="metrics" aria-labelledby="metrics-title">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Body Signals</div>
+            <h2 id="metrics-title">不是打卡墙，是身体信号面板。</h2>
+            <p>所有卡片都围绕真实健康决策：今天是否该降低运动强度、是否需要补水、睡眠债是否正在累积。</p>
+          </div>
+          <span class="status-pill">连续记录 18 天</span>
+        </div>
+        <div class="metric-grid">
+          <article class="metric-card">
+            <div><strong>7h 24m</strong><span>睡眠时长</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 82%"></div></div>
+            <p>深睡比昨日多 18 分钟，晚间咖啡因影响降低。</p>
+          </article>
+          <article class="metric-card">
+            <div><strong>8,420</strong><span>今日步数</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 76%"></div></div>
+            <p>还差 1,580 步，建议晚饭后轻走 16 分钟。</p>
+          </article>
+          <article class="metric-card">
+            <div><strong>1.1 L</strong><span>补水完成</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 61%"></div></div>
+            <p>下一次提醒安排在 15:30，避免睡前集中饮水。</p>
+          </article>
+          <article class="metric-card">
+            <div><strong>平稳</strong><span>情绪标记</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 68%"></div></div>
+            <p>上午会议后压力升高，午后步行后恢复。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="rituals" aria-labelledby="rituals-title">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Habit Journal</div>
+            <h2 id="rituals-title">把习惯记录成可复盘的生活证据。</h2>
+            <p>表单、表格和状态不是组件堆叠，而是一个完整的记录闭环：输入今日计划，查看一周反馈，再决定下一步。</p>
+          </div>
+        </div>
+        <div class="ritual-layout">
+          <form class="journal-card" aria-label="今日习惯记录表单">
+            <h3>今日记录</h3>
+            <label>
+              主要关注
+              <small>选择今天最想稳定的一项习惯。</small>
+              <select aria-label="主要关注">
+                <option>睡眠提前 20 分钟</option>
+                <option>午后补水稳定</option>
+                <option>晚饭后轻步行</option>
+              </select>
+            </label>
+            <label>
+              晚间备注
+              <small>用一句真实描述替代空泛评价。</small>
+              <input aria-label="晚间备注" value="下午疲劳来自午餐后久坐，明天把散步提前到 13:10" />
+            </label>
+            <button class="primary-action" type="button">保存记录</button>
+          </form>
+
+          <div class="week-card" aria-label="一周习惯趋势表">
+            <table>
+              <thead>
+                <tr><th>日期</th><th>重点习惯</th><th>完成</th><th>身体反馈</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>周一</td><td>晨间呼吸</td><td class="mono">4 / 4</td><td><span class="mood">平稳</span></td></tr>
+                <tr><td>周二</td><td>补水节奏</td><td class="mono">3 / 5</td><td><span class="mood">偏干</span></td></tr>
+                <tr><td>周三</td><td>睡前离屏</td><td class="mono">2 / 3</td><td><span class="mood">恢复中</span></td></tr>
+                <tr><td>周四</td><td>午后步行</td><td class="mono">5 / 5</td><td><span class="mood">轻盈</span></td></tr>
+                <tr><td>周五</td><td>情绪日志</td><td class="mono">1 / 2</td><td><span class="mood">需观察</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="coach" aria-labelledby="coach-title">
+        <div class="coach-grid">
+          <article class="coach-card">
+            <div class="eyebrow">Coach Notes</div>
+            <h2 id="coach-title">本周建议：先稳定睡前环境，再增加训练强度。</h2>
+            <p>连续三天的睡前离屏延迟和次日补水波动高度相关。不要新增更多目标，先把 21:50 的睡前记录固定下来。</p>
+            <div class="note-list">
+              <div class="note">把“睡前记录”放在牙刷旁边，而不是手机提醒里。</div>
+              <div class="note">周三和周五不安排高强度运动，只保留 20 分钟轻步行。</div>
+              <div class="note">补水目标保持 1.8 L，不因单日失败提高目标。</div>
+            </div>
+          </article>
+
+          <aside class="calendar" aria-label="月度习惯日历">
+            <span class="day done">1</span><span class="day done">2</span><span class="day soft">3</span><span class="day done">4</span><span class="day done">5</span><span class="day">6</span><span class="day done">7</span>
+            <span class="day done">8</span><span class="day soft">9</span><span class="day done">10</span><span class="day done">11</span><span class="day done">12</span><span class="day soft">13</span><span class="day done">14</span>
+            <span class="day done">15</span><span class="day done">16</span><span class="day soft">17</span><span class="day done">18</span><span class="day">19</span><span class="day">20</span><span class="day">21</span>
+            <span class="day">22</span><span class="day">23</span><span class="day">24</span><span class="day">25</span><span class="day">26</span><span class="day">27</span><span class="day">28</span>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>Living Habit Field</strong><br />
+        <span>为慢节奏健康管理设计的 organic 参考站。</span>
+      </div>
+      <button class="secondary-action" type="button">导出本周报告</button>
+    </footer>
+  </div>
+</body>
+</html>

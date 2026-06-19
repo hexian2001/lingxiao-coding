@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover" />
+  <title>凌霄剑域 - 远程控制</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0f1011" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="description" content="凌霄剑域 - 动态智能编排系统" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    // 全局 require polyfill - 必须在所有模块加载之前定义
+    (function() {
+      if (typeof window !== 'undefined' && typeof window.require === 'undefined') {
+        window.require = function(id) {
+          throw new Error('Dynamic require of "' + id + '" is not supported in browser');
+        };
+      }
+      if (typeof globalThis !== 'undefined' && typeof globalThis.require === 'undefined') {
+        globalThis.require = function(id) {
+          throw new Error('Dynamic require of "' + id + '" is not supported in browser');
+        };
+      }
+    })();
+  </script>
+  <script>
+    // Dev/local UI changes frequently; remove old service workers so stale Vite chunks do not survive rebuilds.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.getRegistrations()
+          .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+          .catch(() => {});
+      });
+    }
+  </script>
+</head>
+<body class="bg-bg-primary text-text-primary min-h-screen overscroll-none">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

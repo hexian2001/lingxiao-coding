@@ -1,0 +1,30 @@
+{
+  "id": "gradient",
+  "name": "Chromatic AI Engine",
+  "title": "AI 创意色彩生成引擎",
+  "description": "为 AI 创意工具、品牌视觉团队和生成式设计工作流打造的完整产品网站主题：以精密渐变、色彩评分、生成队列和可解释调色逻辑呈现一个可落地的色彩生成引擎。",
+  "version": "1.0.0",
+  "category": "creative-ai-product",
+  "tags": [
+    "gradient",
+    "ai-creative-tool",
+    "color-engine",
+    "palette-generator",
+    "chromatic-system",
+    "responsive"
+  ],
+  "palette": {
+    "canvas": "#030712",
+    "surface": "rgba(255, 255, 255, 0.12)",
+    "surfaceStrong": "rgba(255, 255, 255, 0.18)",
+    "ink": "#ffffff",
+    "muted": "rgba(255, 255, 255, 0.72)",
+    "accent": "#f2c673",
+    "accentCool": "#aebdc5",
+    "signalBlue": "#60a5fa",
+    "signalViolet": "#a855f7",
+    "line": "rgba(255, 255, 255, 0.22)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

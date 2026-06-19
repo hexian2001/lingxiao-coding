@@ -1,0 +1,228 @@
+[
+  {
+    "id": "signature-minimal-hero",
+    "name": "Monastic Product 首屏",
+    "category": "hero",
+    "themes": [
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "minimal",
+      "极简产品系统"
+    ],
+    "description": "Monastic Product 的首屏素材，服务于极简产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Monastic Product 首屏\n定位: 极简产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f7f8f5，主强调 #111719，辅助强调 #526f7b。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-minimal-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(21,27,29,0.16);\n  border-radius: 10px;\n  background: linear-gradient(145deg, #f7f8f5, #ecefeb);\n  color: #151b1d;\n  box-shadow: 0 24px 64px rgba(0,0,0,0.18);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-minimal-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(21,27,29,0.035)); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-minimal-hero > * { position: relative; z-index: 1; }\n.sig-minimal-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-minimal-hero .kicker { width: fit-content; border: 1px solid rgba(21,27,29,0.16); border-radius: 999px; padding: 6px 10px; color: #111719; background: #ecefeb; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-minimal-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-minimal-hero p { margin: 0; max-width: 560px; color: #667174; font-size: 15px; line-height: 1.78; }\n.sig-minimal-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-minimal-hero button { height: 40px; padding: 0 16px; border-radius: calc(10px / 2 + 4px); border: 1px solid rgba(21,27,29,0.16); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-minimal-hero .primary { background: #111719; color: #f7f8f5; border-color: #111719; }\n.sig-minimal-hero .secondary { background: transparent; color: #151b1d; }\n.sig-minimal-hero button:hover { transform: translateY(-1px); border-color: #111719; }\n.sig-minimal-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(21,27,29,0.16); border-radius: calc(10px - 2px); background: #ecefeb; backdrop-filter: blur(18px) saturate(140%); }\n.sig-minimal-hero .artifact h2 { margin: 0; font-size: 13px; color: #111719; text-transform: uppercase; letter-spacing: 0; }\n.sig-minimal-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-minimal-hero .metric { padding: 14px; border: 1px solid rgba(21,27,29,0.16); border-radius: calc(10px - 4px); background: color-mix(in srgb, #f7f8f5 76%, transparent); }\n.sig-minimal-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-minimal-hero .metric span { display: block; margin-top: 6px; color: #667174; font-size: 11px; }\n.sig-minimal-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #111719, #526f7b); }\n@media (max-width: 780px) { .sig-minimal-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-minimal-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">极简产品系统</div>\n    <h1>One clear action. Nothing else.</h1>\n    <p>A restrained product surface for onboarding, focused creation, and zero-noise decisions.</p>\n    <div class=\"actions\"><button class=\"primary\">Begin</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Plainform / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>1</strong><span>primary path</span></div>\n      <div class=\"metric\"><strong>0</strong><span>visual debt</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Monastic Product 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-minimal-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #101315 0%, #181d1f 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-minimal-card",
+    "name": "Monastic Product 洞察卡片",
+    "category": "card",
+    "themes": [
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "minimal",
+      "极简产品系统"
+    ],
+    "description": "Monastic Product 的洞察卡片素材，服务于极简产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Monastic Product 洞察卡片\n定位: 极简产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f7f8f5，主强调 #111719，辅助强调 #526f7b。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-minimal-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(21,27,29,0.16); border-radius: 10px; background: #f7f8f5; color: #151b1d; box-shadow: 0 24px 64px rgba(0,0,0,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-minimal-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-minimal-card .label { color: #111719; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-minimal-card .pill { border: 1px solid rgba(21,27,29,0.16); border-radius: 999px; padding: 5px 9px; color: #667174; background: #ecefeb; font-size: 11px; }\n.sig-minimal-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-minimal-card p { margin: 0; color: #667174; font-size: 13px; line-height: 1.7; }\n.sig-minimal-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(21,27,29,0.16); }\n.sig-minimal-card .strip strong { font-variant-numeric: tabular-nums; color: #151b1d; }\n.sig-minimal-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(10px - 4px); background: #111719; color: #f7f8f5; font-weight: 900; }",
+    "html": "<article class=\"sig-minimal-card\">\n  <div class=\"top\"><div><div class=\"label\">Plainform</div><h3>1</h3></div><span class=\"pill\">primary path</span></div>\n  <p>A restrained product surface for onboarding, focused creation, and zero-noise decisions.</p>\n  <div class=\"strip\"><span>visual debt</span><strong>0</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Monastic Product 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-minimal-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #101315 0%, #181d1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-minimal-nav",
+    "name": "Monastic Product 导航",
+    "category": "navigation",
+    "themes": [
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "minimal",
+      "极简产品系统"
+    ],
+    "description": "Monastic Product 的导航素材，服务于极简产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Monastic Product 导航\n定位: 极简产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f7f8f5，主强调 #111719，辅助强调 #526f7b。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-minimal-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(21,27,29,0.16); border-radius: 10px; background: #f7f8f5; color: #151b1d; box-shadow: 0 24px 64px rgba(0,0,0,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-minimal-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-minimal-nav .mark { width: 30px; height: 30px; border-radius: calc(10px - 4px); background: linear-gradient(135deg, #111719, #526f7b); box-shadow: inset 0 0 0 1px rgba(21,27,29,0.16); }\n.sig-minimal-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-minimal-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(10px - 6px); color: #667174; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-minimal-nav a:hover, .sig-minimal-nav a.active { color: #151b1d; background: #ecefeb; }\n.sig-minimal-nav button { height: 34px; padding: 0 13px; border-radius: calc(10px - 6px); border: 1px solid #111719; background: #111719; color: #f7f8f5; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-minimal-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-minimal-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Plainform</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Today</a><a href=\"#\">Drafts</a><a href=\"#\">Decisions</a><a href=\"#\">Archive</a></div>\n  <button>Begin</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Monastic Product 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-minimal-hero",
+      "signature-minimal-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #101315 0%, #181d1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-minimal-form",
+    "name": "Monastic Product 表单",
+    "category": "form",
+    "themes": [
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "minimal",
+      "极简产品系统"
+    ],
+    "description": "Monastic Product 的表单素材，服务于极简产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Monastic Product 表单\n定位: 极简产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f7f8f5，主强调 #111719，辅助强调 #526f7b。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-minimal-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(21,27,29,0.16); border-radius: 10px; background: #f7f8f5; color: #151b1d; box-shadow: 0 24px 64px rgba(0,0,0,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-minimal-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #151b1d; }\n.sig-minimal-form small { color: #667174; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-minimal-form .row { display: flex; gap: 10px; }\n.sig-minimal-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(10px - 6px); border: 1px solid rgba(21,27,29,0.16); background: #ecefeb; color: #151b1d; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-minimal-form input:focus { border-color: #111719; box-shadow: 0 0 0 3px color-mix(in srgb, #111719 18%, transparent); }\n.sig-minimal-form button { height: 42px; padding: 0 14px; border-radius: calc(10px - 6px); border: 1px solid #111719; background: #111719; color: #f7f8f5; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-minimal-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-minimal-form\">\n  <label>Workspace name<small>A single noun is enough. The interface should not over-explain itself.</small></label>\n  <div class=\"row\"><input value=\"atelier\" aria-label=\"Workspace name\" /><button type=\"button\">Begin</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Monastic Product 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-minimal-hero",
+      "signature-minimal-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #101315 0%, #181d1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-minimal-table",
+    "name": "Monastic Product 数据表",
+    "category": "table",
+    "themes": [
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "minimal",
+      "极简产品系统"
+    ],
+    "description": "Monastic Product 的数据表素材，服务于极简产品系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Monastic Product 数据表\n定位: 极简产品系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #f7f8f5，主强调 #111719，辅助强调 #526f7b。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-minimal-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(21,27,29,0.16); border-radius: 10px; background: #f7f8f5; color: #151b1d; box-shadow: 0 24px 64px rgba(0,0,0,0.18); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-minimal-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-minimal-table th, .sig-minimal-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(21,27,29,0.16); }\n.sig-minimal-table th { color: #667174; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #ecefeb; }\n.sig-minimal-table td { color: #151b1d; }\n.sig-minimal-table tr:last-child td { border-bottom: 0; }\n.sig-minimal-table tbody tr:hover td { background: #ecefeb; }\n.sig-minimal-table .mono { font-variant-numeric: tabular-nums; }\n.sig-minimal-table .status { display: inline-flex; align-items: center; gap: 6px; color: #111719; font-weight: 800; }\n.sig-minimal-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #111719; }",
+    "html": "<div class=\"sig-minimal-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Path</td><td><span class=\"status\">Single</span></td><td class=\"mono\">1</td></tr><tr><td>Draft</td><td><span class=\"status\">Clean</span></td><td class=\"mono\">0</td></tr><tr><td>Review</td><td><span class=\"status\">Ready</span></td><td class=\"mono\">1</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Monastic Product 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-minimal-hero",
+      "signature-minimal-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #101315 0%, #181d1f 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  }
+]

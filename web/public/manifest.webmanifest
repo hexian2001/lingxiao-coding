@@ -1,0 +1,17 @@
+{
+  "name": "凌霄剑域",
+  "short_name": "凌霄",
+  "description": "动态智能编排系统",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00ffaa",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

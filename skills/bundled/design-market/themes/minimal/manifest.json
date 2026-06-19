@@ -1,0 +1,27 @@
+{
+  "id": "minimal",
+  "name": "Minimal Decision Desk",
+  "title": "极简 SaaS 产品决策台",
+  "description": "为 B2B SaaS 产品团队设计的极简决策工作台：克制表面、清晰状态、真实指标和单一主动作，帮助用户在低噪声界面中完成优先级判断。",
+  "version": "1.0.0",
+  "category": "business-product",
+  "tags": [
+    "minimal",
+    "saas",
+    "decision-desk",
+    "product-ops",
+    "dashboard",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#f7f8f5",
+    "surfaceMuted": "#ecefeb",
+    "ink": "#111719",
+    "text": "#151b1d",
+    "muted": "#667174",
+    "accent": "#526f7b",
+    "line": "rgba(21, 27, 29, 0.16)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

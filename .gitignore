@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+web/node_modules/
+
+# Build output
+dist/
+web/dist/
+web/.vite/
+build/
+coverage/
+*.tsbuildinfo
+
+# Lingxiao local runtime state
+.lingxiao/
+.lingxiao_cache/
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+
+# Logs
+*.log
+/logs/
+
+# OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Generated artifacts
+release/
+.tmp-binary/
+*.tgz
+*.tar.gz
+*.zip
+
+# Screenshots / captures
+screenshots/
+playwright-report/
+test-results/
+
+# Local dev tools
+.agents/
+.claude/
+.codex/
+.codebuddy/
+.qoder/

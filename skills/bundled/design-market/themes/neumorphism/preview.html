@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soft Instrument Control Room</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --surface: #e8ecf0;
+      --surface-soft: #eef2f4;
+      --surface-inset: #dce3e7;
+      --ink: #243033;
+      --text: #374247;
+      --muted: #69777d;
+      --accent: #526f7b;
+      --accent-2: #9b7c33;
+      --success: #4f7f65;
+      --warn: #9b7c33;
+      --line: rgba(255, 255, 255, 0.72);
+      --shadow-dark: rgba(128, 140, 146, 0.42);
+      --shadow-soft: rgba(255, 255, 255, 0.9);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input { font: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .neu-shell {
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: 18px 18px 38px var(--shadow-dark), -18px -18px 38px var(--shadow-soft);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.58);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: inset 4px 4px 8px rgba(128, 140, 146, 0.38), inset -4px -4px 8px rgba(255, 255, 255, 0.88);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      left: 12px;
+      top: 12px;
+      box-shadow: 0 0 0 5px rgba(82, 111, 123, 0.12);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: inset 4px 4px 9px rgba(128, 140, 146, 0.32), inset -4px -4px 9px rgba(255, 255, 255, 0.86);
+      overflow-x: auto;
+    }
+
+    .nav a {
+      white-space: nowrap;
+      padding: 9px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .nav a[aria-current="page"] {
+      color: var(--ink);
+      background: var(--surface);
+      box-shadow: 5px 5px 10px rgba(128, 140, 146, 0.33), -5px -5px 10px rgba(255, 255, 255, 0.9);
+    }
+
+    .top-action,
+    .primary-action,
+    .secondary-action,
+    .apply-button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      min-height: 42px;
+      transition: transform 160ms ease, box-shadow 160ms ease, color 160ms ease;
+    }
+
+    .top-action, .primary-action {
+      background: var(--accent);
+      color: white;
+      padding: 0 18px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 6px 6px 12px rgba(128, 140, 146, 0.36), -5px -5px 12px rgba(255, 255, 255, 0.72);
+    }
+
+    .secondary-action {
+      background: var(--surface);
+      color: var(--accent);
+      padding: 0 18px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 6px 6px 12px rgba(128, 140, 146, 0.32), -6px -6px 12px rgba(255, 255, 255, 0.9);
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); box-shadow: inset 4px 4px 8px rgba(49, 60, 65, 0.22), inset -4px -4px 8px rgba(255, 255, 255, 0.72); }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgba(82, 111, 123, 0.28); outline-offset: 3px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: 30px;
+      padding: 42px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: inset 3px 3px 7px rgba(128, 140, 146, 0.24), inset -3px -3px 7px rgba(255, 255, 255, 0.86);
+    }
+
+    h1 {
+      margin: 18px 0 18px;
+      max-width: 650px;
+      color: var(--ink);
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: .95;
+      letter-spacing: -0.06em;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 580px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.82;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .summary-card,
+    .console,
+    .panel,
+    .queue,
+    .note-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: 12px 12px 26px rgba(128, 140, 146, 0.34), -12px -12px 26px rgba(255, 255, 255, 0.86);
+    }
+
+    .summary-card {
+      padding: 16px;
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: 24px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .console {
+      padding: 22px;
+    }
+
+    .console-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .console h2, .panel h2, .queue h2, .note-card h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: var(--success);
+      background: var(--surface);
+      box-shadow: inset 3px 3px 6px rgba(128, 140, 146, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .dial-wrap {
+      display: grid;
+      place-items: center;
+      padding: 12px 0 20px;
+    }
+
+    .dial {
+      width: min(260px, 72vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(from -120deg, var(--accent) 0 68%, rgba(82,111,123,.14) 68% 100%);
+      padding: 16px;
+      box-shadow: 12px 12px 24px rgba(128, 140, 146, 0.36), -12px -12px 24px rgba(255, 255, 255, 0.86);
+    }
+
+    .dial-core {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: var(--surface);
+      box-shadow: inset 9px 9px 18px rgba(128, 140, 146, 0.34), inset -9px -9px 18px rgba(255, 255, 255, 0.9);
+    }
+
+    .dial-core strong {
+      color: var(--ink);
+      font-size: 54px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dial-core span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .signal {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: inset 4px 4px 8px rgba(128, 140, 146, 0.27), inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+    }
+
+    .signal span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .signal strong {
+      display: block;
+      margin-top: 7px;
+      color: var(--ink);
+      font-size: 20px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(360px, 1.08fr);
+      gap: 24px;
+      padding: 0 42px 42px;
+    }
+
+    .panel, .queue, .note-card { padding: 22px; }
+
+    .panel-head, .queue-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .panel-head p, .queue-head p, .note-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .control-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .control {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: inset 5px 5px 12px rgba(128, 140, 146, 0.25), inset -5px -5px 12px rgba(255, 255, 255, 0.82);
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .control-label output {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .track {
+      height: 14px;
+      padding: 3px;
+      border-radius: 999px;
+      background: var(--surface-inset);
+      box-shadow: inset 3px 3px 7px rgba(128, 140, 146, 0.36), inset -3px -3px 7px rgba(255, 255, 255, 0.86);
+    }
+
+    .fill {
+      height: 100%;
+      width: var(--value);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #6f8790);
+      box-shadow: 2px 2px 5px rgba(128, 140, 146, 0.36);
+    }
+
+    .preset-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .preset-row label {
+      display: grid;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .preset-row input {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--ink);
+      padding: 0 14px;
+      box-shadow: inset 4px 4px 9px rgba(128, 140, 146, 0.34), inset -4px -4px 9px rgba(255, 255, 255, 0.86);
+    }
+
+    .apply-button {
+      align-self: end;
+      min-width: 112px;
+      background: var(--accent-2);
+      color: white;
+      font-weight: 850;
+      box-shadow: 6px 6px 12px rgba(128, 140, 146, 0.34), -6px -6px 12px rgba(255, 255, 255, 0.84);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.74);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    td { color: var(--ink); }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(255, 255, 255, 0.28); }
+    .mono { font-variant-numeric: tabular-nums; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      font-weight: 850;
+    }
+
+    .badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge.warn { color: var(--warn); }
+    .badge.ok { color: var(--success); }
+
+    .note-card {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    @media (max-width: 940px) {
+      .topbar, .hero, .workspace { padding-left: 24px; padding-right: 24px; }
+      .topbar { flex-wrap: wrap; }
+      .hero, .workspace { grid-template-columns: 1fr; }
+      .console { order: -1; }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 18px, 1180px); padding-top: 10px; }
+      .neu-shell { border-radius: 22px; }
+      .topbar, .hero, .workspace { padding-left: 16px; padding-right: 16px; }
+      .hero { padding-top: 26px; }
+      .summary-strip, .signal-grid, .preset-row, .note-card { grid-template-columns: 1fr; }
+      .apply-button { width: 100%; }
+      table, thead, tbody, tr, th, td { display: block; }
+      thead { display: none; }
+      tr {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.74);
+      }
+      td {
+        border: 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 7px 0;
+      }
+      td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="neu-shell" aria-label="柔和仪器参数控制台预览">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="返回首页">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>CalmRig Console</span>
+        </a>
+        <nav class="nav" aria-label="主导航">
+          <a href="#" aria-current="page">校准总览</a>
+          <a href="#parameters">参数组</a>
+          <a href="#queue">任务队列</a>
+          <a href="#report">报告</a>
+        </nav>
+        <button class="top-action" type="button">同步到设备</button>
+      </header>
+
+      <section class="hero">
+        <div>
+          <span class="eyebrow">Soft Instrument / Live Lab</span>
+          <h1>把 36 台传感器调到同一个呼吸节奏。</h1>
+          <p class="lead">CalmRig 为实验室运维团队提供低噪声参数控制台：在一个柔和仪器面板中检查漂移、调整阈值、锁定预设，并把变更写入可追溯任务队列。</p>
+          <div class="hero-actions" aria-label="首屏动作">
+            <button class="primary-action" type="button">开始 14:30 校准批次</button>
+            <button class="secondary-action" type="button">查看上次回滚记录</button>
+          </div>
+          <div class="summary-strip" aria-label="实时摘要">
+            <article class="summary-card"><span>在线设备</span><strong>36 / 38</strong></article>
+            <article class="summary-card"><span>平均漂移</span><strong>0.42°</strong></article>
+            <article class="summary-card"><span>待确认阈值</span><strong>7 项</strong></article>
+          </div>
+        </div>
+
+        <aside class="console" aria-label="实时校准仪表盘">
+          <div class="console-head">
+            <div>
+              <h2>北区温控回路</h2>
+              <p class="lead" style="font-size:13px;line-height:1.6;margin-top:6px;">采样窗口 12 分钟，当前策略：quiet-release。</p>
+            </div>
+            <span class="status-pill">稳定写入</span>
+          </div>
+          <div class="dial-wrap">
+            <div class="dial" role="img" aria-label="校准完成度百分之六十八">
+              <div class="dial-core"><div><strong>68</strong><span>calibrated</span></div></div>
+            </div>
+          </div>
+          <div class="signal-grid">
+            <div class="signal"><span>Noise Floor</span><strong>-18 dB</strong></div>
+            <div class="signal"><span>Safe Gain</span><strong>0.74</strong></div>
+            <div class="signal"><span>Thermal Drift</span><strong>+0.08°</strong></div>
+            <div class="signal"><span>Write Latency</span><strong>82 ms</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="workspace" id="parameters">
+        <article class="panel" aria-label="参数控制区">
+          <div class="panel-head">
+            <div>
+              <h2>参数控制</h2>
+              <p>调整会先进入审阅队列，确认后再写入现场设备。</p>
+            </div>
+            <span class="status-pill">Guarded</span>
+          </div>
+
+          <div class="control-list">
+            <div class="control">
+              <div class="control-label"><span>增益上限</span><output>0.74</output></div>
+              <div class="track" aria-label="增益上限 74%"><div class="fill" style="--value:74%"></div></div>
+            </div>
+            <div class="control">
+              <div class="control-label"><span>漂移容差</span><output>0.42°</output></div>
+              <div class="track" aria-label="漂移容差 42%"><div class="fill" style="--value:42%"></div></div>
+            </div>
+            <div class="control">
+              <div class="control-label"><span>回写节流</span><output>18 s</output></div>
+              <div class="track" aria-label="回写节流 58%"><div class="fill" style="--value:58%"></div></div>
+            </div>
+          </div>
+
+          <div class="preset-row">
+            <label for="preset-name">预设名称
+              <input id="preset-name" value="quiet-release / north-loop" aria-describedby="preset-help">
+            </label>
+            <button class="apply-button" type="button">提交审阅</button>
+          </div>
+          <p id="preset-help" style="margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.6;">命名需包含策略和设备组，便于值班员在回滚时定位。</p>
+        </article>
+
+        <div>
+          <article class="queue" id="queue" aria-label="任务队列">
+            <div class="queue-head">
+              <div>
+                <h2>校准任务队列</h2>
+                <p>每一行都是可审计的业务动作，不用控件装饰替代信息。</p>
+              </div>
+              <span class="status-pill">4 active</span>
+            </div>
+            <table>
+              <thead>
+                <tr><th>设备组</th><th>动作</th><th>状态</th><th>预计写入</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="设备组">North Loop A</td>
+                  <td data-label="动作">更新增益上限至 0.74</td>
+                  <td data-label="状态"><span class="badge ok">已审阅</span></td>
+                  <td data-label="预计写入" class="mono">14:32</td>
+                </tr>
+                <tr>
+                  <td data-label="设备组">Cold Bench 03</td>
+                  <td data-label="动作">降低漂移容差 0.06°</td>
+                  <td data-label="状态"><span class="badge warn">等待复核</span></td>
+                  <td data-label="预计写入" class="mono">14:41</td>
+                </tr>
+                <tr>
+                  <td data-label="设备组">Acoustic Rack 2</td>
+                  <td data-label="动作">应用 quiet-release 预设</td>
+                  <td data-label="状态"><span class="badge ok">队列中</span></td>
+                  <td data-label="预计写入" class="mono">14:46</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="note-card" id="report">
+            <div>
+              <h2>交接报告已准备</h2>
+              <p>系统会把本次参数变化、异常设备和人工确认记录合并为值班交接摘要。</p>
+            </div>
+            <button class="secondary-action" type="button">预览报告</button>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

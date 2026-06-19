@@ -1,0 +1,626 @@
+[
+  {
+    "id": "signature-gradient-hero",
+    "name": "Chromatic Engine 首屏",
+    "category": "hero",
+    "themes": [
+      "gradient"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "gradient",
+      "精密色彩计算系统"
+    ],
+    "description": "Chromatic Engine 的首屏素材，服务于精密色彩计算系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Chromatic Engine 首屏\n定位: 精密色彩计算系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.14)，主强调 #f2c673，辅助强调 #aebdc5。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-gradient-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(255,255,255,0.26);\n  border-radius: 20px;\n  background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(13,19,24,0.34));\n  color: #ffffff;\n  box-shadow: 0 32px 86px rgba(16,28,38,0.30);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-gradient-hero::before { content: \"\"; position: absolute; inset: 0; background: conic-gradient(from 140deg at 70% 20%, rgba(242,198,115,0.34), rgba(174,189,197,0.20), transparent, rgba(242,198,115,0.34)); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-gradient-hero > * { position: relative; z-index: 1; }\n.sig-gradient-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-gradient-hero .kicker { width: fit-content; border: 1px solid rgba(255,255,255,0.26); border-radius: 999px; padding: 6px 10px; color: #f2c673; background: rgba(13,19,24,0.34); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-gradient-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-gradient-hero p { margin: 0; max-width: 560px; color: rgba(255,255,255,0.76); font-size: 15px; line-height: 1.78; }\n.sig-gradient-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-gradient-hero button { height: 40px; padding: 0 16px; border-radius: calc(20px / 2 + 4px); border: 1px solid rgba(255,255,255,0.26); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-gradient-hero .primary { background: #f2c673; color: #111719; border-color: #f2c673; }\n.sig-gradient-hero .secondary { background: transparent; color: #ffffff; }\n.sig-gradient-hero button:hover { transform: translateY(-1px); border-color: #f2c673; }\n.sig-gradient-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(255,255,255,0.26); border-radius: calc(20px - 2px); background: rgba(13,19,24,0.34); backdrop-filter: blur(18px) saturate(140%); }\n.sig-gradient-hero .artifact h2 { margin: 0; font-size: 13px; color: #f2c673; text-transform: uppercase; letter-spacing: 0; }\n.sig-gradient-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-gradient-hero .metric { padding: 14px; border: 1px solid rgba(255,255,255,0.26); border-radius: calc(20px - 4px); background: color-mix(in srgb, rgba(255,255,255,0.14) 76%, transparent); }\n.sig-gradient-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-gradient-hero .metric span { display: block; margin-top: 6px; color: rgba(255,255,255,0.76); font-size: 11px; }\n.sig-gradient-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #f2c673, #aebdc5); }\n@media (max-width: 780px) { .sig-gradient-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-gradient-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">精密色彩计算系统</div>\n    <h1>Color is data when it has a job.</h1>\n    <p>A chromatic system for AI surfaces, creative tools, and high-signal previews.</p>\n    <div class=\"actions\"><button class=\"primary\">Render</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Spectrum Lab / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>8</strong><span>palettes scored</span></div>\n      <div class=\"metric\"><strong>96</strong><span>harmony</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Chromatic Engine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-gradient-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-gradient-card",
+    "name": "Chromatic Engine 洞察卡片",
+    "category": "card",
+    "themes": [
+      "gradient"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "gradient",
+      "精密色彩计算系统"
+    ],
+    "description": "Chromatic Engine 的洞察卡片素材，服务于精密色彩计算系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Chromatic Engine 洞察卡片\n定位: 精密色彩计算系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.14)，主强调 #f2c673，辅助强调 #aebdc5。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-gradient-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(255,255,255,0.26); border-radius: 20px; background: rgba(255,255,255,0.14); color: #ffffff; box-shadow: 0 32px 86px rgba(16,28,38,0.30); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-gradient-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-gradient-card .label { color: #f2c673; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-gradient-card .pill { border: 1px solid rgba(255,255,255,0.26); border-radius: 999px; padding: 5px 9px; color: rgba(255,255,255,0.76); background: rgba(13,19,24,0.34); font-size: 11px; }\n.sig-gradient-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-gradient-card p { margin: 0; color: rgba(255,255,255,0.76); font-size: 13px; line-height: 1.7; }\n.sig-gradient-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.26); }\n.sig-gradient-card .strip strong { font-variant-numeric: tabular-nums; color: #ffffff; }\n.sig-gradient-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(20px - 4px); background: #f2c673; color: #111719; font-weight: 900; }",
+    "html": "<article class=\"sig-gradient-card\">\n  <div class=\"top\"><div><div class=\"label\">Spectrum Lab</div><h3>8</h3></div><span class=\"pill\">palettes scored</span></div>\n  <p>A chromatic system for AI surfaces, creative tools, and high-signal previews.</p>\n  <div class=\"strip\"><span>harmony</span><strong>96</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Chromatic Engine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-gradient-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-gradient-nav",
+    "name": "Chromatic Engine 导航",
+    "category": "navigation",
+    "themes": [
+      "gradient"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "gradient",
+      "精密色彩计算系统"
+    ],
+    "description": "Chromatic Engine 的导航素材，服务于精密色彩计算系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Chromatic Engine 导航\n定位: 精密色彩计算系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.14)，主强调 #f2c673，辅助强调 #aebdc5。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-gradient-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.26); border-radius: 20px; background: rgba(255,255,255,0.14); color: #ffffff; box-shadow: 0 32px 86px rgba(16,28,38,0.30); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-gradient-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-gradient-nav .mark { width: 30px; height: 30px; border-radius: calc(20px - 4px); background: linear-gradient(135deg, #f2c673, #aebdc5); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26); }\n.sig-gradient-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-gradient-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(20px - 6px); color: rgba(255,255,255,0.76); text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-gradient-nav a:hover, .sig-gradient-nav a.active { color: #ffffff; background: rgba(13,19,24,0.34); }\n.sig-gradient-nav button { height: 34px; padding: 0 13px; border-radius: calc(20px - 6px); border: 1px solid #f2c673; background: #f2c673; color: #111719; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-gradient-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-gradient-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Spectrum Lab</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Model</a><a href=\"#\">Palette</a><a href=\"#\">Render</a><a href=\"#\">Export</a></div>\n  <button>Render</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Chromatic Engine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-gradient-hero",
+      "signature-gradient-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-gradient-form",
+    "name": "Chromatic Engine 表单",
+    "category": "form",
+    "themes": [
+      "gradient"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "gradient",
+      "精密色彩计算系统"
+    ],
+    "description": "Chromatic Engine 的表单素材，服务于精密色彩计算系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Chromatic Engine 表单\n定位: 精密色彩计算系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.14)，主强调 #f2c673，辅助强调 #aebdc5。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-gradient-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(255,255,255,0.26); border-radius: 20px; background: rgba(255,255,255,0.14); color: #ffffff; box-shadow: 0 32px 86px rgba(16,28,38,0.30); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-gradient-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #ffffff; }\n.sig-gradient-form small { color: rgba(255,255,255,0.76); font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-gradient-form .row { display: flex; gap: 10px; }\n.sig-gradient-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(20px - 6px); border: 1px solid rgba(255,255,255,0.26); background: rgba(13,19,24,0.34); color: #ffffff; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-gradient-form input:focus { border-color: #f2c673; box-shadow: 0 0 0 3px color-mix(in srgb, #f2c673 18%, transparent); }\n.sig-gradient-form button { height: 42px; padding: 0 14px; border-radius: calc(20px - 6px); border: 1px solid #f2c673; background: #f2c673; color: #111719; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-gradient-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-gradient-form\">\n  <label>Palette seed<small>Use gradient only where it clarifies depth, state, or ownership.</small></label>\n  <div class=\"row\"><input value=\"aurora-526f\" aria-label=\"Palette seed\" /><button type=\"button\">Render</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Chromatic Engine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-gradient-hero",
+      "signature-gradient-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-gradient-table",
+    "name": "Chromatic Engine 数据表",
+    "category": "table",
+    "themes": [
+      "gradient"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "gradient",
+      "精密色彩计算系统"
+    ],
+    "description": "Chromatic Engine 的数据表素材，服务于精密色彩计算系统，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Chromatic Engine 数据表\n定位: 精密色彩计算系统，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 rgba(255,255,255,0.14)，主强调 #f2c673，辅助强调 #aebdc5。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-gradient-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(255,255,255,0.26); border-radius: 20px; background: rgba(255,255,255,0.14); color: #ffffff; box-shadow: 0 32px 86px rgba(16,28,38,0.30); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-gradient-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-gradient-table th, .sig-gradient-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.26); }\n.sig-gradient-table th { color: rgba(255,255,255,0.76); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(13,19,24,0.34); }\n.sig-gradient-table td { color: #ffffff; }\n.sig-gradient-table tr:last-child td { border-bottom: 0; }\n.sig-gradient-table tbody tr:hover td { background: rgba(13,19,24,0.34); }\n.sig-gradient-table .mono { font-variant-numeric: tabular-nums; }\n.sig-gradient-table .status { display: inline-flex; align-items: center; gap: 6px; color: #f2c673; font-weight: 800; }\n.sig-gradient-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #f2c673; }",
+    "html": "<div class=\"sig-gradient-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Aurora</td><td><span class=\"status\">Balanced</span></td><td class=\"mono\">96</td></tr><tr><td>Metal</td><td><span class=\"status\">Cool</span></td><td class=\"mono\">88</td></tr><tr><td>Signal</td><td><span class=\"status\">Warm</span></td><td class=\"mono\">72</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Chromatic Engine 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-gradient-hero",
+      "signature-gradient-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "btn-gradient-liquid",
+    "name": "Liquid Metal",
+    "category": "button",
+    "themes": [
+      "gradient",
+      "dark"
+    ],
+    "tags": [
+      "gradient",
+      "liquid",
+      "chrome",
+      "animated",
+      "premium"
+    ],
+    "stylePrompt": "高级设计指令: Liquid Metal\n定位: Liquid Metal 是一款 gradient / dark 按钮素材，适合 gradient、liquid、chrome、animated 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Liquid Metal — 液态金属渐变按钮。不是普通双色渐变——是 4 色金属渐变(#94a3b8→#e2e8f0→#94a3b8→#64748b) 以 background-size:300% 做水平位移动画, 模拟液态铬的流动反射。文字 #09090b bold。hover时动画加速。圆角 8px。气质: 钛合金、液态金属。",
+    "css": ".btn-liquid-metal {\n  padding: 13px 28px;\n  background: linear-gradient(90deg, #94a3b8, #e2e8f0, #94a3b8, #64748b, #94a3b8);\n  background-size: 300% 100%;\n  color: #09090b;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  border: none;\n  border-radius: 8px;\n  cursor: pointer;\n  animation: liquid-flow 6s linear infinite;\n  box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);\n}\n.btn-liquid-metal:hover { animation-duration: 2s; }\n@keyframes liquid-flow {\n  from { background-position: 0% 50%; }\n  to { background-position: 300% 50%; }\n}",
+    "html": "<button class=\"btn-liquid-metal\">Forge</button>",
+    "description": "Liquid Metal 是一款 gradient / dark 按钮素材，适合 gradient、liquid、chrome、animated 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "card-gradient-glow",
+    "name": "Gradient Glow Card",
+    "category": "card",
+    "themes": [
+      "gradient",
+      "dark"
+    ],
+    "tags": [
+      "gradient",
+      "glow",
+      "border",
+      "animated",
+      "featured"
+    ],
+    "stylePrompt": "高级设计指令: Gradient Glow Card\n定位: Gradient Glow Card 是一款 gradient / dark 卡片素材，适合 gradient、glow、border、animated 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gradient Glow Card — 渐变辉光卡片。灵感: Magic UI / shadcn showcase。卡片本身深色(#09090b), 但外层包一个1px的渐变边框(用 background + mask trick), 渐变缓慢旋转(conic-gradient animation)。卡片下方投射同色渐变阴影(filter:blur)。气质: 产品 showcase 的'featured'卡片。",
+    "css": ".card-grad-glow {\n  position: relative;\n  padding: 1px;\n  border-radius: 16px;\n  background: conic-gradient(from var(--glow-angle, 0deg), #60a5fa, #a855f7, #ec4899, #60a5fa);\n  animation: glow-spin 4s linear infinite;\n}\n.card-grad-glow .inner {\n  padding: 28px 24px;\n  border-radius: 15px;\n  background: #09090b;\n  color: #fafafa;\n}\n.card-grad-glow::after {\n  content: '';\n  position: absolute;\n  inset: 4px;\n  border-radius: 16px;\n  background: inherit;\n  filter: blur(24px);\n  opacity: 0.3;\n  z-index: -1;\n}\n@keyframes glow-spin { to { --glow-angle: 360deg; } }\n@property --glow-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }\n.card-grad-glow .inner h3 { font-family: 'Inter', system-ui; font-size: 17px; font-weight: 600; margin: 0 0 8px; }\n.card-grad-glow .inner p { font-size: 14px; color: #a1a1aa; margin: 0; line-height: 1.5; }",
+    "html": "<div class=\"card-grad-glow\">\n  <div class=\"inner\">\n    <h3>Featured Component</h3>\n    <p>This card demands attention with its animated gradient border.</p>\n  </div>\n</div>",
+    "description": "Gradient Glow Card 是一款 gradient / dark 卡片素材，适合 gradient、glow、border、animated 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "bg-gradient-mesh-pro",
+    "name": "Pro Mesh Gradient",
+    "category": "background",
+    "themes": [
+      "gradient",
+      "dark"
+    ],
+    "tags": [
+      "mesh",
+      "gradient",
+      "multicolor",
+      "animated",
+      "premium"
+    ],
+    "stylePrompt": "高级设计指令: Pro Mesh Gradient\n定位: Pro Mesh Gradient 是一款 gradient / dark 背景素材，适合 mesh、gradient、multicolor、animated 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Pro Mesh Gradient — 专业级网格渐变。不是简单 linear-gradient——是4个 radial-gradient 叠加在不同位置, 各自极慢移动(25-40s), 创造不断变化的色彩'呼吸'。配色: 靛蓝(#1d4ed8 0.12) + 紫(#7c3aed 0.08) + 青(#06b6d4 0.06) + 品红(#db2777 0.04)。底色 #030712。",
+    "css": ".bg-mesh-pro {\n  min-height: 100vh;\n  background: #030712;\n  position: relative;\n  overflow: hidden;\n}\n.bg-mesh-pro::before {\n  content: '';\n  position: absolute;\n  inset: -20%;\n  background:\n    radial-gradient(ellipse at 20% 30%, rgba(29,78,216,0.12) 0%, transparent 50%),\n    radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.08) 0%, transparent 50%),\n    radial-gradient(ellipse at 60% 80%, rgba(6,182,212,0.06) 0%, transparent 50%),\n    radial-gradient(ellipse at 30% 70%, rgba(219,39,119,0.04) 0%, transparent 50%);\n  animation: mesh-drift 30s ease-in-out infinite alternate;\n}\n@keyframes mesh-drift {\n  0% { transform: translate(0, 0) scale(1); }\n  50% { transform: translate(-3%, 2%) scale(1.02); }\n  100% { transform: translate(2%, -2%) scale(0.98); }\n}",
+    "description": "Pro Mesh Gradient 是一款 gradient / dark 背景素材，适合 mesh、gradient、multicolor、animated 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "rich"
+    },
+    "sourceOrder": 2,
+    "html": "<section class=\"bg-mesh-pro\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(255,255,255,0.26);border-radius:18px;background:rgba(13,19,24,0.34);color:#ffffff;box-shadow:0 28px 78px rgba(16,28,38,0.28);\">\n    <div style=\"color:#f2c673;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Pro Mesh Gradient</h2>\n    <p style=\"margin:0;color:rgba(255,255,255,0.74);font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "grad-hero-aurora",
+    "name": "Aurora Hero",
+    "category": "hero",
+    "tags": [
+      "gradient",
+      "aurora",
+      "animated",
+      "immersive",
+      "premium"
+    ],
+    "description": "Aurora Hero 是一款 gradient 首屏素材，适合 gradient、aurora、animated、immersive 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Aurora Hero\n定位: 极光渐变全屏Hero\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Aurora Hero。4色 radial-gradient 叠加(靛蓝+紫+青+品红, 各opacity 0.1-0.2)在 #030712 底上, 整体做极慢漂移动画(30s)。居中大字 Inter 900 56px #e4e4e7。",
+    "css": ".grad-hero-aurora { min-height:100vh; background:#030712; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; } .grad-hero-aurora::before { content:\"\"; position:absolute; inset:-20%; background:radial-gradient(ellipse at 30% 20%,rgba(99,102,241,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(168,85,247,0.1) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(6,182,212,0.08) 0%,transparent 40%); animation:aurora-d 30s ease-in-out infinite alternate; } @keyframes aurora-d { to{transform:translate(3%,-2%) scale(1.02)} } .grad-hero-aurora h1 { position:relative; font-family:Inter,system-ui; font-size:56px; font-weight:900; color:#e4e4e7; letter-spacing:-0.04em; text-align:center; }",
+    "html": "<section class=\"grad-hero-aurora\"><h1>Beyond Limits</h1></section>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "rich"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "grad-card-shine",
+    "name": "Shine Card",
+    "category": "card",
+    "tags": [
+      "gradient",
+      "shine",
+      "reflection",
+      "premium",
+      "animated"
+    ],
+    "description": "Shine Card 是一款 gradient 卡片素材，适合 gradient、shine、reflection、premium 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Shine Card\n定位: 表面光泽扫过的渐变卡片\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Shine Card。深色面板 + 一道从左到右的斜向光泽(linear-gradient 30deg, transparent→rgba白0.06→transparent)以 translateX 动画扫过。背景 #111113 + 0.5px border。",
+    "css": ".grad-card-shine { padding:28px; border-radius:14px; background:#111113; border:0.5px solid #27272a; position:relative; overflow:hidden; color:#fafafa; } .grad-card-shine::after { content:\"\"; position:absolute; inset:0; background:linear-gradient(30deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%); transform:translateX(-100%); animation:shine-pass 5s ease-in-out infinite; } @keyframes shine-pass { 0%,70%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }",
+    "html": "<div class=\"grad-card-shine\"><h3 style=\"font-family:Inter;font-size:16px;font-weight:600;margin:0 0 8px\">Premium Plan</h3><p style=\"font-size:14px;color:#71717a;margin:0\">Everything you need to scale.</p></div>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "grad-btn-shimmer",
+    "name": "Shimmer Button",
+    "category": "button",
+    "tags": [
+      "gradient",
+      "shimmer",
+      "animated",
+      "cta",
+      "premium"
+    ],
+    "description": "Shimmer Button 是一款 gradient 按钮素材，适合 gradient、shimmer、animated、cta 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Shimmer Button\n定位: 光泽闪烁CTA按钮\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Shimmer Button。背景 linear-gradient(110deg, #1d4ed8, #7c3aed, #1d4ed8) background-size:200%。hover时 background-position 滑动(光泽位移)。白字 Inter 600。圆角 8px。box-shadow 彩色(同色调)。",
+    "css": ".grad-btn-shimmer { padding:12px 24px; background:linear-gradient(110deg,#1d4ed8 0%,#7c3aed 45%,#1d4ed8 100%); background-size:200% 100%; color:#fff; font-family:Inter,system-ui; font-size:14px; font-weight:600; border:none; border-radius:8px; cursor:pointer; box-shadow:0 4px 16px rgba(29,78,216,0.3); transition:background-position 0.5s,box-shadow 0.3s; } .grad-btn-shimmer:hover { background-position:100% 0; box-shadow:0 6px 24px rgba(124,58,237,0.4); }",
+    "html": "<button class=\"grad-btn-shimmer\">Upgrade Now</button>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "grad-text-chrome",
+    "name": "Chrome Text",
+    "category": "effect",
+    "tags": [
+      "gradient",
+      "text",
+      "chrome",
+      "metallic",
+      "heading"
+    ],
+    "description": "Chrome Text 是一款 gradient 特效素材，适合 gradient、text、chrome、metallic 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Chrome Text\n定位: 金属铬渐变文字\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Chrome Text。linear-gradient(180deg, #e2e8f0, #64748b, #e2e8f0) 应用于文字(-webkit-background-clip:text)。字体 Inter 900 极大号(48px+)。模拟金属表面反射——顶部亮中间暗底部亮。",
+    "css": ".grad-chrome-text { font-family:Inter,system-ui; font-size:56px; font-weight:900; background:linear-gradient(180deg,#e2e8f0 0%,#64748b 50%,#e2e8f0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.03em; }",
+    "html": "<h1 class=\"grad-chrome-text\">Titanium</h1>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "grad-divider",
+    "name": "Gradient Divider",
+    "category": "effect",
+    "tags": [
+      "gradient",
+      "divider",
+      "line",
+      "fade",
+      "subtle"
+    ],
+    "description": "Gradient Divider 是一款 gradient 特效素材，适合 gradient、divider、line、fade 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Gradient Divider\n定位: 渐变淡出分隔线\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gradient Divider。1px 高的 div, 背景 linear-gradient(90deg, transparent, rgba白0.15, transparent)。两端自然淡出。替代传统 hr 的低调分隔。",
+    "css": ".grad-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent); border:none; margin:32px 0; }",
+    "html": "<div class=\"grad-divider\"></div>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "grad-badge-pill",
+    "name": "Gradient Pill Badge",
+    "category": "badge",
+    "tags": [
+      "gradient",
+      "pill",
+      "colored",
+      "label",
+      "vibrant"
+    ],
+    "description": "Gradient Pill Badge 是一款 gradient 徽章素材，适合 gradient、pill、colored、label 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Gradient Pill Badge\n定位: 渐变胶囊徽章\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gradient Pill Badge。padding 3px 10px, border-radius:50px。背景: linear-gradient 双色(如蓝→紫)。白字 11px 600。不同语义可换渐变色。",
+    "css": ".grad-pill { display:inline-block; padding:3px 10px; border-radius:50px; font-family:Inter,system-ui; font-size:11px; font-weight:600; color:#fff; } .grad-pill.blue { background:linear-gradient(135deg,#3b82f6,#8b5cf6); } .grad-pill.green { background:linear-gradient(135deg,#059669,#06b6d4); } .grad-pill.red { background:linear-gradient(135deg,#dc2626,#f59e0b); }",
+    "html": "<span class=\"grad-pill blue\">New</span> <span class=\"grad-pill green\">Active</span> <span class=\"grad-pill red\">Urgent</span>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "grad-nav-indicator",
+    "name": "Gradient Tab Indicator",
+    "category": "navigation",
+    "tags": [
+      "gradient",
+      "tab",
+      "indicator",
+      "animated",
+      "underline"
+    ],
+    "description": "Gradient Tab Indicator 是一款 gradient 导航素材，适合 gradient、tab、indicator、animated 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Gradient Tab Indicator\n定位: 渐变下划线tab指示器\n审美系统: Chromatic System / precise chromatic depth。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Gradient Tab Indicator。水平tabs, active项底部有 2px 渐变条(蓝→紫)。inactive项 #71717a, active #fafafa。渐变条用::after absolute。",
+    "css": ".grad-tabs { display:flex; gap:24px; border-bottom:0.5px solid #1a1a1a; } .grad-tabs a { padding:10px 0; font-family:Inter,system-ui; font-size:13px; font-weight:500; color:#71717a; text-decoration:none; position:relative; transition:color 0.15s; } .grad-tabs a:hover { color:#a1a1aa; } .grad-tabs a.active { color:#fafafa; } .grad-tabs a.active::after { content:\"\"; position:absolute; bottom:-0.5px; left:0; right:0; height:2px; background:linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius:1px; }",
+    "html": "<nav class=\"grad-tabs\"><a href=\"#\" class=\"active\">Overview</a><a href=\"#\">Analytics</a><a href=\"#\">Settings</a></nav>",
+    "themes": [
+      "gradient"
+    ],
+    "designNotes": "此素材已按 Chromatic System 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #192033 0%, #526f7b 46%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 9
+  }
+]

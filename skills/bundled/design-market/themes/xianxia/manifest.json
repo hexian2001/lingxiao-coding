@@ -1,0 +1,47 @@
+{
+  "id": "xianxia",
+  "name": "Celestial Sect Archive",
+  "displayName": "玄门秘境档案",
+  "description": "东方玄幻宗门任务与秘境档案系统参考站，克制玉金、深墨青、宗门卷宗与任务调度语义。",
+  "category": "fantasy-product",
+  "tags": [
+    "xianxia",
+    "oriental-fantasy",
+    "sect-dashboard",
+    "mission-system",
+    "archive"
+  ],
+  "preview": "preview.html",
+  "prompt": "prompt.md",
+  "tokens": {
+    "surface": "rgba(16, 29, 25, 0.88)",
+    "surfaceStrong": "#101d19",
+    "ink": "#f3ead2",
+    "muted": "#b7c3aa",
+    "gold": "#dabf7c",
+    "jade": "#8fc7aa",
+    "danger": "#d98a73",
+    "radius": "16px"
+  },
+  "palette": {
+    "surface": "#101d19",
+    "ink": "#f3ead2",
+    "muted": "#b7c3aa",
+    "gold": "#dabf7c",
+    "jade": "#8fc7aa",
+    "danger": "#d98a73"
+  },
+  "useCases": [
+    "宗门任务中台",
+    "秘境探索档案",
+    "修行进度看板",
+    "东方幻想产品控制台"
+  ],
+  "constraints": [
+    "完整纯前端 HTML",
+    "内联 CSS",
+    "无远程资源",
+    "响应式布局",
+    "必须服务真实业务信息结构"
+  ]
+}

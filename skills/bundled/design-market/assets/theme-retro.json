@@ -1,0 +1,617 @@
+[
+  {
+    "id": "signature-retro-hero",
+    "name": "Analog Terminal 首屏",
+    "category": "hero",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "retro",
+      "温暖复古软件"
+    ],
+    "description": "Analog Terminal 的首屏素材，服务于温暖复古软件，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Analog Terminal 首屏\n定位: 温暖复古软件，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #22172b，主强调 #f2c673，辅助强调 #ff8c6a。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-retro-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(242,198,115,0.38);\n  border-radius: 12px;\n  background: linear-gradient(145deg, #22172b, rgba(247,198,111,0.14));\n  color: #fff2d2;\n  box-shadow: 0 28px 76px rgba(31,15,35,0.38);\n  font-family: JetBrains Mono, ui-monospace, monospace;\n}\n.sig-retro-hero::before { content: \"\"; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,242,210,0.045) 0 1px, transparent 1px 5px); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-retro-hero > * { position: relative; z-index: 1; }\n.sig-retro-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-retro-hero .kicker { width: fit-content; border: 1px solid rgba(242,198,115,0.38); border-radius: 999px; padding: 6px 10px; color: #f2c673; background: rgba(247,198,111,0.14); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-retro-hero h1 { margin: 0; max-width: 620px; font-family: JetBrains Mono, ui-monospace, monospace; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-retro-hero p { margin: 0; max-width: 560px; color: #d8b983; font-size: 15px; line-height: 1.78; }\n.sig-retro-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-retro-hero button { height: 40px; padding: 0 16px; border-radius: calc(12px / 2 + 4px); border: 1px solid rgba(242,198,115,0.38); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-retro-hero .primary { background: #f2c673; color: #22172b; border-color: #f2c673; }\n.sig-retro-hero .secondary { background: transparent; color: #fff2d2; }\n.sig-retro-hero button:hover { transform: translateY(-1px); border-color: #f2c673; }\n.sig-retro-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(242,198,115,0.38); border-radius: calc(12px - 2px); background: rgba(247,198,111,0.14); backdrop-filter: blur(18px) saturate(140%); }\n.sig-retro-hero .artifact h2 { margin: 0; font-size: 13px; color: #f2c673; text-transform: uppercase; letter-spacing: 0; }\n.sig-retro-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-retro-hero .metric { padding: 14px; border: 1px solid rgba(242,198,115,0.38); border-radius: calc(12px - 4px); background: color-mix(in srgb, #22172b 76%, transparent); }\n.sig-retro-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-retro-hero .metric span { display: block; margin-top: 6px; color: #d8b983; font-size: 11px; }\n.sig-retro-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #f2c673, #ff8c6a); }\n@media (max-width: 780px) { .sig-retro-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-retro-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">温暖复古软件</div>\n    <h1>Archive the signal before it fades.</h1>\n    <p>A warm terminal interface for logs, tapes, ledgers, and durable machine memory.</p>\n    <div class=\"actions\"><button class=\"primary\">Record</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>TAPE-09 / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>09</strong><span>tapes mounted</span></div>\n      <div class=\"metric\"><strong>742</strong><span>entries held</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Analog Terminal 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-retro-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-retro-card",
+    "name": "Analog Terminal 洞察卡片",
+    "category": "card",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "retro",
+      "温暖复古软件"
+    ],
+    "description": "Analog Terminal 的洞察卡片素材，服务于温暖复古软件，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Analog Terminal 洞察卡片\n定位: 温暖复古软件，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #22172b，主强调 #f2c673，辅助强调 #ff8c6a。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-retro-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(242,198,115,0.38); border-radius: 12px; background: #22172b; color: #fff2d2; box-shadow: 0 28px 76px rgba(31,15,35,0.38); font-family: JetBrains Mono, ui-monospace, monospace; }\n.sig-retro-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-retro-card .label { color: #f2c673; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-retro-card .pill { border: 1px solid rgba(242,198,115,0.38); border-radius: 999px; padding: 5px 9px; color: #d8b983; background: rgba(247,198,111,0.14); font-size: 11px; }\n.sig-retro-card h3 { margin: 0 0 10px; font-family: JetBrains Mono, ui-monospace, monospace; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-retro-card p { margin: 0; color: #d8b983; font-size: 13px; line-height: 1.7; }\n.sig-retro-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(242,198,115,0.38); }\n.sig-retro-card .strip strong { font-variant-numeric: tabular-nums; color: #fff2d2; }\n.sig-retro-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(12px - 4px); background: #f2c673; color: #22172b; font-weight: 900; }",
+    "html": "<article class=\"sig-retro-card\">\n  <div class=\"top\"><div><div class=\"label\">TAPE-09</div><h3>09</h3></div><span class=\"pill\">tapes mounted</span></div>\n  <p>A warm terminal interface for logs, tapes, ledgers, and durable machine memory.</p>\n  <div class=\"strip\"><span>entries held</span><strong>742</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Analog Terminal 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-retro-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-retro-nav",
+    "name": "Analog Terminal 导航",
+    "category": "navigation",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "retro",
+      "温暖复古软件"
+    ],
+    "description": "Analog Terminal 的导航素材，服务于温暖复古软件，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Analog Terminal 导航\n定位: 温暖复古软件，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #22172b，主强调 #f2c673，辅助强调 #ff8c6a。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-retro-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(242,198,115,0.38); border-radius: 12px; background: #22172b; color: #fff2d2; box-shadow: 0 28px 76px rgba(31,15,35,0.38); font-family: JetBrains Mono, ui-monospace, monospace; }\n.sig-retro-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: JetBrains Mono, ui-monospace, monospace; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-retro-nav .mark { width: 30px; height: 30px; border-radius: calc(12px - 4px); background: linear-gradient(135deg, #f2c673, #ff8c6a); box-shadow: inset 0 0 0 1px rgba(242,198,115,0.38); }\n.sig-retro-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-retro-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(12px - 6px); color: #d8b983; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-retro-nav a:hover, .sig-retro-nav a.active { color: #fff2d2; background: rgba(247,198,111,0.14); }\n.sig-retro-nav button { height: 34px; padding: 0 13px; border-radius: calc(12px - 6px); border: 1px solid #f2c673; background: #f2c673; color: #22172b; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-retro-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-retro-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>TAPE-09</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Log</a><a href=\"#\">Tape</a><a href=\"#\">Ledger</a><a href=\"#\">Export</a></div>\n  <button>Record</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Analog Terminal 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-retro-hero",
+      "signature-retro-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-retro-form",
+    "name": "Analog Terminal 表单",
+    "category": "form",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "retro",
+      "温暖复古软件"
+    ],
+    "description": "Analog Terminal 的表单素材，服务于温暖复古软件，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Analog Terminal 表单\n定位: 温暖复古软件，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #22172b，主强调 #f2c673，辅助强调 #ff8c6a。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-retro-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(242,198,115,0.38); border-radius: 12px; background: #22172b; color: #fff2d2; box-shadow: 0 28px 76px rgba(31,15,35,0.38); font-family: JetBrains Mono, ui-monospace, monospace; }\n.sig-retro-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #fff2d2; }\n.sig-retro-form small { color: #d8b983; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-retro-form .row { display: flex; gap: 10px; }\n.sig-retro-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(12px - 6px); border: 1px solid rgba(242,198,115,0.38); background: rgba(247,198,111,0.14); color: #fff2d2; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-retro-form input:focus { border-color: #f2c673; box-shadow: 0 0 0 3px color-mix(in srgb, #f2c673 18%, transparent); }\n.sig-retro-form button { height: 42px; padding: 0 14px; border-radius: calc(12px - 6px); border: 1px solid #f2c673; background: #f2c673; color: #22172b; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-retro-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-retro-form\">\n  <label>Tape label<small>Retro systems feel premium when every label has operational meaning.</small></label>\n  <div class=\"row\"><input value=\"release-memory-09\" aria-label=\"Tape label\" /><button type=\"button\">Record</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Analog Terminal 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-retro-hero",
+      "signature-retro-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-retro-table",
+    "name": "Analog Terminal 数据表",
+    "category": "table",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "retro",
+      "温暖复古软件"
+    ],
+    "description": "Analog Terminal 的数据表素材，服务于温暖复古软件，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Analog Terminal 数据表\n定位: 温暖复古软件，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #22172b，主强调 #f2c673，辅助强调 #ff8c6a。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-retro-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(242,198,115,0.38); border-radius: 12px; background: #22172b; color: #fff2d2; box-shadow: 0 28px 76px rgba(31,15,35,0.38); font-family: JetBrains Mono, ui-monospace, monospace; }\n.sig-retro-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-retro-table th, .sig-retro-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(242,198,115,0.38); }\n.sig-retro-table th { color: #d8b983; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(247,198,111,0.14); }\n.sig-retro-table td { color: #fff2d2; }\n.sig-retro-table tr:last-child td { border-bottom: 0; }\n.sig-retro-table tbody tr:hover td { background: rgba(247,198,111,0.14); }\n.sig-retro-table .mono { font-variant-numeric: tabular-nums; }\n.sig-retro-table .status { display: inline-flex; align-items: center; gap: 6px; color: #f2c673; font-weight: 800; }\n.sig-retro-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #f2c673; }",
+    "html": "<div class=\"sig-retro-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Tape A</td><td><span class=\"status\">Mounted</span></td><td class=\"mono\">742</td></tr><tr><td>Checksum</td><td><span class=\"status\">Good</span></td><td class=\"mono\">100</td></tr><tr><td>Export</td><td><span class=\"status\">Queued</span></td><td class=\"mono\">09</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Analog Terminal 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-retro-hero",
+      "signature-retro-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-grain-film",
+    "name": "Film Grain",
+    "category": "background",
+    "themes": [
+      "dark",
+      "retro",
+      "editorial"
+    ],
+    "tags": [
+      "grain",
+      "film",
+      "texture",
+      "analog",
+      "overlay",
+      "retro"
+    ],
+    "stylePrompt": "高级设计指令: Film Grain\n定位: Film Grain 是一款 dark / retro / editorial 背景素材，适合 grain、film、texture、analog 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Film Grain — 胶片颗粒背景。在任何底色上叠加一层微妙的动态噪点——不是那种粗糙的 SVG turbulence，而是用极细密的 repeating gradient 模拟 35mm 胶片颗粒(opacity:0.015-0.025)。配合底色 #0a0a0f。动态: 每帧微移(steps animation)创造真实颗粒感。气质: A24 电影、analog photography。",
+    "css": ".bg-film-grain {\n  min-height: 100vh;\n  background: #0a0a0f;\n  position: relative;\n}\n.bg-film-grain::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E\");\n  opacity: 0.02;\n  pointer-events: none;\n  animation: grain-shift 0.3s steps(6) infinite;\n}\n@keyframes grain-shift {\n  0% { transform: translate(0, 0); }\n  33% { transform: translate(-1px, 1px); }\n  66% { transform: translate(1px, -1px); }\n}",
+    "description": "Film Grain 是一款 dark / retro / editorial 背景素材，适合 grain、film、texture、analog 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 0,
+    "html": "<section class=\"bg-film-grain\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(242,198,115,0.38);border-radius:12px;background:rgba(247,198,111,0.14);color:#fff2d2;box-shadow:0 24px 70px rgba(31,15,35,0.35);\">\n    <div style=\"color:#f2c673;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Film Grain</h2>\n    <p style=\"margin:0;color:#d8b983;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "card-retro-terminal",
+    "name": "Retro Terminal Card",
+    "category": "card",
+    "themes": [
+      "retro",
+      "dark"
+    ],
+    "tags": [
+      "retro",
+      "terminal",
+      "green",
+      "crt",
+      "nostalgia"
+    ],
+    "stylePrompt": "高级设计指令: Retro Terminal Card\n定位: Retro Terminal Card 是一款 retro / dark 卡片素材，适合 retro、terminal、green、crt 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Retro Terminal Card — CRT 终端卡片。黑底(#0a0a0a) + 纯绿色文字(#33ff33) + 极轻微扫描线(repeating-linear-gradient)。顶部模拟标题栏(绿底黑字)。字体全等宽。圆角 0。边框 2px solid #33ff33。气质: 80年代终端、黑客电影、fallout pip-boy。",
+    "css": ".card-retro-term {\n  width: 320px;\n  background: #0a0a0a;\n  border: 2px solid #33ff33;\n  border-radius: 0;\n  font-family: 'Courier New', monospace;\n  overflow: hidden;\n  position: relative;\n}\n.card-retro-term::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: repeating-linear-gradient(0deg, rgba(51,255,51,0.03) 0px, rgba(51,255,51,0.03) 1px, transparent 1px, transparent 3px);\n  pointer-events: none;\n}\n.card-retro-term .header {\n  background: #33ff33;\n  color: #0a0a0a;\n  padding: 4px 8px;\n  font-size: 11px;\n  font-weight: 700;\n}\n.card-retro-term .body {\n  padding: 16px;\n  color: #33ff33;\n  font-size: 12px;\n  line-height: 1.8;\n  text-shadow: 0 0 4px rgba(51,255,51,0.5);\n}",
+    "html": "<div class=\"card-retro-term\">\n  <div class=\"header\">SYSTEM STATUS</div>\n  <div class=\"body\">CPU: 42% ████████░░░░░<br>MEM: 67% ███████████░░<br>NET: CONNECTED<br>UPTIME: 14d 7h 32m</div>\n</div>",
+    "description": "Retro Terminal Card 是一款 retro / dark 卡片素材，适合 retro、terminal、green、crt 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "bg-retro-scanlines",
+    "name": "CRT Display",
+    "category": "background",
+    "themes": [
+      "retro",
+      "dark"
+    ],
+    "tags": [
+      "crt",
+      "scanlines",
+      "retro",
+      "green",
+      "monitor"
+    ],
+    "stylePrompt": "高级设计指令: CRT Display\n定位: CRT Display 是一款 retro / dark 背景素材，适合 crt、scanlines、retro、green 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: CRT Display — 阴极射线管显示器背景。深黑底(#050505) + 绿色磷光微光(radial-gradient rgba(51,255,51,0.02)) + 扫描线(repeating-linear-gradient 2px间隔) + 极轻微的 vignette(径向渐变黑色边缘变暗)。静态——不需要动画。气质: 早期计算机、fallout。",
+    "css": ".bg-crt {\n  min-height: 100vh;\n  background: #050505;\n  position: relative;\n}\n.bg-crt::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background:\n    repeating-linear-gradient(0deg, rgba(51,255,51,0.02) 0px, rgba(51,255,51,0.02) 1px, transparent 1px, transparent 3px),\n    radial-gradient(ellipse at center, rgba(51,255,51,0.015) 0%, transparent 70%);\n  pointer-events: none;\n}\n.bg-crt::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);\n  pointer-events: none;\n}",
+    "description": "CRT Display 是一款 retro / dark 背景素材，适合 crt、scanlines、retro、green 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 2,
+    "html": "<section class=\"bg-crt\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(242,198,115,0.38);border-radius:12px;background:rgba(247,198,111,0.14);color:#fff2d2;box-shadow:0 24px 70px rgba(31,15,35,0.35);\">\n    <div style=\"color:#f2c673;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">CRT Display</h2>\n    <p style=\"margin:0;color:#d8b983;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "hero-retro-monitor",
+    "name": "Retro Boot Screen",
+    "category": "hero",
+    "themes": [
+      "retro",
+      "dark"
+    ],
+    "tags": [
+      "retro",
+      "boot",
+      "terminal",
+      "nostalgia",
+      "monospace"
+    ],
+    "stylePrompt": "高级设计指令: Retro Boot Screen\n定位: Retro Boot Screen 是一款 retro / dark 首屏素材，适合 retro、boot、terminal、nostalgia 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Retro Boot Screen — 复古启动画面 Hero。模拟 80 年代电脑开机: 纯黑底 + 绿/琥珀色等宽字体 + 逐行出现(stagger animation)。内容模拟 BIOS POST 或 Unix boot messages。字体 'Courier New' 14px。行间距宽(2.0)。气质: 黑客帝国、WarGames。",
+    "css": ".hero-retro-boot {\n  min-height: 100vh;\n  background: #0a0a0a;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 40px;\n}\n.hero-retro-boot .screen {\n  font-family: 'Courier New', monospace;\n  font-size: 14px;\n  color: #33ff33;\n  line-height: 2;\n  text-shadow: 0 0 6px rgba(51,255,51,0.4);\n  max-width: 600px;\n}\n.hero-retro-boot .screen .line {\n  opacity: 0;\n  animation: boot-line 0.3s ease forwards;\n}\n.hero-retro-boot .screen .line:nth-child(1) { animation-delay: 0.2s; }\n.hero-retro-boot .screen .line:nth-child(2) { animation-delay: 0.6s; }\n.hero-retro-boot .screen .line:nth-child(3) { animation-delay: 1.0s; }\n.hero-retro-boot .screen .line:nth-child(4) { animation-delay: 1.4s; }\n.hero-retro-boot .screen .line:nth-child(5) { animation-delay: 1.8s; }\n@keyframes boot-line { to { opacity: 1; } }",
+    "html": "<section class=\"hero-retro-boot\">\n  <div class=\"screen\">\n    <div class=\"line\">BIOS v2.4.1 — Memory check: 65536K OK</div>\n    <div class=\"line\">Loading kernel............ done</div>\n    <div class=\"line\">Mounting filesystems...... done</div>\n    <div class=\"line\">Starting services......... done</div>\n    <div class=\"line\">> Welcome. Type 'help' to begin._</div>\n  </div>\n</section>",
+    "description": "Retro Boot Screen 是一款 retro / dark 首屏素材，适合 retro、boot、terminal、nostalgia 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "btn-retro-pixel",
+    "name": "Pixel Press",
+    "category": "button",
+    "themes": [
+      "retro"
+    ],
+    "tags": [
+      "pixel",
+      "8bit",
+      "retro",
+      "press",
+      "gameboy"
+    ],
+    "stylePrompt": "高级设计指令: Pixel Press\n定位: Pixel Press 是一款 retro 按钮素材，适合 pixel、8bit、retro、press 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Pixel Press — 像素按压按钮。灵感: Game Boy / NES UI。4px border 纯黑, 无圆角(border-radius:0), 底部+右侧 border 加粗到 4px 模拟3D凸起。按下时 border 翻转(顶部+左侧加粗=凹陷)。字体: 'Press Start 2P' 或任何 pixel font, 10px。背景 #d4d4d4。色彩: 有限调色板(4色: 黑/深灰/浅灰/白)。气质: 复古游戏、chiptune。",
+    "css": ".btn-pixel {\n  padding: 10px 20px;\n  background: #c8c8c8;\n  color: #1a1a1a;\n  font-family: 'Courier New', monospace;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.05em;\n  text-transform: uppercase;\n  border: none;\n  box-shadow: inset -3px -3px 0 #888, inset 3px 3px 0 #fff;\n  cursor: pointer;\n  image-rendering: pixelated;\n}\n.btn-pixel:active {\n  box-shadow: inset 3px 3px 0 #888, inset -3px -3px 0 #fff;\n  padding: 11px 19px 9px 21px;\n}",
+    "html": "<button class=\"btn-pixel\">START</button>",
+    "description": "Pixel Press 是一款 retro 按钮素材，适合 pixel、8bit、retro、press 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "retro-vhs",
+    "name": "VHS Card",
+    "category": "card",
+    "tags": [
+      "retro",
+      "vhs",
+      "glitch",
+      "tape"
+    ],
+    "description": "VHS Card 是一款 retro 卡片素材，适合 retro、vhs、glitch、tape 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: VHS Card\n定位: VHS tape-style card\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: VHS Card。黑底+白字Courier+底部彩色条纹bands+REC•闪烁。border 2px #333。圆角0。",
+    "css": ".retro-vhs { width:300px; background:#111; border:2px solid #333; padding:20px; font-family:'Courier New',monospace; color:#fff; } .retro-vhs .rec { color:#ef4444; font-size:11px; font-weight:700; animation:blink 1s step-end infinite; margin-bottom:12px; } @keyframes blink { 50%{opacity:0} } .retro-vhs .bands { height:6px; margin-top:16px; background:repeating-linear-gradient(90deg,#ef4444 0 3px,#fbbf24 3px 6px,#22c55e 6px 9px,#3b82f6 9px 12px); }",
+    "html": "<div class=\"retro-vhs\"><div class=\"rec\">• REC</div><div>HOME_VIDEO_1994.mp4</div><div class=\"bands\"></div></div>",
+    "themes": [
+      "retro"
+    ],
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "retro-arcade-btn",
+    "name": "Arcade Button",
+    "category": "button",
+    "tags": [
+      "retro",
+      "arcade",
+      "round",
+      "press"
+    ],
+    "description": "Arcade Button 是一款 retro 按钮素材，适合 retro、arcade、round、press 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Arcade Button\n定位: Large arcade cabinet button\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Arcade Button。圆形64px, 红色#ef4444, 粗黑border 4px, box-shadow模拟高度。按下translateY+阴影缩小。",
+    "css": ".retro-arcade { width:64px; height:64px; border-radius:50%; background:#ef4444; border:4px solid #000; box-shadow:0 6px 0 #991b1b; cursor:pointer; transition:all 0.1s; font-family:'Courier New',monospace; font-weight:700; font-size:14px; color:#fff; } .retro-arcade:active { transform:translateY(4px); box-shadow:0 2px 0 #991b1b; }",
+    "html": "<button class=\"retro-arcade\">GO</button>",
+    "themes": [
+      "retro"
+    ],
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "retro-dos-menu",
+    "name": "DOS Menu",
+    "category": "navigation",
+    "tags": [
+      "retro",
+      "dos",
+      "ascii",
+      "blue"
+    ],
+    "description": "DOS Menu 是一款 retro 导航素材，适合 retro、dos、ascii、blue 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: DOS Menu\n定位: DOS-style blue background menu\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: DOS Menu。#0000aa蓝底白字等宽。选中项反色(白底蓝字)。ASCII边框模拟。",
+    "css": ".retro-dos { background:#0000aa; color:#fff; font-family:'Courier New',monospace; font-size:14px; padding:2px; display:inline-block; } .retro-dos .item { padding:0 16px; line-height:1.8; cursor:pointer; } .retro-dos .item:hover,.retro-dos .item.active { background:#aaa; color:#0000aa; }",
+    "html": "<div class=\"retro-dos\"><div class=\"item active\">FILE</div><div class=\"item\">EDIT</div><div class=\"item\">VIEW</div><div class=\"item\">QUIT</div></div>",
+    "themes": [
+      "retro"
+    ],
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "retro-cassette",
+    "name": "Cassette Label",
+    "category": "badge",
+    "tags": [
+      "retro",
+      "cassette",
+      "tape",
+      "label"
+    ],
+    "description": "Cassette Label 是一款 retro 徽章素材，适合 retro、cassette、tape、label 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Cassette Label\n定位: Cassette tape label badge\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Cassette Label。窄矩形白底+1px黑边框+Courier 10px全大写。两端小圆•模拟磁带轮。",
+    "css": ".retro-cassette { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border:1px solid #333; border-radius:2px; background:#f5f5f4; font-family:'Courier New',monospace; font-size:10px; font-weight:700; text-transform:uppercase; } .retro-cassette .reel { width:8px; height:8px; border-radius:50%; border:1.5px solid #666; }",
+    "html": "<span class=\"retro-cassette\"><span class=\"reel\"></span>SIDE A - MIX VOL.3<span class=\"reel\"></span></span>",
+    "themes": [
+      "retro"
+    ],
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "retro-taskbar",
+    "name": "Win95 Taskbar",
+    "category": "footer",
+    "tags": [
+      "retro",
+      "windows",
+      "taskbar",
+      "95"
+    ],
+    "description": "Win95 Taskbar 是一款 retro 页脚素材，适合 retro、windows、taskbar、95 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Win95 Taskbar\n定位: Windows 95 style taskbar footer\n审美系统: Analog Terminal / warm retro software without kitsch。使用 #f2c673 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Win95 Taskbar。灰底#c0c0c0, 顶部2px solid白(3D凸起)。Start按钮+右侧时钟。Tahoma 11px。",
+    "css": ".retro-taskbar { display:flex; align-items:center; padding:2px 4px; background:#c0c0c0; border-top:2px solid #fff; font-family:Tahoma,sans-serif; font-size:11px; } .retro-taskbar .start { padding:2px 8px; background:#c0c0c0; border:2px outset #fff; cursor:pointer; font-weight:700; margin-right:8px; } .retro-taskbar .start:active { border-style:inset; } .retro-taskbar .spacer { flex:1; } .retro-taskbar .clock { padding:2px 8px; border:2px inset #fff; }",
+    "html": "<div class=\"retro-taskbar\"><div class=\"start\">Start</div><div class=\"spacer\"></div><div class=\"clock\">4:12 AM</div></div>",
+    "themes": [
+      "retro"
+    ],
+    "designNotes": "此素材已按 Analog Terminal 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(135deg, #2a1730 0%, #674d2e 58%, #f2c673 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

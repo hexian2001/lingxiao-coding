@@ -1,0 +1,29 @@
+{
+  "id": "glassmorphism",
+  "name": "Frosted Atrium AI Workspace",
+  "title": "空间化 AI 工作台 / 预览控制",
+  "description": "面向 AI 设计与运营团队的空间化玻璃控制台：多层景深、磨砂面板、实时预览、评审队列和可执行控制，所有视觉服务于判断、协作与发布前校准。",
+  "version": "1.0.0",
+  "category": "ai-workspace",
+  "tags": [
+    "glassmorphism",
+    "frosted-atrium",
+    "ai-workspace",
+    "preview-control",
+    "spatial-ui",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "rgba(255,255,255,0.18)",
+    "surfaceMuted": "rgba(255,255,255,0.08)",
+    "ink": "#f8fbfa",
+    "text": "#eaf7fb",
+    "muted": "rgba(234,247,251,0.68)",
+    "accent": "#d9f3ff",
+    "accentWarm": "#f2c673",
+    "depth": "#102027",
+    "line": "rgba(255,255,255,0.24)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

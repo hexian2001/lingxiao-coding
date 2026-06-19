@@ -1,0 +1,631 @@
+[
+  {
+    "id": "signature-cyberpunk-hero",
+    "name": "Neon Infrastructure 首屏",
+    "category": "hero",
+    "themes": [
+      "cyberpunk"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "cyberpunk",
+      "克制赛博基础设施"
+    ],
+    "description": "Neon Infrastructure 的首屏素材，服务于克制赛博基础设施，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Neon Infrastructure 首屏\n定位: 克制赛博基础设施，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #090b1a，主强调 #22d3ee，辅助强调 #ff2bd6。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-cyberpunk-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(34,211,238,0.34);\n  border-radius: 10px;\n  background: linear-gradient(145deg, #090b1a, rgba(34,211,238,0.08));\n  color: #f8fbff;\n  box-shadow: 0 30px 80px rgba(34,211,238,0.12);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-cyberpunk-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(34,211,238,0.10) 1px, transparent 1px), linear-gradient(0deg, rgba(255,43,214,0.07) 1px, transparent 1px); background-size: 42px 42px; opacity: 0.78; pointer-events: none; }\n.sig-cyberpunk-hero > * { position: relative; z-index: 1; }\n.sig-cyberpunk-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-cyberpunk-hero .kicker { width: fit-content; border: 1px solid rgba(34,211,238,0.34); border-radius: 999px; padding: 6px 10px; color: #22d3ee; background: rgba(34,211,238,0.08); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-cyberpunk-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-cyberpunk-hero p { margin: 0; max-width: 560px; color: #93a4b8; font-size: 15px; line-height: 1.78; }\n.sig-cyberpunk-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-cyberpunk-hero button { height: 40px; padding: 0 16px; border-radius: calc(10px / 2 + 4px); border: 1px solid rgba(34,211,238,0.34); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-cyberpunk-hero .primary { background: #22d3ee; color: #060817; border-color: #22d3ee; }\n.sig-cyberpunk-hero .secondary { background: transparent; color: #f8fbff; }\n.sig-cyberpunk-hero button:hover { transform: translateY(-1px); border-color: #22d3ee; }\n.sig-cyberpunk-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(34,211,238,0.34); border-radius: calc(10px - 2px); background: rgba(34,211,238,0.08); backdrop-filter: blur(18px) saturate(140%); }\n.sig-cyberpunk-hero .artifact h2 { margin: 0; font-size: 13px; color: #22d3ee; text-transform: uppercase; letter-spacing: 0; }\n.sig-cyberpunk-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-cyberpunk-hero .metric { padding: 14px; border: 1px solid rgba(34,211,238,0.34); border-radius: calc(10px - 4px); background: color-mix(in srgb, #090b1a 76%, transparent); }\n.sig-cyberpunk-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-cyberpunk-hero .metric span { display: block; margin-top: 6px; color: #93a4b8; font-size: 11px; }\n.sig-cyberpunk-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #22d3ee, #ff2bd6); }\n@media (max-width: 780px) { .sig-cyberpunk-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-cyberpunk-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">克制赛博基础设施</div>\n    <h1>Route the city through one clean signal.</h1>\n    <p>A restrained neon operations layer for infrastructure, routing, and live telemetry.</p>\n    <div class=\"actions\"><button class=\"primary\">Trace node</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>GRID/7 / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>7</strong><span>districts linked</span></div>\n      <div class=\"metric\"><strong>31ms</strong><span>route latency</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Neon Infrastructure 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-cyberpunk-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-cyberpunk-card",
+    "name": "Neon Infrastructure 洞察卡片",
+    "category": "card",
+    "themes": [
+      "cyberpunk"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "cyberpunk",
+      "克制赛博基础设施"
+    ],
+    "description": "Neon Infrastructure 的洞察卡片素材，服务于克制赛博基础设施，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Neon Infrastructure 洞察卡片\n定位: 克制赛博基础设施，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #090b1a，主强调 #22d3ee，辅助强调 #ff2bd6。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-cyberpunk-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(34,211,238,0.34); border-radius: 10px; background: #090b1a; color: #f8fbff; box-shadow: 0 30px 80px rgba(34,211,238,0.12); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-cyberpunk-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-cyberpunk-card .label { color: #22d3ee; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-cyberpunk-card .pill { border: 1px solid rgba(34,211,238,0.34); border-radius: 999px; padding: 5px 9px; color: #93a4b8; background: rgba(34,211,238,0.08); font-size: 11px; }\n.sig-cyberpunk-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-cyberpunk-card p { margin: 0; color: #93a4b8; font-size: 13px; line-height: 1.7; }\n.sig-cyberpunk-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(34,211,238,0.34); }\n.sig-cyberpunk-card .strip strong { font-variant-numeric: tabular-nums; color: #f8fbff; }\n.sig-cyberpunk-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(10px - 4px); background: #22d3ee; color: #060817; font-weight: 900; }",
+    "html": "<article class=\"sig-cyberpunk-card\">\n  <div class=\"top\"><div><div class=\"label\">GRID/7</div><h3>7</h3></div><span class=\"pill\">districts linked</span></div>\n  <p>A restrained neon operations layer for infrastructure, routing, and live telemetry.</p>\n  <div class=\"strip\"><span>route latency</span><strong>31ms</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Neon Infrastructure 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-cyberpunk-hero"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-cyberpunk-nav",
+    "name": "Neon Infrastructure 导航",
+    "category": "navigation",
+    "themes": [
+      "cyberpunk"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "cyberpunk",
+      "克制赛博基础设施"
+    ],
+    "description": "Neon Infrastructure 的导航素材，服务于克制赛博基础设施，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Neon Infrastructure 导航\n定位: 克制赛博基础设施，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #090b1a，主强调 #22d3ee，辅助强调 #ff2bd6。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-cyberpunk-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(34,211,238,0.34); border-radius: 10px; background: #090b1a; color: #f8fbff; box-shadow: 0 30px 80px rgba(34,211,238,0.12); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-cyberpunk-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-cyberpunk-nav .mark { width: 30px; height: 30px; border-radius: calc(10px - 4px); background: linear-gradient(135deg, #22d3ee, #ff2bd6); box-shadow: inset 0 0 0 1px rgba(34,211,238,0.34); }\n.sig-cyberpunk-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-cyberpunk-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(10px - 6px); color: #93a4b8; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-cyberpunk-nav a:hover, .sig-cyberpunk-nav a.active { color: #f8fbff; background: rgba(34,211,238,0.08); }\n.sig-cyberpunk-nav button { height: 34px; padding: 0 13px; border-radius: calc(10px - 6px); border: 1px solid #22d3ee; background: #22d3ee; color: #060817; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-cyberpunk-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-cyberpunk-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>GRID/7</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Nodes</a><a href=\"#\">Routes</a><a href=\"#\">Load</a><a href=\"#\">Trace</a></div>\n  <button>Trace node</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Neon Infrastructure 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-cyberpunk-hero",
+      "signature-cyberpunk-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-cyberpunk-form",
+    "name": "Neon Infrastructure 表单",
+    "category": "form",
+    "themes": [
+      "cyberpunk"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "cyberpunk",
+      "克制赛博基础设施"
+    ],
+    "description": "Neon Infrastructure 的表单素材，服务于克制赛博基础设施，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Neon Infrastructure 表单\n定位: 克制赛博基础设施，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #090b1a，主强调 #22d3ee，辅助强调 #ff2bd6。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-cyberpunk-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(34,211,238,0.34); border-radius: 10px; background: #090b1a; color: #f8fbff; box-shadow: 0 30px 80px rgba(34,211,238,0.12); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-cyberpunk-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #f8fbff; }\n.sig-cyberpunk-form small { color: #93a4b8; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-cyberpunk-form .row { display: flex; gap: 10px; }\n.sig-cyberpunk-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(10px - 6px); border: 1px solid rgba(34,211,238,0.34); background: rgba(34,211,238,0.08); color: #f8fbff; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-cyberpunk-form input:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px color-mix(in srgb, #22d3ee 18%, transparent); }\n.sig-cyberpunk-form button { height: 42px; padding: 0 14px; border-radius: calc(10px - 6px); border: 1px solid #22d3ee; background: #22d3ee; color: #060817; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-cyberpunk-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-cyberpunk-form\">\n  <label>Node alias<small>Cyberpunk should feel like infrastructure, not a nightclub poster.</small></label>\n  <div class=\"row\"><input value=\"shanghai-north-07\" aria-label=\"Node alias\" /><button type=\"button\">Trace node</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Neon Infrastructure 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-cyberpunk-hero",
+      "signature-cyberpunk-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-cyberpunk-table",
+    "name": "Neon Infrastructure 数据表",
+    "category": "table",
+    "themes": [
+      "cyberpunk"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "cyberpunk",
+      "克制赛博基础设施"
+    ],
+    "description": "Neon Infrastructure 的数据表素材，服务于克制赛博基础设施，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Neon Infrastructure 数据表\n定位: 克制赛博基础设施，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #090b1a，主强调 #22d3ee，辅助强调 #ff2bd6。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-cyberpunk-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(34,211,238,0.34); border-radius: 10px; background: #090b1a; color: #f8fbff; box-shadow: 0 30px 80px rgba(34,211,238,0.12); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-cyberpunk-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-cyberpunk-table th, .sig-cyberpunk-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(34,211,238,0.34); }\n.sig-cyberpunk-table th { color: #93a4b8; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(34,211,238,0.08); }\n.sig-cyberpunk-table td { color: #f8fbff; }\n.sig-cyberpunk-table tr:last-child td { border-bottom: 0; }\n.sig-cyberpunk-table tbody tr:hover td { background: rgba(34,211,238,0.08); }\n.sig-cyberpunk-table .mono { font-variant-numeric: tabular-nums; }\n.sig-cyberpunk-table .status { display: inline-flex; align-items: center; gap: 6px; color: #22d3ee; font-weight: 800; }\n.sig-cyberpunk-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #22d3ee; }",
+    "html": "<div class=\"sig-cyberpunk-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Node 07</td><td><span class=\"status\">Synced</span></td><td class=\"mono\">31</td></tr><tr><td>Route C</td><td><span class=\"status\">Open</span></td><td class=\"mono\">88</td></tr><tr><td>Relay</td><td><span class=\"status\">Hot</span></td><td class=\"mono\">12</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Neon Infrastructure 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-cyberpunk-hero",
+      "signature-cyberpunk-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-grid-perspective",
+    "name": "Perspective Grid",
+    "category": "background",
+    "themes": [
+      "dark",
+      "cyberpunk"
+    ],
+    "tags": [
+      "grid",
+      "perspective",
+      "3d",
+      "vanishing-point",
+      "futuristic",
+      "cyberpunk"
+    ],
+    "stylePrompt": "高级设计指令: Perspective Grid\n定位: Perspective Grid 是一款 dark / cyberpunk 背景素材，适合 grid、perspective、3d、vanishing-point 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Perspective Grid — 透视网格背景。地平线消失点在画面中偏下(70%)位置。网格线极细(0.5px)、低 opacity(0.06)，颜色是冷蓝#60a5fa。上半部分渐隐(渐变遮罩)。底色 #030712。气质: Tron Legacy、量子计算可视化。不是80s synthwave的粗线紫色网格——是精密的、工程感的。",
+    "css": ".bg-perspective-grid {\n  min-height: 100vh;\n  background: #030712;\n  position: relative;\n  overflow: hidden;\n}\n.bg-perspective-grid::before {\n  content: '';\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 55%;\n  background:\n    linear-gradient(to right, rgba(96,165,250,0.06) 0.5px, transparent 0.5px),\n    linear-gradient(to bottom, rgba(96,165,250,0.06) 0.5px, transparent 0.5px);\n  background-size: 80px 40px;\n  transform: perspective(500px) rotateX(65deg);\n  transform-origin: bottom center;\n  mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 90%);\n  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 90%);\n}",
+    "description": "Perspective Grid 是一款 dark / cyberpunk 背景素材，适合 grid、perspective、3d、vanishing-point 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 90,
+      "tier": "production",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 0,
+    "html": "<section class=\"bg-perspective-grid\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(34,211,238,0.34);border-radius:10px;background:rgba(34,211,238,0.08);color:#f8fbff;box-shadow:0 24px 70px rgba(34,211,238,0.12);\">\n    <div style=\"color:#22d3ee;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Perspective Grid</h2>\n    <p style=\"margin:0;color:#93a4b8;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "btn-void-pulse",
+    "name": "Void Pulse",
+    "category": "button",
+    "themes": [
+      "dark",
+      "cyberpunk"
+    ],
+    "tags": [
+      "primary",
+      "glow",
+      "animated",
+      "dark",
+      "futuristic",
+      "cyberpunk"
+    ],
+    "stylePrompt": "高级设计指令: Void Pulse\n定位: Void Pulse 是一款 dark / cyberpunk 按钮素材，适合 primary、glow、animated、dark 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Void Pulse — 深渊脉冲按钮。纯黑底色上的冷蓝辉光，按钮本体几乎不可见，存在感完全由光晕定义。字体 Inter 600，全小写 letter-spacing:0.1em。hover 时辉光范围扩大2倍+微弱呼吸动画。整体气质: 克制、科技、冷峻。配色: #000 底 + #60a5fa 辉光。圆角 8px(不是 50px 胶囊——那太 generic)。",
+    "css": ".btn-void-pulse {\n  position: relative;\n  padding: 13px 28px;\n  background: #000;\n  color: #60a5fa;\n  font-family: 'Inter', system-ui, sans-serif;\n  font-size: 13px;\n  font-weight: 600;\n  letter-spacing: 0.1em;\n  text-transform: lowercase;\n  border: 1px solid rgba(96, 165, 250, 0.2);\n  border-radius: 8px;\n  cursor: pointer;\n  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);\n  box-shadow: 0 0 0 0 rgba(96, 165, 250, 0), inset 0 0 0 0 rgba(96, 165, 250, 0);\n}\n.btn-void-pulse:hover {\n  border-color: rgba(96, 165, 250, 0.5);\n  box-shadow: 0 0 24px -4px rgba(96, 165, 250, 0.3), 0 0 80px -8px rgba(96, 165, 250, 0.1), inset 0 0 12px -4px rgba(96, 165, 250, 0.1);\n  color: #93c5fd;\n}\n.btn-void-pulse:active {\n  transform: scale(0.97);\n  box-shadow: 0 0 12px -2px rgba(96, 165, 250, 0.4), inset 0 0 20px -4px rgba(96, 165, 250, 0.15);\n}",
+    "html": "<button class=\"btn-void-pulse\">deploy</button>",
+    "description": "Void Pulse 是一款 dark / cyberpunk 按钮素材，适合 primary、glow、animated、dark 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "btn-terminal-enter",
+    "name": "Terminal Enter",
+    "category": "button",
+    "themes": [
+      "dark",
+      "cyberpunk",
+      "minimal"
+    ],
+    "tags": [
+      "terminal",
+      "monospace",
+      "dark",
+      "hacker",
+      "minimal",
+      "cyberpunk"
+    ],
+    "stylePrompt": "高级设计指令: Terminal Enter\n定位: Terminal Enter 是一款 dark / cyberpunk / minimal 按钮素材，适合 terminal、monospace、dark、hacker 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Terminal Enter — 终端回车按钮。纯粹的 terminal 美学: 等宽字体(JetBrains Mono)、方括号包裹文字 [execute]、绿色(#4ade80)文字on纯黑。无圆角(border-radius:2px)。hover时文字前出现闪烁光标'▊'(用::before + animation)。气质: 黑客、Bloomberg Terminal、htop。",
+    "css": ".btn-terminal {\n  position: relative;\n  padding: 10px 20px;\n  background: #000;\n  color: #4ade80;\n  font-family: 'JetBrains Mono', 'Fira Code', monospace;\n  font-size: 13px;\n  font-weight: 400;\n  border: 1px solid #1a1a1a;\n  border-radius: 2px;\n  cursor: pointer;\n  transition: all 0.15s;\n}\n.btn-terminal::before {\n  content: '';\n  display: inline-block;\n  width: 0;\n  overflow: hidden;\n  vertical-align: middle;\n  transition: width 0.2s;\n}\n.btn-terminal:hover::before {\n  content: '▊ ';\n  width: 1.5em;\n  animation: cursor-blink 0.8s step-end infinite;\n}\n.btn-terminal:hover {\n  border-color: #4ade80;\n  box-shadow: 0 0 8px rgba(74, 222, 128, 0.15);\n}\n@keyframes cursor-blink {\n  50% { opacity: 0; }\n}",
+    "html": "<button class=\"btn-terminal\">[execute]</button>",
+    "description": "Terminal Enter 是一款 dark / cyberpunk / minimal 按钮素材，适合 terminal、monospace、dark、hacker 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "fx-border-beam",
+    "name": "Border Beam",
+    "category": "effect",
+    "themes": [
+      "dark",
+      "gradient",
+      "cyberpunk"
+    ],
+    "tags": [
+      "border",
+      "beam",
+      "animated",
+      "light-trail",
+      "premium",
+      "cyberpunk"
+    ],
+    "stylePrompt": "高级设计指令: Border Beam\n定位: Border Beam 是一款 dark / gradient / cyberpunk 特效素材，适合 border、beam、animated、light-trail 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Border Beam — 光束沿边框移动。一个小光点(20px宽的亮白渐变)沿着容器的border路径持续匀速移动。用 conic-gradient + rotate animation 实现。整体容器深色+1px 暗边框,光束是唯一的'生命力'。气质: Magic UI, shadcn 展示组件的那种精致动效。圆角 16px。",
+    "css": ".fx-border-beam {\n  position: relative;\n  padding: 32px;\n  border-radius: 16px;\n  background: #09090b;\n  overflow: hidden;\n}\n.fx-border-beam::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  border-radius: 16px;\n  padding: 1px;\n  background: conic-gradient(from var(--beam-angle, 0deg), transparent 0%, transparent 85%, rgba(255,255,255,0.5) 90%, rgba(255,255,255,0.8) 92%, rgba(255,255,255,0.5) 94%, transparent 99%);\n  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);\n  -webkit-mask-composite: xor;\n  mask-composite: exclude;\n  animation: beam-spin 4s linear infinite;\n}\n@keyframes beam-spin {\n  to { --beam-angle: 360deg; }\n}\n@property --beam-angle {\n  syntax: '<angle>';\n  initial-value: 0deg;\n  inherits: false;\n}",
+    "html": "<div class=\"fx-border-beam\">\n  <p style=\"color:#fafafa;font-family:Inter,system-ui;font-size:14px;margin:0\">Content with animated border beam</p>\n</div>",
+    "description": "Border Beam 是一款 dark / gradient / cyberpunk 特效素材，适合 border、beam、animated、light-trail 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "cyber-card-holo",
+    "name": "Holographic Card",
+    "category": "card",
+    "tags": [
+      "cyberpunk",
+      "holographic",
+      "rainbow",
+      "border",
+      "animated"
+    ],
+    "description": "Holographic Card 是一款 cyberpunk 卡片素材，适合 cyberpunk、holographic、rainbow、border 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Holographic Card\n定位: 全息虹彩边框卡片\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Holographic Card。深黑底(#0a0a0f) + 1px边框用 conic-gradient 彩虹色循环旋转。内部 padding 24px。文字 #00ff88 等宽字体。边框动画用 @property --angle + animation rotate。气质: 赛博朋克ID卡。",
+    "css": ".cyber-holo { padding:24px; background:#0a0a0f; border-radius:4px; position:relative; color:#00ff88; font-family:\"JetBrains Mono\",monospace; font-size:13px; } .cyber-holo::before { content:\"\"; position:absolute; inset:0; border-radius:4px; padding:1px; background:conic-gradient(from var(--a,0deg),#ff0055,#00ff88,#00aaff,#ff0055); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; animation:holo-spin 3s linear infinite; } @property --a{syntax:\"<angle>\";initial-value:0deg;inherits:false} @keyframes holo-spin{to{--a:360deg}}",
+    "html": "<div class=\"cyber-holo\">ID: NX-7742<br>CLASS: OPERATIVE<br>STATUS: ACTIVE</div>",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "cyber-bg-matrix",
+    "name": "Matrix Rain",
+    "category": "background",
+    "tags": [
+      "cyberpunk",
+      "matrix",
+      "rain",
+      "code",
+      "animated"
+    ],
+    "description": "Matrix Rain 是一款 cyberpunk 背景素材，适合 cyberpunk、matrix、rain、code 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Matrix Rain\n定位: 黑客帝国代码雨(纯CSS近似)\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Matrix Rain。#000底, 多列竖向 linear-gradient(绿色字符→透明)以不同速度下落。用 repeating-linear-gradient + background-position animation 模拟。文字不需要真实——光效模拟即可。",
+    "css": ".cyber-matrix { min-height:100vh; background:#000; position:relative; overflow:hidden; } .cyber-matrix::before { content:\"\"; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(0,255,136,0.03) 20px,rgba(0,255,136,0.03) 21px); background-size:30px 100%; animation:matrix-fall 4s linear infinite; } @keyframes matrix-fall { from{background-position:0 -100%} to{background-position:0 100%} }",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 81,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "rich"
+    },
+    "sourceOrder": 5,
+    "html": "<section class=\"cyber-matrix\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(34,211,238,0.34);border-radius:10px;background:rgba(34,211,238,0.08);color:#f8fbff;box-shadow:0 24px 70px rgba(34,211,238,0.12);\">\n    <div style=\"color:#22d3ee;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Matrix Rain</h2>\n    <p style=\"margin:0;color:#93a4b8;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "cyber-btn-glitch",
+    "name": "Glitch Button",
+    "category": "button",
+    "tags": [
+      "cyberpunk",
+      "glitch",
+      "distortion",
+      "animated",
+      "neon"
+    ],
+    "description": "Glitch Button 是一款 cyberpunk 按钮素材，适合 cyberpunk、glitch、distortion、animated 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Glitch Button\n定位: 故障毛刺按钮——hover时文字位移+色散\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Glitch Button。#000底, #00ff88 文字。hover时用 clip-path + translateX 做水平错位, 加 text-shadow 红蓝色散(chromatic aberration)。字体 Orbitron/monospace 全大写。border 1px #00ff88。",
+    "css": ".cyber-glitch { padding:12px 24px; background:#000; color:#00ff88; font-family:\"Courier New\",monospace; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; border:1px solid #00ff88; cursor:pointer; position:relative; transition:text-shadow 0.1s; } .cyber-glitch:hover { text-shadow:2px 0 #ff0055,-2px 0 #00aaff; animation:glitch-shake 0.3s steps(4) infinite; } @keyframes glitch-shake { 0%,100%{transform:translate(0)} 25%{transform:translate(2px,-1px)} 50%{transform:translate(-1px,2px)} 75%{transform:translate(1px,-2px)} }",
+    "html": "<button class=\"cyber-glitch\">[BREACH]</button>",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "reduced-motion-friendly"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "rich"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "cyber-nav-hud",
+    "name": "HUD Navigation",
+    "category": "navigation",
+    "tags": [
+      "cyberpunk",
+      "hud",
+      "corners",
+      "wireframe",
+      "overlay"
+    ],
+    "description": "HUD Navigation 是一款 cyberpunk 导航素材，适合 cyberpunk、hud、corners、wireframe 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: HUD Navigation\n定位: HUD抬头显示风格导航——四角标记线\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: HUD Navigation。透明底, 四个角各有L形细线标记(用::before/::after + border)。内部内容(文字/图标)用 #00ff88 等宽字体。整体像科幻电影的平视显示器。",
+    "css": ".cyber-hud { position:relative; padding:20px 24px; color:#00ff88; font-family:\"Courier New\",monospace; font-size:12px; } .cyber-hud::before,.cyber-hud::after { content:\"\"; position:absolute; width:16px; height:16px; border-color:#00ff88; border-style:solid; } .cyber-hud::before { top:0;left:0; border-width:1px 0 0 1px; } .cyber-hud::after { bottom:0;right:0; border-width:0 1px 1px 0; }",
+    "html": "<div class=\"cyber-hud\">SYS: ONLINE | LAT: 40.7128 | LNG: -74.0060</div>",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "cyber-table-data",
+    "name": "Data Stream Table",
+    "category": "table",
+    "tags": [
+      "cyberpunk",
+      "data",
+      "monospace",
+      "green",
+      "terminal"
+    ],
+    "description": "Data Stream Table 是一款 cyberpunk 表格素材，适合 cyberpunk、data、monospace、green 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Data Stream Table\n定位: 数据流终端表格\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Data Stream Table。#000底, #00ff88文字, 等宽字体。表头 border-bottom 1px #00ff88。无hover效果——数据是冷的。td padding紧凑(6px 12px)。text-shadow微发光。",
+    "css": ".cyber-table { width:100%; border-collapse:collapse; background:#000; color:#00ff88; font-family:\"Courier New\",monospace; font-size:12px; text-shadow:0 0 4px rgba(0,255,136,0.3); } .cyber-table th { padding:8px 12px; text-align:left; border-bottom:1px solid #00ff88; font-weight:400; opacity:0.6; text-transform:uppercase; letter-spacing:0.05em; } .cyber-table td { padding:6px 12px; border-bottom:1px solid rgba(0,255,136,0.1); }",
+    "html": "<table class=\"cyber-table\"><thead><tr><th>PID</th><th>PROC</th><th>MEM</th><th>CPU</th></tr></thead><tbody><tr><td>2847</td><td>node</td><td>142M</td><td>23%</td></tr><tr><td>1103</td><td>nginx</td><td>38M</td><td>2%</td></tr></tbody></table>",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "cyber-footer-coords",
+    "name": "Coordinate Footer",
+    "category": "footer",
+    "tags": [
+      "cyberpunk",
+      "coordinates",
+      "data",
+      "minimal",
+      "terminal"
+    ],
+    "description": "Coordinate Footer 是一款 cyberpunk 页脚素材，适合 cyberpunk、coordinates、data、minimal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Coordinate Footer\n定位: 坐标数据页脚——极简数据输出\n审美系统: Neon Ops / night city infrastructure。使用 #22d3ee 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Coordinate Footer。#000底, 一行 #00ff88 等宽小字: 时间戳+坐标+状态。border-top 1px #00ff88 opacity 0.3。padding 12px。气质: 卫星遥测数据。",
+    "css": ".cyber-footer { background:#000; border-top:1px solid rgba(0,255,136,0.3); padding:12px 16px; font-family:\"Courier New\",monospace; font-size:11px; color:rgba(0,255,136,0.6); display:flex; justify-content:space-between; }",
+    "html": "<footer class=\"cyber-footer\"><span>2026.06.06 04:12:33 UTC</span><span>40.7128°N 74.0060°W</span><span>STATUS: NOMINAL</span></footer>",
+    "themes": [
+      "cyberpunk"
+    ],
+    "designNotes": "此素材已按 Neon Ops 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 76% 8%, rgba(255,43,214,0.36), transparent 28%), radial-gradient(circle at 18% 86%, rgba(34,211,238,0.24), transparent 32%), linear-gradient(145deg, #060817 0%, #111827 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

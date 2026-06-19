@@ -1,0 +1,1116 @@
+[
+  {
+    "id": "signature-dark-hero",
+    "name": "Nocturne Command 首屏",
+    "category": "hero",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "dark",
+      "深色工程控制台"
+    ],
+    "description": "Nocturne Command 的首屏素材，服务于深色工程控制台，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Nocturne Command 首屏\n定位: 深色工程控制台，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #0f1416，主强调 #aebdc5，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-dark-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(210,219,222,0.16);\n  border-radius: 14px;\n  background: linear-gradient(145deg, #0f1416, rgba(239,242,241,0.055));\n  color: #eff2f1;\n  box-shadow: 0 28px 78px rgba(0,0,0,0.38);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-dark-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(174,189,197,0.10) 1px, transparent 1px), linear-gradient(0deg, rgba(174,189,197,0.06) 1px, transparent 1px); background-size: 36px 36px; opacity: 0.78; pointer-events: none; }\n.sig-dark-hero > * { position: relative; z-index: 1; }\n.sig-dark-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-dark-hero .kicker { width: fit-content; border: 1px solid rgba(210,219,222,0.16); border-radius: 999px; padding: 6px 10px; color: #aebdc5; background: rgba(239,242,241,0.055); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-dark-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-dark-hero p { margin: 0; max-width: 560px; color: #8c989a; font-size: 15px; line-height: 1.78; }\n.sig-dark-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-dark-hero button { height: 40px; padding: 0 16px; border-radius: calc(14px / 2 + 4px); border: 1px solid rgba(210,219,222,0.16); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-dark-hero .primary { background: #aebdc5; color: #0f1416; border-color: #aebdc5; }\n.sig-dark-hero .secondary { background: transparent; color: #eff2f1; }\n.sig-dark-hero button:hover { transform: translateY(-1px); border-color: #aebdc5; }\n.sig-dark-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(210,219,222,0.16); border-radius: calc(14px - 2px); background: rgba(239,242,241,0.055); backdrop-filter: blur(18px) saturate(140%); }\n.sig-dark-hero .artifact h2 { margin: 0; font-size: 13px; color: #aebdc5; text-transform: uppercase; letter-spacing: 0; }\n.sig-dark-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-dark-hero .metric { padding: 14px; border: 1px solid rgba(210,219,222,0.16); border-radius: calc(14px - 4px); background: color-mix(in srgb, #0f1416 76%, transparent); }\n.sig-dark-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-dark-hero .metric span { display: block; margin-top: 6px; color: #8c989a; font-size: 11px; }\n.sig-dark-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #aebdc5, #f2c673); }\n@media (max-width: 780px) { .sig-dark-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-dark-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">深色工程控制台</div>\n    <h1>Observe every system before it speaks.</h1>\n    <p>A quiet operations surface for release health, incidents, and agent decisions.</p>\n    <div class=\"actions\"><button class=\"primary\">Open watch</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Nocturne / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>99.98</strong><span>availability</span></div>\n      <div class=\"metric\"><strong>4.8m</strong><span>events shaped</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Nocturne Command 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-dark-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 420,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-dark-card",
+    "name": "Nocturne Command 洞察卡片",
+    "category": "card",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "dark",
+      "深色工程控制台"
+    ],
+    "description": "Nocturne Command 的洞察卡片素材，服务于深色工程控制台，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Nocturne Command 洞察卡片\n定位: 深色工程控制台，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #0f1416，主强调 #aebdc5，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-dark-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(210,219,222,0.16); border-radius: 14px; background: #0f1416; color: #eff2f1; box-shadow: 0 28px 78px rgba(0,0,0,0.38); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-dark-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-dark-card .label { color: #aebdc5; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-dark-card .pill { border: 1px solid rgba(210,219,222,0.16); border-radius: 999px; padding: 5px 9px; color: #8c989a; background: rgba(239,242,241,0.055); font-size: 11px; }\n.sig-dark-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-dark-card p { margin: 0; color: #8c989a; font-size: 13px; line-height: 1.7; }\n.sig-dark-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(210,219,222,0.16); }\n.sig-dark-card .strip strong { font-variant-numeric: tabular-nums; color: #eff2f1; }\n.sig-dark-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(14px - 4px); background: #aebdc5; color: #0f1416; font-weight: 900; }",
+    "html": "<article class=\"sig-dark-card\">\n  <div class=\"top\"><div><div class=\"label\">Nocturne</div><h3>99.98</h3></div><span class=\"pill\">availability</span></div>\n  <p>A quiet operations surface for release health, incidents, and agent decisions.</p>\n  <div class=\"strip\"><span>events shaped</span><strong>4.8m</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Nocturne Command 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-dark-hero"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-dark-nav",
+    "name": "Nocturne Command 导航",
+    "category": "navigation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "dark",
+      "深色工程控制台"
+    ],
+    "description": "Nocturne Command 的导航素材，服务于深色工程控制台，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Nocturne Command 导航\n定位: 深色工程控制台，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #0f1416，主强调 #aebdc5，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-dark-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(210,219,222,0.16); border-radius: 14px; background: #0f1416; color: #eff2f1; box-shadow: 0 28px 78px rgba(0,0,0,0.38); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-dark-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-dark-nav .mark { width: 30px; height: 30px; border-radius: calc(14px - 4px); background: linear-gradient(135deg, #aebdc5, #f2c673); box-shadow: inset 0 0 0 1px rgba(210,219,222,0.16); }\n.sig-dark-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-dark-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(14px - 6px); color: #8c989a; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-dark-nav a:hover, .sig-dark-nav a.active { color: #eff2f1; background: rgba(239,242,241,0.055); }\n.sig-dark-nav button { height: 34px; padding: 0 13px; border-radius: calc(14px - 6px); border: 1px solid #aebdc5; background: #aebdc5; color: #0f1416; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-dark-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-dark-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Nocturne</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Health</a><a href=\"#\">Runs</a><a href=\"#\">Incidents</a><a href=\"#\">Ledger</a></div>\n  <button>Open watch</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Nocturne Command 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-dark-hero",
+      "signature-dark-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-dark-form",
+    "name": "Nocturne Command 表单",
+    "category": "form",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "dark",
+      "深色工程控制台"
+    ],
+    "description": "Nocturne Command 的表单素材，服务于深色工程控制台，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Nocturne Command 表单\n定位: 深色工程控制台，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #0f1416，主强调 #aebdc5，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-dark-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(210,219,222,0.16); border-radius: 14px; background: #0f1416; color: #eff2f1; box-shadow: 0 28px 78px rgba(0,0,0,0.38); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-dark-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #eff2f1; }\n.sig-dark-form small { color: #8c989a; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-dark-form .row { display: flex; gap: 10px; }\n.sig-dark-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(14px - 6px); border: 1px solid rgba(210,219,222,0.16); background: rgba(239,242,241,0.055); color: #eff2f1; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-dark-form input:focus { border-color: #aebdc5; box-shadow: 0 0 0 3px color-mix(in srgb, #aebdc5 18%, transparent); }\n.sig-dark-form button { height: 42px; padding: 0 14px; border-radius: calc(14px - 6px); border: 1px solid #aebdc5; background: #aebdc5; color: #0f1416; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-dark-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-dark-form\">\n  <label>Escalation channel<small>Route only high-signal failures into the incident room.</small></label>\n  <div class=\"row\"><input value=\"release-watch@ops.dev\" aria-label=\"Escalation channel\" /><button type=\"button\">Open watch</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Nocturne Command 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-dark-hero",
+      "signature-dark-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-dark-table",
+    "name": "Nocturne Command 数据表",
+    "category": "table",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "dark",
+      "深色工程控制台"
+    ],
+    "description": "Nocturne Command 的数据表素材，服务于深色工程控制台，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Nocturne Command 数据表\n定位: 深色工程控制台，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #0f1416，主强调 #aebdc5，辅助强调 #f2c673。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-dark-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(210,219,222,0.16); border-radius: 14px; background: #0f1416; color: #eff2f1; box-shadow: 0 28px 78px rgba(0,0,0,0.38); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-dark-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-dark-table th, .sig-dark-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(210,219,222,0.16); }\n.sig-dark-table th { color: #8c989a; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: rgba(239,242,241,0.055); }\n.sig-dark-table td { color: #eff2f1; }\n.sig-dark-table tr:last-child td { border-bottom: 0; }\n.sig-dark-table tbody tr:hover td { background: rgba(239,242,241,0.055); }\n.sig-dark-table .mono { font-variant-numeric: tabular-nums; }\n.sig-dark-table .status { display: inline-flex; align-items: center; gap: 6px; color: #aebdc5; font-weight: 800; }\n.sig-dark-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #aebdc5; }",
+    "html": "<div class=\"sig-dark-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Deploy gate</td><td><span class=\"status\">Clear</span></td><td class=\"mono\">99</td></tr><tr><td>Agent loop</td><td><span class=\"status\">Watching</span></td><td class=\"mono\">42</td></tr><tr><td>Registry</td><td><span class=\"status\">Quiet</span></td><td class=\"mono\">12</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Nocturne Command 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-dark-hero",
+      "signature-dark-card"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 320,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "bg-void-gradient",
+    "name": "The Void",
+    "category": "background",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "dark",
+      "void",
+      "subtle",
+      "gradient",
+      "immersive"
+    ],
+    "stylePrompt": "高级设计指令: The Void\n定位: The Void 是一款 dark / minimal 背景素材，适合 dark、void、subtle、gradient 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: The Void — 深渊背景。不是纯黑——是从 #09090b 到 #0c0a14 的极其微妙的径向渐变，中心略带一丝深紫(#0f0a1a)。这种'几乎看不出的'色彩暗示创造了无限深度感。适合承载任何前景内容。不加任何噪点/纹理——纯粹的深色呼吸。",
+    "css": ".bg-void {\n  min-height: 100vh;\n  background: radial-gradient(ellipse at 50% 30%, #0f0a1a 0%, #09090b 70%);\n}",
+    "description": "The Void 是一款 dark / minimal 背景素材，适合 dark、void、subtle、gradient 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 0,
+    "html": "<section class=\"bg-void\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(210,219,222,0.16);border-radius:14px;background:rgba(239,242,241,0.055);color:#eff2f1;box-shadow:0 24px 70px rgba(0,0,0,0.34);\">\n    <div style=\"color:#aebdc5;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">The Void</h2>\n    <p style=\"margin:0;color:#8c989a;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "card-metric-dark",
+    "name": "Metric Tile",
+    "category": "card",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "metric",
+      "number",
+      "dashboard",
+      "dark",
+      "data"
+    ],
+    "stylePrompt": "高级设计指令: Metric Tile\n定位: Metric Tile 是一款 dark / minimal 卡片素材，适合 metric、number、dashboard、dark 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Metric Tile — 数据指标瓦片。灵感: Vercel/Linear dashboard。深色容器(#111113) + 极细边框(0.5px #27272a)。内容: 标签(12px Inter 500 #71717a) + 大数字(32px Inter 700 #fafafa tabular-nums) + 变化指示(12px 绿/红 带↑↓箭头)。紧凑 padding: 20px 24px。圆角 12px。无任何图表/图形——纯数字的力量。",
+    "css": ".card-metric {\n  padding: 20px 24px;\n  border-radius: 12px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  width: 220px;\n}\n.card-metric .label {\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  font-weight: 500;\n  color: #71717a;\n  margin-bottom: 8px;\n}\n.card-metric .value {\n  font-family: 'Inter', system-ui;\n  font-size: 32px;\n  font-weight: 700;\n  color: #fafafa;\n  font-variant-numeric: tabular-nums;\n  letter-spacing: -0.5px;\n  margin-bottom: 6px;\n}\n.card-metric .change {\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  font-weight: 500;\n}\n.card-metric .change.up { color: #22c55e; }\n.card-metric .change.down { color: #ef4444; }",
+    "html": "<div class=\"card-metric\">\n  <div class=\"label\">Monthly Revenue</div>\n  <div class=\"value\">$48.2K</div>\n  <div class=\"change up\">↑ 12.3% from last month</div>\n</div>",
+    "description": "Metric Tile 是一款 dark / minimal 卡片素材，适合 metric、number、dashboard、dark 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "hero-codex-void",
+    "name": "Codex Void",
+    "category": "hero",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "void",
+      "centered",
+      "massive-type",
+      "dark",
+      "statement"
+    ],
+    "stylePrompt": "高级设计指令: Codex Void\n定位: Codex Void 是一款 dark / minimal 首屏素材，适合 void、centered、massive-type、dark 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Codex Void — 暗夜宣言 Hero。极度克制: 纯深黑底(#030712)上，只有一行超大字(clamp 56-120px)居中，字体 Inter 900 letter-spacing:-0.04em。字色不是纯白——是 #e4e4e7(微灰，减少刺眼)。下方一行小字(15px #71717a)。无按钮、无装饰、无动画——纯粹靠字体重量和留白的压迫感。气质: Linear 首页、Vercel。",
+    "css": ".hero-codex-void {\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  background: #030712;\n  padding: 40px 24px;\n  text-align: center;\n}\n.hero-codex-void h1 {\n  font-family: 'Inter', system-ui;\n  font-size: clamp(56px, 12vw, 120px);\n  font-weight: 900;\n  color: #e4e4e7;\n  letter-spacing: -0.04em;\n  line-height: 1;\n  margin: 0 0 24px;\n}\n.hero-codex-void p {\n  font-family: 'Inter', system-ui;\n  font-size: 15px;\n  color: #71717a;\n  margin: 0;\n  max-width: 420px;\n  line-height: 1.6;\n}",
+    "html": "<section class=\"hero-codex-void\">\n  <h1>Ship faster.</h1>\n  <p>The platform for modern engineering teams who refuse to compromise.</p>\n</section>",
+    "description": "Codex Void 是一款 dark / minimal 首屏素材，适合 void、centered、massive-type、dark 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "landing-hero",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 2
+  },
+  {
+    "id": "form-input-underline",
+    "name": "Underline Input",
+    "category": "form",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "input",
+      "underline",
+      "minimal",
+      "focus",
+      "clean",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Underline Input\n定位: Underline Input 是一款 dark / minimal 表单素材，适合 input、underline、minimal、focus 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Underline Input — 底线输入框。无框无背景——只有底部1px线(#27272a)。focus时底线变色(#60a5fa) + 从中间向两侧展开动画(transform:scaleX 0→1)。label 在上方(12px #71717a)。值文字 15px #fafafa Inter 400。气质: Material Design 的精简版、更克制。",
+    "css": ".form-underline {\n  position: relative;\n  padding-top: 18px;\n}\n.form-underline label {\n  position: absolute;\n  top: 0;\n  left: 0;\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  font-weight: 500;\n  color: #71717a;\n}\n.form-underline input {\n  width: 100%;\n  padding: 8px 0;\n  font-family: 'Inter', system-ui;\n  font-size: 15px;\n  color: #fafafa;\n  background: none;\n  border: none;\n  border-bottom: 1px solid #27272a;\n  outline: none;\n  transition: border-color 0.2s;\n}\n.form-underline input:focus { border-color: #60a5fa; }\n.form-underline .focus-line {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 1.5px;\n  background: #60a5fa;\n  transform: scaleX(0);\n  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\n}\n.form-underline input:focus ~ .focus-line { transform: scaleX(1); }",
+    "html": "<div class=\"form-underline\">\n  <label>Email address</label>\n  <input type=\"email\" placeholder=\"you@company.com\" />\n  <div class=\"focus-line\"></div>\n</div>",
+    "description": "Underline Input 是一款 dark / minimal 表单素材，适合 input、underline、minimal、focus 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "modal-dialog-clean",
+    "name": "Clean Dialog",
+    "category": "modal",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "dialog",
+      "clean",
+      "confirmation",
+      "minimal",
+      "refined",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Clean Dialog\n定位: Clean Dialog 是一款 dark / minimal 弹窗素材，适合 dialog、clean、confirmation、minimal 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Clean Dialog — 干净对话框。灵感: shadcn/ui AlertDialog。深色(#111113) + 极细边框(0.5px #27272a) + 无 blur(不是玻璃——是实色面板)。标题 Inter 600 16px #fafafa。描述 14px #a1a1aa。底部按钮行: 左 ghost button(透明+hover背景), 右 primary button(白底黑字——Vercel 风格反色按钮)。圆角 12px。overlay: rgba(0,0,0,0.6)。",
+    "css": ".modal-clean-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.6);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 9999;\n}\n.modal-clean {\n  width: min(90%, 420px);\n  border-radius: 12px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  padding: 24px;\n  color: #fafafa;\n}\n.modal-clean h3 {\n  font-family: 'Inter', system-ui;\n  font-size: 16px;\n  font-weight: 600;\n  margin: 0 0 8px;\n}\n.modal-clean p {\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  color: #a1a1aa;\n  line-height: 1.6;\n  margin: 0 0 20px;\n}\n.modal-clean .actions { display: flex; justify-content: flex-end; gap: 8px; }\n.modal-clean .btn-ghost {\n  padding: 9px 16px;\n  border-radius: 8px;\n  background: transparent;\n  border: 0.5px solid #27272a;\n  color: #e4e4e7;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: background 0.15s;\n}\n.modal-clean .btn-ghost:hover { background: rgba(255,255,255,0.04); }\n.modal-clean .btn-primary {\n  padding: 9px 16px;\n  border-radius: 8px;\n  background: #fafafa;\n  color: #09090b;\n  border: none;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: opacity 0.15s;\n}\n.modal-clean .btn-primary:hover { opacity: 0.9; }",
+    "html": "<div class=\"modal-clean-overlay\">\n  <div class=\"modal-clean\">\n    <h3>Delete project?</h3>\n    <p>This action is permanent and cannot be undone. All associated data will be removed.</p>\n    <div class=\"actions\">\n      <button class=\"btn-ghost\">Cancel</button>\n      <button class=\"btn-primary\">Delete</button>\n    </div>\n  </div>\n</div>",
+    "description": "Clean Dialog 是一款 dark / minimal 弹窗素材，适合 dialog、clean、confirmation、minimal 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "footer-micro",
+    "name": "Micro Footer",
+    "category": "footer",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "minimal",
+      "micro",
+      "compact",
+      "single-line",
+      "subtle",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Micro Footer\n定位: Micro Footer 是一款 dark / minimal 页脚素材，适合 minimal、micro、compact、single-line 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Micro Footer — 微型页脚。一行: 左侧 © 2026 + 右侧 2-3个链接。字体 Inter 12px #52525b。上方 0.5px border #27272a。总高度 < 48px。没有多余——就是法律要求的那几个字。气质: Vercel footer、Linear footer。",
+    "css": ".footer-micro {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 24px;\n  border-top: 0.5px solid #27272a;\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  color: #52525b;\n}\n.footer-micro .links { display: flex; gap: 16px; }\n.footer-micro a { color: #52525b; text-decoration: none; transition: color 0.15s; }\n.footer-micro a:hover { color: #a1a1aa; }",
+    "html": "<footer class=\"footer-micro\">\n  <span>© 2026 Acme Inc</span>\n  <div class=\"links\"><a href=\"#\">Privacy</a><a href=\"#\">Terms</a></div>\n</footer>",
+    "description": "Micro Footer 是一款 dark / minimal 页脚素材，适合 minimal、micro、compact、single-line 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "table-linear-style",
+    "name": "Linear-style Table",
+    "category": "table",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "linear",
+      "clean",
+      "dark",
+      "hover",
+      "modern"
+    ],
+    "stylePrompt": "高级设计指令: Linear-style Table\n定位: Linear-style Table 是一款 dark / minimal 表格素材，适合 linear、clean、dark、hover 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Linear-style Table — Linear/Vercel风格表格。深色底(#09090b), 极细行分隔(0.5px #1a1a1a), 表头不加粗而是用小字(11px)+全大写+宽字距区分。行 hover 背景 rgba白0.02。数据字体 13px Inter 400 #d4d4d8。紧凑 padding 10px 16px。气质: 开发者工具、IDE。",
+    "css": ".table-linear {\n  width: 100%;\n  border-collapse: collapse;\n  font-family: 'Inter', system-ui;\n}\n.table-linear th {\n  padding: 10px 16px;\n  text-align: left;\n  font-size: 11px;\n  font-weight: 500;\n  letter-spacing: 0.05em;\n  text-transform: uppercase;\n  color: #52525b;\n  border-bottom: 0.5px solid #1a1a1a;\n}\n.table-linear td {\n  padding: 10px 16px;\n  font-size: 13px;\n  color: #d4d4d8;\n  border-bottom: 0.5px solid #1a1a1a;\n}\n.table-linear tr:hover td { background: rgba(255,255,255,0.02); }\n.table-linear tr:last-child td { border-bottom: none; }",
+    "html": "<table class=\"table-linear\" style=\"background:#09090b\">\n  <thead><tr><th>Identifier</th><th>Status</th><th>Updated</th></tr></thead>\n  <tbody>\n    <tr><td style=\"color:#fafafa;font-weight:500\">LIN-2847</td><td><span style=\"color:#22c55e\">• </span>Active</td><td style=\"color:#71717a\">2m ago</td></tr>\n    <tr><td style=\"color:#fafafa;font-weight:500\">LIN-2846</td><td><span style=\"color:#71717a\">• </span>Closed</td><td style=\"color:#71717a\">1h ago</td></tr>\n  </tbody>\n</table>",
+    "description": "Linear-style Table 是一款 dark / minimal 表格素材，适合 linear、clean、dark、hover 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "badge-status-minimal",
+    "name": "Status Dot Badge",
+    "category": "badge",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "status",
+      "dot",
+      "semantic",
+      "compact",
+      "indicator",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Status Dot Badge\n定位: Status Dot Badge 是一款 dark / minimal 徽章素材，适合 status、dot、semantic、compact 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Status Dot Badge — 状态点徽章。灵感: Linear issue status。极小: 圆点(6px) + 文字(12px Inter 500)。不用背景色容器——纯裸文字+点。语义色: 绿=#22c55e/黄=#eab308/红=#ef4444/灰=#52525b。间距 gap:6px。气质: 信息密度最高的数据 UI。",
+    "css": ".badge-dot {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  font-weight: 500;\n  color: #a1a1aa;\n}\n.badge-dot .dot {\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n  flex-shrink: 0;\n}\n.badge-dot.active .dot { background: #22c55e; }\n.badge-dot.active { color: #22c55e; }\n.badge-dot.warning .dot { background: #eab308; }\n.badge-dot.warning { color: #eab308; }\n.badge-dot.error .dot { background: #ef4444; }\n.badge-dot.error { color: #ef4444; }\n.badge-dot.neutral .dot { background: #52525b; }",
+    "html": "<span class=\"badge-dot active\"><span class=\"dot\"></span>Active</span>\n<span class=\"badge-dot warning\"><span class=\"dot\"></span>In Review</span>\n<span class=\"badge-dot error\"><span class=\"dot\"></span>Failed</span>\n<span class=\"badge-dot neutral\"><span class=\"dot\"></span>Archived</span>",
+    "description": "Status Dot Badge 是一款 dark / minimal 徽章素材，适合 status、dot、semantic、compact 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "anim-entrance-blur",
+    "name": "Blur to Focus Entrance",
+    "category": "animation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "entrance",
+      "blur",
+      "focus",
+      "clean",
+      "subtle",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Blur to Focus Entrance\n定位: Blur to Focus Entrance 是一款 dark / minimal 动画素材，适合 entrance、blur、focus、clean 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Blur to Focus Entrance — 失焦到对焦入场。元素从 filter:blur(8px) + opacity:0 + scale(0.98) 过渡到完全清晰。duration 0.5s。不是 translateY 位移入场(太常见)——是纯粹的焦点变化，像相机对焦。cubic-bezier(0.16, 1, 0.3, 1)。气质: macOS窗口出现。",
+    "css": ".anim-focus-in {\n  animation: focus-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n@keyframes focus-in {\n  from {\n    opacity: 0;\n    filter: blur(8px);\n    transform: scale(0.98);\n  }\n  to {\n    opacity: 1;\n    filter: blur(0);\n    transform: scale(1);\n  }\n}",
+    "description": "Blur to Focus Entrance 是一款 dark / minimal 动画素材，适合 entrance、blur、focus、clean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 8,
+    "html": "<article class=\"anim-focus-in\" style=\"width:min(100%,420px);padding:24px;border:1px solid rgba(210,219,222,0.16);border-radius:14px;background:#111719;color:#eff2f1;box-shadow:0 24px 70px rgba(0,0,0,0.34);\">\n  <div style=\"color:#aebdc5;font-size:12px;font-weight:700;text-transform:uppercase;\">Motion Case</div>\n  <h3 style=\"margin:10px 0 8px;font-size:24px;line-height:1.15;\">Blur to Focus Entrance</h3>\n  <p style=\"margin:0;color:#8c989a;font-size:14px;line-height:1.7;\">Used as a product-state transition with a clear message and stable layout.</p>\n</article>"
+  },
+  {
+    "id": "nav-vertical-icon-rail",
+    "name": "Icon Rail",
+    "category": "navigation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "rail",
+      "vertical",
+      "icons",
+      "collapsed",
+      "ide",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Icon Rail\n定位: Icon Rail 是一款 dark / minimal 导航素材，适合 rail、vertical、icons、collapsed 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Icon Rail — 极窄图标轨道。灵感: VS Code activity bar / Linear sidebar。宽度 48px, 全高, 纯图标(20px)垂直排列, active项左侧有2px高亮条(#fafafa)。底色 #09090b, 图标默认 #52525b hover→#a1a1aa active→#fafafa。无文字、无tooltip——纯图标认知。",
+    "css": ".nav-icon-rail {\n  width: 48px;\n  height: 100vh;\n  background: #09090b;\n  border-right: 0.5px solid #1a1a1a;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 12px 0;\n  gap: 4px;\n}\n.nav-icon-rail .item {\n  width: 36px;\n  height: 36px;\n  border-radius: 8px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 18px;\n  color: #52525b;\n  cursor: pointer;\n  position: relative;\n  transition: all 0.15s;\n}\n.nav-icon-rail .item:hover { color: #a1a1aa; background: rgba(255,255,255,0.03); }\n.nav-icon-rail .item.active { color: #fafafa; }\n.nav-icon-rail .item.active::before {\n  content: '';\n  position: absolute;\n  left: -6px;\n  top: 25%;\n  bottom: 25%;\n  width: 2px;\n  border-radius: 1px;\n  background: #fafafa;\n}",
+    "html": "<nav class=\"nav-icon-rail\">\n  <div class=\"item active\">▤</div>\n  <div class=\"item\">⌕</div>\n  <div class=\"item\">⌥</div>\n  <div class=\"item\">⊘</div>\n  <div class=\"item\">▣</div>\n</nav>",
+    "description": "Icon Rail 是一款 dark / minimal 导航素材，适合 rail、vertical、icons、collapsed 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  },
+  {
+    "id": "nav-breadcrumb-slash",
+    "name": "Slash Breadcrumb",
+    "category": "navigation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "breadcrumb",
+      "slash",
+      "path",
+      "hierarchy",
+      "developer",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Slash Breadcrumb\n定位: Slash Breadcrumb 是一款 dark / minimal 导航素材，适合 breadcrumb、slash、path、hierarchy 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Slash Breadcrumb — 斜杠路径导航。灵感: Vercel dashboard breadcrumb。各层级用 / 分隔(斜杠是 #3f3f46 色, 比文字更淡)。当前项 #fafafa font-weight:500, 历史项 #71717a hover→#a1a1aa。字体 Inter 13px。无装饰——纯路径。",
+    "css": ".nav-breadcrumb-slash {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n}\n.nav-breadcrumb-slash a {\n  color: #71717a;\n  text-decoration: none;\n  transition: color 0.15s;\n}\n.nav-breadcrumb-slash a:hover { color: #a1a1aa; }\n.nav-breadcrumb-slash .sep { color: #3f3f46; }\n.nav-breadcrumb-slash .current { color: #fafafa; font-weight: 500; }",
+    "html": "<nav class=\"nav-breadcrumb-slash\">\n  <a href=\"#\">workspace</a><span class=\"sep\">/</span>\n  <a href=\"#\">projects</a><span class=\"sep\">/</span>\n  <span class=\"current\">design-system</span>\n</nav>",
+    "description": "Slash Breadcrumb 是一款 dark / minimal 导航素材，适合 breadcrumb、slash、path、hierarchy 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 10
+  },
+  {
+    "id": "form-select-dropdown",
+    "name": "Dropdown Select",
+    "category": "form",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "select",
+      "dropdown",
+      "dark",
+      "clean",
+      "chevron"
+    ],
+    "stylePrompt": "高级设计指令: Dropdown Select\n定位: Dropdown Select 是一款 dark / minimal 表单素材，适合 select、dropdown、dark、clean 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Dropdown Select — 干净下拉选择。灵感: shadcn Select。触发器: #111113底 + 0.5px border #27272a + 圆角8px + 右侧小V字(chevron)。文字 Inter 13px #d4d4d8。hover border→#3f3f46。下拉面板: 同色系 absolute + 轻微 shadow, 选项 hover 背景 rgba白0.04。",
+    "css": ".form-select-trigger {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 9px 12px;\n  border-radius: 8px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  color: #d4d4d8;\n  cursor: pointer;\n  min-width: 180px;\n  transition: border-color 0.15s;\n}\n.form-select-trigger:hover { border-color: #3f3f46; }\n.form-select-trigger .chevron { color: #52525b; font-size: 12px; }\n.form-select-panel {\n  margin-top: 4px;\n  border-radius: 8px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  padding: 4px;\n  box-shadow: 0 8px 24px rgba(0,0,0,0.3);\n}\n.form-select-panel .option {\n  padding: 8px 10px;\n  border-radius: 5px;\n  font-family: 'Inter', system-ui;\n  font-size: 13px;\n  color: #d4d4d8;\n  cursor: pointer;\n  transition: background 0.1s;\n}\n.form-select-panel .option:hover { background: rgba(255,255,255,0.04); color: #fafafa; }",
+    "html": "<div style=\"width:200px\">\n  <div class=\"form-select-trigger\"><span>Select option</span><span class=\"chevron\">▾</span></div>\n  <div class=\"form-select-panel\">\n    <div class=\"option\">Overview</div>\n    <div class=\"option\">Analytics</div>\n    <div class=\"option\">Reports</div>\n  </div>\n</div>",
+    "description": "Dropdown Select 是一款 dark / minimal 表单素材，适合 select、dropdown、dark、clean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 11
+  },
+  {
+    "id": "layout-dashboard-bento",
+    "name": "Dashboard Bento",
+    "category": "layout",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "dashboard",
+      "bento",
+      "grid",
+      "metrics",
+      "app",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Dashboard Bento\n定位: Dashboard Bento 是一款 dark / minimal 布局素材，适合 dashboard、bento、grid、metrics 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Dashboard Bento — 仪表盘 Bento 布局。灵感: Linear/Vercel dashboard。不等分 grid(repeat auto, minmax(260px,1fr))。每个 cell 是 #111113 + 0.5px border #1a1a1a + 圆角 12px + padding 20px。cell 之间 gap 1px(而非16px——利用border色模拟极细分隔)。整体背景 #09090b。气质: 数据密度高但不压迫。",
+    "css": ".layout-dash-bento {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 1px;\n  background: #1a1a1a;\n  border-radius: 12px;\n  overflow: hidden;\n  border: 0.5px solid #1a1a1a;\n}\n.layout-dash-bento .cell {\n  background: #09090b;\n  padding: 20px;\n  min-height: 120px;\n}\n.layout-dash-bento .cell.wide { grid-column: span 2; }\n.layout-dash-bento .cell.tall { grid-row: span 2; }",
+    "html": "<div class=\"layout-dash-bento\">\n  <div class=\"cell wide\">Wide metric</div>\n  <div class=\"cell\">Cell</div>\n  <div class=\"cell tall\">Tall chart</div>\n  <div class=\"cell\">Cell</div>\n  <div class=\"cell\">Cell</div>\n</div>",
+    "description": "Dashboard Bento 是一款 dark / minimal 布局素材，适合 dashboard、bento、grid、metrics 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 12
+  },
+  {
+    "id": "layout-sidebar-content",
+    "name": "Sidebar + Content",
+    "category": "layout",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "sidebar",
+      "content",
+      "app",
+      "dashboard",
+      "standard",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Sidebar + Content\n定位: Sidebar + Content 是一款 dark / minimal 布局素材，适合 sidebar、content、app、dashboard 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Sidebar + Content — 标准应用布局。灵感: 每个现代SaaS(Linear/Notion/Slack)。左侧固定 sidebar 240px(#09090b + right border 0.5px #1a1a1a), 右侧 content 区域(#09090b, padding 32px)。sidebar 有 logo 区(56px高) + nav items。气质: 标准但精致——细节在于 border 颜色、padding比例、字体层级。",
+    "css": ".layout-sidebar-app {\n  display: grid;\n  grid-template-columns: 240px 1fr;\n  height: 100vh;\n  background: #09090b;\n  color: #fafafa;\n}\n.layout-sidebar-app .sidebar {\n  border-right: 0.5px solid #1a1a1a;\n  display: flex;\n  flex-direction: column;\n}\n.layout-sidebar-app .sidebar .logo {\n  height: 56px;\n  display: flex;\n  align-items: center;\n  padding: 0 16px;\n  font-size: 14px;\n  font-weight: 600;\n  font-family: 'Inter', system-ui;\n  border-bottom: 0.5px solid #1a1a1a;\n}\n.layout-sidebar-app .sidebar nav { padding: 12px 8px; flex: 1; }\n.layout-sidebar-app .sidebar nav a {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 8px 12px;\n  border-radius: 6px;\n  font-size: 13px;\n  color: #71717a;\n  text-decoration: none;\n  transition: all 0.1s;\n}\n.layout-sidebar-app .sidebar nav a:hover { color: #a1a1aa; background: rgba(255,255,255,0.02); }\n.layout-sidebar-app .sidebar nav a.active { color: #fafafa; background: rgba(255,255,255,0.04); }\n.layout-sidebar-app .content { padding: 32px; overflow-y: auto; }",
+    "html": "<div class=\"layout-sidebar-app\">\n  <aside class=\"sidebar\">\n    <div class=\"logo\">Acme</div>\n    <nav>\n      <a href=\"#\" class=\"active\">◈ Overview</a>\n      <a href=\"#\">□ Issues</a>\n      <a href=\"#\">↻ Cycles</a>\n      <a href=\"#\">○ Settings</a>\n    </nav>\n  </aside>\n  <main class=\"content\">\n    <h1 style=\"font-size:22px;font-weight:600;margin:0\">Dashboard</h1>\n  </main>\n</div>",
+    "description": "Sidebar + Content 是一款 dark / minimal 布局素材，适合 sidebar、content、app、dashboard 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 340,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 13
+  },
+  {
+    "id": "modal-toast-stack",
+    "name": "Toast Stack",
+    "category": "modal",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "toast",
+      "notification",
+      "stack",
+      "bottom-right",
+      "feedback",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Toast Stack\n定位: Toast Stack 是一款 dark / minimal 弹窗素材，适合 toast、notification、stack、bottom-right 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Toast Stack — 消息堆栈。灵感: Sonner/shadcn toast。右下角堆叠通知: 每条是独立面板(#111113 + 0.5px border + 圆角10px)。最新在底部(column-reverse)。入场动画: slideIn from right + 轻微scale。消息体: 14px #fafafa + 描述 13px #71717a。成功=左侧绿条, 错误=红条。",
+    "css": ".modal-toast-stack {\n  position: fixed;\n  bottom: 16px;\n  right: 16px;\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n  z-index: 9999;\n  width: 340px;\n}\n.modal-toast-item {\n  padding: 14px 16px;\n  border-radius: 10px;\n  background: #111113;\n  border: 0.5px solid #27272a;\n  box-shadow: 0 4px 16px rgba(0,0,0,0.3);\n  animation: toast-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);\n  position: relative;\n  overflow: hidden;\n}\n.modal-toast-item::before {\n  content: '';\n  position: absolute;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  width: 3px;\n}\n.modal-toast-item.success::before { background: #22c55e; }\n.modal-toast-item.error::before { background: #ef4444; }\n.modal-toast-item .title { font-family: 'Inter', system-ui; font-size: 14px; font-weight: 500; color: #fafafa; margin-bottom: 2px; }\n.modal-toast-item .desc { font-family: 'Inter', system-ui; font-size: 13px; color: #71717a; }\n@keyframes toast-enter {\n  from { opacity: 0; transform: translateX(16px) scale(0.96); }\n  to { opacity: 1; transform: translateX(0) scale(1); }\n}",
+    "html": "<div class=\"modal-toast-stack\">\n  <div class=\"modal-toast-item success\"><div class=\"title\">Changes saved</div><div class=\"desc\">Your project has been updated.</div></div>\n  <div class=\"modal-toast-item error\"><div class=\"title\">Deploy failed</div><div class=\"desc\">Build exited with code 1.</div></div>\n</div>",
+    "description": "Toast Stack 是一款 dark / minimal 弹窗素材，适合 toast、notification、stack、bottom-right 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 14
+  },
+  {
+    "id": "footer-stripe-style",
+    "name": "Stripe Footer",
+    "category": "footer",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "stripe",
+      "columns",
+      "links",
+      "clean",
+      "professional",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Stripe Footer\n定位: Stripe Footer 是一款 dark / minimal 页脚素材，适合 stripe、columns、links、clean 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Stripe Footer — 灵感直接来自 stripe.com。深色底(#09090b), 5列链接网格(标题 11px uppercase #52525b, 链接 13px #71717a hover→#a1a1aa)。最左列是 logo + 一行描述。底部: 细线分隔 + 一行版权+语言选择。气质: 世界级 SaaS 标杆。",
+    "css": ".footer-stripe {\n  background: #09090b;\n  color: #fafafa;\n  padding: 64px 48px 32px;\n  font-family: 'Inter', system-ui;\n}\n.footer-stripe .grid {\n  display: grid;\n  grid-template-columns: 1.5fr repeat(4, 1fr);\n  gap: 40px;\n  margin-bottom: 48px;\n}\n.footer-stripe .brand-col .logo { font-size: 16px; font-weight: 700; margin-bottom: 8px; }\n.footer-stripe .brand-col .desc { font-size: 13px; color: #52525b; line-height: 1.5; }\n.footer-stripe .link-col h5 {\n  font-size: 11px;\n  font-weight: 600;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  color: #52525b;\n  margin: 0 0 14px;\n}\n.footer-stripe .link-col a {\n  display: block;\n  font-size: 13px;\n  color: #71717a;\n  text-decoration: none;\n  margin-bottom: 10px;\n  transition: color 0.15s;\n}\n.footer-stripe .link-col a:hover { color: #a1a1aa; }\n.footer-stripe .bottom {\n  border-top: 0.5px solid #1a1a1a;\n  padding-top: 20px;\n  font-size: 12px;\n  color: #3f3f46;\n}",
+    "html": "<footer class=\"footer-stripe\">\n  <div class=\"grid\">\n    <div class=\"brand-col\"><div class=\"logo\">Acme</div><p class=\"desc\">Financial infrastructure for the internet.</p></div>\n    <div class=\"link-col\"><h5>Products</h5><a href=\"#\">Payments</a><a href=\"#\">Billing</a><a href=\"#\">Connect</a></div>\n    <div class=\"link-col\"><h5>Developers</h5><a href=\"#\">Documentation</a><a href=\"#\">API Reference</a></div>\n    <div class=\"link-col\"><h5>Company</h5><a href=\"#\">About</a><a href=\"#\">Careers</a></div>\n    <div class=\"link-col\"><h5>Legal</h5><a href=\"#\">Privacy</a><a href=\"#\">Terms</a></div>\n  </div>\n  <div class=\"bottom\">© 2026 Acme, Inc.</div>\n</footer>",
+    "description": "Stripe Footer 是一款 dark / minimal 页脚素材，适合 stripe、columns、links、clean 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 15
+  },
+  {
+    "id": "table-issue-tracker",
+    "name": "Issue Tracker Table",
+    "category": "table",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "issue",
+      "tracker",
+      "status",
+      "priority",
+      "linear",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Issue Tracker Table\n定位: Issue Tracker Table 是一款 dark / minimal 表格素材，适合 issue、tracker、status、priority 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Issue Tracker Table — 问题追踪表。灵感: Linear issues list。每行: 状态图标(圆圈/勾/半圆) + 标题(14px 500 #fafafa) + 标签(pill badge) + 优先级(图标) + assignee(小头像)。极窄行高(40px)。hover 整行 rgba白0.02。无显式 border——靠 hover 态区分行。",
+    "css": ".table-issues {\n  width: 100%;\n  font-family: 'Inter', system-ui;\n}\n.table-issues .row {\n  display: grid;\n  grid-template-columns: 24px 1fr auto auto auto;\n  align-items: center;\n  gap: 12px;\n  padding: 0 16px;\n  height: 40px;\n  border-radius: 6px;\n  transition: background 0.1s;\n  cursor: pointer;\n}\n.table-issues .row:hover { background: rgba(255,255,255,0.02); }\n.table-issues .status { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #52525b; }\n.table-issues .status.done { background: #22c55e; border-color: #22c55e; }\n.table-issues .status.progress { border-color: #eab308; border-right-color: transparent; }\n.table-issues .title { font-size: 14px; font-weight: 500; color: #e4e4e7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.table-issues .label {\n  padding: 2px 8px;\n  border-radius: 50px;\n  font-size: 11px;\n  font-weight: 500;\n  background: rgba(96,165,250,0.1);\n  color: #60a5fa;\n}\n.table-issues .priority { font-size: 14px; color: #52525b; }\n.table-issues .avatar { width: 20px; height: 20px; border-radius: 50%; background: #27272a; }",
+    "html": "<div class=\"table-issues\" style=\"background:#09090b;padding:8px 0;border-radius:8px\">\n  <div class=\"row\"><div class=\"status progress\"></div><span class=\"title\">Implement dark mode toggle</span><span class=\"label\">feature</span><span class=\"priority\">🔥</span><div class=\"avatar\"></div></div>\n  <div class=\"row\"><div class=\"status done\"></div><span class=\"title\">Fix memory leak in worker pool</span><span class=\"label\">bug</span><span class=\"priority\">⚡</span><div class=\"avatar\"></div></div>\n  <div class=\"row\"><div class=\"status\"></div><span class=\"title\">Update onboarding flow</span><span class=\"label\">feature</span><span class=\"priority\">—</span><div class=\"avatar\"></div></div>\n</div>",
+    "description": "Issue Tracker Table 是一款 dark / minimal 表格素材，适合 issue、tracker、status、priority 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "composition",
+      "density": "balanced"
+    },
+    "sourceOrder": 16
+  },
+  {
+    "id": "badge-kbd-shortcut",
+    "name": "Keyboard Shortcut",
+    "category": "badge",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "keyboard",
+      "shortcut",
+      "key",
+      "badge",
+      "developer",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Keyboard Shortcut\n定位: Keyboard Shortcut 是一款 dark / minimal 徽章素材，适合 keyboard、shortcut、key、badge 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Keyboard Shortcut — 键盘快捷键 badge。灵感: macOS menu 快捷键 / VS Code keybinding。每个键一个 kbd 元素: #1a1a1a 底 + 0.5px border #27272a + border-bottom 1.5px(模拟按键厚度) + 圆角 4px。字体 11px system-ui。多个键用 + 连接(+ 号 #3f3f46 无框)。",
+    "css": ".badge-kbd {\n  display: inline-flex;\n  align-items: center;\n  gap: 3px;\n}\n.badge-kbd kbd {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 20px;\n  height: 20px;\n  padding: 0 5px;\n  border-radius: 4px;\n  background: #1a1a1a;\n  border: 0.5px solid #27272a;\n  border-bottom-width: 1.5px;\n  font-family: system-ui, -apple-system;\n  font-size: 11px;\n  color: #a1a1aa;\n}\n.badge-kbd .plus { color: #3f3f46; font-size: 10px; margin: 0 1px; }",
+    "html": "<span class=\"badge-kbd\"><kbd>⌘</kbd><span class=\"plus\">+</span><kbd>K</kbd></span>",
+    "description": "Keyboard Shortcut 是一款 dark / minimal 徽章素材，适合 keyboard、shortcut、key、badge 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 17
+  },
+  {
+    "id": "badge-status-chip",
+    "name": "Status Chip",
+    "category": "badge",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "status",
+      "chip",
+      "semantic",
+      "compact",
+      "colored",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Status Chip\n定位: Status Chip 是一款 dark / minimal 徽章素材，适合 status、chip、semantic、compact 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Status Chip — 状态芯片。灵感: Linear/GitHub status labels。极其紧凑: padding 2px 8px, 圆角 50px, 11px font-weight:500。背景用语义色的极低opacity(0.08), 文字用语义色全饱和。不加圆点——颜色本身就是指示。",
+    "css": ".badge-chip {\n  display: inline-block;\n  padding: 2px 8px;\n  border-radius: 50px;\n  font-family: 'Inter', system-ui;\n  font-size: 11px;\n  font-weight: 500;\n}\n.badge-chip.green { background: rgba(34,197,94,0.08); color: #22c55e; }\n.badge-chip.yellow { background: rgba(234,179,8,0.08); color: #eab308; }\n.badge-chip.red { background: rgba(239,68,68,0.08); color: #ef4444; }\n.badge-chip.blue { background: rgba(96,165,250,0.08); color: #60a5fa; }\n.badge-chip.purple { background: rgba(168,85,247,0.08); color: #a855f7; }\n.badge-chip.gray { background: rgba(161,161,170,0.08); color: #71717a; }",
+    "html": "<span class=\"badge-chip green\">Active</span>\n<span class=\"badge-chip yellow\">In Progress</span>\n<span class=\"badge-chip red\">Critical</span>\n<span class=\"badge-chip blue\">Feature</span>\n<span class=\"badge-chip purple\">Design</span>\n<span class=\"badge-chip gray\">Backlog</span>",
+    "description": "Status Chip 是一款 dark / minimal 徽章素材，适合 status、chip、semantic、compact 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 89,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 18
+  },
+  {
+    "id": "anim-page-transition",
+    "name": "Page Transition",
+    "category": "animation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "page",
+      "transition",
+      "route",
+      "smooth",
+      "app",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Page Transition\n定位: Page Transition 是一款 dark / minimal 动画素材，适合 page、transition、route、smooth 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Page Transition — 页面过渡动画。灵感: Linear/Framer 的路由切换。新页面从 opacity:0 + translateY(8px) + scale(0.99) 滑入。旧页面同时 opacity→0 + translateY(-4px)。duration 0.3s, easing cubic-bezier(0.16, 1, 0.3, 1)。subtle到几乎感觉不到——但少了它就'cheap'。",
+    "css": ".anim-page-enter {\n  animation: page-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n.anim-page-exit {\n  animation: page-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;\n}\n@keyframes page-in {\n  from { opacity: 0; transform: translateY(8px) scale(0.99); }\n  to { opacity: 1; transform: translateY(0) scale(1); }\n}\n@keyframes page-out {\n  from { opacity: 1; transform: translateY(0); }\n  to { opacity: 0; transform: translateY(-4px); }\n}",
+    "description": "Page Transition 是一款 dark / minimal 动画素材，适合 page、transition、route、smooth 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 19,
+    "html": "<article class=\"anim-page-enter\" style=\"width:min(100%,420px);padding:24px;border:1px solid rgba(210,219,222,0.16);border-radius:14px;background:#111719;color:#eff2f1;box-shadow:0 24px 70px rgba(0,0,0,0.34);\">\n  <div style=\"color:#aebdc5;font-size:12px;font-weight:700;text-transform:uppercase;\">Motion Case</div>\n  <h3 style=\"margin:10px 0 8px;font-size:24px;line-height:1.15;\">Page Transition</h3>\n  <p style=\"margin:0;color:#8c989a;font-size:14px;line-height:1.7;\">Used as a product-state transition with a clear message and stable layout.</p>\n</article>"
+  },
+  {
+    "id": "anim-skeleton-pulse",
+    "name": "Skeleton Pulse",
+    "category": "animation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "skeleton",
+      "loading",
+      "pulse",
+      "placeholder",
+      "subtle",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Skeleton Pulse\n定位: Skeleton Pulse 是一款 dark / minimal 动画素材，适合 skeleton、loading、pulse、placeholder 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Skeleton Pulse — 骨架脉冲加载。灵感: shadcn Skeleton。不是闪烁横扫——是整体 opacity 脉冲(0.5→1→0.5)。底色 #1a1a1a, 圆角 6px。动画 1.5s ease-in-out infinite。比 shimmer 更克制、更高级。用户不会注意到它在动——只会感觉'还在加载中'。",
+    "css": ".anim-skeleton {\n  background: #1a1a1a;\n  border-radius: 6px;\n  animation: skeleton-pulse 1.5s ease-in-out infinite;\n}\n@keyframes skeleton-pulse {\n  0%, 100% { opacity: 1; }\n  50% { opacity: 0.5; }\n}",
+    "description": "Skeleton Pulse 是一款 dark / minimal 动画素材，适合 skeleton、loading、pulse、placeholder 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 20,
+    "html": "<article style=\"width:min(100%,380px);padding:22px;border:1px solid rgba(210,219,222,0.16);border-radius:14px;background:#111719;box-shadow:0 24px 70px rgba(0,0,0,0.34);\">\n  <div class=\"anim-skeleton\" style=\"width:46%;height:14px;margin-bottom:18px;\"></div>\n  <div class=\"anim-skeleton\" style=\"width:100%;height:72px;margin-bottom:14px;\"></div>\n  <div class=\"anim-skeleton\" style=\"width:72%;height:12px;margin-bottom:10px;\"></div>\n  <div class=\"anim-skeleton\" style=\"width:54%;height:12px;\"></div>\n</article>"
+  },
+  {
+    "id": "anim-number-tick",
+    "name": "Number Tick Up",
+    "category": "animation",
+    "themes": [
+      "dark",
+      "minimal"
+    ],
+    "tags": [
+      "number",
+      "counter",
+      "tick",
+      "metric",
+      "data",
+      "dark"
+    ],
+    "stylePrompt": "高级设计指令: Number Tick Up\n定位: Number Tick Up 是一款 dark / minimal 动画素材，适合 number、counter、tick、metric 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Nocturne Console / deep operational interface。使用 #aebdc5 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Number Tick Up — 数字滚动。灵感: Stripe dashboard 数字变化。用 @property + CSS counter 实现纯CSS数字从0滚到目标值。字体 Inter tabular-nums(等宽数字防抖动)。duration 2s ease-out。配合 Metric Tile 使用最佳。",
+    "css": "@property --num {\n  syntax: '<integer>';\n  initial-value: 0;\n  inherits: false;\n}\n.anim-number-tick {\n  animation: tick-up 2s ease-out forwards;\n  counter-reset: num var(--num);\n  font-family: 'Inter', system-ui;\n  font-variant-numeric: tabular-nums;\n}\n.anim-number-tick::after {\n  content: counter(num);\n}\n@keyframes tick-up {\n  to { --num: var(--target, 100); }\n}",
+    "html": "<span class=\"anim-number-tick\" style=\"--target:4820;font-size:32px;font-weight:700;color:#fafafa\"></span>",
+    "description": "Number Tick Up 是一款 dark / minimal 动画素材，适合 number、counter、tick、metric 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Nocturne Console 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "radial-gradient(circle at 50% 0%, rgba(174,189,197,0.16), transparent 34%), linear-gradient(145deg, #0b0f11 0%, #171c1f 100%)",
+      "minHeight": 280,
+      "surface": "dark"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 21
+  }
+]

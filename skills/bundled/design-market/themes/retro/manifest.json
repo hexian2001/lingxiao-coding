@@ -1,0 +1,28 @@
+{
+  "id": "retro",
+  "name": "Retro Memory Terminal",
+  "title": "复古终端记忆库 / 日志系统",
+  "description": "为长跑 Agent、运维审计和产品事件追踪设计的复古终端式记忆库网站：琥珀屏幕、磁带归档、可读日志流、明确状态和低噪声操作路径。",
+  "version": "1.0.0",
+  "category": "business-product",
+  "tags": [
+    "retro",
+    "terminal",
+    "memory-archive",
+    "log-system",
+    "ops",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#22172b",
+    "surfaceMuted": "#2f2038",
+    "ink": "#fff2d2",
+    "text": "#f7e2ad",
+    "muted": "#d8b983",
+    "accent": "#f2c673",
+    "accentWarm": "#ff8c6a",
+    "line": "rgba(242, 198, 115, 0.34)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

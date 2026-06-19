@@ -1,0 +1,613 @@
+[
+  {
+    "id": "signature-neumorphism-hero",
+    "name": "Soft Instrument 首屏",
+    "category": "hero",
+    "themes": [
+      "neumorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "hero",
+      "neumorphism",
+      "低对比仪器面板"
+    ],
+    "description": "Soft Instrument 的首屏素材，服务于低对比仪器面板，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Soft Instrument 首屏\n定位: 低对比仪器面板，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #e6ece8，主强调 #526f7b，辅助强调 #9b7c33。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 首屏必须把主题的业务世界讲清楚：一个可读主张、一个真实状态面板、两个明确动作。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-neumorphism-hero {\n  position: relative;\n  width: min(100%, 980px);\n  min-height: 440px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.82fr);\n  gap: 34px;\n  align-items: stretch;\n  padding: 42px;\n  overflow: hidden;\n  border: 1px solid rgba(255,255,255,0.72);\n  border-radius: 24px;\n  background: linear-gradient(145deg, #e6ece8, #dce5e0);\n  color: #243033;\n  box-shadow: 12px 12px 28px rgba(72,84,87,0.20), -12px -12px 28px rgba(255,255,255,0.84);\n  font-family: Inter, ui-sans-serif, system-ui, sans-serif;\n}\n.sig-neumorphism-hero::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(145deg, rgba(255,255,255,0.48), rgba(82,111,123,0.08)); background-size: auto; opacity: 0.78; pointer-events: none; }\n.sig-neumorphism-hero > * { position: relative; z-index: 1; }\n.sig-neumorphism-hero .copy { display: grid; align-content: center; gap: 18px; }\n.sig-neumorphism-hero .kicker { width: fit-content; border: 1px solid rgba(255,255,255,0.72); border-radius: 999px; padding: 6px 10px; color: #526f7b; background: #dce5e0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-neumorphism-hero h1 { margin: 0; max-width: 620px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(40px, 6.4vw, 70px); font-weight: 760; line-height: 0.98; letter-spacing: 0; }\n.sig-neumorphism-hero p { margin: 0; max-width: 560px; color: #6b777a; font-size: 15px; line-height: 1.78; }\n.sig-neumorphism-hero .actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }\n.sig-neumorphism-hero button { height: 40px; padding: 0 16px; border-radius: calc(24px / 2 + 4px); border: 1px solid rgba(255,255,255,0.72); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms; }\n.sig-neumorphism-hero .primary { background: #526f7b; color: #ffffff; border-color: #526f7b; }\n.sig-neumorphism-hero .secondary { background: transparent; color: #243033; }\n.sig-neumorphism-hero button:hover { transform: translateY(-1px); border-color: #526f7b; }\n.sig-neumorphism-hero .artifact { display: grid; align-content: space-between; gap: 18px; padding: 22px; border: 1px solid rgba(255,255,255,0.72); border-radius: calc(24px - 2px); background: #dce5e0; backdrop-filter: blur(18px) saturate(140%); }\n.sig-neumorphism-hero .artifact h2 { margin: 0; font-size: 13px; color: #526f7b; text-transform: uppercase; letter-spacing: 0; }\n.sig-neumorphism-hero .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.sig-neumorphism-hero .metric { padding: 14px; border: 1px solid rgba(255,255,255,0.72); border-radius: calc(24px - 4px); background: color-mix(in srgb, #e6ece8 76%, transparent); }\n.sig-neumorphism-hero .metric strong { display: block; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }\n.sig-neumorphism-hero .metric span { display: block; margin-top: 6px; color: #6b777a; font-size: 11px; }\n.sig-neumorphism-hero .rail { height: 9px; border-radius: 999px; background: linear-gradient(90deg, #526f7b, #9b7c33); }\n@media (max-width: 780px) { .sig-neumorphism-hero { grid-template-columns: 1fr; padding: 28px; } }",
+    "html": "<section class=\"sig-neumorphism-hero\">\n  <div class=\"copy\">\n    <div class=\"kicker\">低对比仪器面板</div>\n    <h1>Tune the system by touch.</h1>\n    <p>A tactile instrument surface for settings, thresholds, and gentle state changes.</p>\n    <div class=\"actions\"><button class=\"primary\">Balance</button><button class=\"secondary\">View system</button></div>\n  </div>\n  <aside class=\"artifact\">\n    <h2>Instrument / Live brief</h2>\n    <div class=\"metric-grid\">\n      <div class=\"metric\"><strong>0.42</strong><span>signal gain</span></div>\n      <div class=\"metric\"><strong>18db</strong><span>noise floor</span></div>\n    </div>\n    <div class=\"rail\"></div>\n  </aside>\n</section>",
+    "designNotes": "这不是换色模板；它使用 Soft Instrument 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "landing-hero",
+      "product-introduction",
+      "campaign-cover"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible",
+      "responsive-single-column"
+    ],
+    "pairsWith": [
+      "signature-neumorphism-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 420,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "rich"
+    }
+  },
+  {
+    "id": "signature-neumorphism-card",
+    "name": "Soft Instrument 洞察卡片",
+    "category": "card",
+    "themes": [
+      "neumorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "card",
+      "neumorphism",
+      "低对比仪器面板"
+    ],
+    "description": "Soft Instrument 的洞察卡片素材，服务于低对比仪器面板，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Soft Instrument 洞察卡片\n定位: 低对比仪器面板，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #e6ece8，主强调 #526f7b，辅助强调 #9b7c33。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 卡片必须有一个核心判断、一个状态胶囊、一组可读指标和解释文本。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-neumorphism-card { width: min(100%, 390px); padding: 22px; border: 1px solid rgba(255,255,255,0.72); border-radius: 24px; background: #e6ece8; color: #243033; box-shadow: 12px 12px 28px rgba(72,84,87,0.20), -12px -12px 28px rgba(255,255,255,0.84); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-neumorphism-card .top { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }\n.sig-neumorphism-card .label { color: #526f7b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }\n.sig-neumorphism-card .pill { border: 1px solid rgba(255,255,255,0.72); border-radius: 999px; padding: 5px 9px; color: #6b777a; background: #dce5e0; font-size: 11px; }\n.sig-neumorphism-card h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 32px; line-height: 1; letter-spacing: 0; }\n.sig-neumorphism-card p { margin: 0; color: #6b777a; font-size: 13px; line-height: 1.7; }\n.sig-neumorphism-card .strip { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.72); }\n.sig-neumorphism-card .strip strong { font-variant-numeric: tabular-nums; color: #243033; }\n.sig-neumorphism-card .signal { width: 38px; height: 38px; display: grid; place-items: center; border-radius: calc(24px - 4px); background: #526f7b; color: #ffffff; font-weight: 900; }",
+    "html": "<article class=\"sig-neumorphism-card\">\n  <div class=\"top\"><div><div class=\"label\">Instrument</div><h3>0.42</h3></div><span class=\"pill\">signal gain</span></div>\n  <p>A tactile instrument surface for settings, thresholds, and gentle state changes.</p>\n  <div class=\"strip\"><span>noise floor</span><strong>18db</strong><span>Status</span><span class=\"signal\">✓</span></div>\n</article>",
+    "designNotes": "这不是换色模板；它使用 Soft Instrument 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "dashboard-panel",
+      "status-summary",
+      "quality-metric"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-neumorphism-hero"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "balanced"
+    }
+  },
+  {
+    "id": "signature-neumorphism-nav",
+    "name": "Soft Instrument 导航",
+    "category": "navigation",
+    "themes": [
+      "neumorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "navigation",
+      "neumorphism",
+      "低对比仪器面板"
+    ],
+    "description": "Soft Instrument 的导航素材，服务于低对比仪器面板，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Soft Instrument 导航\n定位: 低对比仪器面板，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #e6ece8，主强调 #526f7b，辅助强调 #9b7c33。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 导航只放品牌、关键入口和一个主动作，active 状态必须清楚但克制。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-neumorphism-nav { width: min(100%, 900px); min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.72); border-radius: 24px; background: #e6ece8; color: #243033; box-shadow: 12px 12px 28px rgba(72,84,87,0.20), -12px -12px 28px rgba(255,255,255,0.84); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-neumorphism-nav .brand { display: flex; align-items: center; gap: 10px; min-width: max-content; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }\n.sig-neumorphism-nav .mark { width: 30px; height: 30px; border-radius: calc(24px - 4px); background: linear-gradient(135deg, #526f7b, #9b7c33); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.72); }\n.sig-neumorphism-nav .links { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; }\n.sig-neumorphism-nav a { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: calc(24px - 6px); color: #6b777a; text-decoration: none; font-size: 13px; transition: color 160ms, background 160ms; white-space: nowrap; }\n.sig-neumorphism-nav a:hover, .sig-neumorphism-nav a.active { color: #243033; background: #dce5e0; }\n.sig-neumorphism-nav button { height: 34px; padding: 0 13px; border-radius: calc(24px - 6px); border: 1px solid #526f7b; background: #526f7b; color: #ffffff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }\n@media (max-width: 720px) { .sig-neumorphism-nav { align-items: stretch; flex-direction: column; } }",
+    "html": "<nav class=\"sig-neumorphism-nav\">\n  <div class=\"brand\"><span class=\"mark\"></span>Instrument</div>\n  <div class=\"links\"><a href=\"#\" class=\"active\">Input</a><a href=\"#\">Tuning</a><a href=\"#\">Limits</a><a href=\"#\">Output</a></div>\n  <button>Balance</button>\n</nav>",
+    "designNotes": "这不是换色模板；它使用 Soft Instrument 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "workspace-nav",
+      "product-console",
+      "portfolio-header"
+    ],
+    "accessibility": [
+      "keyboard-visible",
+      "target-size-stable"
+    ],
+    "pairsWith": [
+      "signature-neumorphism-hero",
+      "signature-neumorphism-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-neumorphism-form",
+    "name": "Soft Instrument 表单",
+    "category": "form",
+    "themes": [
+      "neumorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "form",
+      "neumorphism",
+      "低对比仪器面板"
+    ],
+    "description": "Soft Instrument 的表单素材，服务于低对比仪器面板，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Soft Instrument 表单\n定位: 低对比仪器面板，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #e6ece8，主强调 #526f7b，辅助强调 #9b7c33。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表单必须有 label、辅助说明、真实输入值和 focus 状态；不能用 placeholder 冒充信息。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-neumorphism-form { width: min(100%, 440px); display: grid; gap: 15px; padding: 22px; border: 1px solid rgba(255,255,255,0.72); border-radius: 24px; background: #e6ece8; color: #243033; box-shadow: 12px 12px 28px rgba(72,84,87,0.20), -12px -12px 28px rgba(255,255,255,0.84); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-neumorphism-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 800; color: #243033; }\n.sig-neumorphism-form small { color: #6b777a; font-size: 12px; line-height: 1.55; font-weight: 400; }\n.sig-neumorphism-form .row { display: flex; gap: 10px; }\n.sig-neumorphism-form input { min-width: 0; flex: 1; height: 42px; border-radius: calc(24px - 6px); border: 1px solid rgba(255,255,255,0.72); background: #dce5e0; color: #243033; padding: 0 12px; font: inherit; outline: none; transition: border-color 160ms, box-shadow 160ms; }\n.sig-neumorphism-form input:focus { border-color: #526f7b; box-shadow: 0 0 0 3px color-mix(in srgb, #526f7b 18%, transparent); }\n.sig-neumorphism-form button { height: 42px; padding: 0 14px; border-radius: calc(24px - 6px); border: 1px solid #526f7b; background: #526f7b; color: #ffffff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }\n@media (max-width: 520px) { .sig-neumorphism-form .row { flex-direction: column; } }",
+    "html": "<form class=\"sig-neumorphism-form\">\n  <label>Threshold preset<small>Use named presets so operators understand the effect before applying.</small></label>\n  <div class=\"row\"><input value=\"quiet-release\" aria-label=\"Threshold preset\" /><button type=\"button\">Balance</button></div>\n</form>",
+    "designNotes": "这不是换色模板；它使用 Soft Instrument 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "settings-form",
+      "invite-flow",
+      "search-filter"
+    ],
+    "accessibility": [
+      "label-present",
+      "keyboard-visible",
+      "contrast-aa"
+    ],
+    "pairsWith": [
+      "signature-neumorphism-hero",
+      "signature-neumorphism-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "component",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "signature-neumorphism-table",
+    "name": "Soft Instrument 数据表",
+    "category": "table",
+    "themes": [
+      "neumorphism"
+    ],
+    "tags": [
+      "signature",
+      "curated",
+      "premium",
+      "table",
+      "neumorphism",
+      "低对比仪器面板"
+    ],
+    "description": "Soft Instrument 的数据表素材，服务于低对比仪器面板，包含真实内容、明确状态和可直接落地的前端结构。",
+    "stylePrompt": "高级设计指令: Soft Instrument 数据表\n定位: 低对比仪器面板，用于真实产品场景，不做演示稿式换皮。\n审美校准: 主体表面 #e6ece8，主强调 #526f7b，辅助强调 #9b7c33。所有视觉都必须服务信息层级、阅读节奏和交互判断。\n构图语法: 表格必须有真实字段、语义状态、数字对齐和行反馈，信息密度高但不压迫。\n工程要求: class 命名空间固定；hover/focus/active 状态完整；移动端不溢出；动效低幅度、低频率、可被 prefers-reduced-motion 降级。\n真实案例: 文案、指标、状态、表格行和输入内容必须像真实业务，不允许使用 Lorem ipsum 或空洞口号。\n禁忌: 禁止同构换皮、廉价大渐变、厚重发光、随机装饰、过度圆角、低对比文字、无语义状态色，以及只有“高级感”但没有信息结构的视觉噱头。",
+    "css": ".sig-neumorphism-table { width: min(100%, 780px); overflow: hidden; border: 1px solid rgba(255,255,255,0.72); border-radius: 24px; background: #e6ece8; color: #243033; box-shadow: 12px 12px 28px rgba(72,84,87,0.20), -12px -12px 28px rgba(255,255,255,0.84); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }\n.sig-neumorphism-table table { width: 100%; border-collapse: collapse; font-size: 13px; }\n.sig-neumorphism-table th, .sig-neumorphism-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.72); }\n.sig-neumorphism-table th { color: #6b777a; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0; background: #dce5e0; }\n.sig-neumorphism-table td { color: #243033; }\n.sig-neumorphism-table tr:last-child td { border-bottom: 0; }\n.sig-neumorphism-table tbody tr:hover td { background: #dce5e0; }\n.sig-neumorphism-table .mono { font-variant-numeric: tabular-nums; }\n.sig-neumorphism-table .status { display: inline-flex; align-items: center; gap: 6px; color: #526f7b; font-weight: 800; }\n.sig-neumorphism-table .status::before { content: \"\"; width: 7px; height: 7px; border-radius: 50%; background: #526f7b; }",
+    "html": "<div class=\"sig-neumorphism-table\">\n  <table>\n    <thead><tr><th>Item</th><th>Status</th><th>Signal</th></tr></thead>\n    <tbody><tr><td>Gain</td><td><span class=\"status\">Stable</span></td><td class=\"mono\">42</td></tr><tr><td>Latency</td><td><span class=\"status\">Soft</span></td><td class=\"mono\">18</td></tr><tr><td>Output</td><td><span class=\"status\">Ready</span></td><td class=\"mono\">91</td></tr></tbody>\n  </table>\n</div>",
+    "designNotes": "这不是换色模板；它使用 Soft Instrument 的专属构图、材质和内容节奏。应用时保留信息层级，再替换业务文案。",
+    "useCases": [
+      "data-console",
+      "audit-log",
+      "asset-inventory"
+    ],
+    "accessibility": [
+      "semantic-table",
+      "hover-not-required",
+      "tabular-numerals"
+    ],
+    "pairsWith": [
+      "signature-neumorphism-hero",
+      "signature-neumorphism-card"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 320,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 99,
+      "tier": "signature",
+      "complexity": "composition",
+      "density": "quiet"
+    }
+  },
+  {
+    "id": "btn-neumorph-soft",
+    "name": "Soft Clay",
+    "category": "button",
+    "themes": [
+      "neumorphism",
+      "light"
+    ],
+    "tags": [
+      "neumorphism",
+      "soft",
+      "clay",
+      "emboss",
+      "tactile"
+    ],
+    "stylePrompt": "高级设计指令: Soft Clay\n定位: Soft Clay 是一款 neumorphism / light 按钮素材，适合 neumorphism、soft、clay、emboss 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Soft Clay — 新拟物柔软按钮。背景色与页面完全一致(#e8ecf0), 存在感完全由双向阴影定义: 外阴影(右下 darker #c5cad1) + 外阴影(左上 lighter #fff)。按压时阴影翻转为 inset。字体 Inter 500 14px #5a6170。圆角 14px。气质: 触感UI、泥塑、iOS widget。",
+    "css": ".btn-clay {\n  padding: 14px 28px;\n  background: #e8ecf0;\n  color: #5a6170;\n  font-family: 'Inter', system-ui;\n  font-size: 14px;\n  font-weight: 500;\n  border: none;\n  border-radius: 14px;\n  cursor: pointer;\n  box-shadow: 6px 6px 12px #c5cad1, -6px -6px 12px #ffffff;\n  transition: all 0.15s;\n}\n.btn-clay:hover {\n  box-shadow: 4px 4px 8px #c5cad1, -4px -4px 8px #ffffff;\n}\n.btn-clay:active {\n  box-shadow: inset 4px 4px 8px #c5cad1, inset -4px -4px 8px #ffffff;\n}",
+    "html": "<button class=\"btn-clay\">Settings</button>",
+    "description": "Soft Clay 是一款 neumorphism / light 按钮素材，适合 neumorphism、soft、clay、emboss 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 0
+  },
+  {
+    "id": "card-neumorph-widget",
+    "name": "Neumorph Widget",
+    "category": "card",
+    "themes": [
+      "neumorphism",
+      "light"
+    ],
+    "tags": [
+      "neumorphism",
+      "widget",
+      "soft",
+      "emboss",
+      "ios"
+    ],
+    "stylePrompt": "高级设计指令: Neumorph Widget\n定位: Neumorph Widget 是一款 neumorphism / light 卡片素材，适合 neumorphism、widget、soft、emboss 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Widget — 新拟物小组件。背景与页面同色(#e8ecf0), 双向投影(右下暗影+左上亮影)定义边界。内容: 图标(28px)居上 + 数值(24px bold) + 标签(12px 灰)。圆角 20px。气质: iOS home screen widget、smart home 控制面板。",
+    "css": ".card-neumorph {\n  width: 160px;\n  padding: 24px 20px;\n  background: #e8ecf0;\n  border-radius: 20px;\n  box-shadow: 8px 8px 16px #c5cad1, -8px -8px 16px #ffffff;\n  text-align: center;\n}\n.card-neumorph .icon { font-size: 28px; margin-bottom: 12px; }\n.card-neumorph .value {\n  font-family: 'Inter', system-ui;\n  font-size: 24px;\n  font-weight: 700;\n  color: #2d3748;\n  margin-bottom: 4px;\n}\n.card-neumorph .label {\n  font-family: 'Inter', system-ui;\n  font-size: 12px;\n  color: #7a8599;\n}",
+    "html": "<div class=\"card-neumorph\">\n  <div class=\"icon\">◑</div>\n  <div class=\"value\">23°</div>\n  <div class=\"label\">Living Room</div>\n</div>",
+    "description": "Neumorph Widget 是一款 neumorphism / light 卡片素材，适合 neumorphism、widget、soft、emboss 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 94,
+      "tier": "production",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 1
+  },
+  {
+    "id": "bg-neumorph-surface",
+    "name": "Neumorph Surface",
+    "category": "background",
+    "themes": [
+      "neumorphism",
+      "light"
+    ],
+    "tags": [
+      "neumorphism",
+      "surface",
+      "soft",
+      "clay",
+      "base"
+    ],
+    "stylePrompt": "高级设计指令: Neumorph Surface\n定位: Neumorph Surface 是一款 neumorphism / light 背景素材，适合 neumorphism、surface、soft、clay 场景，强调清晰层级、克制质感和可复制的前端实现。\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Surface — 新拟物基底面。整个页面背景色 #e8ecf0(不是白色也不是灰——是带蓝调的浅灰)。这个精确色值是新拟物设计的关键: 它让双向阴影(暗+亮)都能清晰显现。无纹理、无渐变——纯平色。所有新拟物组件都应放在这个底色上。",
+    "css": ".bg-neumorph {\n  min-height: 100vh;\n  background: #e8ecf0;\n}",
+    "description": "Neumorph Surface 是一款 neumorphism / light 背景素材，适合 neumorphism、surface、soft、clay 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 85,
+      "tier": "foundation",
+      "complexity": "drop-in",
+      "density": "balanced"
+    },
+    "sourceOrder": 2,
+    "html": "<section class=\"bg-neumorph\" style=\"width:100%;min-height:360px;display:grid;place-items:center;padding:32px;\">\n  <div style=\"position:relative;z-index:1;width:min(100%,520px);padding:26px;border:1px solid rgba(255,255,255,0.72);border-radius:22px;background:#dce5e0;color:#243033;box-shadow:10px 10px 24px rgba(72,84,87,0.18), -10px -10px 24px rgba(255,255,255,0.82);\">\n    <div style=\"color:#526f7b;font-size:12px;font-weight:700;text-transform:uppercase;\">Background Case</div>\n    <h2 style=\"margin:10px 0 8px;font-size:32px;line-height:1.08;letter-spacing:0;\">Neumorph Surface</h2>\n    <p style=\"margin:0;color:#6b777a;font-size:14px;line-height:1.7;\">A real product hero preview using this background as the atmospheric system layer.</p>\n  </div>\n</section>"
+  },
+  {
+    "id": "neu-player",
+    "name": "Music Player",
+    "category": "card",
+    "tags": [
+      "neumorphism",
+      "player",
+      "circular",
+      "control"
+    ],
+    "description": "Music Player 是一款 neumorphism 卡片素材，适合 neumorphism、player、circular、control 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Music Player\n定位: Neumorph music player widget\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Music Player。#e8ecf0底。凹陷圆形disc + 凸起控制按钮。双向阴影。",
+    "css": ".neu-player { width:240px; padding:32px; border-radius:24px; background:#e8ecf0; box-shadow:8px 8px 16px #c5cad1,-8px -8px 16px #fff; text-align:center; } .neu-player .disc { width:100px; height:100px; border-radius:50%; margin:0 auto 20px; box-shadow:inset 4px 4px 8px #c5cad1,inset -4px -4px 8px #fff; } .neu-player .title { font-family:Inter,system-ui; font-size:14px; font-weight:600; color:#2d3748; } .neu-player .controls { display:flex; justify-content:center; gap:12px; margin-top:16px; } .neu-player .ctrl { width:40px; height:40px; border-radius:50%; background:#e8ecf0; border:none; box-shadow:4px 4px 8px #c5cad1,-4px -4px 8px #fff; cursor:pointer; font-size:16px; }",
+    "html": "<div class=\"neu-player\"><div class=\"disc\"></div><div class=\"title\">Midnight City</div><div class=\"controls\"><button class=\"ctrl\">⟨⟨</button><button class=\"ctrl\">▷</button><button class=\"ctrl\">⟩⟩</button></div></div>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "dashboard-panel",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 3
+  },
+  {
+    "id": "neu-toggle",
+    "name": "Pill Toggle",
+    "category": "form",
+    "tags": [
+      "neumorphism",
+      "toggle",
+      "switch",
+      "emboss"
+    ],
+    "description": "Pill Toggle 是一款 neumorphism 表单素材，适合 neumorphism、toggle、switch、emboss 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Pill Toggle\n定位: Neumorph toggle switch\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Toggle。凹陷轨道(inset shadow) + 凸起圆形滑块。ON态轨道变淡绿。#e8ecf0底。",
+    "css": ".neu-toggle { width:52px; height:28px; border-radius:14px; background:#e8ecf0; box-shadow:inset 3px 3px 6px #c5cad1,inset -3px -3px 6px #fff; position:relative; cursor:pointer; } .neu-toggle.on { background:#d1fae5; } .neu-toggle .thumb { width:22px; height:22px; border-radius:50%; background:#e8ecf0; box-shadow:3px 3px 6px #c5cad1,-3px -3px 6px #fff; position:absolute; top:3px; left:3px; transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1); } .neu-toggle.on .thumb { transform:translateX(24px); }",
+    "html": "<div class=\"neu-toggle on\"><div class=\"thumb\"></div></div>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 4
+  },
+  {
+    "id": "neu-input",
+    "name": "Inset Input",
+    "category": "form",
+    "tags": [
+      "neumorphism",
+      "input",
+      "inset",
+      "sunken"
+    ],
+    "description": "Inset Input 是一款 neumorphism 表单素材，适合 neumorphism、input、inset、sunken 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Inset Input\n定位: Sunken neumorph input field\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Inset Input。inset双向阴影凹陷。#e8ecf0底。无显式border。Inter 14px #2d3748。圆角10px。",
+    "css": ".neu-input { width:100%; padding:12px 16px; border-radius:10px; background:#e8ecf0; border:none; box-shadow:inset 3px 3px 6px #c5cad1,inset -2px -2px 5px #fff; font-family:Inter,system-ui; font-size:14px; color:#2d3748; outline:none; } .neu-input::placeholder { color:#9ca3af; }",
+    "html": "<input class=\"neu-input\" placeholder=\"Search...\" />",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 5
+  },
+  {
+    "id": "neu-btn-circle",
+    "name": "Circle FAB",
+    "category": "button",
+    "tags": [
+      "neumorphism",
+      "circle",
+      "fab",
+      "raised"
+    ],
+    "description": "Circle FAB 是一款 neumorphism 按钮素材，适合 neumorphism、circle、fab、raised 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Circle FAB\n定位: Raised circular action button\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Circle FAB。56px圆形, 外shadow凸起。按下inset凹陷。#e8ecf0底。图标居中。",
+    "css": ".neu-btn-c { width:56px; height:56px; border-radius:50%; background:#e8ecf0; border:none; box-shadow:6px 6px 12px #c5cad1,-6px -6px 12px #fff; cursor:pointer; font-size:22px; display:flex; align-items:center; justify-content:center; transition:box-shadow 0.15s; } .neu-btn-c:active { box-shadow:inset 4px 4px 8px #c5cad1,inset -4px -4px 8px #fff; }",
+    "html": "<button class=\"neu-btn-c\">+</button>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "primary-action",
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 6
+  },
+  {
+    "id": "neu-progress",
+    "name": "Soft Progress",
+    "category": "effect",
+    "tags": [
+      "neumorphism",
+      "progress",
+      "bar",
+      "filled"
+    ],
+    "description": "Soft Progress 是一款 neumorphism 特效素材，适合 neumorphism、progress、bar、filled 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Soft Progress\n定位: Neumorph progress bar\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Progress。凹陷轨道 + 凸起填充条(绿渐变)。高度10px。#e8ecf0底。圆角5px。",
+    "css": ".neu-progress { width:100%; height:10px; border-radius:5px; background:#e8ecf0; box-shadow:inset 2px 2px 4px #c5cad1,inset -2px -2px 4px #fff; overflow:hidden; } .neu-progress .fill { height:100%; width:var(--pct,60%); border-radius:5px; background:linear-gradient(90deg,#86efac,#22c55e); box-shadow:2px 2px 4px #c5cad1; }",
+    "html": "<div class=\"neu-progress\"><div class=\"fill\" style=\"--pct:72%\"></div></div>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 7
+  },
+  {
+    "id": "neu-nav-pills",
+    "name": "Pill Nav",
+    "category": "navigation",
+    "tags": [
+      "neumorphism",
+      "pills",
+      "segmented",
+      "raised"
+    ],
+    "description": "Pill Nav 是一款 neumorphism 导航素材，适合 neumorphism、pills、segmented、raised 场景，强调清晰层级、克制质感和可复制的前端实现。",
+    "stylePrompt": "高级设计指令: Pill Nav\n定位: Neumorph pill navigation\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Pill Nav。凹陷容器 + active项凸起pill。#e8ecf0底。Inter 13px。",
+    "css": ".neu-nav { display:inline-flex; gap:4px; padding:5px; border-radius:50px; background:#e8ecf0; box-shadow:inset 3px 3px 6px #c5cad1,inset -3px -3px 6px #fff; } .neu-nav a { padding:8px 18px; border-radius:50px; font-family:Inter,system-ui; font-size:13px; font-weight:500; color:#7a8599; text-decoration:none; } .neu-nav a.active { background:#e8ecf0; box-shadow:4px 4px 8px #c5cad1,-4px -4px 8px #fff; color:#2d3748; }",
+    "html": "<nav class=\"neu-nav\"><a href=\"#\" class=\"active\">Home</a><a href=\"#\">Profile</a><a href=\"#\">Settings</a></nav>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa",
+      "keyboard-visible"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 8
+  },
+  {
+    "id": "neu-footer",
+    "name": "Soft Footer",
+    "category": "footer",
+    "tags": [
+      "neumorphism",
+      "footer",
+      "soft",
+      "raised"
+    ],
+    "description": "Neumorph footer with raised separator",
+    "stylePrompt": "高级设计指令: Soft Footer\n定位: Neumorph footer with raised separator\n审美系统: Soft Instrument / tactile low-contrast controls。使用 #526f7b 作为主强调色，保持信息层级、留白、边界和字体重量的秩序感。\n实现要求: 保留素材原有 class 和结构；补齐 hover/focus/active 状态；移动端避免横向溢出；动效必须轻、短、可关闭。\n落地检查: 文字对比度达标，按钮和输入有稳定尺寸，卡片或面板不嵌套过深，状态颜色必须服务真实语义。\n禁忌: 不要随机堆渐变、厚发光、廉价玻璃、过度圆角、无意义装饰符号或只有“高级感”口号但没有可用信息层级的设计。\n原始风格要点:\n设计风格: Neumorph Footer。#e8ecf0底。顶部凸起分隔条替代border-top。居中12px #7a8599。",
+    "css": ".neu-footer { background:#e8ecf0; padding:24px; text-align:center; position:relative; } .neu-footer::before { content:''; position:absolute; top:0; left:20%; right:20%; height:4px; border-radius:2px; background:#e8ecf0; box-shadow:2px 2px 4px #c5cad1,-2px -2px 4px #fff; } .neu-footer .text { font-family:Inter,system-ui; font-size:12px; color:#7a8599; margin-top:8px; }",
+    "html": "<footer class=\"neu-footer\"><div class=\"text\">Crafted with care</div></footer>",
+    "themes": [
+      "neumorphism"
+    ],
+    "designNotes": "此素材已按 Soft Instrument 市场标准补齐提示词和落地约束。使用时优先保留核心比例、状态层级和命名空间 class。",
+    "useCases": [
+      "product-interface"
+    ],
+    "accessibility": [
+      "contrast-aa"
+    ],
+    "preview": {
+      "background": "linear-gradient(145deg, #edf1ee 0%, #cbd5d2 100%)",
+      "minHeight": 280,
+      "surface": "light"
+    },
+    "quality": {
+      "score": 82,
+      "tier": "foundation",
+      "complexity": "component",
+      "density": "balanced"
+    },
+    "sourceOrder": 9
+  }
+]

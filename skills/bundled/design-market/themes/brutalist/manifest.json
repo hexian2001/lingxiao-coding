@@ -1,0 +1,54 @@
+{
+  "id": "brutalist",
+  "name": "Museum Archive Catalogue",
+  "displayName": "美术馆档案 / 展览目录",
+  "description": "以美术馆公共档案、展览目录和馆藏登记为业务场景的粗野主义参考站：硬网格、黑红印章、档案纸色、粗边框与高密度展览信息。",
+  "version": "1.0.0",
+  "category": "culture-archive-product",
+  "tags": [
+    "brutalist",
+    "museum",
+    "archive",
+    "exhibition-catalogue",
+    "hard-grid",
+    "responsive"
+  ],
+  "preview": "preview.html",
+  "prompt": "prompt.md",
+  "tokens": {
+    "paper": "#f8f1cf",
+    "paperMuted": "#ece3bd",
+    "ink": "#111111",
+    "muted": "#4c4636",
+    "accent": "#e03b2f",
+    "accentDark": "#9f241d",
+    "line": "#111111",
+    "shadow": "rgba(0, 0, 0, 0.94)",
+    "radius": "0px"
+  },
+  "palette": {
+    "paper": "#f8f1cf",
+    "paperMuted": "#ece3bd",
+    "ink": "#111111",
+    "muted": "#4c4636",
+    "accent": "#e03b2f",
+    "accentDark": "#9f241d"
+  },
+  "useCases": [
+    "美术馆展览官网",
+    "公共馆藏档案检索",
+    "展览目录发布页",
+    "文化机构研究资料库",
+    "艺术节项目索引"
+  ],
+  "constraints": [
+    "完整纯前端 HTML",
+    "内联 CSS",
+    "无远程资源",
+    "响应式布局",
+    "不是组件库示例",
+    "必须结合真实业务场景",
+    "禁止直接复制素材片段",
+    "禁止堆叠组件"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "cyberpunk",
+  "name": "Signal Router Telemetry",
+  "title": "网络遥测路由基础设施站点",
+  "description": "面向网络运维与路由基础设施团队的克制赛博参考站：深色工程表面、精密透视网格、实时链路遥测、路由健康判断与清晰处置动作。",
+  "version": "1.0.0",
+  "category": "infrastructure-operations",
+  "tags": [
+    "cyberpunk",
+    "network-telemetry",
+    "routing",
+    "infrastructure",
+    "observability",
+    "dashboard",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#060817",
+    "surfaceMuted": "#090b1a",
+    "ink": "#f8fbff",
+    "text": "#dbeafe",
+    "muted": "#8da3b8",
+    "accent": "#22d3ee",
+    "accentAlt": "#ff2bd6",
+    "success": "#4ade80",
+    "warning": "#facc15",
+    "line": "rgba(34, 211, 238, 0.28)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}

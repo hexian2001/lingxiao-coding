@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maison Reserve 静奢限量商品预约站</title>
+  <style>
+    :root {
+      --surface: #fbf8f1;
+      --surface-soft: #f5eddf;
+      --surface-muted: #efe4d2;
+      --ink: #211b16;
+      --text: #2f2520;
+      --muted: #7a6b5d;
+      --muted-2: #9b8c7a;
+      --accent: #9a7738;
+      --accent-deep: #715429;
+      --line: rgba(154, 119, 56, 0.34);
+      --line-soft: rgba(154, 119, 56, 0.18);
+      --paper: rgba(251, 248, 241, 0.78);
+      --shadow: 0 34px 90px rgba(62, 44, 28, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 9% 4%, rgba(154, 119, 56, 0.16), transparent 28rem),
+        radial-gradient(circle at 88% 12%, rgba(47, 37, 32, 0.10), transparent 24rem),
+        linear-gradient(145deg, var(--surface) 0%, #eadfcc 58%, #dfd0b8 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 248, 241, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 17px;
+      letter-spacing: 0.035em;
+    }
+
+    .mark {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, transparent 45%, rgba(251, 248, 241, 0.32) 46%, transparent 54%),
+        linear-gradient(135deg, var(--accent), #2f2520);
+      transform: rotate(45deg);
+    }
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      overflow-x: auto;
+      color: var(--muted);
+      font-size: 13px;
+      scrollbar-width: none;
+    }
+
+    .links::-webkit-scrollbar { display: none; }
+
+    .links a,
+    .text-link {
+      border-radius: 3px;
+      padding: 9px 12px;
+      white-space: nowrap;
+      transition: color 180ms ease, background 180ms ease;
+    }
+
+    .links a:hover,
+    .links a:focus-visible,
+    .text-link:hover,
+    .text-link:focus-visible {
+      color: var(--ink);
+      background: var(--surface-muted);
+      outline: none;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--surface);
+    }
+
+    .button.secondary {
+      background: rgba(251, 248, 241, 0.36);
+      color: var(--ink);
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .button.primary:hover,
+    .button.primary:focus-visible { background: var(--accent-deep); }
+    .button.secondary:hover,
+    .button.secondary:focus-visible { background: var(--surface-muted); }
+
+    .hero {
+      min-height: calc(100vh - 74px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.96fr);
+      gap: clamp(30px, 5vw, 72px);
+      align-items: center;
+      padding: clamp(58px, 8vw, 108px) 0;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 11px;
+      background: rgba(239, 228, 210, 0.74);
+      color: var(--accent-deep);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 710px;
+      margin-top: 22px;
+      font-size: clamp(46px, 8vw, 94px);
+      line-height: 0.96;
+    }
+
+    h2 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.04;
+    }
+
+    h3 {
+      font-size: 24px;
+      line-height: 1.12;
+    }
+
+    .lead {
+      max-width: 590px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 1.86;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .trust-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 570px;
+      margin-top: 34px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }
+
+    .trust-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .trust-row strong {
+      display: block;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 26px;
+      font-weight: 500;
+      line-height: 1.05;
+    }
+
+    .product-panel {
+      position: relative;
+      min-height: 590px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, transparent 49.8%, rgba(154, 119, 56, 0.20) 50%, transparent 50.2%),
+        linear-gradient(160deg, #f7efe1 0%, #dfd0b8 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .product-panel::before {
+      content: "";
+      position: absolute;
+      inset: 34px;
+      border: 1px solid rgba(154, 119, 56, 0.28);
+      pointer-events: none;
+    }
+
+    .edition-tag {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 2;
+      color: var(--accent-deep);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .product-art {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      width: min(58%, 286px);
+      aspect-ratio: 0.66;
+      transform: translate(-50%, -50%);
+      border-radius: 48% 48% 10px 10px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.26), transparent 28%, rgba(47, 37, 32, 0.20) 78%),
+        linear-gradient(145deg, #5a3d30 0%, #251b16 100%);
+      box-shadow: 0 36px 78px rgba(47, 37, 32, 0.34), inset 0 0 0 1px rgba(251, 248, 241, 0.18);
+    }
+
+    .product-art::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 42px;
+      width: 46%;
+      height: 18%;
+      transform: translateX(-50%);
+      border: 2px solid rgba(154, 119, 56, 0.76);
+      border-bottom: 0;
+      border-radius: 999px 999px 0 0;
+    }
+
+    .product-art::after {
+      content: "MR";
+      position: absolute;
+      left: 50%;
+      top: 55%;
+      transform: translate(-50%, -50%);
+      color: rgba(251, 248, 241, 0.64);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      letter-spacing: 0.12em;
+    }
+
+    .product-card {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: end;
+      border: 1px solid var(--line);
+      background: rgba(251, 248, 241, 0.9);
+      padding: 18px;
+      backdrop-filter: blur(14px);
+    }
+
+    .product-card strong {
+      display: block;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.15;
+    }
+
+    .product-card span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stock {
+      text-align: right;
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .section {
+      padding: clamp(60px, 8vw, 96px) 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.84fr) minmax(280px, 0.48fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 30px;
+    }
+
+    .section-head p,
+    .copy p,
+    .small-copy {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .release-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line);
+      background: rgba(251, 248, 241, 0.58);
+    }
+
+    .release-card {
+      min-height: 238px;
+      display: grid;
+      align-content: space-between;
+      gap: 24px;
+      padding: 24px;
+      border-right: 1px solid var(--line);
+    }
+
+    .release-card:last-child { border-right: 0; }
+
+    .number {
+      color: var(--accent);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .release-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1fr);
+      gap: clamp(30px, 5vw, 66px);
+      align-items: center;
+    }
+
+    .story-plate {
+      position: relative;
+      min-height: 440px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, transparent 49%, rgba(154, 119, 56, 0.18) 50%, transparent 51%),
+        linear-gradient(145deg, #efe4d2, #d9c6a9);
+      box-shadow: var(--shadow);
+    }
+
+    .story-plate::before,
+    .story-plate::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(154, 119, 56, 0.34);
+    }
+
+    .story-plate::before {
+      width: 52%;
+      height: 68%;
+      left: 24%;
+      top: 16%;
+      background: rgba(251, 248, 241, 0.28);
+    }
+
+    .story-plate::after {
+      width: 38%;
+      height: 1px;
+      left: 31%;
+      top: 50%;
+      background: var(--accent);
+      transform: rotate(-18deg);
+    }
+
+    .details {
+      display: grid;
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .detail-row b {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .inventory-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(320px, 0.58fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .inventory-table,
+    .concierge-card,
+    .appointment-copy,
+    .form-card {
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .inventory-table { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    th {
+      color: var(--muted);
+      background: rgba(239, 228, 210, 0.72);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: rgba(239, 228, 210, 0.42); }
+    .mono { font-variant-numeric: tabular-nums; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--accent-deep);
+      font-weight: 900;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .concierge-card {
+      padding: clamp(24px, 4vw, 34px);
+    }
+
+    .concierge-card .line {
+      height: 1px;
+      margin: 24px 0;
+      background: linear-gradient(90deg, transparent, var(--line), transparent);
+    }
+
+    .appointment {
+      display: grid;
+      grid-template-columns: minmax(0, 0.78fr) minmax(310px, 0.58fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .appointment-copy,
+    .form-card {
+      padding: clamp(24px, 4vw, 38px);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .metric {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    form {
+      display: grid;
+      gap: 15px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      padding: 0 12px;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    input, select { height: 44px; }
+    textarea { min-height: 88px; padding-top: 11px; resize: vertical; }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(154, 119, 56, 0.16);
+    }
+
+    .submit {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--accent);
+      border-radius: 3px;
+      background: var(--accent);
+      color: var(--surface);
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .submit:hover,
+    .submit:focus-visible {
+      background: var(--accent-deep);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    footer {
+      padding: 42px 0 54px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 920px) {
+      .nav-inner {
+        grid-template-columns: 1fr;
+        align-items: start;
+        padding: 16px 0;
+      }
+
+      .links { justify-content: start; width: 100%; }
+      .hero, .section-head, .story, .inventory-layout, .appointment { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .product-panel { min-height: 520px; }
+      .release-grid { grid-template-columns: 1fr; }
+      .release-card { min-height: 178px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .release-card:last-child { border-bottom: 0; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 22px, 1180px); }
+      .hero-actions { flex-direction: column; }
+      .button { width: 100%; }
+      .trust-row, .metric-strip { grid-template-columns: 1fr; }
+      .product-panel { min-height: 438px; }
+      .product-card { grid-template-columns: 1fr; }
+      .stock { text-align: left; }
+      .detail-row { grid-template-columns: 1fr; gap: 4px; }
+      .appointment-copy, .form-card, .concierge-card { padding: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="主导航">
+    <div class="shell nav-inner">
+      <a class="brand" href="#top" aria-label="Maison Reserve 首页"><span class="mark" aria-hidden="true"></span>Maison Reserve</a>
+      <div class="links" aria-label="页面章节">
+        <a href="#release">限量释出</a>
+        <a href="#craft">工艺记录</a>
+        <a href="#inventory">编号库存</a>
+        <a href="#appointment">预约看货</a>
+      </div>
+      <a class="button primary" href="#appointment">预约私享时段</a>
+    </div>
+  </nav>
+
+  <main id="top" class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="copy">
+        <div class="eyebrow">Limited appointment · 2026 capsule</div>
+        <h1 id="hero-title">Reserved objects for people who do not shop in noise.</h1>
+        <p class="lead">一只手工染色小牛皮手袋，仅向会员开放 42 个编号预约。页面把材质、余量、候补和顾问确认说清楚，让高客单价决策保持安静。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#appointment">选择看货时段</a>
+          <a class="button secondary" href="#inventory">查看编号状态</a>
+        </div>
+        <div class="trust-row" aria-label="关键预约状态">
+          <span><strong>18</strong>剩余可预约件数</span>
+          <span><strong>04</strong>本周私享时段</span>
+          <span><strong>24h</strong>顾问响应承诺</span>
+        </div>
+      </div>
+
+      <aside class="product-panel" aria-label="限量商品概览">
+        <div class="edition-tag">No. 18 · calfskin top handle</div>
+        <div class="product-art" aria-hidden="true"></div>
+        <div class="product-card">
+          <div>
+            <strong>Calma Top Handle · Caramel Brown</strong>
+            <span>佛罗伦萨工坊 · 手工擦色小牛皮 · 6 周交付</span>
+          </div>
+          <div class="stock">18 pieces remaining</div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="release" class="section" aria-labelledby="release-title">
+      <div class="section-head">
+        <h2 id="release-title">预约决策只保留必要信息。</h2>
+        <p>静奢电商不靠倒计时制造压力，而是用真实限制建立信任：编号规则、服务方式、等待周期与下一步动作。</p>
+      </div>
+      <div class="release-grid">
+        <article class="release-card">
+          <div class="number">42</div>
+          <div><h3>编号生产</h3><p>每件绑定独立工坊记录，顾问确认后可为会员锁定候选编号 48 小时。</p></div>
+        </article>
+        <article class="release-card">
+          <div class="number">04</div>
+          <div><h3>本周时段</h3><p>开放线上材质复核、线下试背与电话确认，避免一次表单收集过多隐私信息。</p></div>
+        </article>
+        <article class="release-card">
+          <div class="number">6w</div>
+          <div><h3>交付周期</h3><p>下订后进入手工擦色、边油与刻印阶段，顾问每两周同步一次进度。</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="craft" class="section story" aria-labelledby="craft-title">
+      <div class="story-plate" aria-hidden="true"></div>
+      <div class="copy">
+        <div class="eyebrow">Atelier note</div>
+        <h2 id="craft-title">让稀缺感来自工艺，而不是促销语言。</h2>
+        <p class="lead">页面以编辑专题的节奏呈现商品价值：先解释皮料与工坊限制，再给出编号状态和预约入口。装饰必须为信息层级服务，而不是堆叠金色符号。</p>
+        <div class="details">
+          <div class="detail-row"><b>材质</b><span>Full-grain calfskin，手工擦色，低光泽封蜡，焦糖棕每批存在自然色差。</span></div>
+          <div class="detail-row"><b>服务</b><span>顾问确认背法、刻印、色差接受度与交付城市，再进入编号锁定。</span></div>
+          <div class="detail-row"><b>状态</b><span>18 件可预约，7 位候补会员，13 件已进入工坊制作。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="inventory" class="section" aria-labelledby="inventory-title">
+      <div class="section-head">
+        <h2 id="inventory-title">编号库存以安静的方式可见。</h2>
+        <p>高端预约页可以展示足够的状态透明度，但不需要把库存做成抢购榜单。</p>
+      </div>
+      <div class="inventory-layout">
+        <div class="inventory-table" aria-label="编号库存表">
+          <table>
+            <thead>
+              <tr><th>编号</th><th>颜色</th><th>状态</th><th>顾问说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="mono">No. 18</td><td>Caramel Brown</td><td><span class="status">可预约</span></td><td>适合线上材质复核</td></tr>
+              <tr><td class="mono">No. 21</td><td>Ebony</td><td><span class="status">看货中</span></td><td>周六上海静安试背</td></tr>
+              <tr><td class="mono">No. 24</td><td>Oat Milk</td><td><span class="status">可候补</span></td><td>等待工坊补充皮料确认</td></tr>
+              <tr><td class="mono">No. 31</td><td>Caramel Brown</td><td><span class="status">已锁定</span></td><td>48 小时内等待付款确认</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="concierge-card">
+          <div class="eyebrow">Concierge flow</div>
+          <h3>预约不是立即购买。</h3>
+          <p class="small-copy">提交意向后，顾问会先发送自然光材质照、编号候选与交付说明。确认后才进入定金与锁号流程。</p>
+          <div class="line" aria-hidden="true"></div>
+          <p class="small-copy">建议真实业务接入会员身份、库存锁定、顾问排班与邮件通知；演示页面仅保留纯前端交互结构。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="appointment" class="section appointment" aria-labelledby="appointment-title">
+      <div class="appointment-copy">
+        <div class="eyebrow">Private viewing</div>
+        <h2 id="appointment-title">提交预约意向，顾问确认后锁定编号。</h2>
+        <p class="lead">表单只收集必要信息，降低打扰感。确认邮件会包含候选编号、材质照、可调整项目与下一步付款说明。</p>
+        <div class="metric-strip" aria-label="预约状态">
+          <div class="metric"><strong>18</strong><span>剩余可预约件数</span></div>
+          <div class="metric"><strong>7</strong><span>候补会员</span></div>
+          <div class="metric"><strong>24h</strong><span>顾问响应时间</span></div>
+        </div>
+      </div>
+
+      <form class="form-card" aria-label="预约表单">
+        <label>称呼
+          <input value="林女士" aria-label="称呼">
+        </label>
+        <label>偏好时段
+          <select aria-label="偏好时段">
+            <option>周五 15:30 · 线上材质复核</option>
+            <option>周六 11:00 · 上海静安试背</option>
+            <option>周日 16:00 · 顾问电话确认</option>
+          </select>
+        </label>
+        <label>意向编号
+          <select aria-label="意向编号">
+            <option>No. 18 · Caramel Brown</option>
+            <option>No. 24 · Oat Milk 候补</option>
+            <option>请顾问推荐相近编号</option>
+          </select>
+        </label>
+        <label>关注事项
+          <textarea aria-label="关注事项">想确认焦糖棕在自然光下的色差，并了解刻印位置是否会影响交付周期。</textarea>
+        </label>
+        <button class="submit" type="button">提交预约意向</button>
+        <p class="note">演示表单不会提交数据。真实项目中请接入会员身份、库存锁定和顾问通知流程。</p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    Maison Reserve · quiet luxury editorial commerce
+  </footer>
+</body>
+</html>

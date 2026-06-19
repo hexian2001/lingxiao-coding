@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.cli.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "declarationMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/tui/components/design-system/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/__tests__/**",
+    "src/test-*.ts"
+  ]
+}

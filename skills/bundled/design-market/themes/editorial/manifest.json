@@ -1,0 +1,26 @@
+{
+  "id": "editorial",
+  "name": "Index Research Journal",
+  "title": "数字杂志研究报告发布页",
+  "description": "为研究团队、咨询机构和产品战略部门设计的出版级研究报告发布页：杂志式首屏、可读摘要、章节导航、指标证据和发布状态并重，让复杂洞察以清晰节奏被阅读、引用和转化。",
+  "version": "1.0.0",
+  "category": "publishing-research",
+  "tags": [
+    "editorial",
+    "digital-magazine",
+    "research-report",
+    "publication",
+    "insight",
+    "responsive"
+  ],
+  "palette": {
+    "surface": "#fbfaf7",
+    "paper": "#f1ede4",
+    "ink": "#151515",
+    "muted": "#6f6b63",
+    "accent": "#b03d2d",
+    "line": "rgba(21, 21, 21, 0.18)"
+  },
+  "preview": "preview.html",
+  "prompt": "prompt.md"
+}
