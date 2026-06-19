@@ -5,7 +5,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/hexian2001/lingxiao-coding/main/scripts/install.sh | sh
 #
 # 或先下载再执行：
-#   sh install.sh [--version v0.3.9] [--install-dir /opt/lingxiao]
+#   sh install.sh [--version v1.0.0] [--install-dir ~/.lingxiao]
 #
 # 功能：自动检测平台 → 下载对应 release → 解压 → 创建 symlink → 验证
 
@@ -13,8 +13,8 @@ set -e
 
 # ── 默认配置 ──────────────────────────────────────────────────────────────────
 REPO="hexian2001/lingxiao-coding"
-INSTALL_DIR="/opt/lingxiao"
-BIN_DIR="/usr/local/bin"
+INSTALL_DIR="${HOME}/.lingxiao"
+BIN_DIR="${HOME}/.local/bin"
 VERSION=""  # 空字符串 = 自动获取最新 release tag
 
 # ── 参数解析 ──────────────────────────────────────────────────────────────────
@@ -29,9 +29,9 @@ while [ $# -gt 0 ]; do
       echo "用法: sh install.sh [选项]"
       echo ""
       echo "选项:"
-      echo "  --version <tag>     指定版本 (如 v0.3.9)，默认最新"
-      echo "  --install-dir <path> 安装目录 (默认: /opt/lingxiao)"
-      echo "  --bin-dir <path>     symlink 目录 (默认: /usr/local/bin)"
+      echo "  --version <tag>      指定版本 (如 v1.0.0)，默认最新"
+      echo "  --install-dir <path> 安装目录 (默认: ~/.lingxiao)"
+      echo "  --bin-dir <path>     symlink 目录 (默认: ~/.local/bin)"
       echo "  --help               显示帮助"
       exit 0 ;;
     *) echo "未知参数: $1"; exit 1 ;;
@@ -69,43 +69,104 @@ if [ -z "$VERSION" ]; then
 fi
 echo "★ 版本: ${VERSION}"
 
-# ── 下载 ──────────────────────────────────────────────────────────────────────
-ARCHIVE_NAME="lingxiao-${VERSION}-${TARGET}.tar.gz"
-# 去掉版本号前的 v 前缀用于文件名匹配（release 资产可能用 v0.3.9 或 0.3.9）
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${ARCHIVE_NAME}"
+# 版本号去掉 v 前缀
+VERSION_NO_V="${VERSION#v}"
 
-echo "▸ 下载: ${DOWNLOAD_URL}"
+# ── 下载 ──────────────────────────────────────────────────────────────────────
+# 尝试多种文件名：无版本号 → 带v前缀 → 不带v前缀
+# 归档格式统一为 zip（所有平台一致）
+DOWNLOAD_CANDIDATES=""
+for NAME in \
+  "lingxiao-${TARGET}.zip" \
+  "lingxiao-${VERSION}-${TARGET}.zip" \
+  "lingxiao-${VERSION_NO_V}-${TARGET}.zip"
+do
+  DOWNLOAD_CANDIDATES="${DOWNLOAD_CANDIDATES} https://github.com/${REPO}/releases/download/${VERSION}/${NAME}"
+done
+
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-if ! curl -fSL -o "${TMP_DIR}/${ARCHIVE_NAME}" "$DOWNLOAD_URL" 2>&1; then
-  # 尝试不带 v 前缀的版本号
-  VERSION_NO_V="${VERSION#v}"
-  ARCHIVE_NAME_ALT="lingxiao-${VERSION_NO_V}-${TARGET}.tar.gz"
-  DOWNLOAD_URL_ALT="https://github.com/${REPO}/releases/download/${VERSION}/${ARCHIVE_NAME_ALT}"
-  echo "▸ 重试: ${DOWNLOAD_URL_ALT}"
-  curl -fSL -o "${TMP_DIR}/${ARCHIVE_NAME_ALT}" "$DOWNLOAD_URL_ALT"
-  ARCHIVE_NAME="$ARCHIVE_NAME_ALT"
-fi
-echo "  ✓ 下载完成"
+ARCHIVE_FILE=""
+for URL in $DOWNLOAD_CANDIDATES; do
+  FNAME="$(basename "$URL")"
+  echo "▸ 尝试下载: ${FNAME}"
+  if curl -fSL -o "${TMP_DIR}/${FNAME}" "$URL" 2>/dev/null; then
+    ARCHIVE_FILE="${TMP_DIR}/${FNAME}"
+    echo "  ✓ 下载完成"
+    break
+  fi
+done
 
-# ── 解压 + 安装 ───────────────────────────────────────────────────────────────
-echo "▸ 解压到 ${INSTALL_DIR}..."
+if [ -z "$ARCHIVE_FILE" ]; then
+  echo "✗ 下载失败，请检查版本号或网络"
+  exit 1
+fi
+
+# ── 检查 unzip ────────────────────────────────────────────────────────────────
+if ! command -v unzip >/dev/null 2>&1; then
+  echo "✗ 未找到 unzip，请先安装："
+  echo "  Ubuntu/Debian: sudo apt install unzip"
+  echo "  CentOS/RHEL:   sudo yum install unzip"
+  echo "  macOS:         brew install unzip"
+  exit 1
+fi
+
+# ── 解压 ──────────────────────────────────────────────────────────────────────
+echo "▸ 解压..."
+# 先解压到临时目录，处理可能的套娃 zip
+STAGING="${TMP_DIR}/staging"
+mkdir -p "$STAGING"
+unzip -qo "$ARCHIVE_FILE" -d "$STAGING"
+
+# 处理套娃 zip：如果解压出来只有一个 zip 文件，再解压一层
+INNER_ZIPS=$(find "$STAGING" -maxdepth 2 -name '*.zip' -type f)
+if [ -n "$INNER_ZIPS" ] && [ -z "$(find "$STAGING" -maxdepth 2 -name 'lingxiao' -o -name 'node' -o -name 'node.exe' -type f 2>/dev/null)" ]; then
+  echo "  ℹ 检测到内层压缩包，继续解压..."
+  for INNER in $INNER_ZIPS; do
+    unzip -qo "$INNER" -d "$STAGING"
+  done
+fi
+
+# 找到 lingxiao 目录（可能在 staging 根或套了一层）
+PKG_DIR="$STAGING"
+if [ -d "$STAGING/lingxiao" ]; then
+  PKG_DIR="$STAGING/lingxiao"
+fi
+
+# 验证包内有关键文件
+if [ ! -f "$PKG_DIR/node" ] && [ ! -f "$PKG_DIR/node.exe" ]; then
+  echo "✗ 解压后未找到 node 二进制，包可能损坏"
+  exit 1
+fi
+
+# ── 安装 ──────────────────────────────────────────────────────────────────────
+echo "▸ 安装到 ${INSTALL_DIR}..."
 if [ -d "$INSTALL_DIR" ]; then
   echo "  ⚠ ${INSTALL_DIR} 已存在，备份到 ${INSTALL_DIR}.bak"
   rm -rf "${INSTALL_DIR}.bak"
   mv "$INSTALL_DIR" "${INSTALL_DIR}.bak"
 fi
 
-mkdir -p "$INSTALL_DIR"
-tar xzf "${TMP_DIR}/${ARCHIVE_NAME}" -C "$INSTALL_DIR" --strip-components=1
-echo "  ✓ 解压完成"
+mkdir -p "$(dirname "$INSTALL_DIR")"
+cp -a "$PKG_DIR" "$INSTALL_DIR"
+echo "  ✓ 安装完成"
 
 # ── 创建 symlink ──────────────────────────────────────────────────────────────
 echo "▸ 创建命令链接..."
 mkdir -p "$BIN_DIR"
 ln -sf "${INSTALL_DIR}/lingxiao" "${BIN_DIR}/lingxiao"
 echo "  ✓ ${BIN_DIR}/lingxiao → ${INSTALL_DIR}/lingxiao"
+
+# 检查 BIN_DIR 是否在 PATH 中
+case ":${PATH}:" in
+  *":${BIN_DIR}:"*) ;;
+  *)
+    echo ""
+    echo "  ⚠ ${BIN_DIR} 不在 PATH 中，请添加以下内容到你的 shell 配置："
+    echo "    export PATH=\"${BIN_DIR}:\$PATH\""
+    ;;
+esac
 
 # ── 验证 ──────────────────────────────────────────────────────────────────────
 echo ""

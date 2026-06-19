@@ -8,12 +8,12 @@
   irm https://raw.githubusercontent.com/hexian2001/lingxiao-coding/main/scripts/install.ps1 | iex
 .EXAMPLE
   # 指定版本和安装目录
-  .\install.ps1 -Version "v0.3.9" -InstallDir "C:\lingxiao"
+  .\install.ps1 -Version "v1.0.0" -InstallDir "$env:LOCALAPPDATA\lingxiao"
 #>
 
 param(
   [string]$Version = "",
-  [string]$InstallDir = "C:\lingxiao",
+  [string]$InstallDir = "$env:LOCALAPPDATA\lingxiao",
   [string]$Repo = "hexian2001/lingxiao-coding"
 )
 
@@ -40,25 +40,37 @@ if ([string]::IsNullOrEmpty($Version)) {
 }
 Write-Host "★ 版本: $Version" -ForegroundColor Cyan
 
-# ── 下载 ──────────────────────────────────────────────────────────────────────
-$archiveName = "lingxiao-$Version-$target.zip"
-$downloadUrl = "https://github.com/$Repo/releases/download/$Version/$archiveName"
-$tempDir = New-Item -ItemType Directory -Force -Path "$env:TEMP\lingxiao-install-$(Get-Random)"
-$archivePath = Join-Path $tempDir.FullName $archiveName
+$versionNoV = $Version -replace '^v', ''
 
-Write-Host "▸ 下载: $downloadUrl"
-try {
-  Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath -UseBasicParsing
-} catch {
-  # 尝试不带 v 前缀
-  $versionNoV = $Version -replace '^v', ''
-  $archiveNameAlt = "lingxiao-$versionNoV-$target.zip"
-  $downloadUrlAlt = "https://github.com/$Repo/releases/download/$Version/$archiveNameAlt"
-  Write-Host "▸ 重试: $downloadUrlAlt"
-  Invoke-WebRequest -Uri $downloadUrlAlt -OutFile (Join-Path $tempDir.FullName $archiveNameAlt) -UseBasicParsing
-  $archivePath = Join-Path $tempDir.FullName $archiveNameAlt
+# ── 下载 ──────────────────────────────────────────────────────────────────────
+# 尝试多种文件名：无版本号 → 带v前缀 → 不带v前缀
+$downloadCandidates = @(
+  "lingxiao-$target.zip"
+  "lingxiao-$Version-$target.zip"
+  "lingxiao-$versionNoV-$target.zip"
+)
+
+$tempDir = New-Item -ItemType Directory -Force -Path "$env:TEMP\lingxiao-install-$(Get-Random)"
+
+$archivePath = $null
+foreach ($name in $downloadCandidates) {
+  $url = "https://github.com/$Repo/releases/download/$Version/$name"
+  $dest = Join-Path $tempDir.FullName $name
+  Write-Host "▸ 尝试下载: $name"
+  try {
+    Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing
+    $archivePath = $dest
+    Write-Host "  ✓ 下载完成" -ForegroundColor Green
+    break
+  } catch {
+    Write-Host "  ✗ 未找到，尝试下一个..." -ForegroundColor Yellow
+  }
 }
-Write-Host "  ✓ 下载完成" -ForegroundColor Green
+
+if (-not $archivePath) {
+  Write-Host "✗ 下载失败，请检查版本号或网络" -ForegroundColor Red
+  exit 1
+}
 
 # ── 解压 + 安装 ───────────────────────────────────────────────────────────────
 Write-Host "▸ 解压到 $InstallDir..."
@@ -69,14 +81,39 @@ if (Test-Path $InstallDir) {
   Move-Item $InstallDir $backup
 }
 
-Expand-Archive -Path $archivePath -DestinationPath $InstallDir -Force
+# 先解压到临时目录，处理可能的套娃 zip
+$staging = Join-Path $tempDir.FullName "staging"
+New-Item -ItemType Directory -Force -Path $staging | Out-Null
+Expand-Archive -Path $archivePath -DestinationPath $staging -Force
 
-# 如果解压出来多一层 lingxiao/ 目录，提上来
-$innerDir = Join-Path $InstallDir "lingxiao"
-if (Test-Path $innerDir) {
-  Get-ChildItem $innerDir | ForEach-Object { Move-Item $_.FullName $InstallDir -Force }
-  Remove-Item $innerDir -Recurse -Force
+# 处理套娃 zip：如果解压出来只有 zip 文件，再解压一层
+$innerZips = Get-ChildItem $staging -Filter "*.zip" -File
+$hasNodeExe = Get-ChildItem $staging -Recurse -Filter "node.exe" -File -ErrorAction SilentlyContinue
+if ($innerZips -and -not $hasNodeExe) {
+  Write-Host "  ℹ 检测到内层压缩包，继续解压..." -ForegroundColor Yellow
+  foreach ($innerZip in $innerZips) {
+    Expand-Archive -Path $innerZip.FullName -DestinationPath $staging -Force
+  }
 }
+
+# 找到 lingxiao 目录（可能在 staging 根或套了一层）
+$pkgDir = $staging
+$innerLingxiaoDir = Join-Path $staging "lingxiao"
+if (Test-Path $innerLingxiaoDir) {
+  $pkgDir = $innerLingxiaoDir
+}
+
+# 验证包内有关键文件
+$nodeExe = Join-Path $pkgDir "node.exe"
+if (-not (Test-Path $nodeExe)) {
+  Write-Host "✗ 解压后未找到 node.exe，包可能损坏" -ForegroundColor Red
+  exit 1
+}
+
+# 移动到最终安装目录
+New-Item -ItemType Directory -Force -Path (Split-Path $InstallDir) | Out-Null
+if (Test-Path $InstallDir) { Remove-Item $InstallDir -Recurse -Force }
+Move-Item $pkgDir $InstallDir
 Write-Host "  ✓ 解压完成" -ForegroundColor Green
 
 # ── 添加到 PATH ───────────────────────────────────────────────────────────────
