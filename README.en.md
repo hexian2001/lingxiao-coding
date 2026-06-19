@@ -235,7 +235,7 @@ Node.js 24 · Fastify · SQLite · React · Ink · Playwright · OpenAI · Anthr
 
 ## License
 
-AGPL-3.0-only. See [LICENSE](./LICENSE).
+Proprietary. All rights reserved.
 
 ---
 
@@ -243,6 +243,6 @@ AGPL-3.0-only. See [LICENSE](./LICENSE).
 
 **LingXiao** — AI Engineering Command System
 
-Unauthorized copying, modification, or distribution prohibited
+Unauthorized copying, modification, or distribution prohibited.
 
 </div>

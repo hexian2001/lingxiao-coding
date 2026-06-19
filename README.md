@@ -235,7 +235,7 @@ Node.js 24 · Fastify · SQLite · React · Ink · Playwright · OpenAI · Anthr
 
 ## 许可证
 
-AGPL-3.0-only. See [LICENSE](./LICENSE).
+Proprietary. All rights reserved.
 
 ---
 
