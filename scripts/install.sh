@@ -200,3 +200,15 @@ echo ""
 echo "运行 \`lingxiao doctor\` 验证环境"
 echo ""
 echo "首次使用浏览器功能时会自动下载 Chromium（约 300MB）"
+
+# ── npm link 全局注册 ──────────────────────────────────────────────────────────
+if command -v npm &>/dev/null; then
+  echo "▸ npm link 全局注册..."
+  (cd "$INSTALL_DIR" && npm link 2>/dev/null && echo "  ✓ npm link 完成，可直接使用 lingxiao 命令") || \
+    echo "  ⚠ npm link 失败，请手动运行: cd $INSTALL_DIR && npm link"
+else
+  echo ""
+  echo "  ⚠ 未检测到 npm，无法全局注册"
+  echo "  请安装 Node.js: https://nodejs.org/"
+  echo "  安装后手动运行: cd $INSTALL_DIR && npm link"
+fi
