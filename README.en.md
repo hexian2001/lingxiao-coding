@@ -4,7 +4,7 @@
   <img src="./assets/logo.svg" width="96" alt="LingXiao logo" />
 </p>
 
-> AI engineering command system — not a chat shell, but a local orchestration kernel.
+> One sword cleaves the sky — build what you envision.
 
 Version: `1.0.0`
 
@@ -241,7 +241,7 @@ Proprietary. All rights reserved.
 
 <div align="center">
 
-**LingXiao** — AI Engineering Command System
+**LingXiao** — One Sword Cleaves the Sky
 
 Unauthorized copying, modification, or distribution prohibited.
 
