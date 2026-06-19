@@ -32,12 +32,13 @@ Write-Host "★ 检测到平台: $target" -ForegroundColor Cyan
 if ([string]::IsNullOrEmpty($Version)) {
   Write-Host "▸ 获取最新版本..."
   # 用 HTTP 302 重定向拿版本号，不走 GitHub API，避免 rate limit
-  $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -MaximumRedirection 0 -ErrorAction SilentlyContinue
-  $redirectUrl = $resp.Headers.Location
-  if (-not $redirectUrl) {
-    # 某些 PowerShell 版本不返回 302 body，用 -SkipHttpErrorCheck 重试
-    try { $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -MaximumRedirection 0 -SkipHttpErrorCheck } catch {}
+  # PowerShell 5.1 对 302 会抛异常，需要 catch 里拿 Location header
+  try {
+    $resp = Invoke-WebRequest -Uri "https://github.com/$Repo/releases/latest" -MaximumRedirection 0 -UseBasicParsing -ErrorAction Stop
     $redirectUrl = $resp.Headers.Location
+  } catch {
+    # PS 5.1 对 3xx 也抛异常，但 response 对象在异常里
+    $redirectUrl = $_.Exception.Response.Headers.Location
   }
   if ($redirectUrl -match 'tag/(.+)$') {
     $Version = $Matches[1]

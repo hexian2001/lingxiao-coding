@@ -73,7 +73,7 @@ fi
 if [ -z "$VERSION" ]; then
   echo "▸ 获取最新版本..."
   # 用 HTTP 302 重定向拿版本号，不走 GitHub API，避免 rate limit
-  VERSION=$(curl -fsSL -o /dev/null -w '%{redirect_url}' "https://github.com/${REPO}/releases/latest" | sed 's|.*/tag/||')
+  VERSION=$(curl -sS -o /dev/null -w '%{redirect_url}' "https://github.com/${REPO}/releases/latest" 2>/dev/null | sed 's|.*/tag/||')
   if [ -z "$VERSION" ]; then
     echo "✗ 无法获取最新版本，请用 --version 指定"
     exit 1
