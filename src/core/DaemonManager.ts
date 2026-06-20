@@ -183,7 +183,7 @@ export const DaemonManager = {
    * 启动 daemon（幂等：已有运行中的 daemon 直接返回）
    * 文件锁防止并发启动
    */
-  async startDaemon(port = 8080, host = '127.0.0.1', reason: DaemonStartReason = 'manual_start', sessionId?: string): Promise<DaemonStatus> {
+  async startDaemon(port = 0, host = '127.0.0.1', reason: DaemonStartReason = 'manual_start', sessionId?: string): Promise<DaemonStatus> {
     // 幂等检查：已有运行中的 daemon 直接返回
     const existing = DaemonManager.getStatus();
     if (isDaemonActiveStatus(existing.status)) {
@@ -378,7 +378,7 @@ export const DaemonManager = {
    */
   async restartDaemon(port?: number, host?: string): Promise<DaemonStatus> {
     const existing = readDaemonFile();
-    const targetPort = port || existing?.port || 8080;
+    const targetPort = port || existing?.port || 0;
     const targetHost = host || existing?.host || '127.0.0.1';
 
     await DaemonManager.stopDaemon();
@@ -422,7 +422,7 @@ export const DaemonManager = {
    * 适合「无人值守」场景 — 调用一次即进入永久守护模式。
    */
   async startDaemonWithSupervisor(
-    port = 8080,
+    port = 0,
     host = '127.0.0.1',
     supervisorOptions?: {
       maxRestarts?: number;

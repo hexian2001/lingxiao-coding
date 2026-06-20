@@ -34,6 +34,7 @@ interface RoleSurfaceItem {
   workerBackend?: string;
   model?: string;
   systemPrompt?: string;
+  gitIdentity?: { name: string; email: string };
   definition?: RoleDefinitionMeta;
 }
 
@@ -70,6 +71,8 @@ interface AgentFormState {
   toolsText: string;
   skillsText: string;
   systemPrompt: string;
+  gitUserName: string;
+  gitUserEmail: string;
 }
 
 const ROLE_SOURCE_VALUES = ['preset', 'custom'] as const satisfies readonly RoleSource[];
@@ -102,6 +105,8 @@ const emptyAgentForm: AgentFormState = {
   toolsText: '',
   skillsText: '',
   systemPrompt: '',
+  gitUserName: '',
+  gitUserEmail: '',
 };
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -159,6 +164,14 @@ function parseRoleDefinition(value: unknown): RoleDefinitionMeta | undefined {
   };
 }
 
+function parseGitIdentity(value: unknown): { name: string; email: string } | undefined {
+  if (!isRecord(value)) return undefined;
+  const name = readString(value.name).trim();
+  const email = readString(value.email).trim();
+  if (!name && !email) return undefined;
+  return { name, email };
+}
+
 function parseRoleSurfaceItem(value: unknown): RoleSurfaceItem | null {
   if (!isRecord(value)) return null;
   const name = readString(value.name).trim();
@@ -176,6 +189,7 @@ function parseRoleSurfaceItem(value: unknown): RoleSurfaceItem | null {
     workerBackend: readOptionalString(value.workerBackend),
     model: readOptionalString(value.model),
     systemPrompt: readString(value.systemPrompt),
+    gitIdentity: parseGitIdentity(value.gitIdentity),
     definition: parseRoleDefinition(value.definition),
   };
 }
@@ -243,6 +257,8 @@ function formFromRole(role: RoleSurfaceItem): AgentFormState {
     toolsText: writeCsvText(definition?.tools ?? []),
     skillsText: writeCsvText(definition?.skillNames ?? []),
     systemPrompt: role.systemPrompt ?? '',
+    gitUserName: role.gitIdentity?.name ?? '',
+    gitUserEmail: role.gitIdentity?.email ?? '',
   };
 }
 
@@ -436,6 +452,9 @@ export function RolesSection() {
       tools: readCsvText(agentForm.toolsText),
       skillNames: readCsvText(agentForm.skillsText),
       scope: agentForm.scope,
+      gitIdentity: (agentForm.gitUserName.trim() || agentForm.gitUserEmail.trim())
+        ? { name: agentForm.gitUserName.trim(), email: agentForm.gitUserEmail.trim() }
+        : undefined,
     };
     setBusyRole('__agent_form__');
     try {
@@ -604,6 +623,25 @@ export function RolesSection() {
               />
             </label>
           </div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="space-y-1">
+              <span className="text-[10px] text-text-tertiary">{t('settings.roles.agent.gitUserName')}</span>
+              <input
+                value={agentForm.gitUserName}
+                onChange={(e) => updateAgentForm({ gitUserName: e.target.value })}
+                className="w-full rounded border border-border-default bg-bg-input px-2 py-1.5 text-xs text-text-primary outline-none focus:border-accent-brand font-mono"
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="text-[10px] text-text-tertiary">{t('settings.roles.agent.gitUserEmail')}</span>
+              <input
+                value={agentForm.gitUserEmail}
+                onChange={(e) => updateAgentForm({ gitUserEmail: e.target.value })}
+                className="w-full rounded border border-border-default bg-bg-input px-2 py-1.5 text-xs text-text-primary outline-none focus:border-accent-brand font-mono"
+              />
+            </label>
+          </div>
+          <p className="text-[10px] text-text-tertiary">{t('settings.roles.agent.gitIdentityHint')}</p>
           <label className="space-y-1 block">
             <span className="text-[10px] text-text-tertiary">{t('settings.roles.agent.prompt')}</span>
             <textarea

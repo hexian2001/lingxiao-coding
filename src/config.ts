@@ -549,7 +549,7 @@ const ToolsGroupSchema = z.object({
 const ServerGroupSchema = z.object({
   host: z.string().default(D.SERVER.HOST),
   port: z.number().default(D.SERVER.PORT),
-  random_port: z.boolean().default(false),
+  random_port: z.boolean().default(true),
 });
 
 const BrowserProxySchema = z.object({
@@ -701,6 +701,12 @@ const MemoryGroupSchema = z.object({
 
 const CheckpointGroupSchema = z.object({
   file_checkpointing_enabled: z.boolean().default(true),
+  /** 每个项目 shadow git 仓库保留的最大 commit 数量，超出时自动裁剪旧快照 */
+  max_checkpoints: z.number().int().min(5).default(50),
+  /** 是否自动对 shadow git 仓库执行 gc --prune=now 回收磁盘空间 */
+  auto_gc_enabled: z.boolean().default(true),
+  /** 工作目录文件数安全上限，超过此值时拒绝做快照（防止对系统目录/主目录爆炸） */
+  max_workspace_files: z.number().int().min(1000).default(100_000),
 });
 
 const UiGroupSchema = z.object({
@@ -777,12 +783,23 @@ const ScalingGroupSchema = z.object({
   }),
 });
 
+const PreCommitGateSchema = z.object({
+  enabled: z.boolean().default(false),
+  type_check: z.boolean().default(true),
+  command: z.string().default(''),
+});
+
 const GitGroupSchema = z.object({
   platform: z.enum(['github', 'gitlab', 'gitea', 'none']).default('none'),
   token: z.string().default(''),
   api_url: z.string().default(''),
   default_target_branch: z.string().default('main'),
   auto_detect_remote: z.boolean().default(true),
+  pre_commit_gate: PreCommitGateSchema.default({
+    enabled: false,
+    type_check: true,
+    command: '',
+  }),
 });
 
 const BlackboardGroupSchema = z.object({
@@ -975,6 +992,11 @@ export const ConfigSchema = z.preprocess(withDefaultConfigGroups, z.object({
     api_url: '',
     default_target_branch: 'main',
     auto_detect_remote: true,
+    pre_commit_gate: {
+      enabled: false,
+      type_check: true,
+      command: '',
+    },
   })),
   blackboard: BlackboardGroupSchema,
   advanced: AdvancedGroupSchema.default({

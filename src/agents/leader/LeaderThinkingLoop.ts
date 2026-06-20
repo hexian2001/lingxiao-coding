@@ -868,7 +868,27 @@ export class LeaderThinkingEngine {
                 });
                 emitter.emit('leader:error', { sessionId, error: classifyLLMError(error) });
                 await new Promise((resolve) => setTimeout(resolve, waitMs));
-                this.opts.setLlmErrorRetryCount(0);
+                // 不再 setLlmErrorRetryCount(0) — 那会清零外层计数器导致无限 sleep 循环。
+                // 用外层 retry 计数器追踪连续 CB OPEN sleep，到达上限后停下等待用户介入。
+                const cbRetry = this.opts.getLlmErrorRetryCount() + 1;
+                this.opts.setLlmErrorRetryCount(cbRetry);
+                const outerMax = this.opts.getLlmMaxErrorRetries();
+                if (cbRetry >= outerMax) {
+                  leaderLogger.error(
+                    `Leader CB OPEN 已连续 ${cbRetry}/${outerMax} 次仍未恢复，停下等待用户介入`,
+                  );
+                  emitter.emit('leader:status', {
+                    sessionId,
+                    status: `🛑 Provider 持续不可用：等待人工介入`,
+                  });
+                  const stopMsg = `🛑 [系统终止] Provider 持续不可用（Circuit Breaker 已连续触发 ${cbRetry}/${outerMax} 次）。请检查 provider 状态或更换模型后再继续。`;
+                  this.opts.addMessage({ role: 'system', content: stopMsg });
+                  const c2 = this.opts.getConversation();
+                  await db.saveConversationMessage(sessionId, c2[c2.length - 1]);
+                  this.opts.setLlmErrorRetryCount(0);
+                  this.opts.setWaitingForUser(true);
+                  return { type: 'break' };
+                }
                 return { type: 'continue' };
               }
 

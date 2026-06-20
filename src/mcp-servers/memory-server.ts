@@ -13,6 +13,7 @@ import { MemoryManager } from '../memory/MemoryManager.js';
 import { GraphStore } from '../core/blackboard/GraphStore.js';
 import { BlackboardGraph } from '../core/blackboard/BlackboardGraph.js';
 import { readDepsFromEnv, jsonResult, errorResult } from './shared.js';
+import { VERSION } from '../version.js';
 
 const { dbPath, workspace } = readDepsFromEnv();
 
@@ -22,7 +23,7 @@ const blackboard = new BlackboardGraph(graphStore);
 
 const server = new McpServer({
   name: 'lingxiao-memory',
-  version: '1.0.0',
+  version: VERSION,
 });
 
 // ── Tool: save_memory ─────────────────────────────────────────────────────

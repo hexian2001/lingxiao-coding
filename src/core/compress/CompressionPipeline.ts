@@ -333,28 +333,28 @@ export class CompressionPipeline {
     const preservedMessages = messages.filter((_message, index) => preservedIndexes.has(index));
     const recentMessages = messages.filter((_message, index) => recentIndexes.has(index));
 
+    // 只用 LLM 压缩，不回退本地算法。
+    // LLM 不可用或失败时直接抛错，让调用方感知，不静默降级。
     let llmFailed = false;
-    let summaryContent = deterministicSummary;
-    if (this.options.llmClient) {
-      this.emitCompacting('progress', 'llm_summary', {
-        percent: 14,
-        oldTokens,
-        threshold: this.options.threshold,
-        messageCount: messages.length,
-        label: 'Summarizing conversation',
-      });
-      try {
-        summaryContent = await this.buildHierarchicalSummary(records, archivePath);
-      } catch (error) {
-        llmFailed = true;
-        summaryContent = this.buildDeterministicSummary(records, 'LLM 压缩失败回退');
-        coreLogger.warn(
-          `[CompressionPipeline] ${this.options.sessionId} LLM 分层压缩失败: ${error instanceof Error ? error.message : error}`,
-        );
-      }
-    } else {
+    let summaryContent: string;
+    if (!this.options.llmClient) {
+      throw new Error('LLM 压缩失败：未配置 LLM 客户端（本地算法已禁用）');
+    }
+    this.emitCompacting('progress', 'llm_summary', {
+      percent: 14,
+      oldTokens,
+      threshold: this.options.threshold,
+      messageCount: messages.length,
+      label: 'Summarizing conversation',
+    });
+    try {
+      summaryContent = await this.buildHierarchicalSummary(records, archivePath);
+    } catch (error) {
       llmFailed = true;
-      summaryContent = this.buildDeterministicSummary(records, 'LLM 不可用回退');
+      coreLogger.warn(
+        `[CompressionPipeline] ${this.options.sessionId} LLM 压缩失败，不回退本地算法: ${error instanceof Error ? error.message : error}`,
+      );
+      throw error;
     }
 
     let candidateMessages: ChatMessage[] = [
@@ -924,14 +924,9 @@ export class CompressionPipeline {
         percent: 40,
         label: 'Summarizing conversation in one pass',
       });
-      try {
-        const finalSummarySource = await this.callSummaryLlm(singlePassPrompt, singlePassSource, 1, 'SinglePass');
-        return this.wrapSummaryResult(records, finalSummarySource, archivePath, '单次 LLM 摘要');
-      } catch (error) {
-        coreLogger.warn(
-          `${this.options.sessionId} 单次 LLM 压缩失败，回退到分块递归摘要: ${error instanceof Error ? error.message : error}`,
-        );
-      }
+      // 单次 LLM 压缩失败不回退分块递归，直接抛错让上层感知
+      const finalSummarySource = await this.callSummaryLlm(singlePassPrompt, singlePassSource, 1, 'SinglePass');
+      return this.wrapSummaryResult(records, finalSummarySource, archivePath, '单次 LLM 摘要');
     }
 
     return this.buildChunkedHierarchicalSummary(records, archivePath);
@@ -974,7 +969,9 @@ export class CompressionPipeline {
           });
           return this.summarizeChunk(layer[0], depth, 1, 1, true);
         })()
-      : this.buildDeterministicSummary(records, 'LLM 层级预算回退');
+      : (() => {
+          throw new Error('LLM 压缩失败：分块层级超过最大深度，无法合并最终摘要（本地算法已禁用）');
+        })();
 
     return this.wrapSummaryResult(records, finalSummarySource, archivePath, '默认 LLM 分块/递归摘要');
   }
@@ -1101,7 +1098,7 @@ export class CompressionPipeline {
     const actorLabel = actorLabelSuffix ? `${actorLabelBase}-${actorLabelSuffix}` : actorLabelBase;
     const guardFactory = this.options.llmGuardFactory;
     if (!this.options.llmClient || !guardFactory) {
-      return this.limitText(fallbackText, this.recordCharBudget());
+      throw new Error('LLM 压缩失败：LLM 客户端或 Guard Factory 未配置（本地算法已禁用）');
     }
     const guard = guardFactory({
       actorLabel,
@@ -1128,7 +1125,11 @@ export class CompressionPipeline {
       // 防漂移：压缩摘要走确定性温度，减少上下文压缩本身引入的漂移源
       getReasoningGenerateOptions(),
     );
-    return contentToPlainText(response.content) || this.limitText(fallbackText, this.recordCharBudget());
+    const content = contentToPlainText(response.content);
+    if (!content) {
+      throw new Error('LLM 压缩失败：返回空内容（本地算法已禁用）');
+    }
+    return content;
   }
 
   private async summarizeChunk(
@@ -1138,7 +1139,9 @@ export class CompressionPipeline {
     total: number,
     finalPass = false,
   ): Promise<string> {
-    if (!this.options.llmClient) return chunkText;
+    if (!this.options.llmClient) {
+      throw new Error('LLM 压缩失败：LLM 客户端未配置（本地算法已禁用）');
+    }
 
     const prompt = this.buildSummaryPrompt(chunkText, depth, index, total, finalPass);
 
@@ -1147,9 +1150,9 @@ export class CompressionPipeline {
       return await this.callSummaryLlm(prompt, chunkText, depth);
     } catch (error) {
       coreLogger.warn(
-        `${this.options.sessionId} 语义压缩降级到算法摘要 (depth=${depth}): ${error instanceof Error ? error.message : error}`,
+        `${this.options.sessionId} LLM 语义压缩失败 (depth=${depth})，不回退本地算法: ${error instanceof Error ? error.message : error}`,
       );
-      return this.limitText(chunkText, this.recordCharBudget());
+      throw error;
     }
   }
 

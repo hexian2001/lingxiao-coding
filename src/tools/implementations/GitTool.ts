@@ -3,6 +3,9 @@ import { Tool, type ToolContext, type ToolResult } from '../Tool.js';
 import { RealGitService } from '../../core/git/RealGitService.js';
 import { GitPlatformApi } from '../../core/git/GitPlatformApi.js';
 import { getConfigValue } from '../../config.js';
+import { execFileSync } from 'node:child_process';
+import { emitToolOutput } from '../Tool.js';
+import type { EventEmitter } from '../../core/EventEmitter.js';
 
 const GitToolSchema = z.object({
   action: z.enum([
@@ -59,6 +62,117 @@ export class GitTool extends Tool {
   readonly description = 'Git 版本控制操作：查看状态、暂存文件、提交、切换分支、推送拉取，以及创建/合并 MR/PR（GitHub/GitLab/Gitea）。注意：不支持 force push 和强制删除远端分支等危险操作。';
   readonly parameters = GitToolSchema;
 
+  /**
+   * Resolve git author identity from ToolContext.
+   *
+   * Priority: context.gitIdentity (injected by BaseAgentRuntime from AgentRole.gitIdentity).
+   * Returns undefined if no identity is configured for this agent/role.
+   */
+  private resolveGitIdentity(context?: ToolContext): { name: string; email: string } | undefined {
+    const explicit = context?.gitIdentity;
+    if (explicit && typeof explicit === 'object' && explicit.name && explicit.email) {
+      return explicit as { name: string; email: string };
+    }
+    return undefined;
+  }
+
+  /**
+   * Run pre-commit gate checks. Returns { passed, diagnostics }.
+   *
+   * Gate config from git.pre_commit_gate:
+   *   - enabled: master switch
+   *   - type_check: run `npx tsc --noEmit` before commit
+   *   - command: custom shell command to run before commit
+   */
+  private async runPreCommitGate(workspace: string, context?: ToolContext): Promise<{ passed: boolean; diagnostics: string[] }> {
+    const gateEnabled = getConfigValue('git.pre_commit_gate.enabled');
+    if (gateEnabled !== true) {
+      return { passed: true, diagnostics: [] };
+    }
+
+    const diagnostics: string[] = [];
+
+    // Type check gate
+    const typeCheckEnabled = getConfigValue('git.pre_commit_gate.type_check');
+    if (typeCheckEnabled !== false) {
+      emitToolOutput(context, 'git', { chunk: '[pre-commit gate] Running type check (tsc --noEmit)...\n', stream: 'stdout' });
+      try {
+        execFileSync('npx', ['tsc', '--noEmit'], {
+          cwd: workspace,
+          timeout: 120_000,
+          stdio: ['pipe', 'pipe', 'pipe'],
+          env: { ...process.env, CI: 'true' },
+        });
+        emitToolOutput(context, 'git', { chunk: '[pre-commit gate] Type check passed ✓\n', stream: 'stdout' });
+      } catch (err) {
+        const stderr = err instanceof Error && 'stderr' in err ? String((err as { stderr: unknown }).stderr) : '';
+        const msg = `[pre-commit gate] Type check FAILED: ${stderr || (err instanceof Error ? err.message : String(err))}`;
+        diagnostics.push(msg);
+        emitToolOutput(context, 'git', { chunk: msg + '\n', stream: 'stderr' });
+      }
+    }
+
+    // Custom command gate
+    const customCommand = getConfigValue('git.pre_commit_gate.command');
+    if (typeof customCommand === 'string' && customCommand.trim()) {
+      emitToolOutput(context, 'git', { chunk: `[pre-commit gate] Running custom command: ${customCommand}\n`, stream: 'stdout' });
+      try {
+        execFileSync('bash', ['-c', customCommand], {
+          cwd: workspace,
+          timeout: 120_000,
+          stdio: ['pipe', 'pipe', 'pipe'],
+          env: { ...process.env, CI: 'true' },
+        });
+        emitToolOutput(context, 'git', { chunk: '[pre-commit gate] Custom command passed ✓\n', stream: 'stdout' });
+      } catch (err) {
+        const stderr = err instanceof Error && 'stderr' in err ? String((err as { stderr: unknown }).stderr) : '';
+        const msg = `[pre-commit gate] Custom command FAILED: ${stderr || (err instanceof Error ? err.message : String(err))}`;
+        diagnostics.push(msg);
+        emitToolOutput(context, 'git', { chunk: msg + '\n', stream: 'stderr' });
+      }
+    }
+
+    return { passed: diagnostics.length === 0, diagnostics };
+  }
+
+  /**
+   * Emit git:activity event for monitoring/visualization.
+   * Fires after each git action completes (commit, push, pull, branch, merge, create_mr).
+   */
+  private emitGitActivity(
+    context: ToolContext | undefined,
+    action: 'commit' | 'push' | 'pull' | 'branch_create' | 'branch_switch' | 'merge_mr' | 'create_mr',
+    success: boolean,
+    extra?: {
+      commitHash?: string;
+      commitMessage?: string;
+      author?: { name: string; email: string };
+      branch?: string;
+      gateResult?: { passed: boolean; enabled: boolean; diagnostics: string[] };
+      error?: string;
+    },
+  ): void {
+    const emitter = context?.emitter as EventEmitter | undefined;
+    if (!emitter) return;
+    const sessionId = typeof context?.sessionId === 'string' ? context.sessionId : '';
+    if (!sessionId) return;
+    emitter.emit('git:activity', {
+      sessionId,
+      agentId: String(context?.agentId || 'leader'),
+      agentName: typeof context?.agentName === 'string' ? context.agentName : 'leader',
+      taskId: typeof context?.taskId === 'string' ? context.taskId : undefined,
+      action,
+      success,
+      timestamp: Date.now(),
+      commitHash: extra?.commitHash,
+      commitMessage: extra?.commitMessage,
+      author: extra?.author,
+      branch: extra?.branch,
+      gateResult: extra?.gateResult,
+      error: extra?.error,
+    });
+  }
+
   async execute(args: unknown, context?: ToolContext): Promise<ToolResult> {
     const params = GitToolSchema.parse(args);
     const workspace = context?.workspace || process.cwd();
@@ -106,19 +220,42 @@ export class GitTool extends Tool {
 
         case 'commit': {
           if (!params.message) return { success: false, data: null, error: 'message is required for commit' };
-          const hash = await git.commit(params.message, { amend: params.amend });
-          return { success: true, data: `Committed: ${hash} — ${params.message}` };
+          // Pre-commit gate check
+          const gateResult = await this.runPreCommitGate(workspace, context);
+          if (!gateResult.passed) {
+            return {
+              success: false,
+              data: null,
+              error: `Pre-commit gate failed. Commit aborted.\n${gateResult.diagnostics.join('\n')}`,
+            };
+          }
+          // Resolve per-role git identity
+          const author = this.resolveGitIdentity(context);
+          const hash = await git.commit(params.message, {
+            amend: params.amend,
+            author,
+          });
+          const authorNote = author ? ` (author: ${author.name} <${author.email}>)` : '';
+          this.emitGitActivity(context, 'commit', true, {
+            commitHash: hash,
+            commitMessage: params.message,
+            author: author || undefined,
+            gateResult: { passed: gateResult.passed, enabled: getConfigValue('git.pre_commit_gate.enabled') === true, diagnostics: gateResult.diagnostics },
+          });
+          return { success: true, data: `Committed: ${hash} — ${params.message}${authorNote}` };
         }
 
         case 'branch_create': {
           if (!params.branch) return { success: false, data: null, error: 'branch is required for branch_create' };
           await git.createBranch(params.branch, params.from);
+          this.emitGitActivity(context, 'branch_create', true, { branch: params.branch });
           return { success: true, data: `Created and switched to branch: ${params.branch}` };
         }
 
         case 'branch_switch': {
           if (!params.branch) return { success: false, data: null, error: 'branch is required for branch_switch' };
           await git.switchBranch(params.branch);
+          this.emitGitActivity(context, 'branch_switch', true, { branch: params.branch });
           return { success: true, data: `Switched to branch: ${params.branch}` };
         }
 
@@ -136,11 +273,13 @@ export class GitTool extends Tool {
             branch: params.branch,
             setUpstream: params.set_upstream,
           });
+          this.emitGitActivity(context, 'push', true, { branch: params.branch });
           return { success: true, data: result };
         }
 
         case 'pull': {
           const result = await git.pull(params.remote, params.branch);
+          this.emitGitActivity(context, 'pull', true, { branch: params.branch });
           return { success: true, data: result };
         }
 
@@ -172,6 +311,7 @@ export class GitTool extends Tool {
             targetBranch,
             draft: params.mr_draft,
           });
+          this.emitGitActivity(context, 'create_mr', true, { branch: status.branch });
           return { success: true, data: `Created MR #${mr.id}: ${mr.title}\n${mr.url}` };
         }
 
@@ -179,6 +319,7 @@ export class GitTool extends Tool {
           if (params.mr_id === undefined) return { success: false, data: null, error: 'mr_id is required for merge_mr' };
           const api = await this.buildPlatformApi(git);
           await api.mergeMR(params.mr_id);
+          this.emitGitActivity(context, 'merge_mr', true);
           return { success: true, data: `Merged MR #${params.mr_id}` };
         }
 
@@ -186,7 +327,13 @@ export class GitTool extends Tool {
           return { success: false, data: null, error: `Unknown action: ${String((params as { action: string }).action)}` };
       }
     } catch (err) {
-      return { success: false, data: null, error: err instanceof Error ? err.message : String(err) };
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const actionStr = String((params as { action: string }).action);
+      const trackableActions = ['commit', 'push', 'pull', 'branch_create', 'branch_switch', 'create_mr', 'merge_mr'];
+      if (trackableActions.includes(actionStr)) {
+        this.emitGitActivity(context, actionStr as 'commit' | 'push' | 'pull' | 'branch_create' | 'branch_switch' | 'create_mr' | 'merge_mr', false, { error: errMsg });
+      }
+      return { success: false, data: null, error: errMsg };
     }
   }
 

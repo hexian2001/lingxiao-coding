@@ -123,6 +123,13 @@ export interface AgentRole {
     wire_api?: 'chat' | 'responses';
     no_bare?: boolean;
   };
+  /** Git author identity for this role's commits. When set, git commit uses
+   *  `git -c user.name=... -c user.email=...` to attribute the commit.
+   *  Useful for multi-agent team workflows where audit trail matters. */
+  gitIdentity?: {
+    name: string;
+    email: string;
+  };
   createdBy: 'system' | 'llm' | 'user';
 }
 
@@ -205,6 +212,9 @@ export class AgentRoleRegistry {
         }
         if (role.worker_backend && role.worker_backend !== 'worker_process') {
           parts.push(`  后端: ${role.worker_backend}${role.model ? ` · 模型: ${role.model}` : ''}`);
+        }
+        if (role.gitIdentity) {
+          parts.push(`  Git Identity: ${role.gitIdentity.name} <${role.gitIdentity.email}>`);
         }
         return parts.join('\n');
       }),

@@ -58,6 +58,10 @@ interface FileChangesState {
   selectedDiff: FileDiff | null;
   isLoading: boolean;
   error: string | null;
+  // Checkpoint 磁盘清理
+  diskUsage: { historyDir: string; sizeBytes: number; commitCount: number } | null;
+  isCleaningUp: boolean;
+  cleanupMessage: string | null;
 
   fetchCheckpoints: (sessionId: string) => Promise<void>;
   fetchAllCheckpoints: (sessionId?: string) => Promise<void>;
@@ -69,6 +73,11 @@ interface FileChangesState {
   setSelectedCheckpoint: (id: string | null) => void;
   setSelectedFilePath: (path: string | null) => void;
   clearError: () => void;
+  // Checkpoint 磁盘清理方法
+  fetchDiskUsage: (sessionId: string) => Promise<void>;
+  runGc: (sessionId: string) => Promise<void>;
+  purgeHistory: (sessionId: string) => Promise<void>;
+  clearCleanupMessage: () => void;
 }
 
 async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
@@ -97,6 +106,9 @@ export const useFileChangesStore = create<FileChangesState>((set, get) => ({
   selectedDiff: null,
   isLoading: false,
   error: null,
+  diskUsage: null,
+  isCleaningUp: false,
+  cleanupMessage: null,
 
   fetchCheckpoints: async (sessionId) => {
     set({ isLoading: true, error: null });
@@ -240,4 +252,71 @@ export const useFileChangesStore = create<FileChangesState>((set, get) => ({
   setSelectedCheckpoint: (id) => set({ selectedCheckpoint: id }),
   setSelectedFilePath: (path) => set({ selectedFilePath: path }),
   clearError: () => set({ error: null }),
+
+  // ── Checkpoint 磁盘清理 ──
+
+  fetchDiskUsage: async (sessionId) => {
+    try {
+      const data = await apiFetch<{ historyDir: string; sizeBytes: number; commitCount: number } | { error: string }>(
+        `/file-changes/disk-usage?sessionId=${encodeURIComponent(sessionId)}`,
+      );
+      if ('error' in data) {
+        set({ diskUsage: null });
+      } else {
+        set({ diskUsage: data });
+      }
+    } catch {
+      set({ diskUsage: null });
+    }
+  },
+
+  runGc: async (sessionId) => {
+    set({ isCleaningUp: true, cleanupMessage: null });
+    try {
+      const data = await apiFetch<{ sizeBytesBefore: number; sizeBytesAfter: number; commitCount: number } | { error: string }>(
+        '/file-changes/gc',
+        { method: 'POST', body: JSON.stringify({ sessionId }) },
+      );
+      if ('error' in data) {
+        set({ isCleaningUp: false, cleanupMessage: `GC failed: ${data.error}` });
+      } else {
+        const freedMB = ((data.sizeBytesBefore - data.sizeBytesAfter) / 1024 / 1024).toFixed(1);
+        set({
+          isCleaningUp: false,
+          cleanupMessage: `GC complete: freed ${freedMB} MB, ${data.commitCount} checkpoints remaining`,
+          diskUsage: { historyDir: '', sizeBytes: data.sizeBytesAfter, commitCount: data.commitCount },
+        });
+        // 刷新 checkpoint 列表
+        await get().fetchAllCheckpoints(sessionId);
+      }
+    } catch (err) {
+      set({ isCleaningUp: false, cleanupMessage: `GC failed: ${err instanceof Error ? err.message : 'unknown'}` });
+    }
+  },
+
+  purgeHistory: async (sessionId) => {
+    set({ isCleaningUp: true, cleanupMessage: null });
+    try {
+      const data = await apiFetch<{ deleted: boolean; freedBytes: number; historyDir: string } | { error: string }>(
+        '/file-changes/purge',
+        { method: 'POST', body: JSON.stringify({ sessionId }) },
+      );
+      if ('error' in data) {
+        set({ isCleaningUp: false, cleanupMessage: `Purge failed: ${data.error}` });
+      } else {
+        const freedMB = (data.freedBytes / 1024 / 1024).toFixed(1);
+        set({
+          isCleaningUp: false,
+          cleanupMessage: `Purge complete: freed ${freedMB} MB, all history deleted`,
+          diskUsage: null,
+          checkpoints: [],
+          sessionGroups: [],
+        });
+      }
+    } catch (err) {
+      set({ isCleaningUp: false, cleanupMessage: `Purge failed: ${err instanceof Error ? err.message : 'unknown'}` });
+    }
+  },
+
+  clearCleanupMessage: () => set({ cleanupMessage: null }),
 }));

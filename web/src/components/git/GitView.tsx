@@ -116,8 +116,9 @@ export default function GitView() {
     />
   ) : null;
 
-  // Initial data fetch
+  // Initial data fetch — only when workspace is non-empty (avoids flashing server-default repo data during session switch)
   useEffect(() => {
+    if (!workspace) return;
     const init = async () => {
       await fetchStatus();
       const { status } = useGitStore.getState();

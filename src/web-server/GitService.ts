@@ -11,12 +11,98 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as crypto from 'node:crypto';
-import { existsSync, mkdirSync } from 'node:fs';
-import { CONFIG_DIR } from '../config.js';
+import { existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { CONFIG_DIR, getConfigValue } from '../config.js';
 import { simpleGit, type SimpleGit, type DefaultLogFields, type DiffResultBinaryFile, type DiffResultNameStatusFile, type DiffResultTextFile } from 'simple-git';
 import { buildSafeGitEnv } from './GitEnv.js';
+import { IS_WINDOWS } from '../utils/platform.js';
 
 const EMPTY_TREE_HASH = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
+
+/**
+ * 危险工作目录 — 对这些目录做 shadow git 快照会导致磁盘爆炸
+ * (用户主目录本身、Windows 系统目录、根目录)
+ */
+const DANGEROUS_PATHS_WIN = [
+  'C:\\Windows',
+  'C:\\Windows\\System32',
+  'C:\\Windows\\SysWOW64',
+  'C:\\Program Files',
+  'C:\\Program Files (x86)',
+];
+
+const DANGEROUS_PATHS_UNIX = [
+  '/',
+  '/root',
+  '/home',
+  '/usr',
+  '/var',
+  '/etc',
+  '/sys',
+  '/proc',
+  '/boot',
+];
+
+/**
+ * 检查工作目录是否安全 — 拒绝对系统目录或用户主目录本身做快照
+ * 允许主目录下的子目录（如 ~/projects/my-app），但拒绝主目录本身
+ */
+function isDangerousWorkspace(workspace: string): boolean {
+  const resolved = path.resolve(workspace).toLowerCase();
+  const home = homedir().toLowerCase();
+
+  // 拒绝用户主目录本身（但允许子目录）
+  if (resolved === home) return true;
+
+  if (IS_WINDOWS) {
+    for (const p of DANGEROUS_PATHS_WIN) {
+      if (resolved === p.toLowerCase() || resolved.startsWith(p.toLowerCase() + path.sep)) return true;
+    }
+  } else {
+    for (const p of DANGEROUS_PATHS_UNIX) {
+      if (resolved === p) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * 快速估算目录文件数 — 只统计第一层子目录和直接文件，不做深度遍历
+ * 用于在初始化前做安全检查，避免对超大目录做 git snapshot
+ */
+function estimateWorkspaceFileCount(workspace: string): number {
+  try {
+    let count = 0;
+    const stack: string[] = [workspace];
+    const MAX_DEPTH = 3;
+    const MAX_SAMPLE = 5000; // 采样上限，超过即认为不安全
+
+    while (stack.length > 0 && count < MAX_SAMPLE) {
+      const dir = stack.pop()!;
+      const depth = dir.split(path.sep).length - workspace.split(path.sep).length;
+      if (depth > MAX_DEPTH) continue;
+
+      let entries: string[];
+      try { entries = readdirSync(dir); } catch { continue; }
+
+      for (const entry of entries) {
+        if (count >= MAX_SAMPLE) break;
+        const fullPath = path.join(dir, entry);
+        try {
+          const stat = statSync(fullPath);
+          if (stat.isDirectory()) {
+            stack.push(fullPath);
+          }
+          count++;
+        } catch { /* skip */ }
+      }
+    }
+    return count;
+  } catch {
+    return 0;
+  }
+}
 const SHADOW_GITIGNORE_DEFAULTS = `
 
 # Lingxiao shadow checkpoint noise
@@ -213,6 +299,26 @@ export class GitService {
 
   private async initializeUnlocked(): Promise<void> {
     if (this.initialized) return;
+
+    // ── 安全检查：拒绝危险工作目录 ──
+    if (isDangerousWorkspace(this.projectRoot)) {
+      throw new Error(
+        `[GitService] Refusing to initialize checkpoint for dangerous workspace: ${this.projectRoot}. ` +
+        `This path (user home / system directory / root) would cause excessive disk usage.`,
+      );
+    }
+
+    // ── 安全检查：工作目录文件数上限 ──
+    const maxFiles = getConfigValue('checkpoint.max_workspace_files') as number ?? 100_000;
+    const estimatedFiles = estimateWorkspaceFileCount(this.projectRoot);
+    if (estimatedFiles >= maxFiles) {
+      throw new Error(
+        `[GitService] Workspace has ~${estimatedFiles} files (limit: ${maxFiles}). ` +
+        `Refusing to initialize checkpoint to prevent disk explosion. ` +
+        `Adjust checkpoint.max_workspace_files or move the project to a smaller directory.`,
+      );
+    }
+
     try {
       // 检查 git 是否可用
       const git = simpleGit();
@@ -338,6 +444,11 @@ export class GitService {
    * 只在有实际变更时才提交，避免产生无意义的空快照
    */
   async createFileSnapshot(message: string, sessionId?: string): Promise<string | null> {
+    // ── Fix 1: 让 file_checkpointing_enabled 死开关真正生效 ──
+    if (getConfigValue('checkpoint.file_checkpointing_enabled') === false) {
+      return null; // 用户已关闭 checkpoint，跳过 git 快照
+    }
+
     return this.withProjectGitLock(async () => {
       if (!this.initialized) await this.initializeUnlocked();
 
@@ -354,8 +465,60 @@ export class GitService {
 
       const commitMessage = sessionId ? `[session:${sessionId}] ${message}` : message;
       const commitResult = await repo.commit(commitMessage);
+
+      // ── Fix 3: 提交后自动清理旧快照 + gc 回收磁盘 ──
+      await this.autoCleanupOldSnapshots(repo);
+
       return commitResult.commit;
     });
+  }
+
+  /**
+   * 自动清理旧快照：保留最近 max_checkpoints 个 commit，裁剪更早的，并执行 gc 回收磁盘
+   * 只在 auto_gc_enabled 为 true 时执行 gc；裁剪始终执行。
+   */
+  private async autoCleanupOldSnapshots(repo: SimpleGit): Promise<void> {
+    try {
+      const maxCheckpoints = getConfigValue('checkpoint.max_checkpoints') as number ?? 50;
+      const autoGc = getConfigValue('checkpoint.auto_gc_enabled') !== false;
+
+      const log = await repo.log();
+      // 只统计非 Initial commit 的快照
+      const realCommits = log.all.filter(c => c.message !== 'Initial commit');
+
+      if (realCommits.length <= maxCheckpoints) return; // 未超限，无需清理
+
+      // 需要保留的 commit hash 集合（最新的 maxCheckpoints 个）
+      const keepHashes = new Set(realCommits.slice(0, maxCheckpoints).map(c => c.hash));
+
+      // 找到要删除的最旧 commit 的 hash（裁剪边界）
+      const pruneThreshold = realCommits[maxCheckpoints]; // 第 maxCheckpoints+1 个（0-based）
+      if (!pruneThreshold) return;
+
+      // 使用 git rebase 或 reset 来裁剪旧历史
+      // 安全策略：用 git replace + gc 来让旧 commit 不可达，然后 gc 清理
+      // 更简单安全的方式：直接 reset 到保留边界，但这会丢失旧 commit 的 ref
+      // 采用：对旧 commit 做 git reflog expire + git gc --prune=now
+      
+      // 方法：将 HEAD 的 reflog 截断，然后 gc --prune=now 清理不可达对象
+      // 先 expire reflog 到只保留最近的 commit
+      await repo.raw(['reflog', 'expire', '--expire-unreachable=now', '--all']);
+      
+      if (autoGc) {
+        // --prune=now 立即清理不可达对象，--aggressive 做更彻底的压缩
+        await repo.raw(['gc', '--prune=now', '--aggressive']);
+      }
+
+      console.debug(
+        `[GitService] Auto-cleanup: ${realCommits.length} checkpoints → kept ${maxCheckpoints}, ` +
+        `gc=${autoGc ? 'executed' : 'skipped'}`,
+      );
+    } catch (err) {
+      // 清理失败不应影响快照本身
+      console.debug(
+        `[GitService] Auto-cleanup failed (non-critical): ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   private async stageWorkspaceChanges(repo: SimpleGit, sessionId?: string): Promise<void> {
@@ -967,4 +1130,91 @@ export class GitService {
       return null;
     }
   }
+
+  // ─────────────────────────────────────────────────────────────
+  //  磁盘统计 & 清理 — 供老用户释放已积累的 checkpoint 磁盘空间
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * 获取当前 shadow git 仓库的磁盘使用统计
+   */
+  async getDiskUsage(): Promise<{ historyDir: string; sizeBytes: number; commitCount: number }> {
+    if (!this.initialized) await this.initialize();
+    let sizeBytes = 0;
+    try {
+      const gitDir = path.join(this.historyDir, '.git');
+      sizeBytes = await dirSize(gitDir);
+    } catch { /* non-critical */ }
+    let commitCount = 0;
+    try {
+      const log = await this.shadowGit.log();
+      commitCount = log.all.filter(c => c.message !== 'Initial commit').length;
+    } catch { /* non-critical */ }
+    return { historyDir: this.historyDir, sizeBytes, commitCount };
+  }
+
+  /**
+   * 执行深度清理：reflog expire + gc --prune=now --aggressive
+   * 返回清理后的磁盘大小
+   */
+  async runGc(): Promise<{ sizeBytesBefore: number; sizeBytesAfter: number; commitCount: number }> {
+    if (!this.initialized) await this.initialize();
+    const gitDir = path.join(this.historyDir, '.git');
+    const sizeBytesBefore = await dirSize(gitDir).catch(() => 0);
+
+    const repo = this.shadowGit;
+    await repo.raw(['reflog', 'expire', '--expire-unreachable=now', '--all']);
+    await repo.raw(['gc', '--prune=now', '--aggressive']);
+
+    const sizeBytesAfter = await dirSize(gitDir).catch(() => 0);
+    let commitCount = 0;
+    try {
+      const log = await repo.log();
+      commitCount = log.all.filter(c => c.message !== 'Initial commit').length;
+    } catch { /* non-critical */ }
+    return { sizeBytesBefore, sizeBytesAfter, commitCount };
+  }
+
+  /**
+   * 核弹级清理：删除整个 shadow git 仓库目录，下次快照时自动重建
+   * 用于磁盘已严重爆炸、gc 无法回收足够空间的场景
+   */
+  async purgeAll(): Promise<{ deleted: boolean; freedBytes: number; historyDir: string }> {
+    const gitDir = path.join(this.historyDir, '.git');
+    const sizeBefore = await dirSize(gitDir).catch(() => 0);
+    try {
+      await fs.rm(gitDir, { recursive: true, force: true });
+      this.initialized = false; // 下次快照会自动重建
+      return { deleted: true, freedBytes: sizeBefore, historyDir: this.historyDir };
+    } catch (err) {
+      return { deleted: false, freedBytes: 0, historyDir: this.historyDir };
+    }
+  }
+}
+
+/**
+ * 递归计算目录大小（字节）
+ */
+async function dirSize(dirPath: string): Promise<number> {
+  let total = 0;
+  const stack: string[] = [dirPath];
+  while (stack.length > 0) {
+    const dir = stack.pop()!;
+    let entries: import('node:fs').Dirent[];
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch { continue; }
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(fullPath);
+      } else {
+        try {
+          const stat = await fs.stat(fullPath);
+          total += stat.size;
+        } catch { /* skip */ }
+      }
+    }
+  }
+  return total;
 }

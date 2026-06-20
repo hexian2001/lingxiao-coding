@@ -199,6 +199,8 @@ export interface AgentConfig {
   workflowManager?: WorkflowManager;
   workflowEngine?: WorkflowEngine;
   scheduledTaskManager?: ScheduledTaskManager;
+  /** Per-role git author identity for commit attribution. */
+  gitIdentity?: { name: string; email: string };
 }
 
 /**
@@ -277,6 +279,8 @@ export class BaseAgent {
   protected workflowManager?: WorkflowManager;
   protected workflowEngine?: WorkflowEngine;
   protected scheduledTaskManager?: ScheduledTaskManager;
+  /** Per-role git author identity for commit attribution. */
+  protected gitIdentity?: { name: string; email: string };
 
   /** 带 sessionId 前缀的 bus 收件人名（避免跨会话消息串台） */
   get busName(): string { return `${this.sessionId}:${this.name}`; }
@@ -570,6 +574,7 @@ export class BaseAgent {
     this.workflowManager = config.workflowManager;
     this.workflowEngine = config.workflowEngine;
     this.scheduledTaskManager = config.scheduledTaskManager;
+    this.gitIdentity = config.gitIdentity;
     this.maxIterations = config.maxIterations ?? AGENT_MAX_ITERATIONS;
     this.maxRuntimeMinutes = config.maxRuntimeMinutes ?? AGENT_MAX_RUNTIME_MINUTES;
 
@@ -1401,6 +1406,7 @@ export class BaseAgent {
         workflowEngine: this.workflowEngine,
         scheduledTaskManager: this.scheduledTaskManager,
         toolRegistry: this.tools,
+        gitIdentity: this.gitIdentity,
       });
 
       if (!result.success && String(result.error || '').startsWith('PERMISSION_REQUIRED:')) {
@@ -1429,6 +1435,7 @@ export class BaseAgent {
             workflowEngine: this.workflowEngine,
             scheduledTaskManager: this.scheduledTaskManager,
             toolRegistry: this.tools,
+            gitIdentity: this.gitIdentity,
           });
         }
       }

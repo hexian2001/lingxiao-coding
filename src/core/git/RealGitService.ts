@@ -207,16 +207,25 @@ export class RealGitService {
   /**
    * 提交
    */
-  async commit(message: string, options?: { amend?: boolean; allowEmpty?: boolean }): Promise<string> {
+  async commit(message: string, options?: {
+    amend?: boolean;
+    allowEmpty?: boolean;
+    author?: { name: string; email: string };
+  }): Promise<string> {
     let commitMessage = message;
     // 条件追加 Co-authored-by trailer
     const includeCoAuthor = getConfigValue('ui.include_co_authored_by');
     if (includeCoAuthor !== false && !message.includes('Co-authored-by:')) {
       commitMessage = `${message}\n\nCo-authored-by: Lingxiao <noreply@lingxiao.ai>`;
     }
-    const args = ['commit', '-m', commitMessage];
+    const args: string[] = ['commit', '-m', commitMessage];
     if (options?.amend) args.push('--amend');
     if (options?.allowEmpty) args.push('--allow-empty');
+    // Per-role git identity: use `git -c user.name=... -c user.email=...` to
+    // attribute the commit to the agent's role for audit trail in team workflows.
+    if (options?.author) {
+      args.unshift('-c', `user.name=${options.author.name}`, '-c', `user.email=${options.author.email}`);
+    }
     const result = await this.git.raw(args);
     // Extract commit hash from output
     const match = result.match(/\[[\w\/]+\s+([a-f0-9]+)\]/);

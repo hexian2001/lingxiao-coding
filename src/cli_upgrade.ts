@@ -1,28 +1,30 @@
 /**
- * lingxiao upgrade — 自更新命令
+ * lingxiao upgrade — 自更新命令（跨平台）
  *
  * 功能：
  *   lingxiao upgrade          检查并升级到最新版本
  *   lingxiao upgrade --check  只检查不更新
  *
  * 原理：
- *   1. 查询 GitHub releases/latest 获取最新 tag
+ *   1. 查询 GitHub releases/latest 获取最新 tag（Node 原生 fetch，不依赖 curl）
  *   2. 与当前 VERSION 做 semver 比较
- *   3. 下载对应平台便携包 → 替换安装目录 → 刷新 symlink
- *   4. npm 安装则提示 npm update -g
+ *   3. 根据安装类型自动选择升级策略：
+ *      - source: git pull + npm install + npm run build
+ *      - portable: 下载平台对应预构建包 → 替换安装目录 → 刷新 symlink
+ *      - npm: 提示 npm update -g
+ *   4. 跨平台支持 Windows/macOS/Linux × x64/arm64
  */
 
 import { VERSION } from './version.js';
 import { platform, arch, tmpdir } from 'os';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, renameSync, createReadStream } from 'fs';
-import { join, dirname, basename } from 'path';
+import { existsSync, readFileSync, mkdirSync, rmSync, renameSync, realpathSync, createWriteStream } from 'fs';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { spawnSync } from 'child_process';
-import { createGunzip } from 'zlib';
-import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import chalk from 'chalk';
 
+const IS_WINDOWS = platform() === 'win32';
 const REPO = 'hexian2001/lingxiao-coding';
 const GITHUB_API = `https://api.github.com/repos/${REPO}/releases/latest`;
 
@@ -67,20 +69,19 @@ function detectTarget(): string {
   return `${platformName}-${archName}`;
 }
 
-// ── 查询最新版本 ───────────────────────────────────────────────────────────────
+// ── 查询最新版本（Node 原生 fetch，跨平台） ────────────────────────────────────
 
 async function fetchLatestRelease(): Promise<ReleaseInfo> {
-  // 使用 spawnSync 同步调用 curl，避免引入额外依赖
-  const result = spawnSync('curl', ['-fsSL', GITHUB_API], {
-    encoding: 'utf-8',
-    timeout: 15000,
+  const response = await fetch(GITHUB_API, {
+    headers: { 'User-Agent': 'lingxiao-cli' },
+    signal: AbortSignal.timeout(15000),
   });
 
-  if (result.status !== 0 || !result.stdout) {
-    throw new Error('无法连接 GitHub API，请检查网络后重试');
+  if (!response.ok) {
+    throw new Error(`无法连接 GitHub API (HTTP ${response.status})，请检查网络后重试`);
   }
 
-  const data = JSON.parse(result.stdout);
+  const data = await response.json() as { tag_name?: string; html_url?: string; published_at?: string };
   const tag: string = data.tag_name || '';
   if (!tag) throw new Error('GitHub API 返回格式异常');
 
@@ -99,26 +100,22 @@ type InstallType = 'portable' | 'npm' | 'source';
 function detectInstallType(): { type: InstallType; installDir?: string } {
   const scriptPath = dirname(fileURLToPath(import.meta.url));
 
-  // ── 策略 1：通过 `which lingxiao` + readlink 反向追踪真实安装路径 ──
-  // 这是唯一可靠的全局入口探测方式，无论 npm link / 便携版 / 手动 symlink 都能找到
-  const whichResult = spawnSync('which', ['lingxiao'], { encoding: 'utf-8', timeout: 5000 });
+  // ── 策略 1：通过 `which`/`where lingxiao` + realpath 反向追踪真实安装路径 ──
+  // 跨平台：Unix 用 which，Windows 用 where；解析 symlink 用 Node fs.realpathSync
+  const whichCmd = IS_WINDOWS ? 'where' : 'which';
+  const whichResult = spawnSync(whichCmd, ['lingxiao'], { encoding: 'utf-8', timeout: 5000, shell: IS_WINDOWS });
   if (whichResult.status === 0 && whichResult.stdout.trim()) {
-    let binPath = whichResult.stdout.trim();
+    // Windows `where` 可能返回多行，取第一行；Unix `which` 返回单行
+    let binPath = whichResult.stdout.trim().split('\n')[0].trim().replace(/\r$/, '');
 
     // 递归解析 symlink（npm link 会创建 /usr/local/bin/lingxiao → .../bin/lingxiao.js → ...）
+    // 跨平台：用 Node fs.realpathSync 替代 readlink -f
     let resolved = binPath;
-    for (let i = 0; i < 10; i++) {
-      const readlink = spawnSync('readlink', ['-f', resolved], { encoding: 'utf-8', timeout: 5000 });
-      if (readlink.status !== 0 || !readlink.stdout.trim()) break;
-      const next = readlink.stdout.trim();
-      if (next === resolved) break;
-      resolved = next;
+    try {
+      resolved = realpathSync(binPath);
+    } catch {
+      // realpathSync 失败时 fallback 到原路径
     }
-
-    // resolved 现在指向真实文件，例如：
-    //   源码安装：/root/lingxiao/lingxiao_cli/lingxiao-coding/bin/lingxiao.js
-    //   npm 全局：/usr/lib/node_modules/lingxiao_cli/bin/lingxiao.js
-    //   便携版：  /opt/lingxiao/bin/lingxiao.js 或 /opt/lingxiao/lingxiao
 
     // 从真实路径向上查找项目根目录（含 package.json 且 name=lingxiao_cli）
     let dir = dirname(resolved);
@@ -149,6 +146,7 @@ function detectInstallType(): { type: InstallType; installDir?: string } {
 
   // ── 策略 2：fallback — 从 scriptPath（当前 dist 目录）推断 ──
   // dist/cli_upgrade.js → 项目根 = dirname(scriptPath)
+  // Windows 上 dist\cli_upgrade.js → 项目根 = dirname(scriptPath) 同样有效
   const projectRoot = dirname(scriptPath);
   const pkgPath = join(projectRoot, 'package.json');
   if (existsSync(pkgPath)) {
@@ -163,16 +161,18 @@ function detectInstallType(): { type: InstallType; installDir?: string } {
     } catch { /* ignore */ }
   }
 
-  // ── 策略 3：legacy fallback — 原有逻辑 ──
+  // ── 策略 3：legacy fallback ──
   const possibleBinaryDirs = [
     join(scriptPath, '..'),
     join(scriptPath, '..', '..'),
   ];
 
   for (const dir of possibleBinaryDirs) {
+    // 跨平台：Unix 检查 lingxiao，Windows 检查 lingxiao.cmd / lingxiao.exe
     const binPath = join(dir, 'lingxiao');
     const binCmdPath = join(dir, 'lingxiao.cmd');
-    if (existsSync(binPath) || existsSync(binCmdPath)) {
+    const binExePath = join(dir, 'lingxiao.exe');
+    if (existsSync(binPath) || existsSync(binCmdPath) || existsSync(binExePath)) {
       if (!dir.includes('node_modules')) {
         return { type: 'portable', installDir: dir };
       }
@@ -187,11 +187,11 @@ function detectInstallType(): { type: InstallType; installDir?: string } {
   return { type: 'source', installDir: process.cwd() };
 }
 
-// ── 下载并解压 ────────────────────────────────────────────────────────────────
+// ── 下载并解压（跨平台） ──────────────────────────────────────────────────────
 
 async function downloadAndExtract(tag: string, target: string, destDir: string): Promise<void> {
-  const isWindows = platform() === 'win32';
-  const archiveExt = isWindows ? '.zip' : '.tar.gz';
+  // 跨平台：Windows 用 .zip，Unix 用 .tar.gz
+  const archiveExt = IS_WINDOWS ? '.zip' : '.tar.gz';
   const archiveName = `lingxiao-${tag}-${target}${archiveExt}`;
   // 同时尝试不带 v 前缀
   const versionNoV = tag.replace(/^v/, '');
@@ -205,24 +205,40 @@ async function downloadAndExtract(tag: string, target: string, destDir: string):
   mkdirSync(tmpDir, { recursive: true });
 
   try {
+    // 跨平台下载：使用 Node 原生 fetch + stream pipeline，不依赖 curl
     console.log(chalk.cyan(`▸ 下载: ${downloadUrl}`));
-    let downloadResult = spawnSync('curl', ['-fSL', '-o', join(tmpDir, archiveName), downloadUrl], {
-      stdio: 'inherit',
-      timeout: 120000,
-    });
-
     let actualArchive = archiveName;
+    let downloadOk = false;
 
-    if (downloadResult.status !== 0) {
-      console.log(chalk.yellow(`▸ 重试: ${downloadUrlAlt}`));
-      downloadResult = spawnSync('curl', ['-fSL', '-o', join(tmpDir, archiveNameAlt), downloadUrlAlt], {
-        stdio: 'inherit',
-        timeout: 120000,
+    try {
+      const archivePath = join(tmpDir, archiveName);
+      const resp = await fetch(downloadUrl, {
+        signal: AbortSignal.timeout(120000),
+        redirect: 'follow',
       });
-      actualArchive = archiveNameAlt;
+      if (!resp.ok || !resp.body) throw new Error(`HTTP ${resp.status}`);
+      const ws = createWriteStream(archivePath);
+      await pipeline(resp.body, ws);
+      downloadOk = true;
+    } catch {
+      console.log(chalk.yellow(`▸ 重试: ${downloadUrlAlt}`));
+      try {
+        const archivePath = join(tmpDir, archiveNameAlt);
+        const resp = await fetch(downloadUrlAlt, {
+          signal: AbortSignal.timeout(120000),
+          redirect: 'follow',
+        });
+        if (!resp.ok || !resp.body) throw new Error(`HTTP ${resp.status}`);
+        const ws = createWriteStream(archivePath);
+        await pipeline(resp.body, ws);
+        actualArchive = archiveNameAlt;
+        downloadOk = true;
+      } catch {
+        // 两个 URL 都失败
+      }
     }
 
-    if (downloadResult.status !== 0) {
+    if (!downloadOk) {
       throw new Error('下载失败，请检查网络或版本号');
     }
     console.log(chalk.green('  ✓ 下载完成'));
@@ -244,7 +260,7 @@ async function downloadAndExtract(tag: string, target: string, destDir: string):
     try {
       mkdirSync(destDir, { recursive: true });
 
-      if (isWindows) {
+      if (IS_WINDOWS) {
         // Windows: 用 PowerShell 解压 zip
         spawnSync('powershell', ['-Command',
           `Expand-Archive -Path "${archivePath}" -DestinationPath "${destDir}" -Force`], {
@@ -266,13 +282,17 @@ async function downloadAndExtract(tag: string, target: string, destDir: string):
         });
       }
 
-      if (!existsSync(join(destDir, isWindows ? 'lingxiao.cmd' : 'lingxiao'))) {
+      // 跨平台验证可执行文件
+      const exeFound = IS_WINDOWS
+        ? existsSync(join(destDir, 'lingxiao.cmd')) || existsSync(join(destDir, 'lingxiao.exe'))
+        : existsSync(join(destDir, 'lingxiao'));
+      if (!exeFound) {
         throw new Error('解压后未找到可执行文件，可能包结构有变');
       }
       console.log(chalk.green('  ✓ 解压完成'));
       needRollback = false; // 成功，不需要回滚
     } catch (extractError) {
-      // P0-10: 解压失败时回滚到备份
+      // 解压失败时回滚到备份
       if (needRollback && existsSync(backupDir)) {
         console.log(chalk.red('  ✗ 解压失败，正在回滚到旧版本...'));
         rmSync(destDir, { recursive: true, force: true });
@@ -286,9 +306,16 @@ async function downloadAndExtract(tag: string, target: string, destDir: string):
   }
 }
 
-// ── 刷新 symlink ──────────────────────────────────────────────────────────────
+// ── 刷新 symlink（跨平台） ────────────────────────────────────────────────────
 
 function refreshSymlink(installDir: string): void {
+  // Windows 不使用 symlink — 便携版通过 PATH 或直接运行 lingxiao.cmd
+  if (IS_WINDOWS) {
+    console.log(chalk.dim('  ℹ Windows 便携版，请确保安装目录在 PATH 中'));
+    return;
+  }
+
+  // Unix: 创建/刷新 /usr/local/bin/lingxiao symlink
   const binDir = '/usr/local/bin';
   const binPath = join(installDir, 'lingxiao');
   const linkPath = join(binDir, 'lingxiao');
@@ -361,9 +388,9 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
           : installInfo.installDir)
       : process.cwd();
 
-    // 确认是 git 仓库
+    // 确认是 git 仓库（git 命令本身跨平台）
     const gitCheck = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], {
-      cwd: sourceDir, encoding: 'utf-8', timeout: 5000,
+      cwd: sourceDir, encoding: 'utf-8', timeout: 5000, shell: IS_WINDOWS,
     });
 
     if (gitCheck.status !== 0) {
@@ -375,10 +402,10 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
     try {
       console.log(chalk.cyan(`\n▸ 源码安装模式，自动升级 (目录: ${sourceDir})`));
 
-      // 1. git fetch + reset 到最新 tag（避免本地修改冲突）
+      // 1. git fetch + checkout 到最新 tag
       console.log(chalk.cyan('▸ 拉取最新代码...'));
       const gitFetch = spawnSync('git', ['fetch', '--tags', 'origin'], {
-        cwd: sourceDir, stdio: 'inherit', timeout: 60000,
+        cwd: sourceDir, stdio: 'inherit', timeout: 60000, shell: IS_WINDOWS,
       });
       if (gitFetch.status !== 0) {
         throw new Error('git fetch 失败，请检查网络或手动执行 git pull');
@@ -386,23 +413,24 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
 
       // checkout 到最新 release tag
       const gitCheckout = spawnSync('git', ['checkout', release.tag], {
-        cwd: sourceDir, stdio: 'inherit', timeout: 30000,
+        cwd: sourceDir, stdio: 'inherit', timeout: 30000, shell: IS_WINDOWS,
       });
       if (gitCheckout.status !== 0) {
         // checkout 失败可能是本地有修改，尝试 stash + pull
         console.log(chalk.yellow('  ⚠ checkout 失败，尝试 stash 后 pull...'));
-        spawnSync('git', ['stash'], { cwd: sourceDir, stdio: 'inherit', timeout: 10000 });
+        spawnSync('git', ['stash'], { cwd: sourceDir, stdio: 'inherit', timeout: 10000, shell: IS_WINDOWS });
         const gitPull = spawnSync('git', ['pull', 'origin', 'main'], {
-          cwd: sourceDir, stdio: 'inherit', timeout: 60000,
+          cwd: sourceDir, stdio: 'inherit', timeout: 60000, shell: IS_WINDOWS,
         });
         if (gitPull.status !== 0) {
           throw new Error('git pull 失败，请手动解决冲突后重试');
         }
       }
 
-      // 2. npm install
+      // 2. npm install（npm 命令跨平台，Windows 上需要 npm.cmd）
+      const npmCmd = IS_WINDOWS ? 'npm.cmd' : 'npm';
       console.log(chalk.cyan('▸ 安装依赖...'));
-      const npmInstall = spawnSync('npm', ['install'], {
+      const npmInstall = spawnSync(npmCmd, ['install'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 300000,
       });
       if (npmInstall.status !== 0) {
@@ -411,7 +439,7 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
 
       // 3. npm run build
       console.log(chalk.cyan('▸ 构建项目...'));
-      const npmBuild = spawnSync('npm', ['run', 'build'], {
+      const npmBuild = spawnSync(npmCmd, ['run', 'build'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 300000,
       });
       if (npmBuild.status !== 0) {
@@ -420,7 +448,7 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
 
       // 4. npm link（刷新全局链接）
       console.log(chalk.cyan('▸ 刷新全局链接...'));
-      const npmLink = spawnSync('npm', ['link'], {
+      const npmLink = spawnSync(npmCmd, ['link'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 30000,
       });
       if (npmLink.status !== 0) {
@@ -452,14 +480,13 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
   try {
     await downloadAndExtract(release.tag, target, installInfo.installDir);
 
-    // 刷新 symlink (非 Windows)
-    if (platform() !== 'win32') {
-      console.log(chalk.cyan('▸ 刷新命令链接...'));
-      refreshSymlink(installInfo.installDir);
-    }
+    // 刷新 symlink（跨平台：Windows 跳过）
+    console.log(chalk.cyan('▸ 刷新命令链接...'));
+    refreshSymlink(installInfo.installDir);
 
-    // 验证新版本
-    const verifyResult = spawnSync('lingxiao', ['--version'], { encoding: 'utf-8', timeout: 5000 });
+    // 验证新版本（跨平台）
+    const verifyCmd = IS_WINDOWS ? 'lingxiao.cmd' : 'lingxiao';
+    const verifyResult = spawnSync(verifyCmd, ['--version'], { encoding: 'utf-8', timeout: 5000, shell: IS_WINDOWS });
     const newVersion = verifyResult.stdout?.trim() || release.tag;
 
     console.log('');

@@ -231,6 +231,7 @@ function buildRoleSurface(
     workerBackend: role.worker_backend,
     model: role.model,
     systemPrompt: role.systemPrompt,
+    gitIdentity: role.gitIdentity,
     definition: definition
       ? {
           source: definition.source,
@@ -266,6 +267,14 @@ function parseWorkerBackend(value: unknown): AgentWorkerBackend | undefined {
 
 function parseCustomAgentBody(body: unknown, fallbackName?: string): SaveAgentDefinitionInput {
   const raw = body && typeof body === 'object' && !Array.isArray(body) ? body as Record<string, unknown> : {};
+  const gitIdentityRaw = raw.gitIdentity;
+  const gitIdentity = gitIdentityRaw && typeof gitIdentityRaw === 'object' && !Array.isArray(gitIdentityRaw)
+    ? {
+        name: typeof (gitIdentityRaw as Record<string, unknown>).name === 'string' ? (gitIdentityRaw as Record<string, unknown>).name as string : '',
+        email: typeof (gitIdentityRaw as Record<string, unknown>).email === 'string' ? (gitIdentityRaw as Record<string, unknown>).email as string : '',
+      }
+    : undefined;
+  const validGitIdentity = gitIdentity && gitIdentity.name.trim() && gitIdentity.email.trim() ? gitIdentity : undefined;
   return {
     name: typeof raw.name === 'string' ? raw.name : fallbackName ?? '',
     description: typeof raw.description === 'string' ? raw.description : '',
@@ -275,6 +284,7 @@ function parseCustomAgentBody(body: unknown, fallbackName?: string): SaveAgentDe
     baseRoleName: typeof raw.baseRoleName === 'string' ? raw.baseRoleName : undefined,
     model: typeof raw.model === 'string' ? raw.model : undefined,
     worker_backend: parseWorkerBackend(raw.workerBackend) ?? parseWorkerBackend(raw.worker_backend),
+    gitIdentity: validGitIdentity,
     scope: parseScope(raw.scope),
   };
 }

@@ -155,6 +155,8 @@ interface UseTuiKeyControllerOptions {
   onToggleMouseTracking?: () => void;
   /** 切换可见区最后一张 thinking/tool 卡片的展开/折叠(无鼠标降级,Ctrl+E) */
   onToggleLastCard?: () => void;
+  /** Ctrl+O — 在系统浏览器中打开 Web UI（带 token） */
+  onOpenWebUI?: () => void;
 }
 
 export function useTuiKeyController(opts: UseTuiKeyControllerOptions): (key: KeyLike) => void {
@@ -216,6 +218,7 @@ export function useTuiKeyController(opts: UseTuiKeyControllerOptions): (key: Key
     onCopySelection,
     onToggleMouseTracking,
     onToggleLastCard,
+    onOpenWebUI,
   } = opts;
 
   const lastCtrlCAtRef = useRef(0);
@@ -326,6 +329,12 @@ export function useTuiKeyController(opts: UseTuiKeyControllerOptions): (key: Key
     // 6d. Ctrl+E — toggle collapse of the last visible thinking/tool card (no-mouse fallback)
     if (key.name === 'e' && key.ctrl) {
       if (onToggleLastCard) onToggleLastCard();
+      return;
+    }
+
+    // 6e. Ctrl+O — open Web UI in system browser (with token)
+    if (key.name === 'o' && key.ctrl) {
+      if (onOpenWebUI) onOpenWebUI();
       return;
     }
 
@@ -495,6 +504,7 @@ export function useTuiKeyController(opts: UseTuiKeyControllerOptions): (key: Key
     onToggleCollaborationMode,
     onToggleLastCard,
     onToggleMouseTracking,
+    onOpenWebUI,
     parsePlaceholder,
     pendingPastesMapRef,
     requestProcessExit,

@@ -26,6 +26,7 @@ const TerminalPane = lazy(() => import('./canvas/TerminalPane'));
 const CommandCenterView = lazy(() => import('./agents/CommandCenterView'));
 const BlueprintView = lazy(() => import('./blueprint/BlueprintView'));
 const LangfuseView = lazy(() => import('./langfuse/LangfuseView'));
+const GitActivityView = lazy(() => import('./git/GitActivityView'));
 
 type ViewComponent = ComponentType | LazyExoticComponent<ComponentType>;
 
@@ -79,6 +80,7 @@ const viewComponents: Record<string, ViewComponent> = {
   'design-market': DesignMarketView,
   blueprint: BlueprintView,
   langfuse: LangfuseView,
+  'git-activity': GitActivityView,
 };
 
 export default function MainContent() {

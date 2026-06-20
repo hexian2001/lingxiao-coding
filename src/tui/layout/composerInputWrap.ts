@@ -28,7 +28,8 @@ function readCodePoint(input: string, index: number): { char: string; length: nu
  * cursor on the visual line where editing is happening.
  */
 export function buildComposerInputLines(inputBuffer: string, inputCursor: number, maxDisplayWidth: number): ComposerInputLine[] {
-  const width = Math.max(1, Math.floor(maxDisplayWidth));
+  // Reserve 1 cell for the blinking cursor (▋) so it never overflows the line.
+  const width = Math.max(1, Math.floor(maxDisplayWidth) - 1);
   const cursor = clampCursor(inputBuffer, inputCursor);
   const lines: ComposerInputLine[] = [];
 

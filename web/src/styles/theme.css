@@ -4307,3 +4307,40 @@ input[type="number"]::placeholder {
 [data-theme="dark"] .bp-node.is-highlighted {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-brand) 40%, transparent), 0 4px 14px rgba(0, 0, 0, 0.4);
 }
+
+/* ── Unified modal/dialog overlay ───────────────────────────
+ * 暗色主题下背景已是深色,再叠 50%+ 纯黑会几乎全黑
+ * 统一遮罩: 亮色 40% 黑, 暗色 28% 黑, 都带 blur
+ * ──────────────────────────────────────────────────────── */
+.lx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.40);
+  backdrop-filter: blur(6px) saturate(1.05);
+  -webkit-backdrop-filter: blur(6px) saturate(1.05);
+}
+[data-theme="dark"] .lx-overlay {
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+}
+
+/* ── Update notification toast (no dark overlay) ─────────── */
+.lx-update-toast {
+  animation: lx-update-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lx-update-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

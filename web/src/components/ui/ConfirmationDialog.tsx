@@ -36,7 +36,7 @@ export default function ConfirmationDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="bg-transparent p-0 m-auto backdrop:bg-black/50"
+      className="bg-transparent p-0 m-auto backdrop:bg-black/40 dark:bg-black/28 backdrop:blur-md"
       onClose={onCancel}
       onClick={(e) => {
         if (e.target === dialogRef.current) onCancel();

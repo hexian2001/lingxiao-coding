@@ -1,0 +1,220 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Release 不取消，确保所有平台都完成
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  # ── 构建便携包（三平台并行） ──────────────────────────────────────
+  build-portable:
+    name: Portable ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-latest
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: darwin-x64
+            runner: macos-13
+          - target: darwin-arm64
+            runner: macos-latest
+          - target: win-x64
+            runner: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install web dependencies
+        run: |
+          cd web
+          npm install
+        shell: bash
+
+      - name: Build
+        run: npm run build:package
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: '1'
+
+      - name: Package portable
+        run: node scripts/package-portable.mjs
+        shell: bash
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: '1'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portable-${{ matrix.target }}
+          path: release/lingxiao-v*-${{ matrix.target }}.*
+
+  # ── 构建 SEA 二进制（三平台） ─────────────────────────────────────
+  build-binary:
+    name: Binary ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-latest
+          - target: darwin-arm64
+            runner: macos-latest
+          - target: win-x64
+            runner: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install web dependencies
+        run: |
+          cd web
+          npm install
+        shell: bash
+
+      - name: Build
+        run: npm run build:package
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: '1'
+
+      - name: Build SEA binary
+        run: node scripts/build-binary.mjs
+        shell: bash
+        continue-on-error: true
+
+      - name: Upload artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: release/lingxiao-v*-${{ matrix.target }}*
+
+  # ── 构建源码包 ─────────────────────────────────────────────────────
+  build-source:
+    name: Source Tarball
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Create source release
+        run: node scripts/package-release-source.mjs
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-tarball
+          path: release/lingxiao_cli-*-full.tar.gz
+
+  # ── 创建 GitHub Release ──────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs: [build-portable, build-binary, build-source]
+    runs-on: ubuntu-latest
+    if: always()  # 即使部分 binary 构建失败也发布
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: List artifacts
+        run: |
+          echo "=== Downloaded artifacts ==="
+          find release-assets -type f | sort
+          echo "=== Moving to flat structure ==="
+          mkdir -p release-flat
+          find release-assets -type f -exec cp {} release-flat/ \;
+          ls -lh release-flat/
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          cat > release-notes.md << EOF
+          ## 🗡️ Lingxiao v${VERSION}
+
+          ### 下载
+
+          | 平台 | 便携包 | 说明 |
+          |------|--------|------|
+          | Linux x64 | \`lingxiao-v${VERSION}-linux-x64.tar.gz\` | 解压后运行 \`./lingxiao\` |
+          | Linux arm64 | \`lingxiao-v${VERSION}-linux-arm64.tar.gz\` | 解压后运行 \`./lingxiao\` |
+          | macOS Intel | \`lingxiao-v${VERSION}-darwin-x64.tar.gz\` | 解压后运行 \`./lingxiao\` |
+          | macOS Apple Silicon | \`lingxiao-v${VERSION}-darwin-arm64.tar.gz\` | 解压后运行 \`./lingxiao\` |
+          | Windows x64 | \`lingxiao-v${VERSION}-win-x64.zip\` | 解压后运行 \`lingxiao.cmd\` |
+
+          ### 安装方式
+
+          **便携包（推荐）**
+          \`\`\`bash
+          # Linux / macOS
+          tar xzf lingxiao-v${VERSION}-linux-x64.tar.gz
+          cd lingxiao
+          ./lingxiao
+
+          # Windows
+          # 解压 zip 后双击 lingxiao.cmd
+          \`\`\`
+
+          **源码编译**
+          \`\`\`bash
+          tar xzf lingxiao_cli-${VERSION}-full.tar.gz
+          cd package
+          npm install
+          npm run build
+          npm link
+          lingxiao
+          \`\`\`
+
+          **npm 全局安装**
+          \`\`\`bash
+          npm install -g lingxiao_cli
+          lingxiao
+          \`\`\`
+          EOF
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          files: release-flat/*
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

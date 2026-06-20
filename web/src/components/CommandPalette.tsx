@@ -114,8 +114,8 @@ export default function CommandPalette() {
       onOpenChange={setOpen}
       className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]"
     >
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
+      {/* Backdrop — unified overlay */}
+      <div className="lx-overlay" style={{ alignItems: 'flex-start', paddingTop: '20vh' }} onClick={() => setOpen(false)} />
 
       {/* Dialog */}
       <div className="relative w-full max-w-lg bg-bg-card border border-border-default rounded-lg shadow-2xl font-mono overflow-hidden animate-fade-in">

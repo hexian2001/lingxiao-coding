@@ -289,6 +289,7 @@ export async function buildWorkerPayload(input: WorkerPayloadBuilderInput): Prom
     adaptiveStrategy: adaptivePlan,
     ...(speculativePlan ? { speculativePlan } : {}),
     agentType: input.task.agent_type,
+    ...(input.role.gitIdentity ? { gitIdentity: input.role.gitIdentity } : {}),
     ...(options.conversationHistory ? { conversationHistory: options.conversationHistory } : {}),
     ...(options.inheritHistoryMode ? { inheritHistoryMode: options.inheritHistoryMode } : {}),
   };

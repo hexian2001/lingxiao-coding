@@ -130,6 +130,9 @@ const SETTINGS_MAP: Record<string, string> = {
   'localLlmGatewayInjectEnv': 'llm_gateway.inject_env',
   'localLlmGatewayOverrideExistingEnv': 'llm_gateway.override_existing_env',
   'fileCheckpointingEnabled': 'checkpoint.file_checkpointing_enabled',
+  'checkpointMaxCheckpoints': 'checkpoint.max_checkpoints',
+  'checkpointAutoGcEnabled': 'checkpoint.auto_gc_enabled',
+  'checkpointMaxWorkspaceFiles': 'checkpoint.max_workspace_files',
   'autoCompactEnabled': 'context.autocompact_enabled',
   'memoryEnabled': 'memory.enabled',
   'autoMemoryEnabled': 'memory.auto_memory_enabled',
@@ -147,6 +150,9 @@ const SETTINGS_MAP: Record<string, string> = {
   'gitToken': 'git.token',
   'gitApiUrl': 'git.api_url',
   'gitDefaultTargetBranch': 'git.default_target_branch',
+  'gitPreCommitGateEnabled': 'git.pre_commit_gate.enabled',
+  'gitPreCommitGateTypeCheck': 'git.pre_commit_gate.type_check',
+  'gitPreCommitGateCommand': 'git.pre_commit_gate.command',
   // Server
   'serverRandomPort': 'server.random_port',
   // Network proxy
@@ -193,6 +199,8 @@ const SETTINGS_MAP: Record<string, string> = {
   'langfuseTraceAgentLifecycle': 'observability.langfuse.traceAgentLifecycle',
   'langfuseSampleRate': 'observability.langfuse.sampleRate',
   'langfuseMaskSensitive': 'observability.langfuse.maskSensitive',
+  // Workspace initialization flag
+  'initialized': 'initialized',
 };
 
 const MODEL_PROVIDER_CREATE_FIELDS = new Set([
@@ -249,6 +257,9 @@ export function registerSettingsRoutes(
     data.localLlmGatewayInjectEnv = data.localLlmGatewayInjectEnv !== false;
     data.localLlmGatewayOverrideExistingEnv = !!data.localLlmGatewayOverrideExistingEnv;
     data.fileCheckpointingEnabled = data.fileCheckpointingEnabled !== false;
+    data.checkpointMaxCheckpoints = typeof data.checkpointMaxCheckpoints === 'number' && data.checkpointMaxCheckpoints >= 5 ? data.checkpointMaxCheckpoints : 50;
+    data.checkpointAutoGcEnabled = data.checkpointAutoGcEnabled !== false;
+    data.checkpointMaxWorkspaceFiles = typeof data.checkpointMaxWorkspaceFiles === 'number' && data.checkpointMaxWorkspaceFiles >= 1000 ? data.checkpointMaxWorkspaceFiles : 100000;
     data.autoCompactEnabled = data.autoCompactEnabled !== false;
     data.memoryEnabled = data.memoryEnabled !== false;
     data.autoMemoryEnabled = data.autoMemoryEnabled !== false;

@@ -35,6 +35,8 @@ export interface ToolContext extends ContractToolContext {
   blackboardGraph?: BlackboardGraph;
   assumptionTracker?: AssumptionTracker;
   assumptionFeedback?: (batch: VerificationBatch) => void | Promise<void>;
+  /** Per-role git author identity. When set, GitTool commit uses this as the commit author. */
+  gitIdentity?: { name: string; email: string };
   [key: string]: unknown;
 }
 

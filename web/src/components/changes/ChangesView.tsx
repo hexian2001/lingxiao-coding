@@ -14,7 +14,7 @@ import {
   History, RotateCcw,
   AlertCircle, Loader2, FileText, Undo2,
   ShieldAlert, X, MessageSquare, ChevronDown, ChevronRight, CornerUpLeft,
-  Target,
+  Target, HardDrive, Trash2, Zap,
 } from 'lucide-react';
 import { getServerToken } from '../../api/headers';
 import { useFileChangesStore, type FileDiff, type Checkpoint, type SessionCheckpointGroup, type TurnCheckpointGroup } from '../../stores/fileChangesStore';
@@ -137,7 +137,7 @@ function ConfirmModal({
   const { t } = useTranslation();
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+    <div className="lx-overlay p-4" onClick={onCancel}>
       <div
         className="bg-bg-primary border border-border-default rounded-lg shadow-xl max-w-lg w-full mx-4 p-5"
         onClick={(e) => e.stopPropagation()}
@@ -393,11 +393,15 @@ function SessionRollbackTab({ focusSessionId }: { focusSessionId?: string | null
   const {
     sessionGroups, selectedCheckpoint, isLoading, error,
     fetchAllCheckpoints, revertToCheckpoint, setSelectedCheckpoint, clearError,
+    diskUsage, isCleaningUp, cleanupMessage,
+    fetchDiskUsage, runGc, purgeHistory, clearCleanupMessage,
   } = useFileChangesStore();
 
   const [confirmRevert, setConfirmRevert] = useState<{ cp: Checkpoint; sessionId: string; scope: 'all' | 'code' | 'conversation' } | null>(null);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
   const [otherSessionWarning, setOtherSessionWarning] = useState<string | undefined>();
+  const [showCleanupPanel, setShowCleanupPanel] = useState(false);
+  const [confirmPurge, setConfirmPurge] = useState(false);
   const refreshView = useMemo(
     () => buildRuntimeRefreshViewModel({ sessionId: currentSessionId, phase, runtimeSnapshot }),
     [currentSessionId, phase, runtimeSnapshot],
@@ -407,6 +411,13 @@ function SessionRollbackTab({ focusSessionId }: { focusSessionId?: string | null
   useEffect(() => {
     fetchAllCheckpoints(checkpointSessionId ?? undefined);
   }, [checkpointSessionId, fetchAllCheckpoints]);
+
+  // Load disk usage when cleanup panel is opened
+  useEffect(() => {
+    if (showCleanupPanel && checkpointSessionId) {
+      fetchDiskUsage(checkpointSessionId);
+    }
+  }, [showCleanupPanel, checkpointSessionId, fetchDiskUsage]);
 
   // Auto-expand focused session
   useEffect(() => {
@@ -470,8 +481,95 @@ function SessionRollbackTab({ focusSessionId }: { focusSessionId?: string | null
         <div className="flex items-center gap-2 mb-1">
           <Undo2 className="w-4 h-4 text-accent-brand" />
           <h3 className="text-sm font-medium text-text-primary">{t('fileChanges.rollbackTitle')}</h3>
+          {/* 磁盘清理按钮 */}
+          <button
+            className="ml-auto flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+            onClick={() => setShowCleanupPanel(s => !s)}
+          >
+            <HardDrive className="w-3.5 h-3.5" />
+            {t('fileChanges.diskCleanup', { defaultValue: 'Disk Cleanup' })}
+          </button>
         </div>
         <p className="text-xs text-text-tertiary">{t('fileChanges.rollbackDesc')}</p>
+
+        {/* 磁盘清理面板 */}
+        {showCleanupPanel && (
+          <div className="mt-3 p-3 rounded-lg border border-border-default bg-bg-tertiary/50 space-y-3">
+            {/* 磁盘使用统计 */}
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-text-secondary flex items-center gap-1.5">
+                <HardDrive className="w-3.5 h-3.5" />
+                {t('fileChanges.diskUsage', { defaultValue: 'Disk Usage' })}
+              </span>
+              {diskUsage ? (
+                <span className={diskUsage.sizeBytes > 500 * 1024 * 1024 ? 'text-accent-red font-medium' : 'text-text-tertiary'}>
+                  {(diskUsage.sizeBytes / 1024 / 1024).toFixed(1)} MB · {diskUsage.commitCount} {t('fileChanges.checkpoints', { defaultValue: 'checkpoints' })}
+                </span>
+              ) : (
+                <span className="text-text-tertiary">—</span>
+              )}
+            </div>
+
+            {/* 清理消息 */}
+            {cleanupMessage && (
+              <div className="flex items-center gap-2 text-xs px-2 py-1.5 rounded bg-bg-secondary border border-border-default">
+                <Zap className="w-3.5 h-3.5 text-accent-yellow shrink-0" />
+                <span className="flex-1 text-text-secondary">{cleanupMessage}</span>
+                <button onClick={clearCleanupMessage}><X className="w-3 h-3" /></button>
+              </div>
+            )}
+
+            {/* 操作按钮 */}
+            <div className="flex items-center gap-2">
+              {/* GC 清理 */}
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isCleaningUp || !checkpointSessionId}
+                onClick={() => checkpointSessionId && runGc(checkpointSessionId)}
+              >
+                {isCleaningUp ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                {t('fileChanges.runGc', { defaultValue: 'Run GC' })}
+              </button>
+
+              {/* 核弹级清理 */}
+              {!confirmPurge ? (
+                <button
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-accent-red/10 text-accent-red hover:bg-accent-red/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isCleaningUp || !checkpointSessionId}
+                  onClick={() => setConfirmPurge(true)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {t('fileChanges.purgeAll', { defaultValue: 'Purge All' })}
+                </button>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-accent-red font-medium">{t('fileChanges.purgeConfirm', { defaultValue: 'Delete all history?' })}</span>
+                  <button
+                    className="px-2 py-1 text-xs rounded bg-accent-red text-white hover:bg-accent-red/80 transition-colors"
+                    disabled={isCleaningUp}
+                    onClick={() => {
+                      if (checkpointSessionId) purgeHistory(checkpointSessionId);
+                      setConfirmPurge(false);
+                    }}
+                  >
+                    {t('common.confirm', { defaultValue: 'Confirm' })}
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs rounded border border-border-default text-text-secondary hover:text-text-primary transition-colors"
+                    onClick={() => setConfirmPurge(false)}
+                  >
+                    {t('common.cancel', { defaultValue: 'Cancel' })}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 说明文字 */}
+            <p className="text-xs text-text-tertiary/70">
+              {t('fileChanges.cleanupHint', { defaultValue: 'GC reclaims disk space while keeping snapshots. Purge deletes all history and rebuilds on next snapshot.' })}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Error banner */}

@@ -4,6 +4,7 @@ import { GitBranch, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
 import { DraftTextInput } from '../components/DraftTextInput';
+import { SettingsToggle } from '../components/SettingsToggle';
 import { settingsApiFetch } from '../settingsApi';
 import type { SaveSetting, SaveState, SettingsData } from '../types';
 import { settingString } from '../types';
@@ -80,6 +81,39 @@ export function GitIntegrationSection({ settings, saveState, onSave }: { setting
           saved={saved.gitDefaultTargetBranch}
         />
       </SettingsRow>
+
+      <SettingsRow label={t('settings.item.gitPreCommitGate')} desc={t('settings.item.gitPreCommitGate.desc')} error={errors.gitPreCommitGateEnabled}>
+        <SettingsToggle
+          value={settings.gitPreCommitGateEnabled === true}
+          onChange={(value) => onSave('gitPreCommitGateEnabled', value)}
+          saving={saving.gitPreCommitGateEnabled}
+          saved={saved.gitPreCommitGateEnabled}
+        />
+      </SettingsRow>
+
+      {settings.gitPreCommitGateEnabled === true && (
+        <>
+          <SettingsRow label={t('settings.item.gitPreCommitGateTypeCheck')} desc={t('settings.item.gitPreCommitGateTypeCheck.desc')} error={errors.gitPreCommitGateTypeCheck}>
+            <SettingsToggle
+              value={settings.gitPreCommitGateTypeCheck !== false}
+              onChange={(value) => onSave('gitPreCommitGateTypeCheck', value)}
+              saving={saving.gitPreCommitGateTypeCheck}
+              saved={saved.gitPreCommitGateTypeCheck}
+            />
+          </SettingsRow>
+
+          <SettingsRow label={t('settings.item.gitPreCommitGateCommand')} desc={t('settings.item.gitPreCommitGateCommand.desc')} error={errors.gitPreCommitGateCommand}>
+            <DraftTextInput
+              value={settingString(settings.gitPreCommitGateCommand)}
+              onSave={(value) => onSave('gitPreCommitGateCommand', value)}
+              placeholder="npm run lint"
+              className="w-56"
+              saving={saving.gitPreCommitGateCommand}
+              saved={saved.gitPreCommitGateCommand}
+            />
+          </SettingsRow>
+        </>
+      )}
 
       {gitPlatform !== 'none' && (
         <div className="flex items-center gap-3">

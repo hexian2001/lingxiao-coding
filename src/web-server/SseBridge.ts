@@ -90,6 +90,8 @@ const SESSION_FORWARD_EVENTS = [
   'session:runtime_state',
   // Langfuse real-time trace push
   'langfuse:trace',
+  // Git activity (commit/push/pull with agent identity + gate result)
+  'git:activity',
 ] as const satisfies readonly (EventType & EventName)[];
 
 const AGENT_FORWARD_EVENTS = [

@@ -11,6 +11,67 @@ import type { StorageApi } from './StorageApi.js';
 import { getSystemInfo, getSystemMetrics } from './index.js';
 import { metrics, refreshUptime } from '../core/MetricsRegistry.js';
 import type { AuthFn } from './types.js';
+import { VERSION } from '../version.js';
+import { requireTokenInHeaderOnly, rateLimitExemptLocalhost } from '../core/HardeningPolicy.js';
+
+/**
+ * 版本检测缓存与辅助函数
+ */
+
+const VERSION_CACHE_TTL = 5 * 60 * 1000; // 5分钟
+
+interface VersionCheckData {
+  current: string;
+  latest: string;
+  hasUpdate: boolean;
+  releaseUrl: string;
+  releaseNotes: string;
+}
+
+let versionCheckCache: { data: VersionCheckData; timestamp: number } | null = null;
+
+/** 桌面端 electron-updater 状态（由 desktop/main.ts 通过 setDesktopUpdateStatus 设置） */
+let desktopUpdateStatus: { updateDownloaded: boolean; updateVersion: string | null } | null = null;
+
+export function setDesktopUpdateStatus(status: { updateDownloaded: boolean; updateVersion: string | null } | null): void {
+  desktopUpdateStatus = status;
+}
+
+interface GitHubRelease {
+  tag_name: string;
+  html_url: string;
+  body: string;
+}
+
+/** 调用 GitHub API 获取最新 release */
+async function fetchLatestRelease(): Promise<GitHubRelease | null> {
+  const url = 'https://api.github.com/repos/hexian2001/lingxiao-coding/releases/latest';
+  const res = await globalThis.fetch(url, {
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': `LingXiaoCLI/${VERSION}`,
+    },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) return null;
+  const data = await res.json() as GitHubRelease;
+  return data;
+}
+
+/** 比较语义版本号：返回 >0 表示 a 更新，<0 表示 b 更新，0 表示相等 */
+function compareVersions(a: string, b: string): number {
+  const parseVer = (v: string): number[] =>
+    v.replace(/^v/, '').split(/[.+-]/).filter(s => /^\d+$/.test(s)).map(Number);
+  const partsA = parseVer(a);
+  const partsB = parseVer(b);
+  const len = Math.max(partsA.length, partsB.length);
+  for (let i = 0; i < len; i++) {
+    const va = partsA[i] ?? 0;
+    const vb = partsB[i] ?? 0;
+    if (va !== vb) return va - vb;
+  }
+  return 0;
+}
 
 const builtinDocs = [
   {
@@ -92,6 +153,27 @@ export function registerMiscRoutes(
     }
     reply.status(401);
     return { success: false, error: 'Invalid token' };
+  });
+
+  // --- Local-only token recovery (本地私有化场景) ---
+  // 用户关掉网页重新打开 http://localhost:PORT 时，前端 localStorage 无 token
+  // 可通过此端点无感获取当前 server token，避免 401。
+  // 安全保障：仅允许 loopback 访问；加固模式下禁用（加固模式不信任 IP，要求显式 token）。
+  fastify.get('/api/v1/auth/local-token', async (request, reply) => {
+    // 加固模式禁用此端点
+    if (requireTokenInHeaderOnly()) {
+      reply.status(403);
+      return { error: 'Forbidden: local-token endpoint disabled in hardened mode' };
+    }
+    // 仅允许本机访问（与 server.ts shouldExemptFromRateLimit 逻辑一致，内联以避免循环依赖）
+    const ip = request.ip;
+    const hasRemoteAddress = Boolean(request.raw.socket.remoteAddress);
+    const isLocalAccess = !hasRemoteAddress || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+    if (!isLocalAccess || !rateLimitExemptLocalhost()) {
+      reply.status(403);
+      return { error: 'Forbidden: local access only' };
+    }
+    return { token: serverAuth.token };
   });
 
   // --- Storage KV ---
@@ -265,4 +347,56 @@ export function registerMiscRoutes(
 
   // --- Scheduled Tasks (handled by server.ts with ScheduledTaskManager) ---
   // These routes are registered in server.ts directly, not here.
+
+  // --- Version Check ---
+  // GET /api/v1/version/check — 检查 GitHub Releases 是否有新版本，5分钟缓存
+  fastify.get('/api/v1/version/check', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+
+    // 缓存：5分钟内直接返回上次结果
+    const now = Date.now();
+    if (versionCheckCache && (now - versionCheckCache.timestamp) < VERSION_CACHE_TTL) {
+      return { data: versionCheckCache.data };
+    }
+
+    try {
+      const current = VERSION;
+      const release = await fetchLatestRelease();
+      if (!release) {
+        const result = { current, latest: current, hasUpdate: false, releaseUrl: '', releaseNotes: '' };
+        versionCheckCache = { data: result, timestamp: now };
+        return { data: result };
+      }
+
+      const latest = release.tag_name.replace(/^v/, '');
+      const hasUpdate = compareVersions(latest, current) > 0;
+      const result = {
+        current,
+        latest,
+        hasUpdate,
+        releaseUrl: release.html_url || '',
+        releaseNotes: release.body || '',
+      };
+      versionCheckCache = { data: result, timestamp: now };
+      return { data: result };
+    } catch {
+      // GitHub API 不可达时返回当前版本，不报错
+      const result = { current: VERSION, latest: VERSION, hasUpdate: false, releaseUrl: '', releaseNotes: '' };
+      return { data: result };
+    }
+  });
+
+  // GET /api/v1/version/status — 返回桌面端更新状态
+  fastify.get('/api/v1/version/status', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+
+    // 判断是否在 Electron 桌面端运行
+    const isDesktop = !!(process.versions as Record<string, string | undefined>).electron;
+
+    if (isDesktop && desktopUpdateStatus) {
+      return { data: { isDesktop: true, updateDownloaded: desktopUpdateStatus.updateDownloaded, updateVersion: desktopUpdateStatus.updateVersion } };
+    }
+
+    return { data: { isDesktop, updateDownloaded: false, updateVersion: null } };
+  });
 }

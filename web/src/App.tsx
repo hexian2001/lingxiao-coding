@@ -1,15 +1,17 @@
 import i18n, { normalizeLanguage } from './i18n';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { settingsApiFetch } from './components/settings/settingsApi';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import CommandPalette from './components/CommandPalette';
 import MaintenanceOverlay from './components/MaintenanceOverlay';
 import { ToastProvider } from './components/ui/Toast';
+import UpdateNotification from './components/ui/UpdateNotification';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { useSessionStore } from './stores/sessionStore';
 import { pickBootstrapSessionId } from './utils/sessionListViewModel';
 import InkBackground from './components/decor/InkBackground';
+import OnboardingWizard from './components/onboarding/OnboardingWizard';
 
 /**
  * Session bootstrap — runs at app level so SSE connection is established
@@ -69,13 +71,64 @@ function useConfigLanguageSync() {
   }, []);
 }
 
+/**
+ * Onboarding guard — checks `initialized` flag from settings.
+ * If the app hasn't been initialized yet (first launch), renders
+ * the OnboardingWizard overlay to guide the user through LLM config.
+ */
+function useOnboardingCheck() {
+  const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const checkInitialized = async () => {
+      try {
+        const s = await settingsApiFetch<{ data?: { initialized?: unknown }; initialized?: unknown }>('/settings');
+        if (cancelled) return;
+        const initialized = s?.data?.initialized ?? s?.initialized;
+        if (initialized) {
+          setNeedsOnboarding(false);
+          return; // 已初始化，停止轮询
+        }
+        setNeedsOnboarding(true);
+        // 未初始化 → 启动轮询，TUI 端完成配置后 Web UI 自动关闭 wizard
+        pollTimer = setTimeout(checkInitialized, 2000);
+      } catch {
+        if (cancelled) return;
+        setNeedsOnboarding(true);
+        pollTimer = setTimeout(checkInitialized, 2000);
+      }
+    };
+
+    checkInitialized();
+    return () => {
+      cancelled = true;
+      if (pollTimer) clearTimeout(pollTimer);
+    };
+  }, []);
+
+  return { needsOnboarding, setNeedsOnboarding };
+}
+
 export default function App() {
   useSessionBootstrap();
   useConfigLanguageSync();
+  const { needsOnboarding, setNeedsOnboarding } = useOnboardingCheck();
+
+  const handleOnboardingComplete = () => {
+    setNeedsOnboarding(false);
+  };
+
+  const handleOnboardingSkip = () => {
+    setNeedsOnboarding(false);
+  };
 
   return (
     <ErrorBoundary>
       <ToastProvider>
+        <UpdateNotification />
         <div className="flex h-screen text-text-primary overflow-hidden relative">
           <InkBackground />
           <div className="relative z-10 flex w-full h-full">
@@ -84,6 +137,12 @@ export default function App() {
             <CommandPalette />
             <MaintenanceOverlay />
           </div>
+          {needsOnboarding && (
+            <OnboardingWizard
+              onComplete={handleOnboardingComplete}
+              onSkip={handleOnboardingSkip}
+            />
+          )}
         </div>
       </ToastProvider>
     </ErrorBoundary>

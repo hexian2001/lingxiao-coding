@@ -279,7 +279,7 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 flex items-center justify-center p-4">
+    <div className="lx-overlay p-4">
       <div className="bg-bg-primary border border-border-default rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
         <div className="px-4 py-3 border-b border-border-default flex items-center justify-between">
           <h3 className="text-sm font-medium text-text-primary">

@@ -43,9 +43,9 @@ export class CircuitOpenError extends Error {
 }
 
 /** 连续失败多少次后打开断路器 */
-const FAILURE_THRESHOLD = 5;
+const FAILURE_THRESHOLD = 8;
 /** 断路器保持 OPEN 的最短时间（ms）；之后进入 HALF_OPEN 探针 */
-export const PROBE_INTERVAL_MS = 30_000;
+export const PROBE_INTERVAL_MS = 15_000;
 
 export class CircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;

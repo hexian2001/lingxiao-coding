@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { splitThinkContent, splitThinkStreamingChunk } from '@contracts/adapters/ThinkContent';
 import { createEventProcessorState } from '@contracts/adapters/EventAdapter';
 import { acpClient } from '../api/AcpClient';
-import { getServerToken } from '../api/headers';
+import { getServerToken, tryRecoverToken } from '../api/headers';
 import { saveMessages, appendMessage, updateMessage, loadMessages } from '../utils/historyDB';
 import {
   extractText,
@@ -39,6 +39,8 @@ import { type AgentConversation, type AgentMessage, type AgentRuntime, type Crea
 import { createTokenActions } from './sessionStoreTokens';
 import { usePermissionStore } from './permissionStore';
 import { useBlackboardStore } from './blackboardStore';
+import { useGitStore } from './gitStore';
+import { useGitActivityStore } from './gitActivityStore';
 import {
   appendAgentTextSegment,
   appendAgentThinkingSegment,
@@ -469,12 +471,29 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         fetch('/api/v1/sessions/active', { headers: { 'x-lingxiao-token': getServerToken() } }),
         fetch('/api/v1/info', { headers: { 'x-lingxiao-token': getServerToken(), 'x-lingxiao-request': '1' } }),
       ]);
+      let activeSessionId: string | null = null;
       if (sessionsRes.status === 401) {
-        const appWindow = lingxiaoWindow();
-        if (!appWindow.__lingxiao_401_warned) { appWindow.__lingxiao_401_warned = true; console.warn('[fetchSessions] 401 Unauthorized — token expired. Refresh page manually.'); }
+        // 尝试从 localhost-only 端点恢复 token，成功后重试一次
+        const recovered = await tryRecoverToken();
+        if (!recovered) {
+          const appWindow = lingxiaoWindow();
+          if (!appWindow.__lingxiao_401_warned) { appWindow.__lingxiao_401_warned = true; console.warn('[fetchSessions] 401 Unauthorized — token expired. Refresh page manually.'); }
+          return;
+        }
+        // 恢复成功，重新拉取 sessions + active
+        const retrySessionsRes = await fetch('/api/sessions', { headers: { 'x-lingxiao-token': getServerToken() } });
+        if (!retrySessionsRes.ok) {
+          const appWindow = lingxiaoWindow();
+          if (!appWindow.__lingxiao_401_warned) { appWindow.__lingxiao_401_warned = true; console.warn('[fetchSessions] 401 after token recovery — token mismatch.'); }
+          return;
+        }
+        const retryActiveRes = await fetch('/api/v1/sessions/active', { headers: { 'x-lingxiao-token': getServerToken() } });
+        if (retryActiveRes.ok) { const activeData = asRecord(await retryActiveRes.json()); activeSessionId = stringValue(activeData.sessionId) ?? null; }
+        const retryData = await retrySessionsRes.json();
+        const sessions: SessionInfo[] = (Array.isArray(retryData) ? retryData : []).map((row) => normalizeSessionInfoRow(row as SessionListRow));
+        set({ sessions, activeSessionId, sessionsLoaded: true });
         return;
       }
-      let activeSessionId: string | null = null;
       if (activeRes.ok) { const activeData = asRecord(await activeRes.json()); activeSessionId = stringValue(activeData.sessionId) ?? null; }
       if (infoRes.ok) {
         const infoData = asRecord(await infoRes.json());
@@ -506,6 +525,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       set({ sessionId, activeSessionId: sessionId, ...emptySessionRuntimeState(), isConnected: false, isLoadingHistory: true });
       // 连接到(可能不同的)会话:清空黑板图,避免上一会话的图残留(#4)
       useBlackboardStore.getState().reset();
+      // 清空 Git 状态和活动记录，避免旧 workspace 数据残留
+      useGitStore.getState().setWorkspace('');
+      useGitActivityStore.getState().clear();
       await acpClient.connect(sessionId);
       if (connectingSessionId !== sessionId) { await acpClient.disconnect(); return; }
       try {

@@ -7,13 +7,14 @@ import { useSessionStore } from '../stores/sessionStore';
 import { normalizeLanguage, persistLanguage, type WebLanguage } from '../i18n';
 import { notifySettingChanged, settingsApiFetch } from './settings/settingsApi';
 import { UsageCard } from './sidebar/UsageCard';
+import { SidebarVersionBadge } from './sidebar/SidebarVersionBadge';
 import {
   MessageCircle, Server, ListTodo, Terminal, LayoutDashboard,
   FileCode, FileEdit, Puzzle, BarChart3, Activity, Cpu, ScrollText,
   Settings, Keyboard, BookOpen, ChevronLeft, ChevronRight, Sun, Moon,
   Monitor, AlertCircle, Languages, Plus, RefreshCw, BookMarked, GitBranch,
   Network, GalleryVerticalEnd, Users, Palette, Brain, LayoutGrid,
-  Radar,
+  Radar, GitCommitHorizontal,
 } from 'lucide-react';
 
 interface NavItem {
@@ -40,6 +41,7 @@ const workspaceNav: NavItem[] = [
   { view: 'editor', icon: <FileCode size={16} />, labelKey: 'sidebar.editor' },
   { view: 'changes', icon: <FileEdit size={16} />, labelKey: 'sidebar.changes' },
   { view: 'git', icon: <GitBranch size={16} />, labelKey: 'sidebar.git' },
+  { view: 'git-activity', icon: <GitCommitHorizontal size={16} />, labelKey: 'sidebar.gitActivity' },
   { view: 'wiki', icon: <BookMarked size={16} />, labelKey: 'sidebar.wiki' },
   { view: 'memory', icon: <Brain size={16} />, labelKey: 'sidebar.memory' },
   { view: 'plugins', icon: <Puzzle size={16} />, labelKey: 'sidebar.plugins' },
@@ -319,8 +321,7 @@ export default function Sidebar() {
               {currentLanguage === 'zh' ? '中' : 'EN'}
             </span>
             <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] text-text-tertiary">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-green" />
-              {t('sidebar.ready')}
+              <SidebarVersionBadge />
             </span>
           </>
         )}

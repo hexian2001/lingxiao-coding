@@ -1,4 +1,4 @@
-import { getServerToken } from './headers';
+import { getServerToken, tryRecoverToken } from './headers';
 
 export interface AcpConnection {
   connectionId: string;
@@ -116,11 +116,14 @@ export class AcpClient {
   private async reconnectHandshake() {
     if (!this.connection || this.manuallyDisconnected || this.handshakeInProgress) return;
 
-    // No server token — no point trying to reconnect
+    // No server token — try to recover from localhost-only endpoint first
     if (!getServerToken()) {
-      this.sseActive = false;
-      this.emitConnectionState('disconnected', { reason: 'no_token' });
-      return;
+      const recovered = await tryRecoverToken();
+      if (!recovered) {
+        this.sseActive = false;
+        this.emitConnectionState('disconnected', { reason: 'no_token' });
+        return;
+      }
     }
 
     this.handshakeReconnectCount++;
@@ -197,7 +200,18 @@ export class AcpClient {
         if (!response.ok || !response.body) {
           this.sseActive = false;
           if (response.status === 401 || response.status === 403 || response.status === 404 || response.status === 410) {
-            void this.reconnectHandshake();
+            // 401 可能是 token 丢失，先尝试恢复再重连
+            if (response.status === 401 && !getServerToken()) {
+              void tryRecoverToken().then(recovered => {
+                if (recovered) {
+                  void this.reconnectHandshake();
+                } else {
+                  this.emitConnectionState('disconnected', { reason: 'no_token' });
+                }
+              });
+            } else {
+              void this.reconnectHandshake();
+            }
           } else {
             this.scheduleReconnect();
           }

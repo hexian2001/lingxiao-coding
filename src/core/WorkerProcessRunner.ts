@@ -79,6 +79,8 @@ export interface WorkerTaskPayload {
   agentType?: string;
   /** 契约结构化允许面(已对多契约 intersect)——写工具 intersect 硬校验的依据。undefined=无契约。 */
   contractAllowedScope?: ContractAllowedScope;
+  /** Per-role git author identity for commit attribution in team workflows. */
+  gitIdentity?: { name: string; email: string };
 }
 
 export interface WorkerMessage {

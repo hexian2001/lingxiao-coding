@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { normalizeTerminalPasteContent } from '../utils.js';
 import type { SuggestionItem } from '../utils.js';
+import { readClipboardImage } from '../clipboard.js';
 
 const LARGE_PASTE_CHAR_THRESHOLD = 1000;
 const LARGE_PASTE_LINE_THRESHOLD = 10;
@@ -60,6 +61,32 @@ export function useTuiPasteController({
   const handlePasteDirect = useCallback((content: string) => {
     breakHistoryNavigation();
     const normalizedContent = normalizeTerminalPasteContent(content);
+
+    // ── Image paste detection ──
+    // When the clipboard contains an image (not text), terminals send an empty
+    // string or nothing via bracketed paste. If we get empty/near-empty content,
+    // check the system clipboard for an image and insert its temp file path.
+    if (!normalizedContent || normalizedContent.trim().length === 0) {
+      const imgPath = readClipboardImage();
+      if (imgPath) {
+        const buffer = inputBufferRef.current;
+        const cursor = inputCursorRef.current;
+        const insertion = `${imgPath} `;
+        const nextBuffer = buffer.slice(0, cursor) + insertion + buffer.slice(cursor);
+        const nextCursor = cursor + insertion.length;
+        inputBufferRef.current = nextBuffer;
+        setInputBuffer(nextBuffer);
+        setInputCursor(nextCursor);
+        inputCursorRef.current = nextCursor;
+        const suggestions = maybeBuildSuggestions(nextBuffer);
+        setSuggestionItems(suggestions.items);
+        setSuggestionIndex(0);
+        return;
+      }
+      // No image either — nothing to paste
+      return;
+    }
+
     const charCount = [...normalizedContent].length;
     const lineCount = normalizedContent.split('\n').length;
     if (charCount > LARGE_PASTE_CHAR_THRESHOLD || lineCount > LARGE_PASTE_LINE_THRESHOLD) {

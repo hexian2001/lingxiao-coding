@@ -52,6 +52,8 @@ import {
   type SettingsEditState,
 } from './SettingsPanel.js';
 import type { MouseClickEvent } from '../ui/mouseWheel.js';
+import { openUrlInSystemBrowser } from '../core/SystemBrowserOpener.js';
+import { ServerAuth } from '../web-server/ServerAuth.js';
 
 import type {
   CommandInitialChannelSeed as InitialChannelSeed,
@@ -1950,6 +1952,27 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     }
   }
 
+  /**
+   * Ctrl+O: 在系统浏览器中打开 Web UI（带 token）。
+   * 用户关掉网页后可在 TUI 里按 Ctrl+O 重新打开。
+   */
+  function handleOpenWebUI(): void {
+    if (!webUrl) {
+      appendMessage('main', { type: 'system', content: t('tui.webui.not_available') });
+      return;
+    }
+    // 读取持久化的 server token，拼接带 token 的 URL
+    const token = ServerAuth.readToken();
+    const tokenUrl = token ? `${webUrl}?token=${token}` : webUrl;
+    const result = openUrlInSystemBrowser(tokenUrl);
+    if (result.launched) {
+      appendMessage('main', { type: 'system', content: t('tui.webui.opened', tokenUrl) });
+    } else {
+      // 浏览器启动失败，打印 URL 供用户手动打开
+      appendMessage('main', { type: 'system', content: `${t('tui.webui.open_failed')} ${tokenUrl}` });
+    }
+  }
+
   // ── Mouse click handler (sidebar + settings panel) ──
   handleMouseClickRef.current = (event: MouseClickEvent) => {
     if (event.button === 0 && event.motion && activeMessageSelectionRef.current) {
@@ -2395,6 +2418,7 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     onCopySelection: handleCopySelectionCtrlC,
     onToggleMouseTracking: handleToggleMouseTracking,
     onToggleLastCard: handleToggleLastCard,
+    onOpenWebUI: handleOpenWebUI,
   });
 
   useRawTerminalInput({

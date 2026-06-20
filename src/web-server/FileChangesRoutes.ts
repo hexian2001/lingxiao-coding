@@ -110,4 +110,35 @@ export function registerFileChangesRoutes(
     }
     return fileChangesApi.getOtherSessionChanges(sessionId, commitHash);
   });
+  // ── Checkpoint 磁盘清理端点 ──
+
+  fastify.get('/api/v1/file-changes/disk-usage', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const { sessionId } = request.query as { sessionId?: string };
+    if (!sessionId) {
+      reply.status(400);
+      return { error: 'sessionId is required' };
+    }
+    return fileChangesApi.getCheckpointDiskUsage(sessionId);
+  });
+
+  fastify.post('/api/v1/file-changes/gc', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const body = request.body as { sessionId?: string };
+    if (!body.sessionId) {
+      reply.status(400);
+      return { error: 'sessionId is required' };
+    }
+    return fileChangesApi.runCheckpointGc(body.sessionId);
+  });
+
+  fastify.post('/api/v1/file-changes/purge', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const body = request.body as { sessionId?: string };
+    if (!body.sessionId) {
+      reply.status(400);
+      return { error: 'sessionId is required' };
+    }
+    return fileChangesApi.purgeCheckpointHistory(body.sessionId);
+  });
 }

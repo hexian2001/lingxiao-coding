@@ -34,6 +34,10 @@ export interface AgentDefinition {
   model?: string;
   worker_backend?: AgentWorkerBackend;
   worker_config?: AgentRole['worker_config'];
+  gitIdentity?: {
+    name: string;
+    email: string;
+  };
 }
 
 export interface AgentDefinitionRecord extends AgentDefinition {
@@ -54,6 +58,10 @@ export interface SaveAgentDefinitionInput {
   model?: string;
   worker_backend?: AgentWorkerBackend;
   worker_config?: AgentRole['worker_config'];
+  gitIdentity?: {
+    name: string;
+    email: string;
+  };
   scope?: AgentDefinitionScope;
 }
 
@@ -74,6 +82,11 @@ const WorkerConfigSchema = z.object({
   no_bare: z.boolean().optional(),
 }).strict();
 
+const GitIdentitySchema = z.object({
+  name: z.string(),
+  email: z.string(),
+}).optional();
+
 const AgentDefinitionFrontmatterSchema = z.object({
   name: z.string().optional(),
   description: z.string().default(''),
@@ -87,6 +100,8 @@ const AgentDefinitionFrontmatterSchema = z.object({
   skills: z.array(z.string()).optional(),
   worker_config: WorkerConfigSchema.optional(),
   workerConfig: WorkerConfigSchema.optional(),
+  gitIdentity: GitIdentitySchema,
+  git_identity: GitIdentitySchema,
 }).passthrough();
 
 function unique(values: string[]): string[] {
@@ -146,6 +161,7 @@ function renderDefinitionMarkdown(definition: AgentDefinition): string {
   }
   if (definition.tools.length > 0) frontmatter.tools = definition.tools;
   if (definition.skillNames.length > 0) frontmatter.skillNames = definition.skillNames;
+  if (definition.gitIdentity) frontmatter.gitIdentity = definition.gitIdentity;
 
   return [
     '---',
@@ -181,6 +197,7 @@ function normalizeDefinition(input: SaveAgentDefinitionInput): AgentDefinition {
     model: input.model?.trim() || undefined,
     worker_backend: input.worker_backend ?? 'worker_process',
     worker_config: input.worker_config,
+    gitIdentity: input.gitIdentity,
   };
 }
 
@@ -209,6 +226,7 @@ function parseDefinitionFile(path: string, fallbackName: string, source: AgentDe
     model: fm.model?.trim() || undefined,
     worker_backend: fm.worker_backend ?? fm.workerBackend ?? 'worker_process',
     worker_config: fm.worker_config ?? fm.workerConfig,
+    gitIdentity: fm.gitIdentity ?? fm.git_identity,
     source,
     path,
     editable: true,
@@ -328,6 +346,7 @@ export class AgentDefinitionService {
       model: record.model,
       worker_backend: record.worker_backend,
       worker_config: record.worker_config,
+      gitIdentity: record.gitIdentity,
       createdBy: 'user',
     };
   }

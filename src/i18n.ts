@@ -404,6 +404,8 @@ export type I18nKey =
   | 'tui.copy.no_code'
   | 'tui.mouse.tracking_on'
   | 'tui.mouse.tracking_off'
+  | 'tui.clipboard.image_not_found'
+  | 'tui.clipboard.image_pasted'
   | 'slash.help.title'
   | 'slash.help.image_upload'
   | 'slash.help.image_example'
@@ -523,7 +525,10 @@ export type I18nKey =
   | 'tui.welcome.shortcut.interrupt'
   | 'tui.welcome.shortcut.dag'
   | 'tui.welcome.shortcut.tab'
-  // === TUI 工作笔记 ===
+  // === TUI Web UI ===
+  | 'tui.webui.not_available'
+  | 'tui.webui.opened'
+  | 'tui.webui.open_failed'  // === TUI 工作笔记 ===
   | 'tui.worknotes.title'
   | 'tui.worknotes.empty'
   | 'tui.worknotes.count'
@@ -1058,6 +1063,8 @@ export interface I18nStrings {
   'tui.copy.no_code': string;
   'tui.mouse.tracking_on': string;
   'tui.mouse.tracking_off': string;
+  'tui.clipboard.image_not_found': string;
+  'tui.clipboard.image_pasted': (path: string) => string;
   'slash.help.title': string;
   'slash.help.image_upload': string;
   'slash.help.image_example': string;
@@ -1174,7 +1181,10 @@ export interface I18nStrings {
   'cli.farewell.resume': string;
   'tui.welcome.shortcuts': string;
   'tui.welcome.shortcut.cmd': string;
-  'tui.welcome.shortcut.interrupt': string;
+  // TUI Web UI
+  'tui.webui.not_available': string;
+  'tui.webui.opened': (url: string) => string;
+  'tui.webui.open_failed': string;  'tui.welcome.shortcut.interrupt': string;
   'tui.welcome.shortcut.dag': string;
   'tui.welcome.shortcut.tab': string;
   // TUI 工作笔记
@@ -1922,6 +1932,8 @@ const zhStrings: I18nStrings = {
   'tui.copy.no_code': '没有可复制的代码块',
   'tui.mouse.tracking_on': '鼠标追踪已开启 · TUI 内选择/点击生效',
   'tui.mouse.tracking_off': '鼠标追踪已关闭 · 可用终端原生拖拽选中复制',
+  'tui.clipboard.image_not_found': '剪贴板中未找到图片',
+  'tui.clipboard.image_pasted': (path: string) => `图片已粘贴: ${path}`,
   'slash.help.title': '可用命令（/help 或 / 触发搜索）:',
   'slash.help.image_upload': '图片上传: 消息中包含图片路径即可自动识别 (png/jpg/gif/webp)',
   'slash.help.image_example': '  例: 分析这张图 ./screenshot.png',
@@ -2043,6 +2055,10 @@ const zhStrings: I18nStrings = {
   'tui.welcome.motto': 'Multi-agent coding',
   'cli.farewell.motto': 'Blade rests, the night keeps watch',
   'cli.farewell.session': 'Session',
+  // === TUI Web UI ===
+  'tui.webui.not_available': 'Web UI 尚未启动',
+  'tui.webui.opened': (url: string) => `已在系统浏览器中打开 Web UI：${url}`,
+  'tui.webui.open_failed': '无法启动系统浏览器，请手动打开：',
   'cli.farewell.resume': 'Resume',
   'tui.welcome.shortcuts': '快捷键',
   'tui.welcome.shortcut.cmd': '  /         命令',
@@ -2806,6 +2822,8 @@ const enStrings: I18nStrings = {
   'tui.copy.no_code': 'No code block to copy',
   'tui.mouse.tracking_on': 'Mouse tracking on · in-TUI select/click active',
   'tui.mouse.tracking_off': 'Mouse tracking off · use native terminal drag-select to copy',
+  'tui.clipboard.image_not_found': 'No image found in clipboard',
+  'tui.clipboard.image_pasted': (path: string) => `Image pasted: ${path}`,
   'slash.help.title': 'Available commands (/help or / to search):',
   'slash.help.image_upload': 'Image upload: include an image path in a message to detect it automatically (png/jpg/gif/webp)',
   'slash.help.image_example': '  Example: Analyze this image ./screenshot.png',
@@ -2924,6 +2942,10 @@ const enStrings: I18nStrings = {
 
   // === TUI Welcome Banner ===
   'tui.welcome.tagline': '凌霄剑域',
+  // === TUI Web UI ===
+  'tui.webui.not_available': 'Web UI is not running',
+  'tui.webui.opened': (url: string) => `Opened Web UI in system browser: ${url}`,
+  'tui.webui.open_failed': 'Failed to launch system browser, please open manually: ',
   'tui.welcome.motto': '青锋照夜',
   'cli.farewell.motto': '剑归鞘 · 青锋照夜',
   'cli.farewell.session': '会话',

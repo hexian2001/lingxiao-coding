@@ -62,6 +62,16 @@ export class ServerAuth {
     if (a.length !== b.length) return false;
     return timingSafeEqual(a, b);
   }
+  /**
+   * 读取已持久化的 server token（不生成新 token）。
+   * 供 TUI 等非 server 进程使用——打开浏览器时拼接 ?token=。
+   */
+  static readToken(): string | undefined {
+    try {
+      if (existsSync(TOKEN_FILE)) return readFileSync(TOKEN_FILE, 'utf-8').trim() || undefined;
+    } catch { /* file missing or unreadable */ }
+    return undefined;
+  }
 
   /**
    * Validate a request's server token.

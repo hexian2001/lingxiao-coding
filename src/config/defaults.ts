@@ -408,7 +408,7 @@ export const PATHS = {
 export const SERVER = {
   /** 默认绑定地址 — localhost only, 不暴露公网 */
   HOST: '127.0.0.1',
-  /** 默认端口 */
+  /** 默认端口（仅在 random_port=false 时使用；默认随机端口避免冲突和扫描） */
   PORT: 8080,
 } as const;
 

@@ -6,6 +6,7 @@
 
 import { GitService, type Checkpoint, type FileDiff } from './GitService.js';
 import type { DatabaseRepositoryAdapter, AgentLog } from '../core/DatabaseRepositories.js';
+import { getConfigValue } from '../config.js';
 
 /** Parse [turn:N] [tool] / [turn:N] Turn labels to extract metadata */
 function parseCheckpointLabel(message: string): Pick<Checkpoint, 'turnNumber' | 'toolName' | 'type' | 'actorType' | 'agentName' | 'taskId'> {
@@ -427,6 +428,11 @@ export class FileChangesApi {
     message: string,
     actor?: { agentId: string; agentName: string; agentRole: string; taskId?: string },
   ): Promise<{ hash: string } | { error: string } | null> {
+    // 检查全局开关：用户在设置中关闭了 file checkpointing 时，跳过 git 快照
+    if (getConfigValue('checkpoint.file_checkpointing_enabled') === false) {
+      return null;
+    }
+
     const git = await this.getGitService(sessionId);
 
     let hash: string | null = null;
@@ -584,6 +590,49 @@ export class FileChangesApi {
       };
     } catch { /* expected: git checkout/diff may fail */
       return { hasOtherSessionChanges: false, otherSessionIds: [] };
+    }
+  }
+  // ── Checkpoint 磁盘清理 API ──
+
+  /**
+   * 获取当前项目 checkpoint 的磁盘使用统计
+   */
+  async getCheckpointDiskUsage(sessionId: string): Promise<{ historyDir: string; sizeBytes: number; commitCount: number } | { error: string }> {
+    const git = await this.getGitService(sessionId);
+    if (!git) return { error: 'GitService not available' };
+    try {
+      return await git.getDiskUsage();
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  /**
+   * 执行 gc 清理（reflog expire + gc --prune=now --aggressive）
+   */
+  async runCheckpointGc(sessionId: string): Promise<{ sizeBytesBefore: number; sizeBytesAfter: number; commitCount: number } | { error: string }> {
+    const git = await this.getGitService(sessionId);
+    if (!git) return { error: 'GitService not available' };
+    try {
+      return await git.runGc();
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  /**
+   * 核弹级清理：删除整个 shadow git 仓库，下次快照时自动重建
+   */
+  async purgeCheckpointHistory(sessionId: string): Promise<{ deleted: boolean; freedBytes: number; historyDir: string } | { error: string }> {
+    const git = await this.getGitService(sessionId);
+    if (!git) return { error: 'GitService not available' };
+    try {
+      const result = await git.purgeAll();
+      // 清理后需要从缓存移除，下次使用时重新初始化
+      this.gitServices.delete(sessionId);
+      return result;
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : String(err) };
     }
   }
 }

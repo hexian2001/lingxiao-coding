@@ -15,7 +15,7 @@
 import { config as runtimeConfig } from '../config.js';
 import { LLM } from '../config/defaults.js';
 import { classifyLLMError, formatLLMErrorLabel, LLMError, type LLMErrorKind } from '../llm/errors.js';
-import { getCircuitBreaker, CircuitOpenError } from '../llm/CircuitBreaker.js';
+import { getCircuitBreaker, CircuitOpenError, resetCircuitBreakersForProvider } from '../llm/CircuitBreaker.js';
 import type { ChatMessage, ChatResponse, StreamCallbacks, ToolDefinition } from '../llm/types.js';
 import type { ContentGenerator, GenerateContentParams } from '../llm/ContentGenerator.js';
 import { coreLogger } from '../core/Log.js';
@@ -431,9 +431,15 @@ export class LlmGuard {
         ) {
           try {
             llm.recycle?.();
+            // recycle 已销毁旧 SDK client + undici Agent，旧失败计数不再适用于新 client。
+            // 重置该 provider 在所有 scope 下的 CB 状态，让新 client 从干净状态开始。
+            // 否则新 client 仍被旧失败计数熔断，HALF_OPEN 探针用的还是旧死连接。
+            if (providerKey) {
+              resetCircuitBreakersForProvider(providerKey);
+            }
             const trigger = firstTokenController.signal.aborted ? 'first-token-timeout' : classified.llmErrorKind;
             coreLogger.warn(
-              `[LlmGuard:${this.actorLabel}] ${trigger} retry=${this.retryCount + 1} → recycled LLM client (fresh socket pool) provider="${providerKey ?? '?'}"`,
+              `[LlmGuard:${this.actorLabel}] ${trigger} retry=${this.retryCount + 1} → recycled LLM client + reset CB (fresh socket pool) provider="${providerKey ?? '?'}"`,
             );
           } catch (recycleErr) {
             coreLogger.warn(

@@ -1,6 +1,6 @@
 {
   "name": "lingxiao_cli",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "凌霄剑域 - 动态智能编排系统 (Node.js 版本)",
   "main": "dist/index.js",
   "type": "module",

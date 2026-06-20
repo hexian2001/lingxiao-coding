@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# 同一分支新 push 时取消旧的 CI
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── 后端：类型检查 + 构建 ─────────────────────────────────────────
+  backend-check:
+    name: Backend (tsc + build)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install web dependencies
+        run: |
+          cd web
+          npm install
+        shell: bash
+
+      - name: TypeScript check (backend)
+        run: npx tsc --noEmit
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: '1'
+
+      - name: TypeScript check (frontend)
+        run: |
+          cd web
+          npx tsc --noEmit
+        shell: bash
+
+      - name: Build (package)
+        run: npm run build:package
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: '1'
+
+      - name: Verify dist/cli.js exists
+        run: |
+          if [ ! -f dist/cli.js ]; then
+            echo "✗ dist/cli.js not found after build"
+            exit 1
+          fi
+          echo "✓ dist/cli.js exists"
+        shell: bash
+
+      - name: Upload build artifacts
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: |
+            dist/
+            web/dist/
+          retention-days: 7
+
+  # ── 前端：Vite 构建 ───────────────────────────────────────────────
+  frontend-build:
+    name: Frontend (vite build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install web dependencies
+        run: |
+          cd web
+          npm install
+
+      - name: Vite build
+        run: |
+          cd web
+          npx vite build
+
+      - name: Check bundle size
+        run: |
+          SIZE=$(du -sh web/dist/ | cut -f1)
+          echo "Frontend bundle size: $SIZE"
+          # 警告超过 20MB
+          SIZE_KB=$(du -sk web/dist/ | cut -f1)
+          if [ "$SIZE_KB" -gt 20480 ]; then
+            echo "⚠️  Frontend bundle exceeds 20MB ($SIZE)"
+          fi
+
+  # ── 源码不变性检查 ─────────────────────────────────────────────────
+  source-invariants:
+    name: Source Invariants
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run canonical source invariants test
+        run: node scripts/canonical-source-invariants.test.mjs
+        continue-on-error: true

@@ -53,6 +53,13 @@ export interface AgentRole {
     wire_api?: 'chat' | 'responses';
     no_bare?: boolean;
   };
+  /** Git author identity for this role's commits. When set, git commit uses
+   *  `git -c user.name=... -c user.email=...` to attribute the commit.
+   *  Useful for multi-agent team workflows where audit trail matters. */
+  gitIdentity?: {
+    name: string;
+    email: string;
+  };
   createdBy: 'system' | 'llm' | 'user';
 }
 
@@ -86,6 +93,10 @@ export interface AgentRoleSurfaceItem {
   workerBackend?: Exclude<WorkerBackend, 'remote'>;
   model?: string;
   systemPrompt?: string;
+  gitIdentity?: {
+    name: string;
+    email: string;
+  };
   definition?: {
     source: 'project' | 'global' | 'runtime';
     path?: string;

@@ -10,13 +10,14 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { DatabaseManager } from '../core/Database.js';
 import { textResult, jsonResult, errorResult, readDepsFromEnv } from './shared.js';
+import { VERSION } from '../version.js';
 
 const { dbPath, workspace } = readDepsFromEnv();
 const db = new DatabaseManager(dbPath);
 
 const server = new McpServer({
   name: 'lingxiao-session',
-  version: '1.0.0',
+  version: VERSION,
 });
 
 // ── Tool: create_session ──────────────────────────────────────────────────

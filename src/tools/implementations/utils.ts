@@ -5,6 +5,7 @@ import { join, dirname, basename, resolve, isAbsolute, sep } from 'path';
 import { AsyncFileLock } from '../../core/FileLock.js';
 import { getPythonExecutable } from '../../utils/platform.js';
 import { allowArbitraryTerminalCwd } from '../../core/HardeningPolicy.js';
+import { CONFIG_DIR } from '../../config.js';
 import type { ContractAllowedScope } from '../../core/ContractAllowedScope.js';
 import { getSessionScopePaths } from '../../contracts/adapters/SessionScope.js';
 export {
@@ -105,9 +106,10 @@ export function ensureTaskScopedWritePath(
   contractAllowedScope?: ContractAllowedScope,
   mode?: 'create' | 'modify',
 ): void {
-  // 写入隔离：目标路径必须落在 workspace root、显式 taskWriteScope 或当前 session runtime 之内。
+  // 写入隔离：目标路径必须落在 workspace root、显式 taskWriteScope、当前 session runtime 或
+  // lingxiao 全局配置目录（~/.lingxiao/ — skills/agents/commands/memory 等）之内。
   const workspaceRoot = resolve(workspace || process.cwd());
-  const allowedRoots = new Set<string>([workspaceRoot]);
+  const allowedRoots = new Set<string>([workspaceRoot, CONFIG_DIR]);
   for (const root of normalizeTaskWriteScope(workspaceRoot, taskWriteScope, sessionId)) {
     allowedRoots.add(root);
   }

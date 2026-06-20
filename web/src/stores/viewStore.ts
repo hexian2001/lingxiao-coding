@@ -7,7 +7,8 @@ export type ViewName =
   | 'keybindings' | 'metrics' | 'stats' | 'traces'
   | 'workers' | 'logs' | 'docs' | 'wiki' | 'git' | 'blackboard'
   | 'team' | 'design-market' | 'memory'
-  | 'blueprint' | 'langfuse';
+  | 'blueprint' | 'langfuse'
+  | 'git-activity';
 
 const PANEL_STATE_KEY = 'lingxiao-panel-state';
 
@@ -48,6 +49,7 @@ const validViews: ViewName[] = [
   'workers', 'logs', 'docs', 'wiki', 'git', 'blackboard',
   'team', 'design-market', 'memory',
   'blueprint', 'langfuse',
+  'git-activity',
 ];
 
 const initialPanelState = loadPanelState();

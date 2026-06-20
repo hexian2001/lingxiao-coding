@@ -131,7 +131,8 @@ export type EventType =
   | 'user:input_needed'
   | 'user:question_answered'
   | 'langfuse:trace'
-  | 'session:resync_failed';
+  | 'session:resync_failed'
+  | 'git:activity';
 
 export type EventPayloadBase = object & {
   sessionId?: string;

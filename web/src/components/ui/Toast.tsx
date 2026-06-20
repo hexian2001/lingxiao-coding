@@ -1,10 +1,16 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
   message: string;
   type: 'success' | 'error' | 'warning' | 'info';
   duration?: number;
+  action?: ToastAction;
 }
 
 interface ToastContextValue {
@@ -74,6 +80,17 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
         >
           <span className="text-sm shrink-0">{typeIcons[toast.type]}</span>
           <span className="flex-1 break-words">{toast.message}</span>
+          {toast.action && (
+            <button
+              onClick={() => {
+                toast.action!.onClick();
+                onDismiss(toast.id);
+              }}
+              className="shrink-0 px-2 py-0.5 rounded border border-current opacity-80 hover:opacity-100 transition-opacity font-semibold whitespace-nowrap"
+            >
+              {toast.action.label}
+            </button>
+          )}
           <button
             onClick={() => onDismiss(toast.id)}
             className="shrink-0 opacity-60 hover:opacity-100 transition-opacity"

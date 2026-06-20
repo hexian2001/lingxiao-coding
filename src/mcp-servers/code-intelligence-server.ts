@@ -12,12 +12,13 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute } from 'node:path';
 import { execSync } from 'node:child_process';
 import { readDepsFromEnv, jsonResult, errorResult, textResult } from './shared.js';
+import { VERSION } from '../version.js';
 
 const { workspace } = readDepsFromEnv();
 
 const server = new McpServer({
   name: 'lingxiao-code-intelligence',
-  version: '1.0.0',
+  version: VERSION,
 });
 
 // ── Tool: ast_query ───────────────────────────────────────────────────────

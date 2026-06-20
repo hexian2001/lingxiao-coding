@@ -179,7 +179,13 @@ export const useGitStore = create<GitState>((set, get) => ({
   selectedFiles: [],
   mrStateFilter: 'open',
 
-  setWorkspace: (workspace) => set({ workspace }),
+  setWorkspace: (workspace) => set((s) => {
+    // Clear stale data when workspace changes to prevent showing old repo info
+    if (s.workspace !== workspace) {
+      return { workspace, status: null, branches: [], log: [], diff: '', stagedDiff: '', mrs: [], detectedPlatform: null, error: null, mrError: null, mrUnavailable: null, selectedFiles: [] };
+    }
+    return { workspace };
+  }),
 
   fetchStatus: async () => {
     const { workspace } = get();

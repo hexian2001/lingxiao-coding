@@ -121,6 +121,7 @@ import {
 import { renderContextManifest } from '../core/ContextManifest.js';
 import { formatWorkerCompletion } from './leader/workerCompletionFormatter.js';
 import { classifyLLMError, formatLLMErrorLabel } from '../llm/errors.js';
+import { _resetAllCircuitBreakers } from '../llm/CircuitBreaker.js';
 import { SESSION_KEYS } from '../core/SessionStateKeys.js';
 import { MemoryManager } from '../memory/MemoryManager.js';
 import { createEventStreamClient, type LlmRoundHooks } from './runtime/LlmRoundExecutor.js';
@@ -881,12 +882,24 @@ export class LeaderAgent {
       setOrchestrationVerdict: (taskId, verdict) => this.board.setOrchestrationVerdict(taskId, verdict),
       createFollowupTask: (input) => {
         const taskId = this.board.nextTaskId();
+        // 防御性 guard：如果 nextTaskId 意外返回了与 blockedBy 中相同的 ID（自依赖），
+        // 强制跳过该 ID 再取一个。正常情况下 nextTaskId 的 while 循环已处理此问题，
+        // 但在极端时序下（如 DB 恢复后 taskCounter 未同步）仍可能发生。
+        const blockedBy = input.blockedBy ?? [];
+        let safeTaskId = taskId;
+        if (blockedBy.includes(safeTaskId)) {
+          // nextTaskId 已有 while(this.tasks.has) 保护，但自依赖检查不在其中。
+          // 强制递增直到不再与任何 blockedBy 冲突。
+          do {
+            safeTaskId = this.board.nextTaskId();
+          } while (blockedBy.includes(safeTaskId));
+        }
         const task = this.board.createTask(
-          taskId,
+          safeTaskId,
           input.subject,
           input.description,
           input.agentType,
-          input.blockedBy ?? [],
+          blockedBy,
           [],
           undefined,
           input.context,
@@ -1954,6 +1967,12 @@ export class LeaderAgent {
         role: 'user',
         content: content,
       });
+      // 用户重新发消息时重置所有 Circuit Breaker：
+      // CB OPEN 后系统停下等待用户，用户回来时 provider 可能已恢复，
+      // 不应让上一代失败计数继续阻塞新请求。
+      _resetAllCircuitBreakers();
+      this.llmErrorRetryCount = 0;
+      leaderLogger.info('[LeaderAgent] 用户重新发消息，已重置 Circuit Breaker 和 LLM 重试计数');
     }
   }
 

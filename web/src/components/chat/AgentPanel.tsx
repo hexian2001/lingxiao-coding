@@ -7,7 +7,7 @@
  * - 用户可在此查看Agent的完整工作过程
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SafeMarkdown from '../ui/SafeMarkdown';
 import PreCopyButton from './PreCopyButton';
@@ -44,7 +44,9 @@ function compactPath(path?: string, max = 54): string {
   return tail.length < max ? `.../${tail}` : `...${normalized.slice(-(max - 3))}`;
 }
 
-export default function AgentPanel({ onClose, onExpandChange }: { onClose: () => void; onExpandChange?: (expanded: boolean) => void }) {
+// 性能优化 (T-8)：用 memo 包裹，当 onClose/onExpandChange 未变且内部 store 状态
+// 未变时跳过 re-render，避免 ChatView 每次 setState 导致 AgentPanel 级联重渲。
+function AgentPanel({ onClose, onExpandChange }: { onClose: () => void; onExpandChange?: (expanded: boolean) => void }) {
   const { t } = useTranslation();
   const agents = useSessionStore((s) => s.agents);
   const agentConversations = useSessionStore((s) => s.agentConversations);
@@ -468,6 +470,11 @@ export default function AgentPanel({ onClose, onExpandChange }: { onClose: () =>
     </div>
   );
 }
+
+// 性能优化 (T-8)：memo 包装减少 ChatView re-render 时的级联更新。
+// AgentPanel 的 props（onClose/onExpandChange）在 ChatView 中是稳定引用，
+// 内部状态来自 zustand store 订阅，只有实际变化时才重渲。
+export default memo(AgentPanel);
 
 function formatAgentElapsedShort(ms: number): string {
   if (ms < 1000) return `${ms}ms`;

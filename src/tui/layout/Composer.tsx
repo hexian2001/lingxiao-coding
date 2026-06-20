@@ -8,7 +8,7 @@ import { AgentStatusBar } from '../components/AgentStatusBar.js';
 import { renderCloudPattern } from './cloudPattern.js';
 import { buildComposerInputLines, type ComposerInputLine } from './composerInputWrap.js';
 
-const INPUT_HORIZONTAL_CHROME_WIDTH = 10;
+const INPUT_HORIZONTAL_CHROME_WIDTH = 6;
 const MIN_INPUT_TEXT_WIDTH = 8;
 
 export const BlinkingCursor = memo(() => {
@@ -133,7 +133,7 @@ export function Composer({
               <Box key={`${line.start}:${line.end}:${index}`} flexDirection="row">
                 <Text color={index === 0 ? tuiTheme.semantic.text.accent : tuiTheme.semantic.panel.help} bold={index === 0}>{index === 0 ? '❯' : ' '}</Text>
                 <Text>{' '}</Text>
-                <Text wrap="truncate-end">
+                <Text>
                   {renderInputLineContent(line, commandTokenLength)}
                 </Text>
               </Box>

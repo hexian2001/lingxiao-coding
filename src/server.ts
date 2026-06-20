@@ -36,6 +36,7 @@ import { registerCommandsRoutes } from './web-server/CommandsRoutes.js';
 import { registerWorkerRoutes } from './web-server/WorkerRoutes.js';
 import { registerFileChangesRoutes } from './web-server/FileChangesRoutes.js';
 import { registerMiscRoutes } from './web-server/MiscRoutes.js';
+import { registerWorkspaceRoutes } from './web-server/WorkspaceRoutes.js';
 import { registerLangfuseRoutes } from './web-server/LangfuseRoutes.js';
 import { initLangfuse, shutdownLangfuse, readLangfuseConfig, setLangfuseEmitter } from './core/LangfuseIntegration.js';
 import { onConfigReload } from './config.js';
@@ -323,17 +324,29 @@ export async function createServerWithDeps(
   });
 
   // --- 前端 HTML 注入 server token ---
+  // @fastify/static 可能以 string 或 Buffer 发送 index.html，两种都要处理。
   fastify.addHook('onSend', async (_request, reply, payload) => {
     const contentType = mediaTypeFromHeader(reply.getHeader('content-type'));
-    if (typeof payload === 'string' && contentType === 'text/html') {
-      const injected = payload.replace(
-        '</head>',
-        `<script>window.__LINGXIAO_TOKEN__ = ${JSON.stringify(serverAuth.token)};</script></head>`,
-      );
-      reply.header('content-length', Buffer.byteLength(injected));
-      return injected;
+    if (contentType !== 'text/html') return payload;
+
+    // 统一转 string 处理，兼容 string / Buffer
+    let html: string;
+    if (typeof payload === 'string') {
+      html = payload;
+    } else if (Buffer.isBuffer(payload)) {
+      html = payload.toString('utf-8');
+    } else {
+      return payload;
     }
-    return payload;
+
+    if (!html.includes('</head>')) return payload;
+
+    const injected = html.replace(
+      '</head>',
+      `<script>window.__LINGXIAO_TOKEN__ = ${JSON.stringify(serverAuth.token)};</script></head>`,
+    );
+    reply.header('content-length', Buffer.byteLength(injected));
+    return injected;
   });
 
   // 启动 SSE 事件桥接
@@ -396,6 +409,7 @@ export async function createServerWithDeps(
     getExternalAgentAvailability,
   });
   registerMiscRoutes(fastify, { repos, serverAuth, storageApi, requireServerToken });
+  registerWorkspaceRoutes(fastify, { requireServerToken });
   registerContractRoutes(fastify, { requireServerToken });
   registerAcpRoutes(fastify, { sessionManager, connectionManager, acpHandler, requireServerToken });
   registerTerminalRoutes(fastify, { serverAuth, repos });
@@ -616,9 +630,12 @@ export async function startServer() {
 
   warnIfInsecureHostBinding(webHost, isHardenedMode());
 
-  // 如果配置了 random_port=true，则始终使用 OS 分配的随机端口，规避端口扫描
+  // 端口优先级：显式 LINGXIAO_WEB_PORT 环境变量 > random_port 配置 > config.server.port
+  const envPort = process.env.LINGXIAO_WEB_PORT;
   const useRandomPort = getConfigValue('server.random_port') === true;
-  const requestedPort = useRandomPort ? 0 : webPort;
+  const requestedPort = (envPort != null && parseInt(envPort, 10) !== 0)
+    ? parseInt(envPort, 10)
+    : (useRandomPort ? 0 : webPort);
 
   let actualPort = requestedPort;
   try {

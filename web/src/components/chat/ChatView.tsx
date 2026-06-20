@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useSessionStore, type AgentActivity, type AgentRuntime, type SessionPhase } from '../../stores/sessionStore';
+// 性能优化 (T-8)：useShallow 让返回新对象/数组的选择器用浅比较，避免 zustand
+// 默认引用相等检查在不相关 store 更新时触发不必要的 re-render。
+import { useShallow } from 'zustand/react/shallow';
 import { usePermissionStore, type PermissionRequest } from '../../stores/permissionStore';
 import { useViewStore } from '../../stores/viewStore';
 import { useToast } from '../ui/Toast';
@@ -19,6 +22,7 @@ import { ControlModeToggle } from './ControlModeToggle';
 import { ModeSplitControls } from './ModeSplitControls';
 import { PermissionModeToggle } from './PermissionModeToggle';
 import ChatGitBranchPicker from './ChatGitBranchPicker';
+import WorkspacePicker from './WorkspacePicker';
 import WorkbenchChangeStrip from './WorkbenchChangeStrip';
 import WorkbenchSidePanel, { type WorkbenchToolRequest } from './WorkbenchSidePanel';
 import WorkbenchTerminalDock from './WorkbenchTerminalDock';
@@ -453,14 +457,16 @@ export default function ChatView() {
   // 窄选择器 (2026-05-29)：此前用裸 useSessionStore() 订阅整个 store，任何一次 set()
   // （包括每个流式 chunk）都会 re-render 整个 ChatView 子树。改为按字段订阅，让流式
   // 文本更新只触发依赖 messages 的部分，其余字段不变则不重渲。
+  // 性能优化 (T-8)：对象/数组类型选择器用 useShallow 包裹，避免引用变化导致不必要的
+  // re-render；标量类型保持原样（引用相等即值相等）。
   const sessionId = useSessionStore((s) => s.sessionId);
-  const sessions = useSessionStore((s) => s.sessions);
+  const sessions = useSessionStore(useShallow((s) => s.sessions));
   const activeWorkspace = sessions.find((s) => s.id === sessionId)?.workspace || '';
   const messages = useSessionStore((s) => s.messages);
   const phase = useSessionStore((s) => s.phase);
   const isConnected = useSessionStore((s) => s.isConnected);
   const isLoadingHistory = useSessionStore((s) => s.isLoadingHistory);
-  const tokenUsage = useSessionStore((s) => s.tokenUsage);
+  const tokenUsage = useSessionStore(useShallow((s) => s.tokenUsage));
   // token 消耗轨迹(火花图样本):事件驱动采样——tokenUsage.total 仅在 LLM 调用粒度变化,
   // 无需 setInterval。处理增长/去重/会话切换重置,封顶 24 样本。
   const [tokenHistory, setTokenHistory] = useState<number[]>([]);
@@ -487,19 +493,20 @@ export default function ChatView() {
   }, [tokenUsage.total]);
   const agents = useSessionStore((s) => s.agents);
   const contextRuntimeState = useSessionStore((s) => s.contextRuntimeState);
-  const compactingProgress = useSessionStore((s) => s.compactingProgress);
-  const orchestrationStatus = useSessionStore((s) => s.orchestrationStatus);
-  const runExplanation = useSessionStore((s) => s.runExplanation);
-  const runtimeSnapshot = useSessionStore((s) => s.runtimeSnapshot);
+  const compactingProgress = useSessionStore(useShallow((s) => s.compactingProgress));
+  const orchestrationStatus = useSessionStore(useShallow((s) => s.orchestrationStatus));
+  const runExplanation = useSessionStore(useShallow((s) => s.runExplanation));
+  const runtimeSnapshot = useSessionStore(useShallow((s) => s.runtimeSnapshot));
   const leaderStatusText = useSessionStore((s) => s.leaderStatusText);
-  const fetchSessions = useSessionStore((s) => s.fetchSessions);
-  const connectToSession = useSessionStore((s) => s.connectToSession);
-  const createAndConnect = useSessionStore((s) => s.createAndConnect);
-  const deleteSession = useSessionStore((s) => s.deleteSession);
-  const addMessage = useSessionStore((s) => s.addMessage);
-  const setPhase = useSessionStore((s) => s.setPhase);
-  const fetchTokenUsage = useSessionStore((s) => s.fetchTokenUsage);
-  const compressContext = useSessionStore((s) => s.compressContext);
+  // 性能优化 (T-8)：合并多个函数引用为单次 useShallow 订阅，减少订阅数量和比较开销。
+  const { fetchSessions, connectToSession, createAndConnect, deleteSession,
+    addMessage, setPhase, fetchTokenUsage, compressContext } =
+    useSessionStore(useShallow((s) => ({
+      fetchSessions: s.fetchSessions, connectToSession: s.connectToSession,
+      createAndConnect: s.createAndConnect, deleteSession: s.deleteSession,
+      addMessage: s.addMessage, setPhase: s.setPhase,
+      fetchTokenUsage: s.fetchTokenUsage, compressContext: s.compressContext,
+    })));
   const pendingPermissionRequests = usePermissionStore((s) => s.pendingRequests);
   const permissionHistory = usePermissionStore((s) => s.history);
   const { addToast } = useToast();
@@ -619,6 +626,7 @@ export default function ChatView() {
   const [deleteConfirmSession, setDeleteConfirmSession] = useState<string | null>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isComposingRef = useRef(false);
   const isAtBottomRef = useRef(true);
   // 初始滚动标记：sessionId 变化或历史首次加载完成时需要自动滚到底部。
   // followOutput 只在 data 变化时触发，首次渲染/切换 session 不会自动滚。
@@ -2255,7 +2263,7 @@ export default function ChatView() {
       setEditingMessageId(null);
       return;
     }
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current && !e.nativeEvent.isComposing) {
       e.preventDefault();
       if (uploadingCount === 0 && (input.trim() || pendingImages.length > 0 || pendingFiles.length > 0)) handleSend();
     }
@@ -2953,6 +2961,7 @@ export default function ChatView() {
               <ControlModeToggle />
               <PermissionModeToggle />
               <ChatGitBranchPicker workspace={activeWorkspace} />
+              <WorkspacePicker />
               {isConnected && (
                 <div className="min-w-0 flex-1 flex items-center gap-2 text-[11px] font-mono text-text-tertiary">
                   <span
@@ -2972,6 +2981,7 @@ export default function ChatView() {
               <ControlModeToggle />
               <PermissionModeToggle />
               <ChatGitBranchPicker workspace={activeWorkspace} />
+              <WorkspacePicker />
             </div>
           )}
           {(pendingImages.length > 0 || pendingFiles.length > 0 || uploadingCount > 0 || attachmentError) && (
@@ -3117,6 +3127,8 @@ export default function ChatView() {
               disabled={uploadingCount > 0}
               className="codex-icon-btn !h-8 !min-w-8 disabled:opacity-50" title="Attach file"><Paperclip size={16} /></button>
             <textarea ref={textareaRef} value={input} onChange={(e) => handleInputChange(e.target.value)} onKeyDown={handleKeyDown}
+              onCompositionStart={() => { isComposingRef.current = true; }}
+              onCompositionEnd={() => { isComposingRef.current = false; }}
               onPaste={(e) => {
                 const items = e.clipboardData?.items;
                 if (!items) return;

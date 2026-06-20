@@ -718,6 +718,28 @@ export interface EventMap {
     reason: string;
     attempts: number;
   };
+  'git:activity': {
+    sessionId: string;
+    agentId: string;
+    agentName: string;
+    taskId?: string;
+    action: 'commit' | 'push' | 'pull' | 'branch_create' | 'branch_switch' | 'merge_mr' | 'create_mr';
+    success: boolean;
+    timestamp: number;
+    /** Commit-specific fields */
+    commitHash?: string;
+    commitMessage?: string;
+    author?: { name: string; email: string };
+    branch?: string;
+    /** Pre-commit gate result */
+    gateResult?: {
+      passed: boolean;
+      enabled: boolean;
+      diagnostics: string[];
+    };
+    /** Error message on failure */
+    error?: string;
+  };
 }
 
 export type EventName = keyof EventMap;

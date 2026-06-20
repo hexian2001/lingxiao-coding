@@ -46,6 +46,7 @@ import type {
   ToolCall,
 } from './sessionStoreTypes.ts';
 import { usePermissionStore } from './permissionStore';
+import { useGitActivityStore, type GitActivityEvent } from './gitActivityStore';
 import {
   applyConnectionStateForResync,
   applyRuntimeSnapshotPatch,
@@ -606,6 +607,12 @@ export type PendingStreamEntry =
   | { type: 'agent_text'; agentId: string; chunk: string }
   | { type: 'agent_thinking'; agentId: string; chunk: string };
 
+// ── 性能优化：LeaderToolOutput 批处理缓冲 ──
+// T-5 发现 LeaderToolOutput 每个 chunk 直接触发 setState，工具输出流式时
+// 产生大量 re-render。用 Map 按 callId 累积 chunk，在 rAF 帧内合并为单次 setState。
+type PendingToolOutput = { callId: string; chunks: string[] };
+const pendingToolOutputs: PendingToolOutput[] = [];
+let toolOutputFlushHandle: ReturnType<typeof requestAnimationFrame> | ReturnType<typeof setTimeout> | null = null;
 const pendingStream: { entries: PendingStreamEntry[] } = { entries: [] };
 let streamFlushHandle: ReturnType<typeof requestAnimationFrame> | ReturnType<typeof setTimeout> | null = null;
 const hasRAF = typeof requestAnimationFrame === 'function';
@@ -629,6 +636,9 @@ export function resetThinkStreamState(agentId?: string): void {
 
 export function clearPendingStreamBuffers(): void {
   if (streamFlushHandle !== null) { cancelRaf(streamFlushHandle); streamFlushHandle = null; }
+  // 清理 tool output 批处理缓冲
+  if (toolOutputFlushHandle !== null) { cancelRaf(toolOutputFlushHandle); toolOutputFlushHandle = null; }
+  pendingToolOutputs.length = 0;
   pendingStream.entries = [];
   resetThinkStreamState();
   // Tear down the streaming-watchdog interval too: every session-lifecycle reset
@@ -659,6 +669,34 @@ function enqueuePendingStream(entry: PendingStreamEntry): void {
 function scheduleStreamFlush() {
   if (streamFlushHandle !== null) return;
   streamFlushHandle = scheduleRaf(() => { streamFlushHandle = null; flushStreamBuffers(); });
+}
+
+
+// ── 性能优化：LeaderToolOutput 批处理 flush ──
+// 将累积的 tool output chunks 按 callId 合并，单次 setState 更新 messages，
+// 避免每个 chunk 一次 setState 导致的 N 次 re-render。
+function flushToolOutputBuffers() {
+  if (toolOutputFlushHandle !== null) { cancelRaf(toolOutputFlushHandle); toolOutputFlushHandle = null; }
+  if (pendingToolOutputs.length === 0) return;
+  const batches = pendingToolOutputs.splice(0);
+  getStore().setState((s) => {
+    let messages = s.messages;
+    let changed = false;
+    for (const batch of batches) {
+      const combined = batch.chunks.join('');
+      messages = messages.map(m => {
+        if (m.role !== 'assistant' || !m.toolCalls?.some(tc => tc.id === batch.callId)) return m;
+        changed = true;
+        return { ...m, toolCalls: m.toolCalls!.map(tc => tc.id === batch.callId ? { ...tc, streamingOutput: appendStreamingOutput(tc.streamingOutput || '', combined) } : tc) };
+      });
+    }
+    return changed ? { messages } : s;
+  });
+}
+
+function scheduleToolOutputFlush() {
+  if (toolOutputFlushHandle !== null) return;
+  toolOutputFlushHandle = scheduleRaf(() => { toolOutputFlushHandle = null; flushToolOutputBuffers(); });
 }
 
 export function flushStreamBuffers() {
@@ -860,6 +898,28 @@ export function ensureSseListener() {
     }
 
     handleSessionUpdate(store, update, eventData, kind);
+
+    // Git activity events (not in CANONICAL_EVENT_KIND, handled by eventType)
+    if (eventType === 'git:activity' && update) {
+      const gitEvent: GitActivityEvent = {
+        id: `${update.agentId || 'leader'}-${update.timestamp || Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        sessionId: String(update.sessionId || eventSessionId || ''),
+        agentId: String(update.agentId || 'leader'),
+        agentName: String(update.agentName || 'leader'),
+        taskId: typeof update.taskId === 'string' ? update.taskId : undefined,
+        action: (update.action as GitActivityEvent['action']) || 'commit',
+        success: update.success !== false,
+        timestamp: typeof update.timestamp === 'number' ? update.timestamp : Date.now(),
+        commitHash: typeof update.commitHash === 'string' ? update.commitHash : undefined,
+        commitMessage: typeof update.commitMessage === 'string' ? update.commitMessage : undefined,
+        author: update.author as { name: string; email: string } | undefined,
+        branch: typeof update.branch === 'string' ? update.branch : undefined,
+        gateResult: update.gateResult as GitActivityEvent['gateResult'] | undefined,
+        error: typeof update.error === 'string' ? update.error : undefined,
+      };
+      useGitActivityStore.getState().addEvent(gitEvent);
+      GIT_ACTIVITY_LISTENERS.forEach(fn => fn(gitEvent));
+    }
   });
 }
 
@@ -1018,13 +1078,15 @@ function handleSessionUpdate(store: SessionState, update: SessionEventPayload, d
     case SessionUpdateKind.LeaderToolOutput: {
       if (!update.callId || !update.chunk) break;
       markStreamingActivity();
-      getStore().setState((s) => {
-        const messages = s.messages.map(m => {
-          if (m.role !== 'assistant' || !m.toolCalls?.some(tc => tc.id === update.callId)) return m;
-          return { ...m, toolCalls: m.toolCalls!.map(tc => tc.id === update.callId ? { ...tc, streamingOutput: appendStreamingOutput(tc.streamingOutput || '', update.chunk) } : tc) };
-        });
-        return { messages };
-      });
+      // 性能优化：用 rAF 批处理替代 per-chunk setState，合并同一帧内多个
+      // tool output chunk 为单次 setState，减少 re-render 次数。
+      const existing = pendingToolOutputs.find(p => p.callId === update.callId);
+      if (existing) {
+        existing.chunks.push(update.chunk);
+      } else {
+        pendingToolOutputs.push({ callId: update.callId!, chunks: [update.chunk!] });
+      }
+      scheduleToolOutputFlush();
       break;
     }
     default:
@@ -1769,6 +1831,15 @@ function handleSessionUpdatePart9(store: SessionState, update: SessionEventPaylo
       getStore().setState((s) => ({ notifications: [...(s.notifications || []), { kind: 'context_overflow', tokens: update.tokens, threshold: update.threshold, owner: update.owner, agentId: update.agentId, agentName: update.agentName, receivedAt: Date.now() }].slice(-50) }));
       break;
   }
+}
+
+// ─── Git Activity Events (not in CANONICAL_EVENT_KIND, handle by eventType) ───
+
+const GIT_ACTIVITY_LISTENERS = new Set<(event: GitActivityEvent) => void>();
+
+export function onGitActivity(fn: (event: GitActivityEvent) => void): () => void {
+  GIT_ACTIVITY_LISTENERS.add(fn);
+  return () => GIT_ACTIVITY_LISTENERS.delete(fn);
 }
 
 // Auto-register on import

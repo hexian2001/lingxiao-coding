@@ -415,6 +415,7 @@ async function main(): Promise<void> {
       blackboardGraph,
       workflowManager,
       workflowEngine,
+      ...(payload.gitIdentity ? { gitIdentity: payload.gitIdentity } : {}),
     });
 
     // A4: 透传契约结构化允许面(已在 WorkerPayloadBuilder 对多契约 intersect),供写工具 intersect 硬校验。
