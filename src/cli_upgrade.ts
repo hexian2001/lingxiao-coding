@@ -430,11 +430,13 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
       // 2. npm install（npm 命令跨平台，Windows 上需要 npm.cmd）
       const npmCmd = IS_WINDOWS ? 'npm.cmd' : 'npm';
       console.log(chalk.cyan('▸ 安装依赖...'));
+      // 跳过 electron 二进制下载（CLI 源码升级不需要，避免大文件下载超时）
       const npmInstall = spawnSync(npmCmd, ['install'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 300000,
+        env: { ...process.env, ELECTRON_SKIP_BINARY_DOWNLOAD: '1' },
       });
       if (npmInstall.status !== 0) {
-        throw new Error('npm install 失败');
+        throw new Error('npm install 失败（可能是网络问题，尝试设置代理后手动执行 npm install）');
       }
 
       // 3. npm run build
