@@ -111,7 +111,7 @@ ${html}
   // 高度自适应：通过 ResizeObserver 监听 body 高度变化，postMessage 通知父窗口
   function sendHeight() {
     var h = document.body.scrollHeight;
-    window.parent.postMessage({ source: 'mcp-app', type: 'resize', height: h }, '*');
+    window.parent.postMessage({ source: 'mcp-app', type: 'resize', height: h }, window.location.origin);
   }
   // 初始延迟发送（等待内容渲染）
   setTimeout(sendHeight, 100);
@@ -196,7 +196,7 @@ function McpAppRenderer({ html, title, height, actions }: McpAppRendererProps) {
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage(
         { type: 'theme-change', theme: resolvedTheme },
-        '*',
+        window.location.origin,
       );
     }
   }, [resolvedTheme]);
@@ -216,7 +216,7 @@ function McpAppRenderer({ html, title, height, actions }: McpAppRendererProps) {
   const handleAction = useCallback((action: { label: string; event: string; data?: unknown }) => {
     const win = iframeRef.current?.contentWindow;
     if (win) {
-      win.postMessage({ type: 'mcp-action', event: action.event, data: action.data }, '*');
+      win.postMessage({ type: 'mcp-action', event: action.event, data: action.data }, window.location.origin);
     }
   }, []);
 
