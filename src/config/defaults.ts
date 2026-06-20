@@ -199,15 +199,15 @@ export const CONTEXT = {
   /** 压缩后最大文件数 */
   POST_COMPACT_MAX_FILES: 10,
   /** 压缩后 token 预算 */
-  POST_COMPACT_TOKEN_BUDGET: 60_000,
+  POST_COMPACT_TOKEN_BUDGET: 200_000,
   /** 压缩后每文件最大 token 数 */
   POST_COMPACT_MAX_TOKENS_PER_FILE: 6_000,
   /** 最近文件容量 */
   RECENT_FILES_CAPACITY: 10,
   /** 最近窗口 token 预算 */
-  RECENT_WINDOW_TOKEN_BUDGET: 50_000,
+  RECENT_WINDOW_TOKEN_BUDGET: 150_000,
   /** 最近消息最大条数 */
-  MAX_RECENT_MESSAGE_COUNT: 24,
+  MAX_RECENT_MESSAGE_COUNT: 40,
   /** 分块 token 预算 */
   CHUNK_TOKEN_BUDGET: 8_000,
   /** 最大摘要深度 */
@@ -215,7 +215,7 @@ export const CONTEXT = {
   /** 保留系统消息数 */
   PRESERVED_SYSTEM_COUNT: 3,
   /** 保留最近消息数 */
-  PRESERVED_RECENT_COUNT: 15,
+  PRESERVED_RECENT_COUNT: 24,
   /** 压缩后工具结果最大长度 */
   COMPRESSED_TOOL_RESULT_MAX: 200,
 } as const;

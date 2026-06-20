@@ -26,7 +26,7 @@ const AUTOCOMPACT_MIN_THRESHOLD = 10_000;
  * RESERVED_TOKENS(13K) 预留思路对齐。此前直接 contextLimit*0.8 不预留输出，大输出模型
  * （如 64K output）会在压缩摘要本身 + 下一轮输出时溢出真实窗口而 400。
  */
-const RESERVED_OUTPUT_OVERHEAD_RATIO = 0.15;
+const RESERVED_OUTPUT_OVERHEAD_RATIO = 0.05;
 const RESERVED_OUTPUT_OVERHEAD_FLOOR = 12_000;
 
 function defaultLeaderModel(): string {
