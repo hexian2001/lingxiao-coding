@@ -24,7 +24,7 @@
     "build:server": "node scripts/build.mjs --server-only",
     "desktop:dev": "npm run build && electron dist/desktop/main.js",
     "desktop:pack": "npm run build && electron-builder --dir",
-    "desktop:msi": "npm run build && electron-builder --win msi --publish never --config.electronDist=node_modules/electron/dist",
+    "desktop:msi": "npm run build && electron-builder --win msi --publish never",
     "desktop:publish": "npm run build && electron-builder --win nsis --publish always",
     "package:portable": "node scripts/package-portable.mjs",
     "build:binary": "node scripts/build-binary.mjs",
