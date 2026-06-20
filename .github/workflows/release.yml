@@ -26,8 +26,6 @@ jobs:
             runner: ubuntu-latest
           - target: linux-arm64
             runner: ubuntu-24.04-arm
-          - target: darwin-x64
-            runner: macos-13
           - target: darwin-arm64
             runner: macos-latest
           - target: win-x64
@@ -214,7 +212,6 @@ jobs:
           |------|--------|------|
           | Linux x64 | \`lingxiao-v${VERSION}-linux-x64.tar.gz\` | 解压后运行 \`./lingxiao\` |
           | Linux arm64 | \`lingxiao-v${VERSION}-linux-arm64.tar.gz\` | 解压后运行 \`./lingxiao\` |
-          | macOS Intel | \`lingxiao-v${VERSION}-darwin-x64.tar.gz\` | 解压后运行 \`./lingxiao\` |
           | macOS Apple Silicon | \`lingxiao-v${VERSION}-darwin-arm64.tar.gz\` | 解压后运行 \`./lingxiao\` |
           | Windows x64 | \`lingxiao-v${VERSION}-win-x64.zip\` | 解压后运行 \`lingxiao.cmd\` |
           | Windows x64 (桌面版) | \`LingXiao-Setup-*.exe\` | NSIS 安装包，支持自动更新 |
