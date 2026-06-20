@@ -22,6 +22,10 @@
     "build:package": "node scripts/build.mjs --package",
     "build:web": "node scripts/build.mjs --web-only",
     "build:server": "node scripts/build.mjs --server-only",
+    "desktop:dev": "npm run build && electron dist/desktop/main.js",
+    "desktop:pack": "npm run build && electron-builder --dir",
+    "desktop:msi": "npm run build && electron-builder --win msi --publish never --config.electronDist=node_modules/electron/dist",
+    "desktop:dist": "npm run build && electron-builder",
     "package:portable": "node scripts/package-portable.mjs",
     "build:binary": "node scripts/build-binary.mjs",
     "fetch-models": "node scripts/fetch-models-snapshot.mjs",
@@ -59,12 +63,14 @@
     "LICENSE"
   ],
   "keywords": [],
-  "author": "",
+  "author": "LingXiao",
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/pdfkit": "^0.17.6",
     "@types/react": "^19.2.14",
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
@@ -149,5 +155,65 @@
     "esbuild": "0.28.1",
     "traverse": "0.3.9",
     "@jridgewell/trace-mapping": "^0.3.25"
+  },
+  "build": {
+    "appId": "cn.lingxiao.desktop",
+    "productName": "LingXiao",
+    "directories": {
+      "output": "release/desktop"
+    },
+    "extraMetadata": {
+      "main": "dist/desktop/main.js"
+    },
+    "msiProjectCreated": "scripts/patch-msi-project-codepage.cjs",
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "extraResources": [
+      {
+        "from": "skills",
+        "to": "skills",
+        "filter": [
+          "**/*",
+          "!bundled/huashu-design/assets/**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "icon": "build-resources/icon.ico",
+      "target": [
+        "msi",
+        "nsis",
+        "portable"
+      ]
+    },
+    "msi": {
+      "oneClick": false,
+      "runAfterFinish": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "additionalLightArgs": [
+        "-cultures:zh-cn"
+      ],
+      "shortcutName": "凌霄",
+      "menuCategory": "凌霄"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    }
   }
 }

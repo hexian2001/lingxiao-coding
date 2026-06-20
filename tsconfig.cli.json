@@ -23,6 +23,7 @@
     "dist",
     "src/tui/components/design-system/**/*",
     "src/web-server/agent_history_helpers.test.ts",
-    "src/test-llm-request.ts"
+    "src/test-llm-request.ts",
+    "src/desktop/**/*"
   ]
 }

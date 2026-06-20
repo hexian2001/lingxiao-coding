@@ -1,0 +1,46 @@
+name: Release Desktop
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-msi:
+    name: Build Windows MSI
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build MSI
+        run: npm run desktop:msi
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: "1"
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LingXiao-Windows-MSI
+          path: release/desktop/*.msi
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') && env.ACT != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/desktop/*.msi
