@@ -1,7 +1,5 @@
 /// <reference types="electron" />
 import { app, BrowserWindow, Menu, shell } from 'electron';
-/// <reference types="electron-updater" />
-import { autoUpdater, UpdateCheckResult } from 'electron-updater';
 import { existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -19,8 +17,17 @@ let shutdownStarted = false;
 
 let updateNotificationShown = false;
 
-function setupAutoUpdater(): void {
+async function setupAutoUpdater(): Promise<void> {
   if (!app.isPackaged) return;
+
+  let autoUpdater;
+  try {
+    const mod = await import('electron-updater');
+    autoUpdater = mod.autoUpdater;
+  } catch {
+    console.warn('[Updater] electron-updater 不可用，跳过自动更新。');
+    return;
+  }
 
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
@@ -172,7 +179,7 @@ void app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   const url = await startDesktopServer();
   mainWindow = createMainWindow(url);
-  setupAutoUpdater();
+  setupAutoUpdater().catch(() => {/* 静默失败 */});
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
