@@ -34,7 +34,7 @@ export default function MessageInput() {
     <div className="absolute bottom-28 right-2 w-80 z-20">
       <div className="bg-bg-primary/95 backdrop-blur-sm rounded-lg border border-border-default px-3 py-2 flex items-center gap-2 shadow-lg">
         <span className="text-[10px] text-text-tertiary shrink-0">@{targetName}</span>
-        <input ref={inputRef} type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder={t('office.sendMessage','Send message...')} className="flex-1 rounded-md border border-border-input bg-bg-input px-2 py-1 text-sm text-text-primary placeholder:text-text-tertiary outline-none" disabled={sending} />
+        <input ref={inputRef} type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSend(); } }} placeholder={t('office.sendMessage','Send message...')} className="flex-1 rounded-md border border-border-input bg-bg-input px-2 py-1 text-sm text-text-primary placeholder:text-text-tertiary outline-none" disabled={sending} />
         <button onClick={handleSend} disabled={!message.trim() || sending} className="p-1 rounded hover:bg-bg-secondary text-accent-brand disabled:opacity-30"><Send size={14} /></button>
       </div>
     </div>
