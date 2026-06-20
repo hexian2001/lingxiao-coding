@@ -1,4 +1,5 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
+import { autoUpdater, UpdateCheckResult } from 'electron-updater';
 import { existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +10,60 @@ import { isHardenedMode } from '../core/HardeningPolicy.js';
 
 let mainWindow: BrowserWindow | null = null;
 let shutdownStarted = false;
+
+// ── Auto-updater ──────────────────────────────────────────────────────────────
+// electron-updater 在打包后的 MSI/NSIS 安装版中自动检查 GitHub Releases。
+// 开发模式（非 packaged）下跳过，避免无谓报错。
+
+let updateNotificationShown = false;
+
+function setupAutoUpdater(): void {
+  if (!app.isPackaged) return;
+
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('[Updater] 正在检查更新...');
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log(`[Updater] 发现新版本: ${info.version}，开始下载...`);
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[Updater] 当前版本已是最新。');
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    const percent = progress.percent.toFixed(1);
+    console.log(`[Updater] 下载中: ${percent}% (${progress.transferred}/${progress.total} bytes)`);
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    console.log('[Updater] 更新已下载，将在退出时自动安装。');
+    // 通知主窗口展示更新提示（通过 webContents executeJavaScript 注入 toast）
+    if (mainWindow && !updateNotificationShown) {
+      updateNotificationShown = true;
+      mainWindow.webContents.executeJavaScript(
+        `if (window.showToast) { window.showToast('新版本已下载，重启后生效。', 'info', 8000); }`
+      ).catch(() => {/* 窗口可能还没准备好 */});
+    }
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('[Updater] 检查更新失败:', err?.message || err);
+  });
+
+  // 启动后 5 秒检查更新，之后每 4 小时检查一次
+  setTimeout(() => {
+    autoUpdater.checkForUpdates().catch(() => {/* 静默失败 */});
+  }, 5_000);
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates().catch(() => {/* 静默失败 */});
+  }, 4 * 60 * 60 * 1000);
+}
 
 function resolveIconPath(): string | undefined {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -115,6 +170,7 @@ void app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   const url = await startDesktopServer();
   mainWindow = createMainWindow(url);
+  setupAutoUpdater();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

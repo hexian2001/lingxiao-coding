@@ -25,7 +25,7 @@
     "desktop:dev": "npm run build && electron dist/desktop/main.js",
     "desktop:pack": "npm run build && electron-builder --dir",
     "desktop:msi": "npm run build && electron-builder --win msi --publish never --config.electronDist=node_modules/electron/dist",
-    "desktop:dist": "npm run build && electron-builder",
+    "desktop:publish": "npm run build && electron-builder --win nsis --publish always",
     "package:portable": "node scripts/package-portable.mjs",
     "build:binary": "node scripts/build-binary.mjs",
     "fetch-models": "node scripts/fetch-models-snapshot.mjs",
@@ -71,6 +71,7 @@
     "@types/react": "^19.2.14",
     "electron": "^42.4.1",
     "electron-builder": "^26.15.3",
+    "electron-updater": "^6.8.9",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
@@ -184,6 +185,12 @@
     "asarUnpack": [
       "**/*.node"
     ],
+    "publish": {
+      "provider": "github",
+      "owner": "hexian2001",
+      "repo": "lingxiao-coding",
+      "releaseType": "release"
+    },
     "win": {
       "icon": "build-resources/icon.ico",
       "target": [

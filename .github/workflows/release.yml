@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-windows-msi:
-    name: Build Windows MSI
+    name: Build Windows Desktop
     runs-on: windows-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build MSI
+      - name: Build MSI (artifact only)
         run: npm run desktop:msi
         env:
           LINGXIAO_SKIP_MODELS_SNAPSHOT: "1"
@@ -39,8 +39,12 @@ jobs:
           path: release/desktop/*.msi
           if-no-files-found: error
 
-      - name: Publish GitHub Release
+      # ── Publish: tag 触发时构建 NSIS 安装包并发布到 GitHub Releases ──
+      # NSIS + latest.yml 是 electron-updater 自动更新所需的格式。
+      # MSI 不支持 electron-updater 的差量更新，所以用 NSIS 作为自动更新渠道。
+      - name: Publish NSIS to GitHub Releases
         if: startsWith(github.ref, 'refs/tags/v') && env.ACT != 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release/desktop/*.msi
+        run: npm run desktop:publish
+        env:
+          LINGXIAO_SKIP_MODELS_SNAPSHOT: "1"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
