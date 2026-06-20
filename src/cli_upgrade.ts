@@ -232,41 +232,55 @@ async function downloadAndExtract(tag: string, target: string, destDir: string):
     console.log(chalk.cyan(`▸ 解压到 ${destDir}...`));
 
     // 备份现有安装
+    const backupDir = `${destDir}.bak`;
+    let needRollback = false;
     if (existsSync(destDir)) {
-      const backupDir = `${destDir}.bak`;
       if (existsSync(backupDir)) rmSync(backupDir, { recursive: true, force: true });
       renameSync(destDir, backupDir);
       console.log(chalk.yellow(`  ⚠ 旧版本已备份到 ${backupDir}`));
+      needRollback = true;
     }
 
-    mkdirSync(destDir, { recursive: true });
+    try {
+      mkdirSync(destDir, { recursive: true });
 
-    if (isWindows) {
-      // Windows: 用 PowerShell 解压 zip
-      spawnSync('powershell', ['-Command',
-        `Expand-Archive -Path "${archivePath}" -DestinationPath "${destDir}" -Force`], {
-        stdio: 'inherit',
-      });
-
-      // 如果多一层目录，提上来
-      const innerDir = join(destDir, 'lingxiao');
-      if (existsSync(innerDir)) {
+      if (isWindows) {
+        // Windows: 用 PowerShell 解压 zip
         spawnSync('powershell', ['-Command',
-          `Get-ChildItem "${innerDir}" | ForEach-Object { Move-Item $_.FullName "${destDir}" -Force }; Remove-Item "${innerDir}" -Recurse -Force`], {
+          `Expand-Archive -Path "${archivePath}" -DestinationPath "${destDir}" -Force`], {
+          stdio: 'inherit',
+        });
+
+        // 如果多一层目录，提上来
+        const innerDir = join(destDir, 'lingxiao');
+        if (existsSync(innerDir)) {
+          spawnSync('powershell', ['-Command',
+            `Get-ChildItem "${innerDir}" | ForEach-Object { Move-Item $_.FullName "${destDir}" -Force }; Remove-Item "${innerDir}" -Recurse -Force`], {
+            stdio: 'inherit',
+          });
+        }
+      } else {
+        // Unix: tar 解压
+        spawnSync('tar', ['xzf', archivePath, '-C', destDir, '--strip-components=1'], {
           stdio: 'inherit',
         });
       }
-    } else {
-      // Unix: tar 解压
-      spawnSync('tar', ['xzf', archivePath, '-C', destDir, '--strip-components=1'], {
-        stdio: 'inherit',
-      });
-    }
 
-    if (!existsSync(join(destDir, isWindows ? 'lingxiao.cmd' : 'lingxiao'))) {
-      throw new Error('解压后未找到可执行文件，可能包结构有变');
+      if (!existsSync(join(destDir, isWindows ? 'lingxiao.cmd' : 'lingxiao'))) {
+        throw new Error('解压后未找到可执行文件，可能包结构有变');
+      }
+      console.log(chalk.green('  ✓ 解压完成'));
+      needRollback = false; // 成功，不需要回滚
+    } catch (extractError) {
+      // P0-10: 解压失败时回滚到备份
+      if (needRollback && existsSync(backupDir)) {
+        console.log(chalk.red('  ✗ 解压失败，正在回滚到旧版本...'));
+        rmSync(destDir, { recursive: true, force: true });
+        renameSync(backupDir, destDir);
+        console.log(chalk.yellow('  ⚠ 已回滚到旧版本'));
+      }
+      throw extractError;
     }
-    console.log(chalk.green('  ✓ 解压完成'));
   } finally {
     rmSync(tmpDir, { recursive: true, force: true });
   }
