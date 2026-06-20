@@ -434,6 +434,7 @@ type TaskOrchestrationMetadata = {
   nextAction?: string;
   explainReason?: string;
   mainPathRank?: number;
+  repairCount?: number;
 };
 type TaskUpdatePayload = {
   id: string;
@@ -1314,7 +1315,7 @@ function handleSessionUpdatePart5(store: SessionState, update: SessionEventPaylo
         if (task) taskUpdateListeners.forEach(fn => fn(task, 'orchestration_node_update'));
       }
       getStore().setState((s) => {
-        const eventHistory = [...(s.orchestrationStatus?.eventHistory || []), { kind: 'node' as const, eventType: String(update.eventType || 'NodeUpdated'), taskId: update.task?.id, nodeKind: update.metadata?.nodeKind, verdict: update.metadata?.verdict, generation: update.metadata?.generation, agentName: update.task?.assigned_agent, repairCount: update.metadata?.repairCount, ts: Date.now() }];
+        const eventHistory = [...(s.orchestrationStatus?.eventHistory || []), { kind: 'node' as const, eventType: String(update.eventType || 'NodeUpdated'), taskId: update.task?.id, nodeKind: update.metadata?.nodeKind, verdict: update.metadata?.verdict, generation: update.metadata?.generation, agentName: update.task?.assigned_agent != null ? String(update.task.assigned_agent) : undefined, repairCount: typeof update.metadata?.repairCount === 'number' ? update.metadata.repairCount : undefined, ts: Date.now() }];
         return { orchestrationStatus: { ...(s.orchestrationStatus || { active: true, state: 'running', summary: '', updatedAt: Date.now() }), active: true, updatedAt: Date.now(), runId: update.runId, eventHistory: eventHistory.slice(-50) } };
       });
       break;
@@ -1330,7 +1331,7 @@ function handleSessionUpdatePart5(store: SessionState, update: SessionEventPaylo
             : kind === SessionUpdateKind.OrchestrationResetRequested
               ? 'reset'
               : 'applied';
-        const eventHistory = [...(s.orchestrationStatus?.eventHistory || []), { kind: historyKind, eventType: String(update.eventType || kind || 'orchestrationEvent'), taskId: update.taskId, nodeKind: update.nodeKind, verdict: update.verdict, reason: update.reason, generation: update.generation, repairCount: update.repairCount, ts: Date.now() }];
+        const eventHistory = [...(s.orchestrationStatus?.eventHistory || []), { kind: historyKind, eventType: String(update.eventType || kind || 'orchestrationEvent'), taskId: update.taskId, nodeKind: update.nodeKind, verdict: update.verdict, reason: update.reason, generation: update.generation, repairCount: typeof update.repairCount === 'number' ? update.repairCount : undefined, ts: Date.now() }];
         return { orchestrationStatus: { ...(s.orchestrationStatus || { active: true, state: 'running', summary: '', updatedAt: Date.now() }), active: true, state: historyKind === 'rejected' ? 'blocked' : (s.orchestrationStatus?.state || 'running'), summary: historyKind === 'rejected' ? `rejected: ${update.eventType || update.taskId || ''}` : (s.orchestrationStatus?.summary || ''), reason: update.reason, runId: update.runId, generation: update.generation, eventHistory: eventHistory.slice(-50), eventCount: (s.orchestrationStatus?.eventCount || 0) + 1, updatedAt: Date.now() } };
       });
       break;

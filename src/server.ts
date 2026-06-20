@@ -43,7 +43,6 @@ import { registerTerminalRoutes } from './web-server/TerminalRoutes.js';
 import { registerScheduledTaskRoutes } from './web-server/ScheduledTaskRoutes.js';
 import { registerWorkbenchRoutes } from './web-server/WorkbenchRoutes.js';
 import { registerWorktreeRoutes } from './web-server/WorktreeRoutes.js';
-import { registerMcpForgeRoutes } from './web-server/McpForgeRoutes.js';
 import { registerMcpShareRoutes } from './web-server/McpShareRoutes.js';
 import { registerDesignMarketRoutes } from './web-server/DesignMarketRoutes.js';
 import { registerBrowserRoutes } from './web-server/BrowserRoutes.js';
@@ -413,7 +412,6 @@ export async function createServerWithDeps(
   registerLangfuseRoutes(fastify, { requireServerToken });
   registerTempDownloadRoutes(fastify);
   registerScheduledTaskRoutes(fastify, { scheduledTaskManager, requireServerToken });
-  registerMcpForgeRoutes(fastify, { requireServerToken });
   registerMcpShareRoutes(fastify, { requireServerToken });
 
   // ============================================================

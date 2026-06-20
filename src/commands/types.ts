@@ -48,6 +48,10 @@ export interface CommandLogMessage extends Partial<BaseMessage> {
   toolDiff?: ToolDiffLine[];
   /** 工具调用开始时间戳（用于实时计时） */
   toolStartedAt?: number;
+  /** 工具调用参数（展开视图展示，多行 key: value 格式） */
+  toolInput?: string;
+  /** 工具结果预览（展开视图展示，截断的原始输出） */
+  toolOutput?: string;
 }
 
 /** 内联 diff 单行：kind 决定着色，text 为去掉前缀的内容 */

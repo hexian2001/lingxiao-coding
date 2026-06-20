@@ -1285,6 +1285,12 @@ export class LeaderToolsExecutor {
       status: catalog.completedStatus,
     });
 
+    // Switch back to manual mode after goal completion
+    if (this.leader.isEternalMode()) {
+      const modeResult = await this.leader.setControlMode('manual');
+      leaderLogger.info(`[CompleteEternalGoal] Auto-switched to manual mode: ${modeResult.message}`);
+    }
+
     leaderLogger.info(`[CompleteEternalGoal] Goal completed: ${goal.description.slice(0, 80)}`);
 
     return catalog.completedToolResult(goal.description);

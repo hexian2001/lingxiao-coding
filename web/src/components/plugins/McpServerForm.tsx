@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Plus, Trash2, X } from 'lucide-react';
+import { Code2, Loader2, FormInput, Plus, Trash2, X } from 'lucide-react';
 import { getServerToken } from '../../api/headers';
 
 export type McpTransport = 'streamable-http' | 'stdio';
@@ -45,6 +45,64 @@ interface Props {
 }
 
 const ID_RE = /^[a-z][a-z0-9_]{1,79}$/;
+/** Generate an empty JSON template for new servers */
+function emptyJsonTemplate(): string {
+  return JSON.stringify({
+    id: '',
+    name: '',
+    transport: 'stdio',
+    command: 'npx',
+    args: ['-y', '@modelcontextprotocol/server-filesystem', '/tmp'],
+    env: {},
+    enabled: true,
+  }, null, 2);
+}
+
+/** Serialize current form state to JSON string */
+function serverToJson(server: McpServerConfig, headers: McpHeader[], argsText: string, envList: Array<{ key: string; value: string }>): string {
+  const obj: Record<string, unknown> = {
+    id: server.id,
+    name: server.name,
+    ...(server.title?.trim() ? { title: server.title.trim() } : {}),
+    ...(server.description?.trim() ? { description: server.description.trim() } : {}),
+    transport: server.transport,
+    enabled: server.enabled !== false,
+  };
+  if (server.transport === 'streamable-http') {
+    if (server.url) obj.url = server.url;
+    if (headers.length > 0) obj.headers = headers.filter((h) => h.name.trim()).map((h) => ({ name: h.name.trim(), value: h.value }));
+  } else {
+    if (server.command) obj.command = server.command;
+    const args = argsText.split('\n').map((a) => a.trim()).filter(Boolean);
+    if (args.length > 0) obj.args = args;
+    const env: Record<string, string> = {};
+    for (const item of envList) { if (item.key.trim()) env[item.key.trim()] = item.value; }
+    if (Object.keys(env).length > 0) obj.env = env;
+    if (server.cwd?.trim()) obj.cwd = server.cwd.trim();
+  }
+  if (server.registry) obj.registry = server.registry;
+  return JSON.stringify(obj, null, 2);
+}
+
+/** Parse JSON text to McpServerConfig and validate required fields */
+function parseJsonConfig(text: string): { ok: true; config: McpServerConfig } | { ok: false; error: string } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    return { ok: false, error: 'Root must be a JSON object' };
+  }
+  const obj = parsed as Record<string, unknown>;
+  if (typeof obj.id !== 'string' || !obj.id) return { ok: false, error: 'id' };
+  if (typeof obj.name !== 'string' || !obj.name) return { ok: false, error: 'name' };
+  if (typeof obj.transport !== 'string' || !['streamable-http', 'stdio'].includes(obj.transport)) {
+    return { ok: false, error: 'transport' };
+  }
+  return { ok: true, config: obj as unknown as McpServerConfig };
+}
 
 function emptyServer(): McpServerConfig {
   return {
@@ -85,8 +143,38 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'form' | 'json'>('form');
+  const [jsonText, setJsonText] = useState(() => initial ? serverToJson(initial, initial.headers || [], (initial.args || []).join('\n'), initial.env ? Object.entries(initial.env).map(([k, v]) => ({ key: k, value: v })) : []) : emptyJsonTemplate());
 
   const update = (patch: Partial<McpServerConfig>) => setServer((prev) => ({ ...prev, ...patch }));
+
+  /** Switch from form mode to JSON: serialize current form data */
+  const switchToJson = () => {
+    setJsonText(serverToJson(server, headers, argsText, envList));
+    setMode('json');
+    setError(null);
+  };
+
+  /** Switch from JSON mode to form: try to parse JSON and populate form fields */
+  const switchToForm = () => {
+    const result = parseJsonConfig(jsonText);
+    if (!result.ok) {
+      // Show error but stay in JSON mode
+      if (result.error === 'id' || result.error === 'name' || result.error === 'transport') {
+        setError(t('mcp.error.jsonMissingField', { field: result.error }));
+      } else {
+        setError(t('mcp.error.jsonParse', { error: result.error }));
+      }
+      return;
+    }
+    const config = result.config;
+    setServer({ ...config });
+    setHeaders(config.headers ? [...config.headers] : []);
+    setArgsText((config.args || []).join('\n'));
+    setEnvList(config.env ? Object.entries(config.env).map(([k, v]) => ({ key: k, value: v })) : []);
+    setMode('form');
+    setError(null);
+  };
 
   const validate = (): string | null => {
     if (!ID_RE.test(server.id)) return t('mcp.error.idInvalid');
@@ -142,15 +230,46 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
   };
 
   const save = async () => {
-    const validation = validate();
-    if (validation) {
-      setError(validation);
-      return;
-    }
-    setSaving(true);
     setError(null);
+
+    let payload: McpServerConfig;
+    if (mode === 'json') {
+      const result = parseJsonConfig(jsonText);
+      if (!result.ok) {
+        if (result.error === 'id' || result.error === 'name' || result.error === 'transport') {
+          setError(t('mcp.error.jsonMissingField', { field: result.error }));
+        } else {
+          setError(t('mcp.error.jsonParse', { error: result.error }));
+        }
+        return;
+      }
+      payload = result.config;
+      // Validate ID format for JSON mode
+      if (!ID_RE.test(payload.id)) {
+        setError(t('mcp.error.idInvalid'));
+        return;
+      }
+      // Validate transport-specific fields
+      if (payload.transport === 'streamable-http' && !payload.url?.trim()) {
+        setError(t('mcp.error.urlRequired'));
+        return;
+      }
+      if (payload.transport === 'stdio' && !payload.command?.trim()) {
+        setError(t('mcp.error.commandRequired'));
+        return;
+      }
+    } else {
+      const validation = validate();
+      if (validation) {
+        setError(validation);
+        return;
+      }
+      payload = buildPayload();
+    }
+
+    setSaving(true);
     try {
-      const saved = await saveServer(buildPayload());
+      const saved = await saveServer(payload);
       onSaved(saved);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -160,7 +279,7 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 flex items-center justify-center p-4">
       <div className="bg-bg-primary border border-border-default rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
         <div className="px-4 py-3 border-b border-border-default flex items-center justify-between">
           <h3 className="text-sm font-medium text-text-primary">
@@ -173,6 +292,47 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
 
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
           {error && <div className="px-3 py-2 bg-accent-red/10 text-accent-red text-xs rounded">{error}</div>}
+
+          {/* Mode switcher */}
+          <div className="flex items-center gap-1 border-b border-border-default pb-2">
+            <button
+              onClick={() => mode === 'json' && switchToForm()}
+              className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-t transition-colors ${
+                mode === 'form'
+                  ? 'text-accent-brand border-b-2 border-accent-brand -mb-[9px] font-medium'
+                  : 'text-text-tertiary hover:text-text-secondary'
+              }`}
+            >
+              <FormInput className="w-3.5 h-3.5" />
+              {t('mcp.mode.form')}
+            </button>
+            <button
+              onClick={() => mode === 'form' && switchToJson()}
+              className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-t transition-colors ${
+                mode === 'json'
+                  ? 'text-accent-brand border-b-2 border-accent-brand -mb-[9px] font-medium'
+                  : 'text-text-tertiary hover:text-text-secondary'
+              }`}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              {t('mcp.mode.json')}
+            </button>
+          </div>
+
+          {mode === 'json' ? (
+            <div className="space-y-2">
+              <p className="text-xs text-text-tertiary">{t('mcp.json.hint')}</p>
+              <textarea
+                value={jsonText}
+                onChange={(event) => setJsonText(event.target.value)}
+                rows={20}
+                spellCheck={false}
+                placeholder={t('mcp.json.placeholder')}
+                className="w-full bg-bg-input border border-border-input rounded px-3 py-2 text-xs font-mono text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-brand/30"
+              />
+            </div>
+          ) : (
+            <>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label={t('mcp.field.serverId')}>
@@ -333,6 +493,8 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
                 ))}
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
 

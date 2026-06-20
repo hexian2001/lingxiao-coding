@@ -49,7 +49,10 @@ export interface LogMessageLike {
   toolDiff?: Array<{ kind: 'add' | 'del' | 'context' | 'hunk'; text: string }>;
   /** 工具调用开始时间戳（用于实时计时器） */
   toolStartedAt?: number;
-}
+  /** 工具调用参数（展开视图展示，多行 key: value 格式） */
+  toolInput?: string;
+  /** 工具结果预览（展开视图展示，截断的原始输出） */
+  toolOutput?: string;}
 
 // ── 消息渲染窗口(虚拟化):只渲染最近一部分消息,避免长会话全量渲染卡死 ──
 // 从最新消息(含流式虚拟消息)向前累积,条数/字符量任一触顶即停;
@@ -1134,8 +1137,8 @@ export function buildMessageLogView(options: {
         toolStatus: isResult ? 'done' : 'running',
         toolDuration,
         toolStartedAt: message.toolStartedAt,
-        toolInput: '',
-        toolOutput: '',
+        toolInput: message.toolInput,
+        toolOutput: message.toolOutput,
         toolAdded,
         toolRemoved,
         cardKey: toolCardKey,
@@ -1146,6 +1149,27 @@ export function buildMessageLogView(options: {
       if (toolExpanded) {
         if (toolSummary && toolSummary !== toolName) {
           rendered.push({ type: 'tool', text: toolSummary, isContinuation: true });
+        }
+        // 展开态：显示参数行（toolInput）
+        const toolInputExpanded = message.toolInput;
+        if (toolInputExpanded) {
+          for (const paramLine of toolInputExpanded.split('\n')) {
+            if (paramLine.trim()) {
+              rendered.push({ type: 'tool', text: `  ${paramLine}`, isContinuation: true });
+            }
+          }
+        }
+        // 展开态：显示结果预览（toolOutput）
+        const toolOutputExpanded = message.toolOutput;
+        if (toolOutputExpanded) {
+          const outputLines = toolOutputExpanded.split('\n').slice(0, 15);
+          for (const outLine of outputLines) {
+            rendered.push({ type: 'tool', text: `  ${outLine}`, isContinuation: true });
+          }
+          const totalLines = toolOutputExpanded.split('\n').length;
+          if (totalLines > 15) {
+            rendered.push({ type: 'tool', text: `  … (+${totalLines - 15} lines)`, isContinuation: true });
+          }
         }
         if (toolDiff && toolDiff.length > 0) {
           for (const dline of toolDiff) {

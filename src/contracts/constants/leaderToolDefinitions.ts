@@ -890,7 +890,7 @@ description: '提交当前的完整执行方案。行为取决于控制模式（
     type: 'function',
     function: {
       name: 'complete_eternal_goal',
-      description: '标记当前 Eternal 目标为已完成。仅当有充分证据证明目标已达成时调用。调用后 goal 被清除，Leader 进入 idle 待命（用户可设置新 goal 继续）。不要在目标仍有未验证部分时调用。',
+      description: '标记当前 Eternal 目标为已完成。仅当有充分证据证明目标已达成时调用。调用后 goal 被清除，自动切回 manual 模式，Leader 进入 idle 待命。如需继续可设置新 goal。不要在目标仍有未验证部分时调用。',
       parameters: {
         type: 'object',
         properties: {

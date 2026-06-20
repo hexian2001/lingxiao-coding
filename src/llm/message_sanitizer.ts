@@ -263,6 +263,24 @@ export function coalesceMiddleSystemMessages(messages: ChatMessage[]): ChatMessa
 }
 
 /**
+ * GLM/Qwen 等模型拒绝只有 system 消息、没有 user 消息的请求（返回 400）。
+ * 兜底：如果序列中没有 user 消息，把最后一条非 tool 消息转为 user。
+ */
+function ensureHasUserMessage(messages: ChatMessage[]): ChatMessage[] {
+  if (messages.length === 0) return messages;
+  const hasUser = messages.some(m => m.role === 'user');
+  if (hasUser) return messages;
+  // 从后往前找最后一条非 tool 消息，转为 user
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role !== 'tool') {
+      messages[i] = { ...messages[i], role: 'user' };
+      break;
+    }
+  }
+  return messages;
+}
+
+/**
  * 统一消息序列净化管线（provider 无关）。
  *
  * 在每次 API 调用前执行，确保消息序列符合所有 provider 的格式要求：
@@ -282,7 +300,10 @@ export function sanitizeMessageSequence(messages: ChatMessage[]): ChatMessage[] 
   const coalesced = coalesceMiddleSystemMessages(merged2);
   const cleaned = cleanOrphanedToolCalls(coalesced);
   const contentSanitized = sanitizeMessageContent(cleaned);
-  return sanitizeOpenAIToolMessageSequence(contentSanitized);
+  const toolSequenced = sanitizeOpenAIToolMessageSequence(contentSanitized);
+  // GLM/Qwen 等模型拒绝只有 system 消息、没有 user 消息的请求（返回 400）。
+  // 兜底：如果序列中没有 user 消息，把最后一条非 tool 消息转为 user。
+  return ensureHasUserMessage(toolSequenced);
 }
 
 /**

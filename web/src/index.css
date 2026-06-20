@@ -2,6 +2,8 @@
 @import "./styles/theme.css";
 @import "./styles/ink-decoration.css";
 
+/* 让 Tailwind dark: 变体与 data-theme="dark" attribute 联动（替代默认 prefers-color-scheme） */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @theme inline {
   --color-bg-primary: var(--color-bg-primary);
   --color-bg-secondary: var(--color-bg-secondary);

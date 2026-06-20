@@ -1326,6 +1326,30 @@ export interface I18nStrings {
   'tui.tool.summary.writing': (path: string) => string;
   'tui.tool.summary.running': (cmd: string) => string;
   'tui.tool.summary.args': (keys: string) => string;
+  'tui.tool.summary.creating': (path: string) => string;
+  'tui.tool.summary.patching': (path: string, hunks: number) => string;
+  'tui.tool.summary.globbing': (pattern: string) => string;
+  'tui.tool.summary.searching_code': (detail: string) => string;
+  'tui.tool.summary.python': (code: string) => string;
+  'tui.tool.summary.http': (method: string, url: string) => string;
+  'tui.tool.summary.browser': (action: string, target: string) => string;
+  'tui.tool.summary.browser_verify': (url: string) => string;
+  'tui.tool.summary.screenshot': (url: string) => string;
+  'tui.tool.summary.git': (action: string) => string;
+  'tui.tool.summary.creating_task': (subject: string) => string;
+  'tui.tool.summary.updating_task': (taskId: string) => string;
+  'tui.tool.summary.updating_status': (taskId: string, status: string) => string;
+  'tui.tool.summary.dispatching': (taskId: string, agent: string) => string;
+  'tui.tool.summary.exploring': (goal: string) => string;
+  'tui.tool.summary.agent_op': (op: string, agent: string) => string;
+  'tui.tool.summary.messaging': (recipient: string) => string;
+  'tui.tool.summary.writing_note': (summary: string) => string;
+  'tui.tool.summary.plan': (action: string, detail: string) => string;
+  'tui.tool.summary.memory_op': (action: string) => string;
+  'tui.tool.summary.asking': (question: string) => string;
+  'tui.tool.summary.finish': (summary: string) => string;
+  'tui.tool.summary.download_link': (path: string) => string;
+  'tui.tool.summary.defining_role': (role: string) => string;
   'tui.tool.result.line_single': (line: number) => string;
   'tui.tool.result.line_range': (a: number, b: number) => string;
   'tui.tool.result.read_lines': (range: string, total: number) => string;
@@ -1335,6 +1359,15 @@ export interface I18nStrings {
   'tui.tool.result.fetched': (chars: number) => string;
   'tui.tool.result.searched': (count: number) => string;
   'tui.tool.result.generic': (chars: number) => string;
+  'tui.tool.result.created': string;
+  'tui.tool.result.patched': (added: number, removed: number) => string;
+  'tui.tool.result.searched_code': (count: number) => string;
+  'tui.tool.result.git': string;
+  'tui.tool.result.dispatched': string;
+  'tui.tool.result.browser': string;
+  'tui.tool.result.executed': (lines: number) => string;
+  'tui.tool.result.http': (status: string | number) => string;
+  'tui.tool.result.task_done': string;
   // Leader / Agent 运行状态显示文本（仅显示，不参与 === 比较；语义状态值如 running/completed 保持原样）
   'tui.leader.status.completed': string;
   'tui.leader.status.leading': string;
@@ -2177,6 +2210,30 @@ const zhStrings: I18nStrings = {
   'tui.tool.summary.writing': (path: string) => `写入 ${path || '文件'}`,
   'tui.tool.summary.running': (cmd: string) => `运行: ${cmd || '命令'}`,
   'tui.tool.summary.args': (keys: string) => `参数: ${keys}`,
+  'tui.tool.summary.creating': (path: string) => `创建 ${path || '文件'}`,
+  'tui.tool.summary.patching': (path: string, hunks: number) => `补丁 ${path || '文件'} (${hunks} hunk)`,
+  'tui.tool.summary.globbing': (pattern: string) => `匹配 ${pattern}`,
+  'tui.tool.summary.searching_code': (detail: string) => `搜索代码: ${detail}`,
+  'tui.tool.summary.python': (code: string) => `Python: ${code}`,
+  'tui.tool.summary.http': (method: string, url: string) => `${method} ${url}`,
+  'tui.tool.summary.browser': (action: string, target: string) => `浏览器 ${action}${target ? ` → ${target}` : ''}`,
+  'tui.tool.summary.browser_verify': (url: string) => `验证页面 ${url || '...'}`,
+  'tui.tool.summary.screenshot': (url: string) => `截图 ${url || '...'}`,
+  'tui.tool.summary.git': (action: string) => `Git: ${action}`,
+  'tui.tool.summary.creating_task': (subject: string) => `创建任务: ${subject}`,
+  'tui.tool.summary.updating_task': (taskId: string) => `更新任务 ${taskId}`,
+  'tui.tool.summary.updating_status': (taskId: string, status: string) => `状态变更 ${taskId} → ${status}`,
+  'tui.tool.summary.dispatching': (taskId: string, agent: string) => `派发 ${taskId} → ${agent}`,
+  'tui.tool.summary.exploring': (goal: string) => `探索: ${goal}`,
+  'tui.tool.summary.agent_op': (op: string, agent: string) => `${op} ${agent}`,
+  'tui.tool.summary.messaging': (recipient: string) => `发消息给 ${recipient}`,
+  'tui.tool.summary.writing_note': (summary: string) => `写笔记: ${summary}`,
+  'tui.tool.summary.plan': (action: string, detail: string) => `${action}: ${detail}`,
+  'tui.tool.summary.memory_op': (action: string) => `记忆: ${action}`,
+  'tui.tool.summary.asking': (question: string) => `提问: ${question}`,
+  'tui.tool.summary.finish': (summary: string) => `结束会话: ${summary}`,
+  'tui.tool.summary.download_link': (path: string) => `下载链接: ${path}`,
+  'tui.tool.summary.defining_role': (role: string) => `定义角色: ${role}`,
   'tui.tool.result.line_single': (line: number) => `第 ${line} 行`,
   'tui.tool.result.line_range': (a: number, b: number) => `第 ${a}-${b} 行`,
   'tui.tool.result.read_lines': (range: string, total: number) => `读取 ${range} (${total} 行)`,
@@ -2186,6 +2243,15 @@ const zhStrings: I18nStrings = {
   'tui.tool.result.fetched': (chars: number) => `抓取 (${chars} 字符)`,
   'tui.tool.result.searched': (count: number) => count > 0 ? `已搜索 (${count} 条结果)` : '已搜索',
   'tui.tool.result.generic': (chars: number) => `结果 (${chars} 字符)`,
+  'tui.tool.result.created': '已创建/写入',
+  'tui.tool.result.patched': (added: number, removed: number) => `补丁完成 (+${added} -${removed})`,
+  'tui.tool.result.searched_code': (count: number) => `代码搜索 (${count} 处匹配)`,
+  'tui.tool.result.git': 'Git 操作完成',
+  'tui.tool.result.dispatched': '已派发',
+  'tui.tool.result.browser': '浏览器操作完成',
+  'tui.tool.result.executed': (lines: number) => `执行完成 (${lines} 行输出)`,
+  'tui.tool.result.http': (status: string | number) => `HTTP 响应 (${status})`,
+  'tui.tool.result.task_done': '任务操作完成',
   // Leader / Agent 运行状态显示文本
   'tui.leader.status.completed': '已完成',
   'tui.leader.status.leading': '主导中…',
@@ -3028,6 +3094,30 @@ const enStrings: I18nStrings = {
   'tui.tool.summary.writing': (path: string) => `Writing ${path || 'file'}`,
   'tui.tool.summary.running': (cmd: string) => `Running: ${cmd || 'command'}`,
   'tui.tool.summary.args': (keys: string) => `Args: ${keys}`,
+  'tui.tool.summary.creating': (path: string) => `Creating ${path || 'file'}`,
+  'tui.tool.summary.patching': (path: string, hunks: number) => `Patching ${path || 'file'} (${hunks} hunks)`,
+  'tui.tool.summary.globbing': (pattern: string) => `Glob ${pattern}`,
+  'tui.tool.summary.searching_code': (detail: string) => `Code search: ${detail}`,
+  'tui.tool.summary.python': (code: string) => `Python: ${code}`,
+  'tui.tool.summary.http': (method: string, url: string) => `${method} ${url}`,
+  'tui.tool.summary.browser': (action: string, target: string) => `Browser ${action}${target ? ` → ${target}` : ''}`,
+  'tui.tool.summary.browser_verify': (url: string) => `Verify page ${url || '...'}`,
+  'tui.tool.summary.screenshot': (url: string) => `Screenshot ${url || '...'}`,
+  'tui.tool.summary.git': (action: string) => `Git: ${action}`,
+  'tui.tool.summary.creating_task': (subject: string) => `Create task: ${subject}`,
+  'tui.tool.summary.updating_task': (taskId: string) => `Update task ${taskId}`,
+  'tui.tool.summary.updating_status': (taskId: string, status: string) => `Status ${taskId} → ${status}`,
+  'tui.tool.summary.dispatching': (taskId: string, agent: string) => `Dispatch ${taskId} → ${agent}`,
+  'tui.tool.summary.exploring': (goal: string) => `Explore: ${goal}`,
+  'tui.tool.summary.agent_op': (op: string, agent: string) => `${op} ${agent}`,
+  'tui.tool.summary.messaging': (recipient: string) => `Message ${recipient}`,
+  'tui.tool.summary.writing_note': (summary: string) => `Note: ${summary}`,
+  'tui.tool.summary.plan': (action: string, detail: string) => `${action}: ${detail}`,
+  'tui.tool.summary.memory_op': (action: string) => `Memory: ${action}`,
+  'tui.tool.summary.asking': (question: string) => `Ask: ${question}`,
+  'tui.tool.summary.finish': (summary: string) => `Finish: ${summary}`,
+  'tui.tool.summary.download_link': (path: string) => `Download link: ${path}`,
+  'tui.tool.summary.defining_role': (role: string) => `Define role: ${role}`,
   'tui.tool.result.line_single': (line: number) => `line ${line}`,
   'tui.tool.result.line_range': (a: number, b: number) => `lines ${a}-${b}`,
   'tui.tool.result.read_lines': (range: string, total: number) => `Read ${range} (${total} lines)`,
@@ -3037,6 +3127,15 @@ const enStrings: I18nStrings = {
   'tui.tool.result.fetched': (chars: number) => `Fetched (${chars} chars)`,
   'tui.tool.result.searched': (count: number) => count > 0 ? `Searched (${count} results)` : 'Searched',
   'tui.tool.result.generic': (chars: number) => `Result (${chars} chars)`,
+  'tui.tool.result.created': 'Created/written',
+  'tui.tool.result.patched': (added: number, removed: number) => `Patched (+${added} -${removed})`,
+  'tui.tool.result.searched_code': (count: number) => `Code search (${count} matches)`,
+  'tui.tool.result.git': 'Git operation done',
+  'tui.tool.result.dispatched': 'Dispatched',
+  'tui.tool.result.browser': 'Browser action done',
+  'tui.tool.result.executed': (lines: number) => `Executed (${lines} lines output)`,
+  'tui.tool.result.http': (status: string | number) => `HTTP response (${status})`,
+  'tui.tool.result.task_done': 'Task operation done',
   // Leader / Agent 运行状态显示文本
   'tui.leader.status.completed': 'Completed',
   'tui.leader.status.leading': 'Leading…',

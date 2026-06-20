@@ -32,7 +32,8 @@ import {
   type EternalLoopDeps,
   type EternalPatrolCandidate,
 } from '../core/EternalLoop.js';
-import { judgeEternalAction } from './runtime/EternalPatrolJudge.js';
+// EternalPatrolJudge (LLM-based) removed — eternal mode uses deterministic runtime policy only.
+import { decideEternalActionFromRuntimeState } from '../contracts/adapters/EternalPatrolPolicy.js';
 import { getPromptCatalog } from './prompts/i18n/catalog.js';
 
 export interface LeaderProgressInvariantDeps {
@@ -362,9 +363,7 @@ export class LeaderProgressInvariant {
         getBlackboardCounts: this.getBlackboardCounts,
         getScratchpadDigest: this.getScratchpadDigest,
         getRecentConversationDigest: this.getRecentConversationDigest,
-        getJudgeLlm: this.getEternalJudgeLlm,
-        getJudgeModel: this.getEternalJudgeModel,
-        judgeFn: judgeEternalAction,
+        judgeFn: (input) => Promise.resolve(decideEternalActionFromRuntimeState(input)),
         yieldToUser: this.yieldEternalToUser,
       };
 
@@ -539,7 +538,9 @@ export class LeaderProgressInvariant {
             : '确无高价值工作时无需执行工具，简要说明即可。',
         ].join('\n');
 
-    await this.addAndPersistMessage({ role: 'system', content: patrolPrompt });
+    // GLM 等模型拒绝只有 system 消息、没有 user 消息的请求（返回 400）。
+    // patrol prompt 改用 role: 'user' 注入，确保请求始终包含 user 消息。
+    await this.addAndPersistMessage({ role: 'user', content: patrolPrompt });
     await this.leaderThinkAndAct();
 
     // Detect tool calls from new messages

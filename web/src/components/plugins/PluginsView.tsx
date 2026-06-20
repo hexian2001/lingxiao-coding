@@ -10,7 +10,7 @@ import { getServerToken } from '../../api/headers';
 import { useSessionStore } from '../../stores/sessionStore';
 import {
   Puzzle, Trash2, RefreshCw, Search,
-  Loader2, AlertTriangle, ToggleLeft, ToggleRight, Wrench, Server, Store, BookOpen, Terminal, Bot, Hammer,
+  Loader2, AlertTriangle, ToggleLeft, ToggleRight, Wrench, Server, Store, BookOpen, Terminal, Bot,
 } from 'lucide-react';
 import ToolsTab from './ToolsTab';
 import McpServersTab from './McpServersTab';
@@ -18,7 +18,6 @@ import MarketplaceTab from './MarketplaceTab';
 import SkillsTab from './SkillsTab';
 import CommandsTab from './CommandsTab';
 import AgentsTab from './AgentsTab';
-import ForgeTab from './ForgeTab';
 
 interface Plugin {
   id: string;
@@ -59,7 +58,7 @@ export default function PluginsView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'installed' | 'skills' | 'commands' | 'agents' | 'tools' | 'mcp' | 'forge' | 'marketplace'>('installed');
+  const [activeTab, setActiveTab] = useState<'installed' | 'skills' | 'commands' | 'agents' | 'tools' | 'mcp' | 'marketplace'>('installed');
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -164,12 +163,6 @@ export default function PluginsView() {
           >
             <Store className="w-3 h-3" />
             {t('plugins.browseMarketplace')}
-          </button>          <button
-            className={`codex-chip px-3 py-1.5 text-xs flex items-center gap-1 transition-colors ${activeTab === 'forge' ? 'text-text-primary' : 'text-text-tertiary'}`}
-            onClick={() => setActiveTab('forge')}
-          >
-            <Hammer className="w-3 h-3" />
-            {t('forge.title') || 'Forge'}
           </button>
           <div className="flex-1" />
           {activeTab === 'installed' && <div className="relative">
@@ -192,7 +185,7 @@ export default function PluginsView() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
         {activeTab === 'tools' ? (
           <ToolsTab />
         ) : activeTab === 'skills' ? (
@@ -203,8 +196,6 @@ export default function PluginsView() {
           <AgentsTab />
         ) : activeTab === 'mcp' ? (
           <McpServersTab />
-        ) : activeTab === 'forge' ? (
-          <ForgeTab />
         ) : activeTab === 'marketplace' ? (
           <MarketplaceTab onInstalled={fetchData} />
         ) : isLoading ? (
@@ -213,12 +204,12 @@ export default function PluginsView() {
           </div>
         ) : (
           filteredPlugins.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-text-tertiary">
+            <div className="h-full overflow-y-auto flex flex-col items-center justify-center py-12 text-text-tertiary">
               <Puzzle className="w-8 h-8 mb-2" />
               <p className="text-sm">{t('plugins.noPlugins') || 'No plugins installed'}</p>
             </div>
           ) : (
-            <div className="divide-y divide-border-muted">
+            <div className="h-full overflow-y-auto divide-y divide-border-muted">
               {filteredPlugins.map((plugin) => (
                 <div key={plugin.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-bg-hover/70 transition-colors">
                   <Puzzle className="w-5 h-5 text-text-tertiary" />
