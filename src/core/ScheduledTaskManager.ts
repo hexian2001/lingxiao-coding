@@ -232,6 +232,8 @@ export class ScheduledTaskManager {
         coreLogger.error(`[ScheduledTaskManager] tick 未捕获错误: ${err instanceof Error ? err.message : String(err)}`);
       });
     }, this.POLL_INTERVAL_MS);
+    // P0-1 fix: unref 防止定时器阻止进程退出
+    this.pollTimer.unref();
     coreLogger.info('[ScheduledTaskManager] 调度器已启动，每 30s 检查到期任务');
   }
 

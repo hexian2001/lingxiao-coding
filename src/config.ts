@@ -1,7 +1,7 @@
 import { homedir } from 'os';
 import { IS_WINDOWS } from './utils/platform.js';
 import { join, resolve } from 'path';
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { watch } from 'chokidar';
 import { z } from 'zod';
 import { setLanguage, t } from './i18n.js';
@@ -1311,7 +1311,16 @@ export function loadSettings(): Config {
     try {
       raw = JSON.parse(readFileSync(SETTINGS_FILE, 'utf-8'));
     } catch (e) {
+      // P0-9 fix: 配置文件损坏时备份并回退默认配置，而非静默忽略
       configLogger.warn(`[Config] 加载 ${SETTINGS_FILE} 失败: ${e}`);
+      try {
+        const backupPath = SETTINGS_FILE + '.corrupt.' + Date.now();
+        copyFileSync(SETTINGS_FILE, backupPath);
+        configLogger.warn(`[Config] 损坏的配置文件已备份到 ${backupPath}，将使用默认配置`);
+      } catch (backupErr) {
+        configLogger.error(`[Config] 备份损坏配置文件失败: ${backupErr}`);
+      }
+      // raw 保持为空对象，后续合并默认值后使用默认配置
     }
   }
 

@@ -18,25 +18,48 @@ import { RealGitService } from './RealGitService.js';
 import { GitPlatformApi, GitPlatformUnavailableError, type GitPlatformConfig } from './GitPlatformApi.js';
 import { getConfigValue } from '../config.js';
 import { existsSync } from 'fs';
+import { resolve as pathResolve } from 'path';
+import { isPathInside } from './FileSystemRoutes.js';
 
 /** Locked at server startup — never changes after boot */
 const SERVER_CWD = process.cwd();
 
+/** Allowed root directories for workspace resolution */
+const ALLOWED_ROOTS: string[] = [SERVER_CWD];
+
+/**
+ * Validate that a resolved path is inside an allowed root.
+ * Throws if path traversal is detected.
+ */
+function assertPathInside(target: string): void {
+  const resolved = pathResolve(target);
+  const isAllowed = ALLOWED_ROOTS.some(root => isPathInside(root, resolved));
+  if (!isAllowed) {
+    throw new Error(`Workspace path outside allowed roots: ${target}`);
+  }
+}
+
 /**
  * Resolve workspace for READ-ONLY operations.
  * Falls back to SERVER_CWD rather than the (potentially changed) process.cwd().
+ * P0-5 fix: validate resolved path is inside allowed roots.
  */
 function resolveReadWorkspace(workspace?: string): string {
-  return workspace?.trim() || SERVER_CWD;
+  const dir = workspace?.trim() || SERVER_CWD;
+  assertPathInside(dir);
+  return dir;
 }
 
 /**
  * Resolve workspace for WRITE operations.
  * Returns null if workspace is empty/missing — callers must reject the request.
+ * P0-5 fix: validate resolved path is inside allowed roots.
  */
 function resolveWriteWorkspace(workspace?: string): string | null {
   const w = workspace?.trim();
-  return w || null;
+  if (!w) return null;
+  assertPathInside(w);
+  return w;
 }
 
 export class GitIntegrationApi {
