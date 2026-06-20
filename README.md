@@ -277,3 +277,7 @@ npm start
 - **GitHub**: [hexian2001/lingxiao-coding](https://github.com/hexian2001/lingxiao-coding)
 - **Issues**: [Report a bug or request a feature](https://github.com/hexian2001/lingxiao-coding/issues)
 - **Commercial License**: hexian2001@github.com
+
+## Community
+
+本开源项目已链接并认可 [LINUX DO 社区](https://linux.do)。
