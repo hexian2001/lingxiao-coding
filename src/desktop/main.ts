@@ -8,6 +8,11 @@
 
 // 动态加载 electron 和 electron-updater（非桌面环境不会执行此文件）
 import type { app as AppType, BrowserWindow, ipcMain } from 'electron';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface AutoUpdaterModule {
   autoUpdater: {
