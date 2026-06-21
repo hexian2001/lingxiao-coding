@@ -11,10 +11,10 @@ on:
         required: true
         type: string
 
-# 同 tag 新推送时取消旧的，避免重复构建
+# 同 tag 不取消正在运行的构建，避免 build 被 cancel 后 create-release 竞态
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -294,6 +294,30 @@ jobs:
           lingxiao
           \`\`\`
           EOF
+
+      - name: Delete existing release (if incomplete)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                ...context.repo,
+                tag,
+              });
+              core.info(`Found existing release ${tag} (id=${release.id}), deleting to recreate cleanly`);
+              await github.rest.repos.deleteRelease({
+                ...context.repo,
+                release_id: release.id,
+              });
+              core.info('Old release deleted');
+            } catch (e) {
+              if (e.status === 404) {
+                core.info(`No existing release for ${tag} — will create new`);
+              } else {
+                throw e;
+              }
+            }
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
