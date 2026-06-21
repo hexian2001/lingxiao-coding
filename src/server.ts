@@ -19,6 +19,7 @@ import { config as runtimeConfig, getConfigValue, startSettingsWatcher, stopSett
 import { installProcessRuntimeGuards } from './core/RuntimeGuards.js';
 import { ConnectionManager, SseBridge, AcpHandler, StorageApi, FileChangesApi, WikiApi, ServerAuth } from './web-server/index.js';
 import { GitIntegrationApi } from './web-server/GitIntegrationApi.js';
+import { GitActivityBuffer } from './web-server/GitActivityBuffer.js';
 import { registerSessionRoutes } from './web-server/SessionRoutes.js';
 import { registerSettingsRoutes } from './web-server/SettingsRoutes.js';
 import { registerFileSystemRoutes } from './web-server/FileSystemRoutes.js';
@@ -218,6 +219,9 @@ export async function createServerWithDeps(
   const storageApi = new StorageApi(repos.sessionState);
   const fileChangesApi = new FileChangesApi(repos);
   const gitIntegrationApi = new GitIntegrationApi();
+  const gitActivityBuffer = new GitActivityBuffer();
+  gitActivityBuffer.start(eventEmitter);
+  registerCleanup(() => gitActivityBuffer.stop(), 8);
   const wikiApi = new WikiApi(eventEmitter, repos);
   const browserRuntime = new BrowserRuntime();
   const scheduledTaskManager = new ScheduledTaskManager(db, bus, eventEmitter, sessionManager);
@@ -414,6 +418,7 @@ export async function createServerWithDeps(
   registerAcpRoutes(fastify, { sessionManager, connectionManager, acpHandler, requireServerToken });
   registerTerminalRoutes(fastify, { serverAuth, repos });
   gitIntegrationApi.registerRoutes(fastify, requireServerToken);
+  gitActivityBuffer.registerRoutes(fastify, requireServerToken);
   registerWorkbenchRoutes(fastify, { repos, sessionManager, requireServerToken, getActiveSessionId });
   registerWorktreeRoutes(fastify, { repos, requireServerToken });
   registerBrowserRoutes(fastify, { requireServerToken, browserRuntime });

@@ -965,8 +965,14 @@ function handleSessionUpdate(store: SessionState, update: SessionEventPayload, d
       const umId = `remote-user-${umTimestamp}`;
       getStore().setState((s: SessionState) => {
         const msgs = [...s.messages];
-        const last = msgs[msgs.length - 1];
-        if (last && last.role === 'user' && last.content === umContent && Math.abs(last.timestamp - umTimestamp) < 5000) return s;
+        // Search backwards through recent messages for a duplicate, not just the
+        // last one — intermediate assistant placeholders or phase-change events
+        // can push the local optimistic user message out of the `last` position,
+        // causing a duplicate user bubble.
+        for (let i = msgs.length - 1; i >= 0 && i >= msgs.length - 5; i--) {
+          const m = msgs[i];
+          if (m.role === 'user' && m.content === umContent && Math.abs(m.timestamp - umTimestamp) < 10000) return s;
+        }
         return { messages: trimMessageWindow([...msgs, { id: umId, role: 'user' as const, content: umContent, timestamp: umTimestamp, isStreaming: false, retrying: false }]) };
       });
       break;

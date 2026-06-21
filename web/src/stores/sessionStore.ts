@@ -525,9 +525,19 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       set({ sessionId, activeSessionId: sessionId, ...emptySessionRuntimeState(), isConnected: false, isLoadingHistory: true });
       // 连接到(可能不同的)会话:清空黑板图,避免上一会话的图残留(#4)
       useBlackboardStore.getState().reset();
-      // 清空 Git 状态和活动记录，避免旧 workspace 数据残留
+      // 清空 Git 状态，避免旧 workspace 数据残留
       useGitStore.getState().setWorkspace('');
-      useGitActivityStore.getState().clear();
+      // Fetch persisted git activity from backend ring buffer instead of clearing.
+      // The backend retains events across session switches so history is not lost.
+      useGitActivityStore.getState().setEvents([]);
+      fetch(`/api/v1/git/activity/${encodeURIComponent(sessionId)}`, {
+        headers: { 'x-lingxiao-token': getServerToken() },
+      }).then(res => res.ok ? res.json() : null).then(data => {
+        if (connectingSessionId !== sessionId) return;
+        if (data?.data && Array.isArray(data.data)) {
+          useGitActivityStore.getState().setEvents(data.data);
+        }
+      }).catch(() => {});
       await acpClient.connect(sessionId);
       if (connectingSessionId !== sessionId) { await acpClient.disconnect(); return; }
       try {

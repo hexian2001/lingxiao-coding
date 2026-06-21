@@ -25,6 +25,8 @@ interface GitActivityState {
   events: GitActivityEvent[];
   addEvent: (event: GitActivityEvent) => void;
   clear: () => void;
+  /** Replace all events (used when loading from REST API) */
+  setEvents: (events: GitActivityEvent[]) => void;
   /** Remove events older than maxAgeMs to prevent unbounded growth */
   prune: (maxAgeMs?: number) => void;
 }
@@ -47,6 +49,7 @@ export const useGitActivityStore = create<GitActivityState>((set) => ({
       return { events };
     }),
   clear: () => set({ events: [] }),
+  setEvents: (events) => set({ events }),
   prune: (maxAgeMs = DEFAULT_MAX_AGE_MS) =>
     set((state) => {
       const cutoff = Date.now() - maxAgeMs;

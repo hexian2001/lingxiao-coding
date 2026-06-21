@@ -309,7 +309,72 @@ export class ShellTool extends Tool {
     const abortSignal = params._abortSignal instanceof AbortSignal
       ? (context?.abortSignal ? AbortSignal.any([params._abortSignal, context.abortSignal]) : params._abortSignal)
       : context?.abortSignal;
-    return this.executeForeground(params, sandbox, workDir, timeout, context, abortSignal);
+    const result = await this.executeForeground(params, sandbox, workDir, timeout, context, abortSignal);
+    this.maybeEmitGitActivity(params.command, result.success, context);
+    return result;
+  }
+
+  /**
+   * Detect git subcommands in a shell command string and emit git:activity events.
+   * This covers cases where the Leader/worker uses `shell` to run git commands
+   * (e.g. `git push origin refs/heads/v1.0.2:refs/heads/v1.0.2`) instead of the
+   * dedicated `git` tool — those operations would otherwise be invisible in the
+   * Git Activity panel.
+   */
+  private maybeEmitGitActivity(command: string, success: boolean, context?: ToolContext): void {
+    const emitter = context?.emitter;
+    const sessionId = typeof context?.sessionId === 'string' ? context.sessionId : '';
+    if (!emitter || !sessionId) return;
+
+    // Match `git <action>` at the start of the command or after && / ; / | / newline
+    const gitCmdRegex = /(?:^|[;&|]\s*)git\s+(\w+)/g;
+    const actions: Array<{ action: string; branch?: string }> = [];
+    let match: RegExpExecArray | null;
+    while ((match = gitCmdRegex.exec(command)) !== null) {
+      const sub = match[1];
+      // Map shell git subcommands to GitActivityEvent actions
+      const actionMap: Record<string, 'commit' | 'push' | 'pull' | 'branch_create' | 'branch_switch' | 'merge_mr' | 'create_mr'> = {
+        commit: 'commit',
+        push: 'push',
+        pull: 'pull',
+        checkout: 'branch_switch',
+        switch: 'branch_switch',
+        merge: 'merge_mr',
+      };
+      const action = actionMap[sub];
+      if (action) {
+        // Try to extract branch name for push/pull/checkout
+        let branch: string | undefined;
+        if (sub === 'push' || sub === 'pull') {
+          const branchMatch = command.match(new RegExp(`git\s+${sub}\s+(?:\S+\s+)?refs/heads/(\S+)|git\s+${sub}\s+(?:origin\s+)?(\S+)`));
+          if (branchMatch) branch = branchMatch[1] || branchMatch[2];
+        } else if (sub === 'checkout' || sub === 'switch') {
+          const branchMatch = command.match(new RegExp(`git\s+${sub}\s+(?:-b\s+)?(\S+)`));
+          if (branchMatch) {
+            branch = branchMatch[1];
+            // `git checkout -b <name>` is branch_create
+            if (/git\s+(?:checkout|switch)\s+-b/.test(command)) {
+              actions.push({ action: 'branch_create', branch });
+              continue;
+            }
+          }
+        }
+        actions.push({ action, branch });
+      }
+    }
+
+    for (const { action, branch } of actions) {
+      emitter.emit('git:activity', {
+        sessionId,
+        agentId: String(context?.agentId || 'leader'),
+        agentName: typeof context?.agentName === 'string' ? context.agentName : 'leader',
+        taskId: typeof context?.taskId === 'string' ? context.taskId : undefined,
+        action,
+        success,
+        timestamp: Date.now(),
+        branch,
+      });
+    }
   }
 
   /**
