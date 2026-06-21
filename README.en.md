@@ -48,6 +48,20 @@ How it works: the Leader Agent breaks down requirements, designs the plan, assem
 </table>
 
 ## Project Overview
+## Case Studies
+
+Both projects below were autonomously built by the LingXiao AI platform — from architecture design to full-stack implementation, testing, and verification — fully AI-driven, with humans providing only requirements and direction.
+
+| Project | Description | Tech Stack |
+|---|---|---|
+| [Lingxiao Tribulation](https://github.com/hexian2001/lingxiao-tribulation) | LLM-driven autonomous pentest platform · Cyber-xianxia aesthetics · DAG + Blackboard + Plan&Execute | FastAPI · Next.js 14 · WebSocket |
+| [Ink-Flow](https://github.com/hexian2001/ink-flow) | Multi-Agent collaborative novel writing platform · Ink-Gold design language · React 18 + Express | Express · React 18 · WebSocket · SSE |
+
+![Lingxiao Tribulation — DAG Attack Tree Visualization](https://raw.githubusercontent.com/hexian2001/lingxiao-tribulation/main/images/03-dag.png)
+
+![Ink-Flow — Agent Real-time Monitor](https://raw.githubusercontent.com/hexian2001/ink-flow/main/images/04-agent-monitor.png)
+
+
 
 ### Project Structure
 
