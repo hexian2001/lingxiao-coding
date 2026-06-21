@@ -527,17 +527,23 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       useBlackboardStore.getState().reset();
       // 清空 Git 状态，避免旧 workspace 数据残留
       useGitStore.getState().setWorkspace('');
-      // Fetch persisted git activity from backend ring buffer instead of clearing.
-      // The backend retains events across session switches so history is not lost.
-      useGitActivityStore.getState().setEvents([]);
+      // Fetch persisted git activity from backend ring buffer.
+      // Don't clear first — fetch then replace to avoid empty window if fetch fails.
       fetch(`/api/v1/git/activity/${encodeURIComponent(sessionId)}`, {
         headers: { 'x-lingxiao-token': getServerToken() },
       }).then(res => res.ok ? res.json() : null).then(data => {
         if (connectingSessionId !== sessionId) return;
         if (data?.data && Array.isArray(data.data)) {
           useGitActivityStore.getState().setEvents(data.data);
+        } else {
+          useGitActivityStore.getState().setEvents([]);
         }
-      }).catch(() => {});
+      }).catch(() => {
+        // Fetch failed — clear to avoid showing stale events from previous session
+        if (connectingSessionId === sessionId) {
+          useGitActivityStore.getState().setEvents([]);
+        }
+      });
       await acpClient.connect(sessionId);
       if (connectingSessionId !== sessionId) { await acpClient.disconnect(); return; }
       try {

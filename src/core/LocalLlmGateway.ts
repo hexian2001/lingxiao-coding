@@ -475,6 +475,7 @@ export function buildLocalLlmGatewayPromptSection(): string {
   return [
     '**【本地 LLM 测试网关】**',
     `- 当前会话启用了凌霄本地 LLM Gateway；固定地址 \`${gateway.origin}\`，默认 provider: \`${gateway.provider}\`，默认模型: \`${gateway.apiModel}\`。`,
+    `- OpenAI 兼容端点完整 base URL: \`${gateway.openaiBaseUrl}\` — chat completions 路径为 \`${gateway.openaiBaseUrl}/chat/completions\`，embeddings 路径为 \`${gateway.openaiBaseUrl}/embeddings\`。`,
     `- 如果正在开发/测试用户项目的 LLM 接入，且用户没有提供项目专属 LLM 配置，可使用已注入的 ${providerVars}。`,
     '- 模型名以已注入配置为准，直接使用该模型开展开发/测试。',
     `- ${alternateEndpoint}；仅当项目代码明确使用另一套 SDK/API 格式时再切换。`,

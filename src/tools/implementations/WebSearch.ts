@@ -36,8 +36,8 @@ interface SearchResult {
 type SearchEngine = 'bing' | 'google';
 
 interface SearchAttempt {
-  engine: SearchEngine;
-  backend: 'api' | 'browser';
+  engine: SearchEngine | 'bing-html';
+  backend: 'api' | 'browser' | 'http';
   ok: boolean;
   resultCount: number;
   message?: string;
@@ -259,6 +259,97 @@ async function searchApi(engine: SearchEngine, query: string, maxResults: number
     : searchBingApi(query, maxResults, timeoutMs);
 }
 
+// ─── Bing HTML search (no API key, no browser, China-accessible) ───
+// Lightweight HTTP-only fallback: fetches Bing's HTML SERP and parses
+// results with regex. Zero Playwright dependency, works in parallel without
+// resource exhaustion. Uses cn.bing.com which is directly accessible in China
+// without VPN. Used as the primary fallback when no official search API keys
+// are configured.
+
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/<[^>]+>/g, '')
+    .trim();
+}
+
+function parseBingHtml(html: string, maxResults: number): SearchResult[] {
+  const results: SearchResult[] = [] as SearchResult[];
+
+  // Bing result blocks: <li class="b_algo"> ... <h2><a href="URL">TITLE</a></h2> ... <p>SNIPPET</p>
+  const blockRegex = /<li\s+class="b_algo"[\s\S]*?<\/li>/g;
+  const linkRegex = /<a\s+href="(https?:[^"]+)"[^>]*>([\s\S]*?)<\/a>/i;
+  // Bing caption snippets: <div class="b_caption"><p ...>SNIPPET</p>
+  const snippetRegex = /<p[^>]*class="b_lineclamp[^"]*"[^>]*>([\s\S]*?)<\/p>/i;
+
+  let blockMatch: RegExpExecArray | null;
+  while ((blockMatch = blockRegex.exec(html)) !== null && results.length < maxResults) {
+    const block = blockMatch[0];
+    const linkMatch = block.match(linkRegex);
+    if (!linkMatch) continue;
+    const url = linkMatch[1];
+    const title = decodeHtmlEntities(linkMatch[2]);
+    if (!title || !url) continue;
+    // Skip Bing internal links
+    if (url.includes('bing.com/aclk') || url.includes('go.microsoft.com')) continue;
+    const snipMatch = block.match(snippetRegex);
+    const snippet = snipMatch ? decodeHtmlEntities(snipMatch[1]) : '';
+    let source = '';
+    try { source = new URL(url).hostname; } catch { /* expected */ }
+    results.push({ title, url, snippet, source, resultType: 'organic' });
+  }
+  return results;
+}
+
+async function searchBingHtml(
+  query: string,
+  maxResults: number,
+  timeoutMs: number | undefined,
+): Promise<SearchResult[]> {
+  // cn.bing.com is directly accessible in China without VPN
+  const url = `https://cn.bing.com/search?q=${encodeURIComponent(query)}&count=${Math.min(maxResults, 30)}&setlang=en`;
+  const response = await fetchWithTimeout(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/html,application/xhtml+xml',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    },
+  }, timeoutSeconds(timeoutMs));
+
+  if (!response.ok) throw new Error(`Bing HTML HTTP ${response.status}`);
+  const html = await response.text();
+  return parseBingHtml(html, maxResults);
+}
+
+// ─── Browser search concurrency limiter ───
+// Prevents multiple parallel Playwright instances from exhausting resources
+// when multiple web_search calls run concurrently (e.g. LLM emits 4 tool calls).
+const MAX_CONCURRENT_BROWSER_SEARCHES = 1;
+let _browserSearchRunning = 0;
+const _browserSearchQueue: Array<() => void> = [];
+
+async function withBrowserSearchLimit<T>(fn: () => Promise<T>): Promise<T> {
+  while (_browserSearchRunning >= MAX_CONCURRENT_BROWSER_SEARCHES) {
+    await new Promise<void>((resolve) => _browserSearchQueue.push(resolve));
+  }
+  _browserSearchRunning++;
+  try {
+    return await fn();
+  } finally {
+    _browserSearchRunning--;
+    const next = _browserSearchQueue.shift();
+    if (next) next();
+  }
+}
+
 async function searchBrowser(engine: SearchEngine, query: string, maxResults: number, timeoutMs: number | undefined) {
   return engine === 'google'
     ? browserManager.searchGoogleDetailed(query, maxResults, { timeoutMs })
@@ -277,6 +368,7 @@ async function runSearchBatch(
 
   for (const searchEngine of engines) {
     for (const plannedQuery of plannedQueries) {
+      // 1. Try official API (Bing/Google) — fastest, structured JSON
       try {
         const apiResults = await searchApi(searchEngine, plannedQuery, maxResults * 2, timeoutMs);
         if (apiResults) {
@@ -302,7 +394,30 @@ async function runSearchBatch(
         });
       }
 
-      const browserResponse = await searchBrowser(searchEngine, plannedQuery, maxResults * 2, timeoutMs);
+      // 2. Try Bing HTML (no key, no browser — lightweight fallback, China-accessible)
+      try {
+        const htmlResults = await searchBingHtml(plannedQuery, maxResults * 2, timeoutMs);
+        if (htmlResults.length > 0) {
+          attempts.push({ engine: 'bing-html', backend: 'http', ok: true, resultCount: htmlResults.length });
+          rawResults.push(...htmlResults);
+          if (rawResults.length >= maxResults * 2) return { results: rawResults, attempts };
+          continue;
+        }
+        attempts.push({ engine: 'bing-html', backend: 'http', ok: false, resultCount: 0, message: 'Bing HTML 返回空结果' });
+      } catch (error) {
+        attempts.push({
+          engine: 'bing-html',
+          backend: 'http',
+          ok: false,
+          resultCount: 0,
+          message: `Bing HTML 失败: ${error instanceof Error ? error.message : String(error)}`,
+        });
+      }
+
+      // 3. Last resort: browser search (with concurrency limit to prevent resource exhaustion)
+      const browserResponse = await withBrowserSearchLimit(() =>
+        searchBrowser(searchEngine, plannedQuery, maxResults * 2, timeoutMs),
+      );
       attempts.push({
         engine: searchEngine,
         backend: 'browser',
@@ -331,7 +446,7 @@ function formatAttemptDiagnostics(attempts: SearchAttempt[]): string {
 export class WebSearchTool extends Tool {
   readonly name = 'web_search';
   readonly description =
-    '优先使用官方 Bing / Google 搜索 JSON API，未配置 API key 时才用隔离浏览器会话兜底，返回结构化搜索结果。' +
+    '优先使用官方 Bing / Google 搜索 JSON API，未配置 API key 时用 Bing HTML 轻量搜索（无需浏览器，国内直连），浏览器仅作最后兜底，返回结构化搜索结果。' +
     'query 支持并原样透传搜索引擎高级语法：site:、"精确短语"、-排除词、filetype:、OR、括号；site_domains 会额外做结果过滤兜底。' +
     '适合需要最新网页信息的搜索场景。';
   readonly parameters = WebSearchSchema;

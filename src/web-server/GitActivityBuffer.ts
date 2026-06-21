@@ -11,6 +11,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { EventEmitter } from '../core/EventEmitter.js';
 
 export interface GitActivityRecord {
+  id?: string;
   sessionId: string;
   agentId: string;
   agentName: string;
@@ -63,7 +64,10 @@ export class GitActivityBuffer {
   }
 
   getEvents(sessionId: string): GitActivityRecord[] {
-    return [...(this.store.get(sessionId) ?? [])];
+    return [...(this.store.get(sessionId) ?? [])].map((rec, i) => ({
+      ...rec,
+      id: rec.id ?? `${rec.sessionId}-${rec.timestamp}-${i}`,
+    }));
   }
 
   registerRoutes(
