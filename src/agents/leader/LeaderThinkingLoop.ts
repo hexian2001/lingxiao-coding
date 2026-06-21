@@ -24,6 +24,7 @@ import {
   ENABLE_STREAMING,
   LEADER_MAX_RUNTIME_MINUTES,
   LEADER_MAX_TOOL_ROUNDS,
+  LEADER_ROUND_TIMEOUT_MS,
   config as runtimeConfig,
 } from '../../config.js';
 import { t } from '../../i18n.js';
@@ -808,6 +809,23 @@ export class LeaderThinkingEngine {
             const llmAbort = new AbortController();
             this.opts.setCurrentLlmAbortController(llmAbort);
 
+            // P1: per-round wall-clock 安全网 — 兜底 LlmGuard 内部 hang watchdog (240s) 失效或
+            // 内层重试循环 (3×180s+backoff ≈ 540s+) 运行过久。600s 高于 LlmGuard 最坏情况，
+            // 仅在极端场景触发；触发后 abort 当前 LLM 调用，按可重试错误走外层 retry 计数器。
+            let roundTimeoutFired = false;
+            const roundTimer = setTimeout(() => {
+              roundTimeoutFired = true;
+              llmAbort.abort();
+              leaderLogger.error(
+                `Leader 单轮 wall-clock 超时 (${LEADER_ROUND_TIMEOUT_MS / 1000}s)，abort LLM 调用`,
+              );
+              emitter.emit('leader:status', {
+                sessionId,
+                status: `⏱️ 单轮超时 (${LEADER_ROUND_TIMEOUT_MS / 1000}s)，正在重试...`,
+              });
+            }, LEADER_ROUND_TIMEOUT_MS);
+            roundTimer.unref?.();
+
             // 对齐 CodeBuddy: LLM 请求发出前 emit model_requesting phase
             emitter.emit('leader:phase_change', { sessionId, phase: 'model_requesting' });
 
@@ -846,10 +864,38 @@ export class LeaderThinkingEngine {
                 // 防漂移：Leader 主推理走确定性温度(默认 0)，避免任务分解/工具选择随机抖动
                 getReasoningGenerateOptions(),
               );
+              clearTimeout(roundTimer);
             } catch (error) {
+              clearTimeout(roundTimer);
               // 用户中断（ESC / interrupt）不应重试，直接退出思考循环
               const errorMsg = error instanceof Error ? error.message : String(error);
               if (errorMsg.includes('aborted by caller') || llmAbort.signal.aborted) {
+                if (roundTimeoutFired) {
+                  // 单轮 wall-clock 超时触发 abort — 按可重试处理，计入外层 retry 计数器
+                  leaderLogger.warn('Leader 单轮 wall-clock 超时，abort 后计入外层重试');
+                  const toRetry = this.opts.getLlmErrorRetryCount() + 1;
+                  this.opts.setLlmErrorRetryCount(toRetry);
+                  const outerMax = this.opts.getLlmMaxErrorRetries();
+                  if (toRetry >= outerMax) {
+                    leaderLogger.error(
+                      `Leader 单轮超时连续 ${toRetry}/${outerMax} 次，停下等待用户介入`,
+                    );
+                    emitter.emit('leader:status', {
+                      sessionId,
+                      status: '⏱️ 单轮超时次数耗尽，等待人工介入',
+                    });
+                    this.opts.addMessage({
+                      role: 'system',
+                      content: `⏱️ [系统终止] Leader 单轮 LLM 调用连续超时 ${toRetry}/${outerMax} 次。请检查 provider 状态或网络连接。`,
+                    });
+                    const c2 = this.opts.getConversation();
+                    await db.saveConversationMessage(sessionId, c2[c2.length - 1]);
+                    this.opts.setLlmErrorRetryCount(0);
+                    this.opts.setWaitingForUser(true);
+                    return { type: 'break' };
+                  }
+                  return { type: 'continue' };
+                }
                 leaderLogger.info('LLM 调用被用户中断，退出思考循环');
                 return { type: 'break' };
               }

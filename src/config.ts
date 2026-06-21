@@ -293,6 +293,7 @@ const VerificationGroupSchema = z.object({
 const LeaderGroupSchema = z.object({
   max_tool_rounds: z.number().default(D.LEADER.MAX_TOOL_ROUNDS),
   max_runtime_minutes: z.number().default(D.LEADER.MAX_RUNTIME_MINUTES),
+  round_timeout_ms: z.number().default(D.LEADER.ROUND_TIMEOUT_MS),
   probe_silence_seconds: z.number().default(D.LEADER.PROBE_SILENCE_SECONDS),
   probe_max_interval_seconds: z.number().default(D.LEADER.PROBE_MAX_INTERVAL_SECONDS),
   probe_backoff_multiplier: z.number().default(D.LEADER.PROBE_BACKOFF_MULTIPLIER),
@@ -1051,6 +1052,7 @@ const ENV_OVERRIDE_MAP: EnvMapping[] = [
   { env: 'LINGXIAO_REMOTE_WORKERS_ENABLED', path: 'scaling.remoteWorkers.enabled', type: 'boolean' },
   { env: 'LINGXIAO_LEADER_MAX_TOOL_ROUNDS', path: 'leader.max_tool_rounds', type: 'number' },
   { env: 'LINGXIAO_LEADER_MAX_RUNTIME_MINUTES', path: 'leader.max_runtime_minutes', type: 'number' },
+  { env: 'LINGXIAO_LEADER_ROUND_TIMEOUT_MS', path: 'leader.round_timeout_ms', type: 'number' },
   { env: 'LINGXIAO_LEADER_PROBE_SILENCE_SECONDS', path: 'leader.probe_silence_seconds', type: 'number' },
   { env: 'LINGXIAO_LEADER_PROBE_MAX_INTERVAL_SECONDS', path: 'leader.probe_max_interval_seconds', type: 'number' },
   { env: 'LINGXIAO_LEADER_PROBE_BACKOFF_MULTIPLIER', path: 'leader.probe_backoff_multiplier', type: 'number' },
@@ -1571,6 +1573,7 @@ export let AGENT_MAX_ITERATIONS = config.agents.max_iterations;
 export let AGENT_MAX_RUNTIME_MINUTES = config.agents.max_runtime_minutes;
 export let LEADER_MAX_TOOL_ROUNDS = config.leader.max_tool_rounds;
 export let LEADER_MAX_RUNTIME_MINUTES = config.leader.max_runtime_minutes;
+export let LEADER_ROUND_TIMEOUT_MS = config.leader.round_timeout_ms;
 export let LEADER_PROBE_SILENCE_SECONDS = config.leader.probe_silence_seconds;
 export let LEADER_PROBE_MAX_INTERVAL_SECONDS = config.leader.probe_max_interval_seconds;
 export let LEADER_PROBE_BACKOFF_MULTIPLIER = config.leader.probe_backoff_multiplier;
@@ -1599,6 +1602,7 @@ export function syncDerivedConstants(): void {
   AGENT_MAX_RUNTIME_MINUTES = config.agents.max_runtime_minutes;
   LEADER_MAX_TOOL_ROUNDS = config.leader.max_tool_rounds;
   LEADER_MAX_RUNTIME_MINUTES = config.leader.max_runtime_minutes;
+  LEADER_ROUND_TIMEOUT_MS = config.leader.round_timeout_ms;
   LEADER_PROBE_SILENCE_SECONDS = config.leader.probe_silence_seconds;
   LEADER_PROBE_MAX_INTERVAL_SECONDS = config.leader.probe_max_interval_seconds;
   LEADER_PROBE_BACKOFF_MULTIPLIER = config.leader.probe_backoff_multiplier;

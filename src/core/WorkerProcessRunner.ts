@@ -207,7 +207,7 @@ export interface WorkerProcessRunnerOptions {
 const DEFAULT_OPTIONS: Required<WorkerProcessRunnerOptions> = {
   heartbeatTimeoutMs: 90000,  // 3x heartbeat interval (30s) — 容忍偶尔延迟
   spawnTimeoutMs: 30000,
-  maxRuntimeMs: 600000, // 10 minutes
+  maxRuntimeMs: 480 * 60 * 1000, // 8 hours — 与 defaults.ts WORKER_MAX_RUNTIME_MS 一致
   debug: false,
   workerScriptPath: resolve(__dirname, '../agents/WorkerProcessEntry.js'),
   heartbeatMonitorIntervalMs: 5000,

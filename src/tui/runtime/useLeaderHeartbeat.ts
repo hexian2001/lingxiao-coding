@@ -72,7 +72,10 @@ export function useLeaderHeartbeat({
       lastLeaderHeartbeatAtRef.current = now;
 
       const elapsed = now - lastLeaderVisibleActivityAtRef.current;
-      if (elapsed > 120000) {
+      if (elapsed > 300000) {
+        // P1-2: 300s 可操作升级 — 引导用户主动中断/重启
+        updateChannelNext('main', `🔴 ${t('tui.leader.heartbeat.critical_stall', status, Math.floor(elapsed / 1000))}`);
+      } else if (elapsed > 120000) {
         updateChannelNext('main', `⚠️ ${t('tui.leader.heartbeat.long_stall', status, Math.floor(elapsed / 1000))}`);
       }
     }, 5000);

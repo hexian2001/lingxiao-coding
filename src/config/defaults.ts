@@ -107,6 +107,13 @@ export const LEADER = {
   MAX_TOOL_ROUNDS: 200,
   /** Leader 最大运行时间 (分钟) — 24×7 模式持续运行 */
   MAX_RUNTIME_MINUTES: 480,
+  /**
+   * Leader 单轮 wall-clock 超时 (ms) — 安全网，兜底 LlmGuard 内部 hang watchdog
+   * (240s) 失效或内层重试循环 (3×180s=540s+backoff) 运行过久。
+   * 600s 高于 LlmGuard 最坏情况 (~723s)，仅在极端场景触发；
+   * 触发后 abort 当前 LLM 调用，按可重试错误走外层 retry 计数器。
+   */
+  ROUND_TIMEOUT_MS: 600_000,
   /** Leader 探测沉默阈值 (秒) — Agent 启动后首次静默多久开始探测 */
   PROBE_SILENCE_SECONDS: 300,
   /** Leader 探测最大间隔 (秒) */

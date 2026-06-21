@@ -33,7 +33,7 @@ const CATEGORY_MAP: Record<string, string[]> = {
     'agents.max_continuation_depth',
   ],
   'Leader': [
-    'leader.max_tool_rounds', 'leader.max_runtime_minutes',
+    'leader.max_tool_rounds', 'leader.max_runtime_minutes', 'leader.round_timeout_ms',
     'leader.probe_silence_seconds', 'leader.probe_max_interval_seconds',
     'leader.probe_backoff_multiplier', 'leader.idle_warning_seconds',
     'leader.idle_probe_max_wait_ms', 'leader.idle_probe_backoff_base_ms',

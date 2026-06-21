@@ -252,6 +252,7 @@ export type I18nKey =
   | 'tui.leader.heartbeat.working'
   | 'tui.leader.heartbeat.cancel_hint'
   | 'tui.leader.heartbeat.long_stall'
+  | 'tui.leader.heartbeat.critical_stall'
   | 'tui.leader.heartbeat.tool_executing'
   | 'tui.meta.age.seconds'
   | 'tui.meta.age.minutes_seconds'
@@ -911,6 +912,7 @@ export interface I18nStrings {
   'tui.leader.heartbeat.working': string;
   'tui.leader.heartbeat.cancel_hint': string;
   'tui.leader.heartbeat.long_stall': (status: string, seconds: number) => string;
+  'tui.leader.heartbeat.critical_stall': (status: string, seconds: number) => string;
   'tui.leader.heartbeat.tool_executing': (tool: string, seconds: number) => string;
   'tui.meta.age.seconds': (seconds: number) => string;
   'tui.meta.age.minutes_seconds': (minutes: number, seconds: number) => string;
@@ -1776,6 +1778,7 @@ const zhStrings: I18nStrings = {
   'tui.leader.heartbeat.cancel_hint': ' · Esc 可中断',
   'tui.leader.heartbeat.tool_executing': (tool: string, seconds: number) => `仍在执行 ${tool}（${seconds}s）`,
   'tui.leader.heartbeat.long_stall': (status: string, seconds: number) => `${status} (${seconds}s) · 如果长时间无响应可尝试 Ctrl+C 中断`,
+  'tui.leader.heartbeat.critical_stall': (status: string, seconds: number) => `${status} (${seconds}s) · 已超时 5 分钟，建议 Ctrl+C 中断后重试`,
   'tui.meta.age.seconds': (seconds: number) => `${seconds}s前`,
   'tui.meta.age.minutes_seconds': (minutes: number, seconds: number) => `${minutes}m${seconds}s前`,
   'tui.meta.age.minutes': (minutes: number) => `${minutes}m前`,
@@ -2666,6 +2669,7 @@ const enStrings: I18nStrings = {
   'tui.leader.heartbeat.cancel_hint': ' · Esc to interrupt',
   'tui.leader.heartbeat.tool_executing': (tool: string, seconds: number) => `still executing ${tool} (${seconds}s)`,
   'tui.leader.heartbeat.long_stall': (status: string, seconds: number) => `${status} (${seconds}s) · try Ctrl+C to interrupt if it keeps hanging`,
+  'tui.leader.heartbeat.critical_stall': (status: string, seconds: number) => `${status} (${seconds}s) · stalled 5+ min, press Ctrl+C to interrupt and retry`,
   'tui.meta.age.seconds': (seconds: number) => `${seconds}s ago`,
   'tui.meta.age.minutes_seconds': (minutes: number, seconds: number) => `${minutes}m${seconds}s ago`,
   'tui.meta.age.minutes': (minutes: number) => `${minutes}m ago`,
