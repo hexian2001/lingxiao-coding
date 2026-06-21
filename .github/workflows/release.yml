@@ -4,18 +4,61 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要构建的 tag（如 v1.0.2）'
+        required: true
+        type: string
 
-# Release 不取消，确保所有平台都完成
+# 同 tag 新推送时取消旧的，避免重复构建
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
+  # ── 检查是否已有 Release（防重复） ──────────────────────────────
+  check-release:
+    name: Check Existing Release
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                ...context.repo,
+                tag,
+              });
+              // Release 已存在 — 检查是否已有附件
+              const assets = release.assets || [];
+              if (assets.length > 0) {
+                core.info(`Release ${tag} already exists with ${assets.length} assets — skipping`);
+                core.setOutput('should_run', 'false');
+              } else {
+                core.info(`Release ${tag} exists but has no assets — will rebuild`);
+                core.setOutput('should_run', 'true');
+              }
+            } catch (e) {
+              if (e.status === 404) {
+                core.info(`Release ${tag} does not exist — will create`);
+                core.setOutput('should_run', 'true');
+              } else {
+                throw e;
+              }
+            }
+
   # ── 构建便携包（三平台并行） ──────────────────────────────────────
   build-portable:
+    needs: check-release
+    if: needs.check-release.outputs.should_run == 'true'
     name: Portable ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -67,6 +110,8 @@ jobs:
 
   # ── 构建 SEA 二进制（三平台） ─────────────────────────────────────
   build-binary:
+    needs: check-release
+    if: needs.check-release.outputs.should_run == 'true'
     name: Binary ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -116,6 +161,8 @@ jobs:
 
   # ── 构建源码包 ─────────────────────────────────────────────────────  # ── 构建 Windows 桌面版（MSI + NSIS） ─────────────────────────────
   build-windows-desktop:
+    needs: check-release
+    if: needs.check-release.outputs.should_run == 'true'
     name: Windows Desktop (MSI + NSIS)
     runs-on: windows-latest
 
@@ -156,6 +203,8 @@ jobs:
 
 
   build-source:
+    needs: check-release
+    if: needs.check-release.outputs.should_run == 'true'
     name: Source Tarball
     runs-on: ubuntu-latest
     steps:
@@ -178,9 +227,9 @@ jobs:
   # ── 创建 GitHub Release ──────────────────────────────────────────
   create-release:
     name: Create GitHub Release
-    needs: [build-portable, build-binary, build-windows-desktop, build-source]
+    needs: [check-release, build-portable, build-binary, build-windows-desktop, build-source]
     runs-on: ubuntu-latest
-    if: always()  # 即使部分 binary 构建失败也发布
+    if: always() && needs.check-release.outputs.should_run == 'true'  # 即使部分 binary 构建失败也发布
     steps:
       - uses: actions/checkout@v4
 
