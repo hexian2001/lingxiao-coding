@@ -8,6 +8,7 @@ import { normalizeLanguage, persistLanguage, type WebLanguage } from '../i18n';
 import { notifySettingChanged, settingsApiFetch } from './settings/settingsApi';
 import { UsageCard } from './sidebar/UsageCard';
 import { SidebarVersionBadge } from './sidebar/SidebarVersionBadge';
+import { BetaBadge } from './sidebar/BetaBadge';
 import {
   MessageCircle, Server, ListTodo, Terminal, LayoutDashboard,
   FileCode, FileEdit, Puzzle, BarChart3, Activity, Cpu, ScrollText,
@@ -24,6 +25,7 @@ interface NavItem {
   action?: () => void; // Optional action button (e.g. + for new chat)
   actionIcon?: React.ReactNode;
   actionTitle?: string;
+  isBeta?: boolean;
 }
 
 const topNav: NavItem[] = [
@@ -36,16 +38,16 @@ const workspaceNav: NavItem[] = [
   { view: 'blueprint', icon: <LayoutGrid size={16} />, labelKey: 'sidebar.blueprint' },
   { view: 'blackboard', icon: <Network size={16} />, labelKey: 'sidebar.blackboard' },
   { view: 'terminal', icon: <Terminal size={16} />, labelKey: 'sidebar.terminalMode' },
-  { view: 'canvas', icon: <LayoutDashboard size={16} />, labelKey: 'sidebar.canvas' },
+  { view: 'canvas', icon: <LayoutDashboard size={16} />, labelKey: 'sidebar.canvas', isBeta: true },
   { view: 'artifact', icon: <GalleryVerticalEnd size={16} />, labelKey: 'sidebar.artifacts' },
   { view: 'editor', icon: <FileCode size={16} />, labelKey: 'sidebar.editor' },
   { view: 'changes', icon: <FileEdit size={16} />, labelKey: 'sidebar.changes' },
   { view: 'git', icon: <GitBranch size={16} />, labelKey: 'sidebar.git' },
-  { view: 'git-activity', icon: <GitCommitHorizontal size={16} />, labelKey: 'sidebar.gitActivity' },
+  { view: 'git-activity', icon: <GitCommitHorizontal size={16} />, labelKey: 'sidebar.gitActivity', isBeta: true },
   { view: 'wiki', icon: <BookMarked size={16} />, labelKey: 'sidebar.wiki' },
   { view: 'memory', icon: <Brain size={16} />, labelKey: 'sidebar.memory' },
   { view: 'plugins', icon: <Puzzle size={16} />, labelKey: 'sidebar.plugins' },
-  { view: 'design-market', icon: <Palette size={16} />, labelKey: 'sidebar.designMarket' },
+  { view: 'design-market', icon: <Palette size={16} />, labelKey: 'sidebar.designMarket', isBeta: true },
 ];
 
 const observabilityNav: NavItem[] = [
@@ -134,7 +136,10 @@ function NavSection({ title, items, id }: { title: string; items: NavItem[]; id?
               {item.icon}
             </span>
             {!sidebarCollapsed && (
-              <span className="font-medium text-[12px]">{t(item.labelKey)}</span>
+              <>
+                <span className="font-medium text-[12px]">{t(item.labelKey)}</span>
+                {item.isBeta && <BetaBadge className="ml-1.5" />}
+              </>
             )}
             {/* Action button on the right side of nav item */}
             {item.action && !sidebarCollapsed && (
