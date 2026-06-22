@@ -1,0 +1,70 @@
+name: GLM PR Review
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      pull_number:
+        description: Pull request number to review
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  glm-pr-review:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: glm-pr-review-${{ github.event.pull_request.number || inputs.pull_number }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Check GLM review secret
+        id: secret-check
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: |
+          if [ -z "$ZHIPU_API_KEY" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=GLM review skipped::ZHIPU_API_KEY is not configured."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout base repository
+        if: ${{ steps.secret-check.outputs.configured == 'true' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+
+      - name: Set up Node.js
+        if: ${{ steps.secret-check.outputs.configured == 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install root dependencies
+        if: ${{ steps.secret-check.outputs.configured == 'true' }}
+        run: npm ci
+
+      - name: Review pull request with GLM
+        if: ${{ steps.secret-check.outputs.configured == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          ZHIPU_BASE_URL: ${{ vars.ZHIPU_BASE_URL }}
+          ZHIPU_MODEL: ${{ vars.ZHIPU_PR_REVIEW_MODEL }}
+          GLM_REVIEW_PULL_NUMBER: ${{ inputs.pull_number }}
+        run: node scripts/glm-pr-review.mjs

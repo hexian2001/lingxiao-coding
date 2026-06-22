@@ -1,0 +1,30 @@
+name: Copilot task
+description: Delegate a bounded coding or review task to GitHub Copilot or other repository automation.
+title: "[Copilot Task] "
+labels:
+  - copilot-task
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Task summary
+      description: Briefly describe the task to be completed.
+      placeholder: Add a concise task summary.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and constraints
+      description: Explain the required scope, exclusions, and any important constraints.
+      placeholder: List important constraints, affected paths, and exclusions.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation expectations
+      description: Describe the checks or evidence expected before this task is considered complete.
+      placeholder: Note required tests, screenshots, logs, or review notes.
+    validations:
+      required: true
