@@ -12,12 +12,24 @@ export default function AgentContextMenu() {
   const [nudge, setNudge] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
 
+  // Single early return to avoid Hook race conditions
   if (!contextMenu) return null;
-
+  
   const agent = agents.find((a) => a.agentId === contextMenu.agentId);
   const conv = agentConversations[contextMenu.agentId];
   const name = conv?.agentName || agent?.agentName;
-  if (!agent || !name) return null;
+  
+  // Guard against incomplete data but avoid second return null after Hooks
+  if (!agent || !name) {
+    // Render placeholder instead of null to keep Hook call chain stable
+    return (
+      <div className="fixed z-50 w-64 rounded-lg border border-border-muted bg-bg-primary/95 shadow-lg backdrop-blur-sm" style={{ left: contextMenu.x, top: contextMenu.y }}>
+        <div className="flex items-center justify-center p-4 text-xs text-text-tertiary">
+          Loading agent data...
+        </div>
+      </div>
+    );
+  }
 
   const run = async (kind: string, action: () => Promise<void>, success: string) => {
     if (!sessionId || busy) return;

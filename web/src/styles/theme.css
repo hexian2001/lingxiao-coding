@@ -62,6 +62,7 @@
   --color-accent-blue: #4f7488;
   --color-accent-purple: #7471c9;
   --color-accent-pink: #c04482;
+  --color-accent-cinnabar: #c8432e;
 
   --color-inline-code: #b8326c;
   --color-scrollbar: rgba(48, 75, 86, 0.20);
@@ -148,6 +149,7 @@
   --color-accent-blue: var(--lingxiao-sword);
   --color-accent-purple: #b7b4ea;
   --color-accent-pink: #f299c1;
+  --color-accent-cinnabar: #f5a573;
 
   --color-inline-code: #f299c1;
   --color-scrollbar: rgba(255, 255, 255, 0.16);
