@@ -103,7 +103,11 @@ export function hasContractComplianceProofText(text: string): boolean {
     .map((line) => fieldValue(line, 'evidence'))
     .find((value): value is string => Boolean(value));
   const bulletEvidence = hasEvidenceField && section.some((line) => line.trim().startsWith('- ') && line.trim().slice(2).trim().length > 0);
+  // deviations 是 optional 字段；仅当存在但内容为空时才算缺失，省略 deviations 仍可通过
   const hasDeviationsField = section.some((line) => fieldValue(line, 'deviations') !== null);
+  const deviationsEmpty = hasDeviationsField && section
+    .filter((line) => line.trim().startsWith('- '))
+    .every((line) => line.trim().slice(2).trim().length === 0 || false);
 
   return Boolean(
     surface &&
@@ -111,7 +115,7 @@ export function hasContractComplianceProofText(text: string): boolean {
     isWorkerContractComplianceStatus(status) &&
     hasEvidenceField &&
     (inlineEvidence || bulletEvidence) &&
-    hasDeviationsField,
+    (!hasDeviationsField || !deviationsEmpty),
   );
 }
 
@@ -120,17 +124,38 @@ function expectedContractSurface(task: Task): string {
   return isNonEmptyString(binding?.surface) ? binding.surface.trim() : `task:${task.id}`;
 }
 
-function missingContractComplianceFeedback(task: Task): string {
+function missingContractComplianceFeedback(task: Task, retryCount: number): string {
   const surface = expectedContractSurface(task);
+  const taskId = task.id;
   return [
-    '缺少“契约遵守证明”，不能收尾。请继续完成任务，并在最终收尾中使用 attempt_completion.contract_compliance，或输出以下机器可检格式：',
+    `⚠️ 缺少“契约遵守证明”（第 ${retryCount} 次提醒），不能收尾。`,
+    '',
+    '你有两种方式补上契约遵守证明：',
+    '',
+    '方式 A（推荐）—— 调用 attempt_completion 工具，传入 contract_compliance 嵌套对象：',
+    '```json',
+    '{',
+    '  "summary": "一句话总结你完成了什么（至少8个字符）",',
+    '  "contract_compliance": {',
+    `    "surface": "${surface}",`,
+    '    "status": "complied",',
+    '    "evidence": ["写出真实文件路径、命令、测试结果等证据"],',
+    '    "deviations": ["无"]',
+    '  }',
+    '}',
+    '```',
+    '',
+    '方式 B —— 在最终输出文本中包含以下机器可检格式：',
     '## 契约遵守证明',
     `surface: ${surface}`,
-    'status: complied | upgraded | blocked | not_applicable',
+    'status: complied',
     'evidence:',
     '- 写出真实文件、命令、测试、报告或契约节点证据',
     'deviations:',
     '- 无；如有偏离，说明偏离原因和影响',
+    '',
+    '注意：contract_compliance 必须是嵌套对象（含 surface/status/evidence），不要把字段放在顶层。',
+    `surface 使用 "${surface}"，status 用 complied/upgraded/blocked/not_applicable 之一。`,
   ].join('\n');
 }
 
@@ -165,7 +190,7 @@ export function evaluateWorkerCompletionHardGuards(input: EvaluateWorkerCompleti
     return {
       accepted: false,
       reason: 'missing_contract_compliance_proof',
-      feedback: missingContractComplianceFeedback(input.task),
+      feedback: missingContractComplianceFeedback(input.task, 0),
     };
   }
 

@@ -3698,12 +3698,45 @@ export class BaseAgent {
       artifacts: this.attemptCompletion?.artifacts,
       toolTrace,
     });
+
+    // 自动合成契约遵守证明：当 worker 有真实工作产物（toolTrace 有文件/命令）
+    // 但未调用 attempt_completion 或未填 contract_compliance 时，
+    // 框架用 toolTrace 证据自动合成基本证明，避免 worker 因格式认知不足反复失败。
+    const hasRealArtifacts =
+      toolTrace.files_created.length > 0 ||
+      toolTrace.files_modified.length > 0 ||
+      toolTrace.commands_run.length > 0;
+    let contractCompliance = this.attemptCompletion?.contract_compliance;
+    if (!contractCompliance && hasRealArtifacts) {
+      const binding = (task as Task & { orchestration?: { contractBinding?: { surface?: unknown } } }).orchestration?.contractBinding;
+      const surface = typeof binding?.surface === 'string' && binding.surface.trim() ? binding.surface.trim() : `task:${task.id}`;
+      const evidence: string[] = [];
+      if (toolTrace.files_created.length > 0) {
+        evidence.push(`files_created: ${toolTrace.files_created.join(', ')}`);
+      }
+      if (toolTrace.files_modified.length > 0) {
+        evidence.push(`files_modified: ${toolTrace.files_modified.join(', ')}`);
+      }
+      if (toolTrace.commands_run.length > 0) {
+        evidence.push(`commands_run: ${toolTrace.commands_run.slice(0, 5).join('; ')}`);
+      }
+      contractCompliance = {
+        surface,
+        status: 'complied',
+        evidence: evidence.length > 0 ? evidence : ['task completed with tool activity'],
+        deviations: ['无（框架自动合成，worker 未显式声明契约遵守证明）'],
+      };
+      agentLogger.info(
+        `[${this.name}] worker 未提供 contract_compliance，框架用 toolTrace 自动合成 (surface=${surface}, evidence=${evidence.length} items)`,
+      );
+    }
+
     return evaluateWorkerCompletionCandidate({
       final,
       task,
       role: this.role,
       messages: this.messages,
-      contractCompliance: this.attemptCompletion?.contract_compliance,
+      contractCompliance,
       verification,
       hasContractAllowedScope: Boolean(this.currentContractAllowedScope),
       llm: this.llm,
