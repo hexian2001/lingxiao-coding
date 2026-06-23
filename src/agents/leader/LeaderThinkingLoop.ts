@@ -89,6 +89,7 @@ export interface LeaderThinkingEngineOptions {
   isFinished: () => boolean;
   isWaitingForUser: () => boolean;
   isUserInterruptPending: () => boolean;
+  isToolUseSuppressedForCurrentTurn?: () => boolean;
   /** 是否有待处理的 Agent 完成信号 */
   isAgentCompletionPending?: () => boolean;
   setWaitingForUser: (v: boolean) => void;
@@ -401,9 +402,10 @@ export class LeaderThinkingEngine {
         this.opts.setWaitingForUser(true);
         return null;
       }
-      this.opts.addMessage({ role: input.continuationRole, content: verdict.continuationPrompt || '请基于当前上下文接续未完成部分，已输出内容用承接方式处理。' });
-      const c = this.opts.getConversation();
-      await db.saveConversationMessage(sessionId, c[c.length - 1]);
+
+      // 不注入任何 continuation prompt 到持久化历史
+      // 模型会基于当前上下文自然继续，无需显式提示
+      leaderLogger.info(`[LeaderContinuation] 续跑 (retry=${retry}, reason=${verdict.reason})，不注入 prompt`);
       return { done: false };
     }
 
@@ -413,9 +415,9 @@ export class LeaderThinkingEngine {
       return null;
     }
 
-    this.opts.addMessage({ role: input.continuationRole, content: hook.feedback || 'Stop Hook 要求继续推进当前会话。' });
-    const c = this.opts.getConversation();
-    await db.saveConversationMessage(sessionId, c[c.length - 1]);
+    // Stop hook 要求继续，但不注入到持久化历史
+    // 模型会基于当前上下文继续推进
+    leaderLogger.info(`[LeaderContinuation] Stop hook 要求继续，不注入 prompt`);
     return { done: false };
   }
 
@@ -452,6 +454,7 @@ export class LeaderThinkingEngine {
       setRawXmlRetryCount: (value) => this.opts.setRawXmlRetryCount(value),
       setEmptyResponseRetryCount: (value) => this.opts.setEmptyResponseRetryCount(value),
       isUserInterruptPending: () => this.opts.isUserInterruptPending(),
+      isToolUseSuppressedForCurrentTurn: () => this.opts.isToolUseSuppressedForCurrentTurn?.() ?? false,
       getActiveTeam: this.opts.getActiveTeam,
       getCollaborationMode: this.opts.getCollaborationMode,
       peekNextTaskIds: this.opts.peekNextTaskIds,

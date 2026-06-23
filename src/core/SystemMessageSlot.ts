@@ -48,16 +48,34 @@ export function collapseSystemSlots(
   matchers: readonly SystemSlotMatcher[],
 ): ChatMessage[] {
   if (matchers.length === 0) return messages;
+
   // 收集每个 matcher 最后一次出现的下标（保留位）。
   const keep = new Set<number>();
+  const slotStats = new Map<string, { total: number; kept: number; removed: number }>();
+
   for (const matcher of matchers) {
     let lastIndex = -1;
+    let totalMatches = 0;
+    const slotKey = matcher.kind === 'manifestSlot' ? matcher.slot : matcher.prefix;
+
     for (let i = 0; i < messages.length; i += 1) {
-      if (slotMessageMatches(messages[i], matcher)) lastIndex = i;
+      if (slotMessageMatches(messages[i], matcher)) {
+        totalMatches++;
+        lastIndex = i;
+      }
     }
-    if (lastIndex >= 0) keep.add(lastIndex);
+
+    if (lastIndex >= 0) {
+      keep.add(lastIndex);
+      slotStats.set(slotKey, {
+        total: totalMatches,
+        kept: 1,
+        removed: totalMatches - 1,
+      });
+    }
   }
-  return messages.filter((msg, index) => {
+
+  const filtered = messages.filter((msg, index) => {
     if (msg.role !== 'system') return true;
     let belongsToAnySlot = false;
     for (const matcher of matchers) {
@@ -66,6 +84,24 @@ export function collapseSystemSlots(
     if (!belongsToAnySlot) return true;
     return keep.has(index);
   });
+
+  // 如果有变化，打印统计日志
+  if (filtered.length !== messages.length) {
+    const totalRemoved = messages.length - filtered.length;
+    const removedChars = messages
+      .filter((msg, index) => !filtered.includes(msg))
+      .reduce((sum, msg) => sum + contentToPlainText(msg.content).length, 0);
+
+    console.log(`[SystemSlotCollapse] before=${messages.length} after=${filtered.length} removed=${totalRemoved} removedChars=${removedChars}`);
+
+    for (const [slot, stats] of slotStats) {
+      if (stats.removed > 0) {
+        console.log(`  slot="${slot}" total=${stats.total} kept=${stats.kept} removed=${stats.removed}`);
+      }
+    }
+  }
+
+  return filtered;
 }
 
 export interface UpsertSystemSlotResult {

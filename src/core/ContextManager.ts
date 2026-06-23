@@ -221,11 +221,11 @@ export class ContextManager {
   }
 
   /**
-   * 主要入口：只在 token 或字节超阈值时触发压缩，其余情况零开销返回。
+   * 主要入口：只在真正 overflow 时触发压缩（LLM 返回 413/context_length_exceeded）。
+   * 平时不做任何主动裁剪，保持历史完整性。
    */
   async manage(): Promise<ChatMessage[]> {
-    this.applyHierarchicalContextBudget();
-
+    // autocompact 关闭时，不执行任何上下文管理
     if (runtimeConfig.context?.autocompact_enabled === false) {
       return this.messages;
     }
@@ -237,67 +237,17 @@ export class ContextManager {
       return this.messages;
     }
 
-    // tiktoken 精确计算（带缓存：messages 未变则直接返回上次结果）
+    // 只计数用于 runtime state，不触发主动压缩
     const currentTokens = await this.getTokenCount();
 
-    // Checkpoint 写入与压缩解耦：每轮都评估边界，让低位阈值（0.2/0.4/0.6…）
-    // 随上下文增长逐级落盘，而非等到压缩点（~0.8）才一次性触发。
-    // evaluateBoundary 自带阈值闸 + single-flight 守卫，重复调用安全。
+    // Checkpoint 写入（不触发压缩）
     if (this.checkpointService && this.llmClient) {
       this.checkpointService.tryStartAsync(this.messages, this.llmClient, this.maxTokens);
     }
 
-    // 字节维度：未配置或未超网关上限则跳过
-    // 安全阀：仅当 token 维度也已超过 proactive 阈值的 50% 时才因字节触发压缩。
-    // 否则大窗口模型（如 1M）在 token 远未到阈值时，仅因中文/代码内容字节密度高
-    // 就被过早压缩——token 才用了 14% 却因字节触网关而压缩。
-    const byteThreshold = this.maxRequestBytes > 0
-      ? calculateByteThreshold(this.maxRequestBytes)
-      : 0;
-    const currentBytes = byteThreshold > 0 ? calculateRequestBytes(this.messages) : 0;
-    const tokenNearThreshold = currentTokens > Math.floor(this.proactiveCompactThreshold * 0.5);
-    const bytesOverBudget = byteThreshold > 0
-      && currentBytes > byteThreshold
-      && tokenNearThreshold;
-
-    // P1-1h: proactive compression at 70% of budget (before reaching the ~80% threshold).
-    // Only triggers if tokens are above the proactive threshold but below the hard threshold,
-    // and no byte overflow. This gives a softer compaction earlier to avoid sudden large compressions.
-    if (
-      this.proactiveCompactThreshold > 0
-      && currentTokens > this.proactiveCompactThreshold
-      && currentTokens <= this.threshold
-      && !bytesOverBudget
-      && !this.compacting
-    ) {
-      coreLogger.info(
-        `${this.sessionId || '(no-session)'} proactive compact triggered: ${currentTokens.toLocaleString()} > ${this.proactiveCompactThreshold.toLocaleString()} (70% of ${this.maxTokens.toLocaleString()})`,
-      );
-      this.compacting = this.runCompaction();
-      try {
-        return await this.compacting;
-      } finally {
-        this.compacting = null;
-      }
-    }
-
-    // 核心判定：token 未超阈值 且 字节未超限 → 直接返回，不跑任何压缩
-    if (currentTokens <= this.threshold && !bytesOverBudget) {
-      this.updateRuntimeState({ currentTokens }, 'observe');
-      return this.messages;
-    }
-
-    // 超阈值 → 执行压缩（single-flight 守卫）
-    if (this.compacting) {
-      return this.compacting;
-    }
-
-    this.compacting = this.runCompaction();
-    try {
-      return await this.compacting;
-    } finally {
-      this.compacting = null;
-    }
+    // 不再主动压缩：等待 LLM 返回 overflow 错误后，由外层 LlmGuard/overflow handler 调用 forceCompact()
+    this.updateRuntimeState({ currentTokens }, 'observe');
+    return this.messages;
   }
 
   /** 实际执行一次压缩。仅由 manage() 在 single-flight 守卫下调用。 */
@@ -630,6 +580,13 @@ export class ContextManager {
       await this.compacting;
     }
 
+    const beforeCount = this.messages.length;
+    const oldTokens = await this.getTokenCount();
+
+    coreLogger.warn(
+      `[ContextManager.forceCompact] ${this.sessionId || '(no-session)'} 强制压缩触发 (通常因 LLM overflow): beforeMessages=${beforeCount} beforeTokens=${oldTokens}`,
+    );
+
     const runPromise = this.pipeline.forceRun(this.messages, {
       recentFiles: this.recentFiles,
       compactType: 'manual',
@@ -640,6 +597,14 @@ export class ContextManager {
     this.compacting = runPromise.then((r) => r.messages, () => this.messages);
     try {
       const result = await runPromise;
+
+      const afterCount = result.messages.length;
+      const removedMessages = beforeCount - afterCount;
+      const tokenDelta = oldTokens - result.newTokens;
+
+      coreLogger.warn(
+        `[ContextManager.forceCompact] ${this.sessionId || '(no-session)'} 压缩完成: afterMessages=${afterCount} afterTokens=${result.newTokens} removedMessages=${removedMessages} tokenDelta=${tokenDelta} compacted=${result.compacted} overflow=${result.overflow}`,
+      );
 
       this.messages = result.messages;
       this.cachedTokenCount = result.newTokens;
@@ -753,6 +718,7 @@ export class ContextManager {
       return;
     }
 
+    const beforeCount = this.messages.length;
     const result = this.hierarchicalContext.buildContext(this.messages, {
       protectedCount: 1,
       maxMessages: this.maxMessages,
@@ -762,6 +728,11 @@ export class ContextManager {
     });
 
     if (result.messages.length !== this.messages.length) {
+      const afterCount = result.messages.length;
+      const removed = beforeCount - afterCount;
+      coreLogger.warn(
+        `[HierarchicalBudget] ${this.sessionId || '(no-session)'} trimmed messages: before=${beforeCount} after=${afterCount} removed=${removed} maxMessages=${this.maxMessages} hot=${result.hotCount} warm=${result.warmCount} cold=${result.coldCount} demoted=${result.demotedCount}`,
+      );
       this.messages = result.messages;
       this.cachedTokenCount = null;
     }

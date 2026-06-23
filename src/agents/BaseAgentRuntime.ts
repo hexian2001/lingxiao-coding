@@ -2162,20 +2162,14 @@ export class BaseAgent {
         // 下一轮只会从头重新生成——MAX_CONTINUATION_RETRIES 次预算全部浪费在重写前文上，
         // 最终强制收尾时输出仍是半截（"无法真正续写"的根因）。
         // 入栈模式与 evaluateCompletionAndRetry / handleRawToolSyntaxRetry 完全一致：
-        // 先 assistant 半截内容，再追加续写指令。
+        // 先 assistant 半截内容，再不注入续写指令到持久化历史
         this.addMessage({ role: 'assistant', content: final, thinking: response.thinking });
         if (this.db) {
           await this.db.saveAgentMessage?.(this.sessionId, this.agentId, this.name, this.messages[this.messages.length - 1]);
         }
 
-        this.addMessage({
-          role: 'user',
-          content: nextSpeakerVerdict.continuationPrompt || '请基于当前上下文接续未完成部分，已输出内容用承接方式处理。',
-        });
-
-        if (this.db) {
-          await this.db.saveAgentMessage?.(this.sessionId, this.agentId, this.name, this.messages[this.messages.length - 1]);
-        }
+        // 不注入 continuation prompt，模型会基于当前上下文自然继续
+        agentLogger.info(`[${this.name}] Agent 续跑 (retry=${continuationRetry})，不注入 prompt`);
 
         return { done: false };
       }
@@ -2183,10 +2177,8 @@ export class BaseAgent {
 
     const stopHook = await this.maybeContinueFromStopHook(final);
     if (stopHook.shouldContinue) {
-      this.addMessage({ role: 'user', content: stopHook.feedback || 'Stop Hook 要求继续推进当前任务。' });
-      if (this.db) {
-        await this.db.saveAgentMessage?.(this.sessionId, this.agentId, this.name, this.messages[this.messages.length - 1]);
-      }
+      // Stop hook 要求继续，但不注入到持久化历史
+      agentLogger.info(`[${this.name}] Stop hook 要求继续，不注入 prompt`);
       return { done: false };
     }
 

@@ -462,6 +462,8 @@ export interface SessionRuntimeSnapshot {
     executionMode?: string;
     executionReason?: string;
     permissionSummary?: string;
+    leaderModel?: string;
+    agentModel?: string;
   };
   pendingUserInput?: {
     raw?: unknown;

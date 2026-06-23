@@ -917,6 +917,8 @@ export function coerceSessionRuntimeSnapshot(raw: unknown): SessionRuntimeSnapsh
       executionMode: stringValue(leader.executionMode),
       executionReason: stringValue(leader.executionReason),
       permissionSummary: stringValue(leader.permissionSummary),
+      leaderModel: stringValue(leader.leaderModel) || undefined,
+      agentModel: stringValue(leader.agentModel) || undefined,
     },
     pendingUserInput: Object.keys(pendingInput).length > 0
       ? { raw: pendingInput.raw, kind: pendingKind, preview: stringValue(pendingInput.preview) }

@@ -20,16 +20,26 @@ function makeState() {
   };
 }
 
+function readTurnId(raw: unknown): number {
+  const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? Math.trunc(parsed) : 0;
+}
+
 function shouldExposeRecordCapabilityIntentTool(db: { getSessionState(sessionId: string, key: string): unknown | null }, sessionId: string): boolean {
-  const currentRaw = db.getSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID);
-  const recordedRaw = db.getSessionState(sessionId, SESSION_KEYS.CAPABILITY_INTENT_TURN_ID);
-  const currentTurnId = typeof currentRaw === 'number' ? currentRaw : typeof currentRaw === 'string' ? Number(currentRaw) : NaN;
-  const recordedTurnId = typeof recordedRaw === 'number' ? recordedRaw : typeof recordedRaw === 'string' ? Number(recordedRaw) : NaN;
-  if (!Number.isFinite(currentTurnId) || currentTurnId <= 0) return true;
-  return !Number.isFinite(recordedTurnId) || Math.trunc(recordedTurnId) !== Math.trunc(currentTurnId);
+  const currentTurnId = readTurnId(db.getSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID));
+  const recordedTurnId = readTurnId(db.getSessionState(sessionId, SESSION_KEYS.CAPABILITY_INTENT_TURN_ID));
+  if (currentTurnId <= 0) return true;
+  return recordedTurnId !== currentTurnId;
+}
+
+function isToolUseSuppressedForCurrentTurn(db: { getSessionState(sessionId: string, key: string): unknown | null }, sessionId: string): boolean {
+  const currentTurnId = readTurnId(db.getSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID));
+  const suppressedTurnId = readTurnId(db.getSessionState(sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID));
+  return currentTurnId > 0 && suppressedTurnId === currentTurnId;
 }
 
 function visibleMetaToolNames(db: { getSessionState(sessionId: string, key: string): unknown | null }, sessionId: string): string[] {
+  if (isToolUseSuppressedForCurrentTurn(db, sessionId)) return [];
   const metaTools = shouldExposeRecordCapabilityIntentTool(db, sessionId)
     ? LEADER_META_TOOLS
     : LEADER_META_TOOLS.filter((tool) => tool.function.name !== 'record_capability_intent');
@@ -47,6 +57,18 @@ test('record_capability_intent is exposed before a turn is recorded and hidden a
   assert.equal(visibleMetaToolNames(db, sessionId).includes('record_capability_intent'), false);
 
   db.setSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID, 8);
+  assert.equal(visibleMetaToolNames(db, sessionId).includes('record_capability_intent'), true);
+});
+
+test('tool-use suppression hides all meta tools for the current turn only', () => {
+  const db = makeState();
+  const sessionId = 's-no-tools';
+
+  db.setSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID, 9);
+  db.setSessionState(sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID, 9);
+  assert.deepEqual(visibleMetaToolNames(db, sessionId), []);
+
+  db.setSessionState(sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID, 10);
   assert.equal(visibleMetaToolNames(db, sessionId).includes('record_capability_intent'), true);
 });
 

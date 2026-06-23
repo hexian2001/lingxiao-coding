@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { test } from 'vitest';
 import {
   buildSessionBadgeViewModel,
+  loadLastSelectedSessionId,
   pickBootstrapSessionId,
+  saveLastSelectedSessionId,
 } from './sessionListViewModel.ts';
 import type { SessionInfo, SessionRuntimeSnapshot } from '../stores/sessionStoreTypes.ts';
 
@@ -171,6 +173,15 @@ test('pickBootstrapSessionId prefers running worker sessions over stale activeSe
   assert.equal(selected, 'worker-live');
 });
 
+test('pickBootstrapSessionId restores last selected session before backend active session', () => {
+  const selected = pickBootstrapSessionId([
+    session({ id: 'backend-active', status: 'active', isActive: true, createdAt: 3 }),
+    session({ id: 'last-viewed', status: 'active', createdAt: 2 }),
+  ], 'backend-active', 'last-viewed');
+
+  assert.equal(selected, 'last-viewed');
+});
+
 test('pickBootstrapSessionId prefers active memory sessions before resumable persisted sessions', () => {
   const selected = pickBootstrapSessionId([
     session({ id: 'old-resumable', status: 'active', createdAt: 1 }),
@@ -189,4 +200,94 @@ test('pickBootstrapSessionId treats persisted active as resumable, not running',
   ]);
 
   assert.equal(selected, 'resumable');
+});
+
+test('pickBootstrapSessionId keeps running worker sessions ahead of last selected session', () => {
+  const selected = pickBootstrapSessionId([
+    session({ id: 'last-viewed', status: 'active', createdAt: 4 }),
+    session({
+      id: 'worker-live',
+      status: 'active',
+      createdAt: 2,
+      runtimeSnapshot: runtimeSnapshot({
+        sessionId: 'worker-live',
+        hasRunningWorkers: true,
+        runningWorkerCount: 1,
+        runningWorkers: [{ agentId: 'a1', name: 'Architect', roleType: 'architect', taskId: 'T-1', status: 'running' }],
+      }),
+    }),
+  ], null, 'last-viewed');
+
+  assert.equal(selected, 'worker-live');
+});
+
+test('pickBootstrapSessionId keeps busy runtime sessions ahead of last selected session', () => {
+  const selected = pickBootstrapSessionId([
+    session({ id: 'last-viewed', status: 'active', createdAt: 4 }),
+    session({
+      id: 'busy-live',
+      status: 'active',
+      createdAt: 2,
+      runtimeSnapshot: runtimeSnapshot({
+        sessionId: 'busy-live',
+        leader: {
+          running: true,
+          finished: false,
+          waitingForUser: false,
+          pendingReview: false,
+          planApproved: false,
+        },
+      }),
+    }),
+  ], null, 'last-viewed');
+
+  assert.equal(selected, 'busy-live');
+});
+
+test('pickBootstrapSessionId ignores missing or deleted last selected session', () => {
+  const deletedSelected = pickBootstrapSessionId([
+    session({ id: 'backend-active', status: 'active', createdAt: 2 }),
+    session({ id: 'deleted-last', status: 'deleted', createdAt: 3 }),
+  ], 'backend-active', 'deleted-last');
+  const missingSelected = pickBootstrapSessionId([
+    session({ id: 'resumable', status: 'active', createdAt: 2 }),
+  ], null, 'missing-last');
+
+  assert.equal(deletedSelected, 'backend-active');
+  assert.equal(missingSelected, 'resumable');
+});
+
+test('pickBootstrapSessionId restores terminal but non-deleted last selected session', () => {
+  const selected = pickBootstrapSessionId([
+    session({ id: 'resumable', status: 'active', createdAt: 5 }),
+    session({ id: 'completed-viewed', status: 'completed', createdAt: 1 }),
+  ], null, 'completed-viewed');
+
+  assert.equal(selected, 'completed-viewed');
+});
+
+test('last selected session storage helpers round-trip and clear values', () => {
+  const store = new Map<string, string>();
+  const previousLocalStorage = globalThis.localStorage;
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => { store.set(key, value); },
+      removeItem: (key: string) => { store.delete(key); },
+    },
+  });
+
+  try {
+    saveLastSelectedSessionId('s-123');
+    assert.equal(loadLastSelectedSessionId(), 's-123');
+
+    saveLastSelectedSessionId(null);
+    assert.equal(loadLastSelectedSessionId(), null);
+  } finally {
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: previousLocalStorage,
+    });
+  }
 });

@@ -198,6 +198,12 @@ function memoryTypeForExtractedEntry(scope: MemoryScope, category: string): Memo
   return category === 'norm' ? 'feedback' : 'project';
 }
 
+function userExplicitlyForbidsToolUse(content: MessageContent): boolean {
+  const text = contentToPlainText(content).toLowerCase();
+  if (!text.trim()) return false;
+  return /(?:\b(?:do\s*not|don't|dont|without|no)\s+(?:call|use|invoke|run)?\s*tools?\b|\bno\s+tool\s*(?:use|calls?)?\b|\bwithout\s+tools?\b|不要\s*(?:调用|使用)?\s*(?:任何)?\s*工具|不用\s*(?:任何)?\s*工具|别\s*(?:调用|使用)?\s*(?:任何)?\s*工具|禁止\s*(?:调用|使用)?\s*(?:任何)?\s*工具|禁用\s*工具)/iu.test(text);
+}
+
 /**
  * 会话管理器 - 完整复刻 Python 版本
  * 
@@ -1258,6 +1264,12 @@ export class SessionManager {
     await this.db.setSessionState(sessionId, SESSION_KEYS.PENDING_USER_INPUT, typeof enrichedMessage === 'string' ? enrichedMessage : enrichedMessage);
 
     const userMsgText = contentToPlainText(enrichedMessage);
+    if (userExplicitlyForbidsToolUse(enrichedMessage)) {
+      await this.db.setSessionState(sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_PENDING, 'true');
+    } else {
+      this.db.deleteSessionState(sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_PENDING);
+      this.db.deleteSessionState(sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID);
+    }
 
     if (isAskUserAnswer) {
       this.db.deleteSessionState(sessionId, SESSION_KEYS.PENDING_USER_GATE);
@@ -1997,7 +2009,11 @@ export class SessionManager {
     if (!session) {
       return { ok: false, message: `会话 ${sessionId} 未激活` };
     }
-    return session.leader.setModel(modelId);
+    const result = session.leader.setModel(modelId);
+    if (result.ok) {
+      this.scheduleSessionRuntimeStatePublish(sessionId, { source: 'leader_model_changed' });
+    }
+    return result;
   }
 
   /**

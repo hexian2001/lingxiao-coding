@@ -47,6 +47,10 @@ export interface LeaderInteractionSnapshot {
   executionReason: string;
   permissionSummary: string;
   pendingPermissionRequest: PermissionRequestPayload | null;
+  /** Current session-local leader model ID (falls back to global config). */
+  leaderModel?: string;
+  /** Current session-local agent/worker model ID (falls back to global config). */
+  agentModel?: string;
 }
 
 export interface RuntimeWorkerSummary {

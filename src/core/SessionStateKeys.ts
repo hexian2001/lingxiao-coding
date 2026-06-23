@@ -107,6 +107,10 @@ export const SESSION_KEYS = {
   CAPABILITY_INTENT_TURN_ID: 'capability_intent_turn_id',
   /** Current user turn id, incremented when Leader accepts a user message. */
   CURRENT_USER_TURN_ID: 'current_user_turn_id',
+  /** Pending flag set by runtime when the just-arrived user input explicitly forbids tool calls. */
+  TOOL_USE_SUPPRESSION_PENDING: 'tool_use_suppression_pending',
+  /** Current user turn id for which all Leader tool calls must be hidden/skipped. */
+  TOOL_USE_SUPPRESSION_TURN_ID: 'tool_use_suppression_turn_id',
   /** Latest structured autonomy gate decision trace for Web/TUI audit. */
   AUTONOMY_DECISION_TRACE: 'autonomy_decision_trace',
   /**

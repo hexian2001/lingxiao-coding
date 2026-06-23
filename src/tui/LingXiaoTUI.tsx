@@ -450,6 +450,7 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [leaderRuntimeActive, setLeaderRuntimeActive] = useState(false);
   const [leaderRuntimeQueueLength, setLeaderRuntimeQueueLength] = useState(0);
+  const [leaderRuntimeModel, setLeaderRuntimeModel] = useState<string | undefined>(undefined);
   const [mainQueuedCount, setMainQueuedCount] = useState(0);
   const leaderRuntimeActiveRef = useRef(false);
   const leaderRuntimeQueueLengthRef = useRef(0);
@@ -520,6 +521,7 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     leaderRuntimeActiveRef.current = false;
     setLeaderRuntimeQueueLength(0);
     leaderRuntimeQueueLengthRef.current = 0;
+    setLeaderRuntimeModel(undefined);
   }, []);
 
   // 主 tab 只显示真实上下文 token（context:runtime_updated / context:compressed）。
@@ -591,7 +593,7 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     maxWidth: Math.max(24, termSize.cols - 4),
     now,
   }), [sessionStatus, currentTab, tabOrder, channels, mainQueuedCount, taskSummaryText, currentAgentDiagnostic, currentAgentInteractiveState, termSize.cols, now, languageVersion]);
-  const modelName = config.llm.leader_model || config.llm.agent_model || 'default-model';
+  const modelName = leaderRuntimeModel || config.llm.leader_model || config.llm.agent_model || 'default-model';
   const statusView = useMemo(() => buildTuiStatusView({
     modelName,
     currentTab,
@@ -1363,6 +1365,7 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
       hasRunningWorkers,
       nextSessionStatus,
       nextLeaderStatus,
+      leaderModel: projectedLeaderModel,
     } = projection;
     const wasRuntimeActive = leaderRuntimeActiveRef.current;
     sessionStatusRef.current = nextSessionStatus;
@@ -1382,6 +1385,9 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     leaderRuntimeActiveRef.current = runtimeActive;
     setLeaderRuntimeQueueLength(queueLength);
     leaderRuntimeQueueLengthRef.current = queueLength;
+    if (projectedLeaderModel) {
+      setLeaderRuntimeModel(projectedLeaderModel);
+    }
     if (runtimeActive && !wasRuntimeActive) {
       tokenUsageHandlers.resetStreamingTokens();
     }

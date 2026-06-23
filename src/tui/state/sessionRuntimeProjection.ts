@@ -38,6 +38,10 @@ export interface TuiSessionRuntimeProjection {
   eternalRuntime?: EternalRuntimeSnapshot;
   nextSessionStatus: CommandSessionStatusData;
   nextLeaderStatus: string;
+  /** Session-local leader model from runtime state (undefined if not available). */
+  leaderModel?: string;
+  /** Session-local agent/worker model from runtime state (undefined if not available). */
+  agentModel?: string;
 }
 
 function asRuntimeRecord(value: unknown): RuntimeRecord | null {
@@ -132,6 +136,9 @@ export function buildTuiSessionRuntimeProjection(
           ? input.awaitingInputStatus
           : input.idleStatus ?? input.awaitingInputStatus;
 
+  const leaderModel = asString(leader.leaderModel);
+  const agentModel = asString(leader.agentModel);
+
   return {
     runtimeState,
     runtimeSessionId,
@@ -148,5 +155,7 @@ export function buildTuiSessionRuntimeProjection(
     eternalRuntime,
     nextSessionStatus,
     nextLeaderStatus,
+    leaderModel,
+    agentModel,
   };
 }

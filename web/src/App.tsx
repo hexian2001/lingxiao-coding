@@ -9,7 +9,7 @@ import { ToastProvider } from './components/ui/Toast';
 import UpdateNotification from './components/ui/UpdateNotification';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { useSessionStore } from './stores/sessionStore';
-import { pickBootstrapSessionId } from './utils/sessionListViewModel';
+import { loadLastSelectedSessionId, pickBootstrapSessionId } from './utils/sessionListViewModel';
 import InkBackground from './components/decor/InkBackground';
 import OnboardingWizard from './components/onboarding/OnboardingWizard';
 
@@ -45,7 +45,8 @@ function useSessionBootstrap() {
       store.createAndConnect().finally(() => { connectingRef.current = false; });
       return;
     }
-    const targetId = pickBootstrapSessionId(sessions, activeSessionId);
+    const lastSelectedSessionId = loadLastSelectedSessionId();
+    const targetId = pickBootstrapSessionId(sessions, activeSessionId, lastSelectedSessionId);
     if (targetId) {
       connectingRef.current = true;
       store.connectToSession(targetId).finally(() => { connectingRef.current = false; });

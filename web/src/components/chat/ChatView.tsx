@@ -913,6 +913,18 @@ export default function ChatView() {
   useEffect(() => {
     fetchModels();
   }, [fetchModels]);
+  // 从 runtime snapshot 同步 leader/agent 模型：当服务端 setModel 改变模型后，
+  // runtime state 会携带新的 leaderModel/agentModel，覆盖本地 localStorage 值。
+  useEffect(() => {
+    const snapLeaderModel = runtimeSnapshot?.leader?.leaderModel;
+    const snapAgentModel = runtimeSnapshot?.leader?.agentModel;
+    if (snapLeaderModel && snapLeaderModel !== leaderModel) {
+      setLeaderModel(snapLeaderModel);
+    }
+    if (snapAgentModel && snapAgentModel !== agentModel) {
+      setAgentModel(snapAgentModel);
+    }
+  }, [runtimeSnapshot?.leader?.leaderModel, runtimeSnapshot?.leader?.agentModel]);
 
   useEffect(() => {
     const handler = (event: Event) => {

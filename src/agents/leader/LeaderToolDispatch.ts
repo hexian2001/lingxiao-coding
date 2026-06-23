@@ -26,6 +26,7 @@ export interface LeaderToolDispatchOptions {
   setRawXmlRetryCount(value: number): void;
   setEmptyResponseRetryCount(value: number): void;
   isUserInterruptPending(): boolean;
+  isToolUseSuppressedForCurrentTurn?: () => boolean;
   getActiveTeam?: () => string | null;
   getCollaborationMode?: () => 'solo' | 'team';
   peekNextTaskIds?: (count: number) => string[];
@@ -278,8 +279,8 @@ export function createLeaderToolScheduler(
         }
       }
 
-      if (options.isUserInterruptPending()) {
-        leaderLogger.info('[UserInterrupt] 检测到用户中断信号，跳过剩余工具调用');
+      if (options.isUserInterruptPending() || options.isToolUseSuppressedForCurrentTurn?.()) {
+        leaderLogger.info('[UserInterrupt] 检测到用户中断信号或本轮禁用工具，跳过剩余工具调用');
         return { done: true };
       }
       // 记录本批将执行的 tool_calls（ask_user gate 可能已 splice 截断），

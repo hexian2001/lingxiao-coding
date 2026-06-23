@@ -393,6 +393,9 @@ export class LeaderToolsExecutor {
   }
 
   private recordCapabilityIntent(args: Record<string, unknown>): string {
+    if (this.leader.isUserInterruptPending() || this.leader.isToolUseSuppressedForCurrentTurn()) {
+      return 'ERROR: record_capability_intent 已被跳过：检测到更新的用户输入/本轮用户明确要求不要调用工具。请立即停止工具调用，直接回复最新用户消息。';
+    }
     const currentTurnId = this.readCurrentUserTurnId();
     const recordedTurnId = this.readRecordedCapabilityIntentTurnId();
     if (currentTurnId > 0 && recordedTurnId === currentTurnId) {

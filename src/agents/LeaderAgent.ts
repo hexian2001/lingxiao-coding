@@ -1016,6 +1016,7 @@ export class LeaderAgent {
       isWaitingForUser: () => this.waitingForUser,
       setWaitingForUser: (v) => { this.waitingForUser = v; },
       isUserInterruptPending: () => this.userInterruptPending,
+      isToolUseSuppressedForCurrentTurn: () => this.isToolUseSuppressedForCurrentTurn(),
       isPendingReview: () => this.pendingReview,
       setIsBusy: (v) => { this.isBusy = v; },
       getLastProgressAtMs: () => this.progressInvariant.lastProgressAtMs,
@@ -1332,7 +1333,18 @@ export class LeaderAgent {
   }
 
   protected getActiveToolDefinitions(): ToolDefinition[] {
+    if (this.isToolUseSuppressedForCurrentTurn()) {
+      return [];
+    }
     return this.executionController.getActiveToolDefinitions();
+  }
+
+  public isToolUseSuppressedForCurrentTurn(): boolean {
+    const suppressedRaw = this.db.getSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID);
+    const currentRaw = this.db.getSessionState(this.sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID);
+    const suppressedTurn = typeof suppressedRaw === 'number' ? suppressedRaw : typeof suppressedRaw === 'string' ? Number(suppressedRaw) : NaN;
+    const currentTurn = typeof currentRaw === 'number' ? currentRaw : typeof currentRaw === 'string' ? Number(currentRaw) : NaN;
+    return Number.isFinite(suppressedTurn) && suppressedTurn > 0 && Number.isFinite(currentTurn) && Math.trunc(suppressedTurn) === Math.trunc(currentTurn);
   }
 
   protected setExecutionRoute(decision: RouteDecision): void {
@@ -1349,6 +1361,12 @@ export class LeaderAgent {
     this.db.deleteSessionState(this.sessionId, SESSION_KEYS.CAPABILITY_INTENT_PROFILE);
     this.db.deleteSessionState(this.sessionId, SESSION_KEYS.CAPABILITY_INTENT_TURN_ID);
     this.db.deleteSessionState(this.sessionId, SESSION_KEYS.AUTONOMY_DECISION_TRACE);
+    if (this.db.getSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_PENDING) === 'true') {
+      this.db.setSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID, this.turnCount);
+      this.db.deleteSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_PENDING);
+    } else {
+      this.db.deleteSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID);
+    }
     return this.turnCount;
   }
 
@@ -3620,6 +3638,8 @@ export class LeaderAgent {
     for (const msg of pendingUser) {
       const content = (msg.payload as MessageContent) ?? '';
       if (isEmptyContent(content)) continue;
+      this.beginUserTurn();
+      this.setExecutionRoute(this.chooseExecutionRoute(null));
       this.addMessage({ role: 'user', content });
       try {
         await this.db.saveConversationMessage(this.sessionId, { role: 'user', content });
@@ -3848,6 +3868,8 @@ export class LeaderAgent {
       executionReason: this.executionReason,
       permissionSummary: summarizePermissionContextForDisplay(this.permManager.permissionContext),
       pendingPermissionRequest: this.permManager.pendingPermissionRequest,
+      leaderModel: this.model,
+      agentModel: this.pool?.getModel?.() ?? undefined,
     };
   }
 

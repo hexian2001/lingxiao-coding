@@ -42,6 +42,7 @@ import { useBlackboardStore } from './blackboardStore';
 import { useGitStore } from './gitStore';
 import { useGitActivityStore } from './gitActivityStore';
 import { useAgentActivityStore } from './agentActivityStore';
+import { loadLastSelectedSessionId, saveLastSelectedSessionId } from '../utils/sessionListViewModel';
 import {
   appendAgentTextSegment,
   appendAgentThinkingSegment,
@@ -524,6 +525,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       if (connectingSessionId !== sessionId) return;
       usePermissionStore.setState((s) => ({ pendingRequests: s.pendingRequests.filter((request) => request.sessionId === sessionId) }));
       set({ sessionId, activeSessionId: sessionId, ...emptySessionRuntimeState(), isConnected: false, isLoadingHistory: true });
+      saveLastSelectedSessionId(sessionId);
       // 连接到(可能不同的)会话:清空黑板图,避免上一会话的图残留(#4)
       useBlackboardStore.getState().reset();
       // 清空 Git 状态，避免旧 workspace 数据残留
@@ -643,6 +645,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       const res = await fetch(`/api/sessions/${encodeURIComponent(sessionId)}`, { method: 'DELETE', headers: { 'x-lingxiao-token': getServerToken() } });
       if (res.ok) {
         const { sessionId: currentId } = get();
+        if (loadLastSelectedSessionId() === sessionId) saveLastSelectedSessionId(null);
         if (currentId === sessionId) {
           connectAbortController?.abort(); connectAbortController = null; streamSaveTimers.clear(); clearPendingStreamBuffers();
           await acpClient.disconnect();

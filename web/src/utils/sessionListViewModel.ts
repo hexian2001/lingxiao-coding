@@ -6,6 +6,8 @@ import {
 } from '../stores/sessionStoreHelpers.ts';
 import type { SessionInfo, SessionRuntimeSnapshot } from '../stores/sessionStoreTypes.ts';
 
+const LAST_SELECTED_SESSION_KEY = 'lingxiao-last-selected-session-id';
+
 export type SessionBadgeTone = 'active' | 'warn' | 'danger' | 'ok' | 'neutral';
 
 export interface SessionBadgeViewModel {
@@ -17,6 +19,30 @@ export interface SessionBadgeViewModel {
 export interface SessionBadgeInput {
   currentSessionId?: string | null;
   runtimeSnapshot?: SessionRuntimeSnapshot | null;
+}
+
+export function loadLastSelectedSessionId(): string | null {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    const stored = localStorage.getItem(LAST_SELECTED_SESSION_KEY);
+    return stored && stored.trim() ? stored : null;
+  } catch (err) {
+    console.warn('[sessionListViewModel] Failed to load last selected session:', err);
+    return null;
+  }
+}
+
+export function saveLastSelectedSessionId(sessionId: string | null): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (sessionId && sessionId.trim()) {
+      localStorage.setItem(LAST_SELECTED_SESSION_KEY, sessionId);
+    } else {
+      localStorage.removeItem(LAST_SELECTED_SESSION_KEY);
+    }
+  } catch (err) {
+    console.warn('[sessionListViewModel] Failed to save last selected session:', err);
+  }
 }
 
 function isMatchingRuntimeSnapshot(sessionId: string, snapshot?: SessionRuntimeSnapshot | null): snapshot is SessionRuntimeSnapshot {
@@ -96,6 +122,7 @@ function latestSession(sessions: SessionInfo[]): SessionInfo | undefined {
 export function pickBootstrapSessionId(
   sessions: SessionInfo[],
   activeSessionId?: string | null,
+  lastSelectedSessionId?: string | null,
 ): string | null {
   const selectable = sessions.filter((session) => !isDeletedSession(session));
   const runningWorkerSession = latestSession(selectable.filter(sessionRuntimeHasWorkers));
@@ -103,6 +130,10 @@ export function pickBootstrapSessionId(
 
   const busyRuntimeSession = latestSession(selectable.filter(sessionRuntimeBusy));
   if (busyRuntimeSession) return busyRuntimeSession.id;
+
+  if (lastSelectedSessionId && selectable.some((session) => session.id === lastSelectedSessionId)) {
+    return lastSelectedSessionId;
+  }
 
   if (activeSessionId && selectable.some((session) => session.id === activeSessionId)) {
     return activeSessionId;

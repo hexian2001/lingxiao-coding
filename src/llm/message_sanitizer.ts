@@ -300,6 +300,10 @@ function ensureHasUserMessage(messages: ChatMessage[]): ChatMessage[] {
  */
 export function sanitizeMessageSequence(messages: ChatMessage[]): ChatMessage[] {
   if (!messages || messages.length === 0) return messages;
+
+  const beforeCount = messages.length;
+  const beforeRoles = countByRole(messages);
+
   const merged1 = mergeConsecutiveAssistantMessages(messages);
   const merged2 = mergeConsecutiveUserMessages(merged1);
   const coalesced = coalesceMiddleSystemMessages(merged2);
@@ -308,7 +312,35 @@ export function sanitizeMessageSequence(messages: ChatMessage[]): ChatMessage[] 
   const toolSequenced = sanitizeOpenAIToolMessageSequence(contentSanitized);
   // GLM/Qwen 等模型拒绝只有 system 消息、没有 user 消息的请求（返回 400）。
   // 兜底：如果序列中没有 user 消息，把最后一条非 tool 消息转为 user。
-  return ensureHasUserMessage(toolSequenced);
+  const final = ensureHasUserMessage(toolSequenced);
+
+  const afterCount = final.length;
+  const afterRoles = countByRole(final);
+
+  // 如果有变化，打印统计日志
+  if (afterCount !== beforeCount || JSON.stringify(beforeRoles) !== JSON.stringify(afterRoles)) {
+    console.log(`[MessageSanitizer] before=${beforeCount} after=${afterCount} beforeRoles=${JSON.stringify(beforeRoles)} afterRoles=${JSON.stringify(afterRoles)}`);
+
+    const mergedAssistants = beforeRoles.assistant - afterRoles.assistant;
+    const mergedUsers = beforeRoles.user - afterRoles.user;
+    const coalescedSystems = beforeRoles.system - afterRoles.system;
+    const removedTools = beforeRoles.tool - afterRoles.tool;
+
+    if (mergedAssistants > 0) console.log(`  mergedAssistants=${mergedAssistants}`);
+    if (mergedUsers > 0) console.log(`  mergedUsers=${mergedUsers}`);
+    if (coalescedSystems > 0) console.log(`  coalescedSystems=${coalescedSystems}`);
+    if (removedTools > 0) console.log(`  removedOrphanTools=${removedTools}`);
+  }
+
+  return final;
+}
+
+function countByRole(messages: ChatMessage[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const msg of messages) {
+    counts[msg.role] = (counts[msg.role] || 0) + 1;
+  }
+  return counts;
 }
 
 /**
