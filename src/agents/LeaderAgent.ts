@@ -487,8 +487,9 @@ export class LeaderAgent {
 
     if (binding.requireContract) {
       const graph = this.leaderBlackboard?.blackboardGraph;
-      const liveContract = graph?.getActiveContract(this.sessionId, binding.surface);
-      if (!liveContract) {
+      const contractEvidence = graph?.getContractEvidence(this.sessionId, binding.surface)
+        ?? graph?.getActiveContract(this.sessionId, binding.surface);
+      if (!contractEvidence) {
         reasons.push(`等待黑板契约就绪: ${tag}`);
       }
     }

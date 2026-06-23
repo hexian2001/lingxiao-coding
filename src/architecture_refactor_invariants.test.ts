@@ -132,6 +132,40 @@ test('BlackboardGraph.addContract template does not supersede authoritative cont
     assert.equal(persistedReal.supersededBy, undefined);
     assert.equal(persistedTemplate.supersededBy, undefined);
     assert.equal(graph.getActiveContract('s1', 'api-surface')?.id, real.id);
+    assert.equal(graph.getContractEvidence('s1', 'api-surface')?.id, real.id);
+  } finally {
+    db.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('BlackboardGraph.getContractEvidence accepts tagged and semantic fact contract evidence', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lx-blackboard-evidence-'));
+  const db = new DatabaseManager(join(dir, 'test.sqlite'));
+  try {
+    db.init();
+    const graph = new BlackboardGraph(new GraphStore(db.getDb()));
+
+    const tagged = graph.addFact({
+      sessionId: 's1',
+      title: 'API fact contract',
+      content: '字段、错误码、验收口径已确认',
+      tags: ['contract:fact-surface'],
+      createdBy: 'test',
+      confidence: 'confirmed',
+    });
+    assert.equal(graph.getActiveContract('s1', 'fact-surface'), null);
+    assert.equal(graph.getContractEvidence('s1', 'fact-surface')?.id, tagged.id);
+
+    const semantic = graph.addFact({
+      sessionId: 's1',
+      title: 'semantic-surface 契约',
+      content: 'Contract fields and status flow are ready for semantic-surface.',
+      tags: [],
+      createdBy: 'test',
+      confidence: 'confirmed',
+    });
+    assert.equal(graph.getContractEvidence('s1', 'semantic-surface')?.id, semantic.id);
   } finally {
     db.close();
     rmSync(dir, { recursive: true, force: true });

@@ -80,6 +80,24 @@ function truncateNodeContent(content: string, maxChars: number): string {
   return content.slice(0, Math.max(0, maxChars - marker.length)) + marker;
 }
 
+function normalizeContractSurface(surface: string): string {
+  return surface.startsWith('contract:') ? surface.slice('contract:'.length) : surface;
+}
+
+function contractTagForSurface(surface: string): string {
+  return `contract:${normalizeContractSurface(surface)}`;
+}
+
+function isContractEvidenceKind(kind: NodeKind): boolean {
+  return kind === 'design_doc' || kind === 'fact';
+}
+
+function containsContractSemanticEvidence(node: GraphNode, surface: string): boolean {
+  const normalizedSurface = normalizeContractSurface(surface).toLowerCase();
+  const haystack = `${node.title}\n${node.content}`.toLowerCase();
+  return haystack.includes(normalizedSurface) && /contract|契约/.test(haystack);
+}
+
 // ═══════════════════════════════════════════════════════════════
 // BlackboardGraph
 // ═══════════════════════════════════════════════════════════════
@@ -291,13 +309,36 @@ export class BlackboardGraph {
   }
 
   getActiveContract(sessionId: string, surface: string): GraphNode | null {
-    const tag = surface.startsWith('contract:') ? surface : `contract:${surface}`;
+    const tag = contractTagForSurface(surface);
     const live = this.store.getNodesByTag(sessionId, tag)
       .filter(node => node.kind === 'contract' && !node.supersededBy);
     return live.reduce<GraphNode | null>((best, node) => {
       if (!best || shouldPreferContractNode(node, best)) return node;
       return best;
     }, null);
+  }
+
+  /**
+   * 返回可解除 contract gate 的黑板证据。
+   *
+   * 正式 contract 节点优先；同时兼容 Leader/Worker 通过 blackboard(write_fact)
+   * 记录的契约事实，避免只有 kind='contract' 才能解锁实现任务。
+   */
+  getContractEvidence(sessionId: string, surface: string): GraphNode | null {
+    const activeContract = this.getActiveContract(sessionId, surface);
+    if (activeContract) return activeContract;
+
+    const tag = contractTagForSurface(surface);
+    const taggedEvidence = this.store.getNodesByTag(sessionId, tag)
+      .filter(node => isContractEvidenceKind(node.kind) && !node.supersededBy)
+      .sort((a, b) => b.createdAt - a.createdAt);
+    if (taggedEvidence[0]) return taggedEvidence[0];
+
+    const semanticEvidence = this.store.getNodesBySession(sessionId)
+      .filter(node => isContractEvidenceKind(node.kind) && !node.supersededBy)
+      .filter(node => containsContractSemanticEvidence(node, surface))
+      .sort((a, b) => b.createdAt - a.createdAt);
+    return semanticEvidence[0] ?? null;
   }
 
   setOrigin(sessionId: string, content: string, title = 'Origin'): GraphNode {
