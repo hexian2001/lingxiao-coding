@@ -114,9 +114,27 @@ export class LeaderExecutionController {
 
   getActiveToolDefinitions(): ToolDefinition[] {
     const directDefinitions = this.directToolsExecutor.getDefinitions();
-    const metaTools = this.shouldExposeRecordCapabilityIntentTool()
-      ? LEADER_META_TOOLS
-      : LEADER_META_TOOLS.filter((tool) => tool.function.name !== 'record_capability_intent');
+
+    // 工具抑制检查：当用户明确禁止工具调用时，隐藏所有元工具
+    // 但 record_capability_intent 豁免：它是元认知工具，用于理解用户意图，
+    // 即使用户说"不要调用工具"也需要先识别意图才能理解真实需求。
+    const toolUseSuppressed = this.db.getSessionState(this.sessionId, SESSION_KEYS.TOOL_USE_SUPPRESSION_TURN_ID);
+    const currentTurnId = this.db.getSessionState(this.sessionId, SESSION_KEYS.CURRENT_USER_TURN_ID);
+    const isToolUseSuppressed =
+      typeof toolUseSuppressed === 'number' && typeof currentTurnId === 'number' &&
+      toolUseSuppressed > 0 && toolUseSuppressed === currentTurnId;
+
+    let metaTools: ToolDefinition[];
+    if (isToolUseSuppressed) {
+      // 工具抑制时：只保留 record_capability_intent（元认知层豁免）
+      metaTools = LEADER_META_TOOLS.filter((tool) => tool.function.name === 'record_capability_intent');
+    } else {
+      // 正常情况：按轮次判断是否暴露 record_capability_intent
+      metaTools = this.shouldExposeRecordCapabilityIntentTool()
+        ? LEADER_META_TOOLS
+        : LEADER_META_TOOLS.filter((tool) => tool.function.name !== 'record_capability_intent');
+    }
+
     const modes = resolveModeRuntimeProjection({
       sessionId: this.sessionId,
       db: this.db,
