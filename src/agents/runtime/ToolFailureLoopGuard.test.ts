@@ -24,6 +24,7 @@ describe('ToolFailureLoopGuard', () => {
     assert.equal(classifyToolFailure('SANDBOX_BLOCKED', '沙盒拦截'), 'sandbox');
     assert.equal(classifyToolFailure('NETWORK_FORBIDDEN', '网络禁止'), 'network');
     assert.equal(classifyToolFailure('TOOL_ARGUMENT_VALIDATION_FAILED', '参数错'), 'schema');
+    assert.equal(classifyToolFailure('FILE_MUST_BE_READ_FIRST', '需要先 file_read'), 'precondition');
     assert.equal(classifyToolFailure('TOOL_TIMEOUT', '超时'), 'timeout');
     assert.equal(classifyToolFailure('UNKNOWN_CODE', '任意错误'), 'other');
   });
@@ -32,6 +33,7 @@ describe('ToolFailureLoopGuard', () => {
     assert.equal(STATE_ERROR_KINDS.has('permission'), true);
     assert.equal(STATE_ERROR_KINDS.has('mode'), true);
     assert.equal(STATE_ERROR_KINDS.has('execution'), false);
+    assert.equal(STATE_ERROR_KINDS.has('precondition'), false);
     assert.equal(STATE_ERROR_KINDS.has('other'), false);
   });
 
@@ -83,6 +85,30 @@ describe('ToolFailureLoopGuard', () => {
     assert.equal(d3.count, 1);
     assert.equal(d3.tripped, false);
     assert.equal(d3.errorKind, 'timeout');
+  });
+
+  it('does not trip guided precondition failures such as FILE_MUST_BE_READ_FIRST', () => {
+    const guard = new ToolFailureLoopGuard({ threshold: 3 });
+    const base = {
+      sessionId: 's1',
+      agentId: 'a1',
+      agentName: 'A1',
+      toolName: 'structured_patch',
+      args: { path: 'src/example.ts', hunks: [{ search: 'a', replace: 'b' }], dry_run: false },
+      errorCode: 'FILE_MUST_BE_READ_FIRST',
+      errorMessage: '编辑前必须 file_read。LLM_RECOVERY={"next_tool":{"name":"file_read"}}',
+    };
+
+    let last = guard.record(base);
+    last = guard.record(base);
+    last = guard.record(base);
+    last = guard.record(base);
+
+    assert.equal(last.errorKind, 'precondition');
+    assert.equal(last.count, 4);
+    assert.equal(last.tripped, false, '前置条件错误应保留原始 next_tool 指引，不应被熔断替换');
+    assert.equal(last.requiresEscalation, false);
+    assert.equal(guard.countTripped('s1'), 0);
   });
 
   it('emits agent:tool_failure_loop event on trip', () => {

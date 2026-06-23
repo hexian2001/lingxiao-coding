@@ -44,6 +44,7 @@ export type ToolFailureErrorKind =
   | 'sandbox'
   | 'network'
   | 'schema'
+  | 'precondition'
   | 'execution'
   | 'timeout'
   | 'aborted'
@@ -59,6 +60,7 @@ const ERROR_KIND_PATTERNS: Array<{ kind: ToolFailureErrorKind; pattern: RegExp }
   { kind: 'write_scope', pattern: /WRITE_SCOPE_FORBIDDEN|WRITE_OUT_OF_SCOPE|SCOPE_FORBIDDEN|write_scope/i },
   { kind: 'sandbox', pattern: /SANDBOX_FORBIDDEN|SANDBOX_BLOCKED|sandbox/i },
   { kind: 'network', pattern: /NETWORK_FORBIDDEN|NETWORK_BLOCKED|NETWORK_UNREACHABLE|network/i },
+  { kind: 'precondition', pattern: /FILE_MUST_BE_READ_FIRST|READ_FIRST|file_must_read_first/i },
   { kind: 'schema', pattern: /TOOL_ARGUMENT_PARSE_FAILED|TOOL_ARGUMENT_VALIDATION_FAILED|TOOL_NOT_FOUND|SCHEMA_INVALID|argument_validation/i },
   { kind: 'timeout', pattern: /TOOL_TIMEOUT|TIMEOUT/i },
   { kind: 'aborted', pattern: /TOOL_ABORTED|ABORTED|AbortError/i },
@@ -67,7 +69,7 @@ const ERROR_KIND_PATTERNS: Array<{ kind: ToolFailureErrorKind; pattern: RegExp }
 /**
  * 哪些 errorKind 属于"状态类错误"（继续重试无意义，必须升级）。
  * 状态类错误到达阈值时，强制 trip 并由 BaseAgentRuntime 走 escalate 路径。
- * execution/timeout/aborted/other 不强制升级（可能因临时抖动重试有效）。
+ * precondition/execution/timeout/aborted/other 不强制升级（可能可按工具提示修复或因临时抖动重试有效）。
  */
 export const STATE_ERROR_KINDS: ReadonlySet<ToolFailureErrorKind> = new Set([
   'permission',
@@ -76,6 +78,15 @@ export const STATE_ERROR_KINDS: ReadonlySet<ToolFailureErrorKind> = new Set([
   'sandbox',
   'network',
   'schema',
+]);
+
+/**
+ * 带明确 next_tool/fix 的前置条件错误不应触发 TOOL_FAILURE_LOOP_TRIPPED。
+ * 例如 structured_patch 的 FILE_MUST_BE_READ_FIRST：正确下一步是先 file_read，
+ * 若熔断器把它替换成不可恢复错误，LLM 反而看不到原始修复指引。
+ */
+const NON_TRIPPING_ERROR_KINDS: ReadonlySet<ToolFailureErrorKind> = new Set([
+  'precondition',
 ]);
 
 export interface ToolFailureLoopGuardOptions {
@@ -293,7 +304,8 @@ export class ToolFailureLoopGuard {
     record.lastSeenAtMs = now;
     record.lastErrorMessage = input.errorMessage || record.lastErrorMessage;
 
-    const tripped = record.count >= this.threshold;
+    const canTrip = !NON_TRIPPING_ERROR_KINDS.has(errorKind);
+    const tripped = canTrip && record.count >= this.threshold;
     if (tripped) {
       record.tripped = true;
       record.trippedAtMs = now;
