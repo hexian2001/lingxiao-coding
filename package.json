@@ -66,7 +66,7 @@
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.0.0",
     "@types/pdfkit": "^0.17.6",
     "@types/react": "^19.2.14",
     "electron": "^42.4.1",
