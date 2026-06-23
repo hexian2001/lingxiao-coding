@@ -2847,14 +2847,20 @@ export class LeaderAgent {
       // Eternal silence lock 必须在处理用户消息前主动解锁，
       // 否则刚收到的用户输入会被 fingerprint 锁挡掉一轮 patrol。
       this.progressInvariant.invalidateEternalSilenceLock?.('user_message');
-      const msg = this.userMessageQueue.shift()!;
-      // 通知 TUI 队列长度更新
-      if (this.userMessageQueue.length > 0) {
-        this.emitter.emit('leader:message_dequeued', {
-          sessionId: this.sessionId,
-          queueLength: this.userMessageQueue.length,
-        });
+
+      // ★ 修复：一次性处理队列中的所有用户消息，避免用户连发N条要分N轮处理
+      const allUserMessages: typeof this.userMessageQueue = [];
+      while (this.userMessageQueue.length > 0) {
+        allUserMessages.push(this.userMessageQueue.shift()!);
       }
+
+      // 通知 TUI 队列已清空
+      this.emitter.emit('leader:message_dequeued', {
+        sessionId: this.sessionId,
+        queueLength: 0,
+      });
+
+      const msg = allUserMessages[0];
       const content = contentToPlainText(msg.payload as MessageContent);
 
       if (this.waitingForUser) {
@@ -2875,6 +2881,16 @@ export class LeaderAgent {
           role: 'user',
           content: msgContentInner,
         });
+
+        // ★ 修复：追加队列中剩余的所有用户消息（索引1到末尾），让 LLM 一次性看到全部输入
+        for (let i = 1; i < allUserMessages.length; i++) {
+          const extraMsg = allUserMessages[i];
+          const extraContent = (extraMsg.payload as MessageContent) ?? '';
+          if (isEmptyContent(extraContent)) continue;
+          this.addMessage({ role: 'user', content: extraContent });
+          await this.db.saveConversationMessage(this.sessionId, { role: 'user', content: extraContent });
+          leaderLogger.info(`追加用户消息 ${i + 1}/${allUserMessages.length}: ${contentToPlainText(extraContent).substring(0, 50)}...`);
+        }
         try {
           if (!this.fileChangesApi) {
             const { FileChangesApi } = await import('../web-server/FileChangesApi.js');
@@ -2929,6 +2945,16 @@ export class LeaderAgent {
       }
       this.addMessage({ role: 'user', content: msgContent });
       await this.db.saveConversationMessage(this.sessionId, { role: 'user', content: msgContent });
+
+      // ★ 修复：追加队列中剩余的所有用户消息（索引1到末尾），让 LLM 一次性看到全部输入
+      for (let i = 1; i < allUserMessages.length; i++) {
+        const extraMsg = allUserMessages[i];
+        const extraContent = (extraMsg.payload as MessageContent) ?? '';
+        if (isEmptyContent(extraContent)) continue;
+        this.addMessage({ role: 'user', content: extraContent });
+        await this.db.saveConversationMessage(this.sessionId, { role: 'user', content: extraContent });
+        leaderLogger.info(`追加用户消息 ${i + 1}/${allUserMessages.length}: ${contentToPlainText(extraContent).substring(0, 50)}...`);
+      }
       try {
         if (!this.fileChangesApi) {
           const { FileChangesApi } = await import('../web-server/FileChangesApi.js');
@@ -2961,19 +2987,23 @@ export class LeaderAgent {
 
     // 2. 检查评审状态
     if (this.pendingReview && !hasCompletionToProcess) {
-      // 从队列取一条评审消息
-      const reviewMsg = this.userMessageQueue.shift();
-      if (!reviewMsg) {
+      // ★ 修复：一次性处理队列中的所有评审消息
+      const allReviewMessages: typeof this.userMessageQueue = [];
+      while (this.userMessageQueue.length > 0) {
+        allReviewMessages.push(this.userMessageQueue.shift()!);
+      }
+
+      if (allReviewMessages.length === 0) {
         return 'continue';
       }
-      // 通知 TUI 队列长度更新
-      if (this.userMessageQueue.length > 0) {
-        this.emitter.emit('leader:message_dequeued', {
-          sessionId: this.sessionId,
-          queueLength: this.userMessageQueue.length,
-        });
-      }
-      const reviewMsgsForLoop = [reviewMsg];
+
+      // 通知 TUI 队列已清空
+      this.emitter.emit('leader:message_dequeued', {
+        sessionId: this.sessionId,
+        queueLength: 0,
+      });
+
+      const reviewMsgsForLoop = allReviewMessages;
       for (const msg of reviewMsgsForLoop) {
         const content = contentToPlainText(msg.payload as MessageContent);
         const normalized = content.trim().toLowerCase();
