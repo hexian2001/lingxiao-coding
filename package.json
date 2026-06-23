@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/pdfkit": "^0.17.6",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "electron": "^42.4.1",
     "electron-builder": "^26.15.3",
     "nodemon": "^3.1.14",
@@ -127,7 +127,7 @@
     "playwright": "^1.59.1",
     "pptxgenjs": "^4.0.1",
     "proxy-agent": "^8.0.1",
-    "react": "^19.2.4",
+    "react": "^19.2.7",
     "react-virtuoso": "^4.18.7",
     "sharp": "^0.34.5",
     "simple-git": "^3.36.0",
