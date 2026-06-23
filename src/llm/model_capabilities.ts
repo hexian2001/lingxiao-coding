@@ -5,7 +5,7 @@
  * 支持动态匹配模型、配置参数、响应字段映射
  */
 
-import { getConfigValue } from '../config.js';
+import { getConfigValue, isLlmConfigUserSet } from '../config.js';
 import {
   type ModelCapabilityConfig,
   type ModelCapabilitiesMap,
@@ -328,8 +328,21 @@ export class ModelCapabilities {
       if (effort === 'adaptive') {
         return { [paramName]: { type: 'adaptive' } };
       }
-      const explicitBudget = getConfigValue('llm.thinking_budget_tokens');
-      const budget = typeof explicitBudget === 'number' ? explicitBudget : (EFFORT_TO_BUDGET[effort] ?? 32_000);
+      // 2026-06-23 修复「强度未传递」：anthropic thinking 的预算必须由 effort 驱动，
+      // 否则用户配置的 reasoning_effort（如 xhigh/max/medium）对 Anthropic 完全失效——
+      // 旧实现只要 llm.thinking_budget_tokens（schema 默认 32000）存在就直接采用，
+      // 把 effort 旁路掉，导致强度档位被静默丢弃，且与 JSON 驱动路径行为不一致。
+      // 现在与 JSON 驱动路径（见上文 getThinkingParams anthropic 分支）对齐：
+      //   base = EFFORT_TO_BUDGET[effort]
+      //   仅当用户在 settings.json/env 显式设定了 thinking_budget_tokens 时，
+      //   才用该精确预算覆盖 effort 估算（提供「我要精确控制预算」的逃生口）。
+      const effortBudget = EFFORT_TO_BUDGET[effort] ?? 32_000;
+      const explicitBudget = isLlmConfigUserSet('llm.thinking_budget_tokens')
+        ? getConfigValue('llm.thinking_budget_tokens')
+        : undefined;
+      const budget = typeof explicitBudget === 'number' && explicitBudget >= 0
+        ? explicitBudget
+        : effortBudget;
       if (budget <= 0) {
         return { [paramName]: { type: 'disabled' } };
       }

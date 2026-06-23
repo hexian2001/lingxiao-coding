@@ -1485,6 +1485,47 @@ export function generateDefaultSettings(): void {
 
 export const config = loadSettings();
 
+/**
+ * 原始（未填 schema 默认值）的 llm 配置快照。
+ * 用于区分「用户显式设定」与「schema 默认值」——例如 thinking_budget_tokens
+ * 的 schema 默认 32000 不应覆盖用户配置的 reasoning_effort 强度档位。
+ * 仅记录 settings.json + env 覆盖后真实出现的键。
+ */
+const rawLlmConfig: Record<string, unknown> = (() => {
+  try {
+    let raw: Record<string, unknown> = {};
+    if (existsSync(SETTINGS_FILE)) {
+      raw = JSON.parse(readFileSync(SETTINGS_FILE, 'utf-8'));
+    }
+    for (const group of ['llm']) {
+      if (!raw[group]) raw[group] = {};
+    }
+    raw = applyEnvOverrides(raw);
+    const llm = raw.llm;
+    return (llm && typeof llm === 'object' && !Array.isArray(llm))
+      ? llm as Record<string, unknown>
+      : {};
+  } catch {
+    return {};
+  }
+})();
+
+/**
+ * 判断某个 llm.* 配置键是否被用户显式设定（settings.json 或环境变量），
+ * 而非来自 ConfigSchema 的默认值。用于让用户配置优先生效、避免 schema
+ * 默认值静默覆盖更高优先级的语义（如 reasoning_effort 强度档位）。
+ */
+export function isLlmConfigUserSet(path: string): boolean {
+  const keys = path.split('.').filter(Boolean);
+  if (keys[0] === 'llm') keys.shift();
+  let current: unknown = rawLlmConfig;
+  for (const key of keys) {
+    if (current === null || current === undefined || typeof current !== 'object') return false;
+    current = (current as Record<string, unknown>)[key];
+  }
+  return current !== undefined;
+}
+
 export function refreshRuntimeConfig(): Config {
   const latest = loadSettings();
   // 深拷贝避免嵌套对象引用不一致

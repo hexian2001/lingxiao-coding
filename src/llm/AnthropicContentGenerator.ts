@@ -619,14 +619,27 @@ export class AnthropicContentGenerator implements ContentGenerator {
     const thinking = requestBody.thinking as Record<string, unknown> | undefined;
     if (!thinking || thinking.type !== 'enabled') return;
 
-    const maxTokens = typeof requestBody.max_tokens === 'number'
+    // 2026-06-23 修复「思考预算被压扁」：旧实现只用本次请求的 max_tokens（默认上限仅
+    // 16384，见 CAPPED_MAX_TOKENS）来夹预算，导致高强度档位（xhigh=48000 / max=64000）
+    // 即便正确生成也会被 clamp 回 ~12k，等于变相关闭深度思考。
+    // 现在以「模型真实输出上限」作为 budget 的硬天花板，再以「本次请求 max_tokens」
+    // 保证可见输出有预留空间，两者取较宽松但仍安全的上界。
+    const requestMaxTokens = typeof requestBody.max_tokens === 'number'
       ? requestBody.max_tokens
-      : getModelOutputLimit(String(requestBody.model || ''));
+      : 0;
+    const modelOutputLimit = getModelOutputLimit(String(requestBody.model || ''));
     const currentBudget = typeof thinking.budget_tokens === 'number' ? thinking.budget_tokens : 0;
-    // 预留可见输出下限：max(1024, 25% of maxTokens)。旧的固定 `maxTokens - 1024` 在小 max_tokens
-    // （如 16384）下会把思考预算顶到几乎整个窗口，只剩 ~1024 给可见回答，输出被截断。
-    const outputReserve = Math.max(1_024, Math.floor(maxTokens * 0.25));
-    const maxBudget = Math.max(1_024, maxTokens - outputReserve);
+
+    // budget 不得超模型输出上限；同时给可见输出预留 max(1024, 25% 请求 max_tokens)。
+    // 当请求 max_tokens 较小（如 16384）时，仍允许 budget 上探到模型输出上限附近，
+    // 由 provider 侧自行约束（Anthropic 要求 budget_tokens < max_tokens，下面统一收敛）。
+    const reserveFromRequest = Math.max(1_024, Math.floor(requestMaxTokens * 0.25));
+    const maxBudgetFromRequest = requestMaxTokens > 0
+      ? Math.max(1_024, requestMaxTokens - reserveFromRequest)
+      : modelOutputLimit;
+    // Anthropic API 硬约束：budget_tokens 必须 < max_tokens。最终 budget 取
+    // min(用户/effort 预算, 请求级上限, 模型输出上限 - 1)，并兜底 ≥1024。
+    const maxBudget = Math.max(1_024, Math.min(maxBudgetFromRequest, modelOutputLimit - 1));
     if (!currentBudget || currentBudget > maxBudget) {
       requestBody.thinking = { ...thinking, budget_tokens: maxBudget };
     }
