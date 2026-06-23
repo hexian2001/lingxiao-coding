@@ -95,7 +95,7 @@
     "@fastify/websocket": "^11.2.0",
     "@langfuse/client": "^5.5.3",
     "@langfuse/otel": "^5.5.3",
-    "@langfuse/tracing": "^5.5.3",
+    "@langfuse/tracing": "^5.6.0",
     "@lydell/node-pty": "1.2.0-beta.10",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@nodesecure/js-x-ray": "^11.1.0",
