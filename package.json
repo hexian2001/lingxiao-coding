@@ -136,7 +136,7 @@
     "strip-ansi": "^7.2.0",
     "tesseract.js": "^7.0.0",
     "undici": "^8.0.2",
-    "unzipper": "^0.12.3",
+    "unzipper": "^0.12.5",
     "wrap-ansi": "^10.0.0",
     "yaml": "^2.9.0",
     "zod": "^4.3.6"
