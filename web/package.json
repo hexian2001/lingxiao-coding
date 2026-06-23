@@ -17,7 +17,7 @@
     "cmdk": "^1.0.0",
     "dompurify": "^3.4.2",
     "i18next": "^24.0.0",
-    "lucide-react": "^0.470.0",
+    "lucide-react": "^1.21.0",
     "mermaid": "^11.14.0",
     "pixi.js": "^8.19.0",
     "react": "^19.0.0",
