@@ -338,13 +338,10 @@ export class DispatchDecisionCoordinator {
         leaderLogger.warn(`[Scheduler] role ${task.agent_type} not found for ${task.id}`);
         return false;
       }
-      // 蓝图覆盖 gate:有未覆盖 implement 子系统时,拒绝 dispatch。
-      // 把 prompt 里"缺口拦截派发"的承诺变成机器 gate(不破坏 Leader dispatch 决策权:
-      // 这不是替 Leader 决定派哪个,而是强制"缺口未补齐不许开工")。
+      // v1.0.4: blueprint coverage gate 已降级——不再拦截派发，仅记录警告
       const blueprintReject = checkBlueprintCoverageGate(task, deps);
       if (blueprintReject) {
-        leaderLogger.warn(`[Scheduler] dispatch ${task.id} rejected: ${blueprintReject}`);
-        return false;
+        leaderLogger.warn(`[Scheduler] blueprint gap for ${task.id}: ${blueprintReject} (not blocking)`);
       }
       const agentName = opts?.agentName || task.preferred_agent_name || `worker-${task.id.toLowerCase()}`;
       const modes = resolveModeRuntimeProjection({

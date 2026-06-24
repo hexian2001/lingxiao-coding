@@ -158,29 +158,9 @@ export class TaskBoard {
     };
   }
 
-  private getContractReadiness(task: Task): TaskContractReadiness {
-    const binding = task.orchestration?.contractBinding;
-    if (!binding || (!binding.requireContract && !binding.requireAck)) {
-      return { ready: true };
-    }
-    if (!this.contractReadinessResolver) {
-      return {
-        ready: false,
-        reasons: [`等待契约状态解析器就绪: ${binding.tag || binding.surface}`],
-      };
-    }
-    try {
-      const result = this.contractReadinessResolver(task);
-      if (!result || typeof result.ready !== 'boolean') {
-        return { ready: false, reasons: [`契约状态解析结果无效: ${binding.tag || binding.surface}`] };
-      }
-      return result;
-    } catch (error) {
-      return {
-        ready: false,
-        reasons: [`契约状态解析失败: ${error instanceof Error ? error.message : String(error)}`],
-      };
-    }
+  private getContractReadiness(_task: Task): TaskContractReadiness {
+    // v1.0.4: contract gate 降级为无操作，不再阻塞派发
+    return { ready: true };
   }
 
   private persistTask(task: Task): void {

@@ -337,8 +337,36 @@ export const LEADER_META_TOOLS: ToolDefinition[] = [
   {
     type: 'function',
     function: {
+      name: 'spawn_worker',
+      description: '一步到位派发临时 worker：创建任务 + 派发 + 等待完成，结果异步回流。适用于需要隔离上下文执行的子任务，替代 create_task + dispatch_agent 两步操作。Worker 完成后结果自动回流到 Leader 上下文。',
+      parameters: {
+        type: 'object',
+        properties: {
+          goal: {
+            type: 'string',
+            description: '任务目标：具体写清要做什么、验收标准。',
+          },
+          scope: {
+            type: 'string',
+            description: '可选。工作范围（目录/模块），限定 worker 的写入范围。',
+          },
+          role: {
+            type: 'string',
+            description: '可选。Worker 角色类型，默认 fullstack。',
+          },
+          context: {
+            type: 'string',
+            description: '可选。背景知识包，给 worker 的额外上下文。',
+          },
+        },
+        required: ['goal'],
+      },
+    },
+  },  {
+    type: 'function',
+    function: {
       name: 'create_task',
-      description: '任务创建原语：创建单个 OrchestrationNode，派发由 dispatch_agent 执行。DAG 依赖用 blocked_by，验收语义用 contract/evaluation_policy。新建角色附带 role_definition 一步完成。多任务并行须 write_scope 两两正交。参数优先级和分组见各参数 description。',
+      description: '创建任务并加入任务板。派发由 dispatch_agent 执行。DAG 依赖用 blocked_by。多任务并行须 write_scope 两两正交。新建角色附带 role_definition 一步完成。',
       parameters: {
         type: 'object',
         properties: {
@@ -379,63 +407,14 @@ export const LEADER_META_TOOLS: ToolDefinition[] = [
             type: 'string',
             description: '可选。该任务默认工作的目录，必须位于当前 workspace 内。',
           },
-          worktree_policy: {
-            type: 'string',
-            enum: ['none', 'session', 'task', 'auto'],
-            description: '可选。任务工作树隔离策略：none=沿用当前 workspace；session=使用当前会话目录；task=为该任务创建独立 git worktree，并将 working_directory/write_scope 映射到该 worktree；auto=对实现/修复/重构类任务自动使用 task，对调研/验收类保持 none。',
-          },
           write_scope: {
             type: 'array',
             items: { type: 'string' },
             description: '可选。该任务允许写入的目录或文件根路径列表，必须位于当前 workspace 内。',
           },
-          contract: {
-            ...CONTRACT_SCHEMA,
-            description: `${CONTRACT_SCHEMA.description} 提供后任务将作为统一编排节点参与 evaluation/verdict/repair 流程，并写入 contract:<surface> 黑板节点。`,
-          },
-          contract_surface: {
-            type: 'string',
-            description: '可选。跨栈接口/数据契约的稳定 surface，如 "POST /api/login" 或 "chat.message.api"。实现类任务指定后会等待黑板 contract:<surface> 就绪再可派发；node_kind="contract"/architect 任务默认产出该契约而不被它阻塞。',
-          },
-          contract_version: {
-            type: 'integer',
-            minimum: 1,
-            description: '可选。期望契约正整数版本；用于生成 request_id <surface>@v<N> 与 worker 上下文提示。',
-          },
-          contract_request_id: {
-            type: 'string',
-            description: '可选。契约协作 request/ack 的闭环 ID；省略时按 <contract_surface>@v<contract_version|1> 生成。',
-          },
-          require_contract: {
-            type: 'boolean',
-            description: '可选。是否把 contract_surface 作为派发前硬 gate；仅实现/修复类 contract consumer 默认 true，architect/node_kind=contract 与 evaluate/generic 默认 false。evaluation_policy 不会隐式生成 contract_surface。',
-          },
-          require_ack: {
-            type: 'boolean',
-            description: '可选。是否要求 contract_request_id 的 team request 已闭环后才可派发；默认 false，适合实现后确认类 ack；需要开工前确认时设为 true。',
-          },
-          evaluation_policy: EVALUATION_POLICY_SCHEMA,
-          node_kind: {
-            type: 'string',
-            enum: ['plan', 'contract', 'implement', 'evaluate', 'repair', 'reset', 'generic'],
-            description: '可选。统一编排节点类型；默认 generic。',
-          },
-          orchestration_run_id: {
-            type: 'string',
-            description: '可选。指定所属 OrchestrationRun；省略时系统会按当前 session 自动生成。',
-          },
-          generation: {
-            type: 'integer',
-            minimum: 0,
-            description: '可选。编排 generation，非负整数，用于 reset/repair 后拒绝 stale terminal event。',
-          },
           preferred_agent_name: {
             type: 'string',
-              description: '可选。未来 dispatch_agent 的 agent_name 约束/提示，不会自动派发。Team 模式下应来自当前 roster；Solo 模式下可作为 ephemeral worker 名字提示。Leader 仍必须显式调用 dispatch_agent，且 agent_name 需与它一致。',
-          },
-          subsystem: {
-            type: 'string',
-            description: '可选。声明该任务实现的项目蓝图子系统(需先 define_project_blueprint)。值为当前项目蓝图中的 subsystem id(由你在 define_project_blueprint 自定义)。系统据此登记到蓝图对应子系统;dispatch 前会校验所有 implement 子系统都有任务覆盖,缺口拦截派发。仅 Team 模式下会话已定义项目蓝图时有效；Solo 模式下忽略此参数。',
+            description: '可选。未来 dispatch_agent 的 agent_name 提示。',
           },
         },
         required: ['subject', 'description'],
@@ -446,7 +425,7 @@ export const LEADER_META_TOOLS: ToolDefinition[] = [
     type: 'function',
     function: {
       name: 'define_project_blueprint',
-      description: '定义项目蓝图:由你自主列出本项目应包含的全部子系统清单(id/名称/范围/角色/状态/依赖),把"做一个完整项目"展开成你规划的模块矩阵。项目级任务(完整产品/系统/前后端应用)开工前先调用本工具;随后为每个 implement 子系统建 create_task(subsystem=<id>)。dispatch 前系统会校验所有 implement 子系统都有任务覆盖——缺口拦截派发,防止规划坍缩成 MVP。子系统清单 100% 由你定义,系统不预设任何模板;要砍掉某个子系统,在该条目标 status=defer/not_applicable 并附 rationale。⚠ 硬约束:当 implement 状态的子系统 ≥ 3 个时,必须额外包含一个集成验证子系统(subsystem_id 含 integration-verify 或 integ-verify,如 {subsystem_id:"integration-verify", name:"集成验证", status:"implement", agent_type:"verify"}),否则蓝图校验直接报错。建议该子系统 depends_on 设为所有其它 implement 子系统。',
+      description: '【高级/内部】定义项目蓝图子系统清单。大多数情况不需要调用——Leader 直接按用户需求建任务即可。仅当用户明确要求蓝图规划或需要子系统跟踪时使用。',
       parameters: {
         type: 'object',
         properties: {
@@ -495,49 +474,9 @@ export const LEADER_META_TOOLS: ToolDefinition[] = [
           blocked_by: { type: 'array', items: { type: 'string' }, description: '可选，完整替换依赖任务 ID 列表' },
           working_directory: { type: 'string', description: '可选，新工作目录' },
           write_scope: { type: 'array', items: { type: 'string' }, description: '可选，完整替换写入范围' },
-          preferred_agent_name: { type: 'string', description: '可选，改绑未来 dispatch_agent 的 agent_name 约束/提示；不会自动派发。传空字符串清除预绑定，回到 Leader 显式 dispatch 决策。' },
-          contract: {
-            ...CONTRACT_SCHEMA,
-            description: '可选。补充或替换强校验契约模板；必须包含 surface/title/content，version 如提供必须为正整数。',
-          },
-          contract_surface: {
-            type: 'string',
-            description: '可选。补充或修改跨栈接口/数据契约 surface，如 "POST /api/login" 或 "chat.message.api"；会生成/更新 contractBinding.tag=contract:<surface>。',
-          },
-          contract_version: {
-            type: 'integer',
-            minimum: 1,
-            description: '可选。补充或修改期望契约正整数版本。',
-          },
-          contract_request_id: {
-            type: 'string',
-            description: '可选。补充或修改契约 request/ack 闭环 ID；省略时按 <surface>@v<version|1> 生成。',
-          },
-          require_contract: {
-            type: 'boolean',
-            description: '可选。是否把 contract_surface 作为派发前硬 gate；仅实现/修复类 contract consumer 默认 true，architect/node_kind=contract 与 evaluate/generic 默认 false。evaluation_policy 不会隐式生成 contract_surface。',
-          },
-          require_ack: {
-            type: 'boolean',
-            description: '可选。是否要求 contract_request_id 的 team request 已闭环后才可派发。',
-          },
-          evaluation_policy: EVALUATION_POLICY_SCHEMA,
-          node_kind: {
-            type: 'string',
-            enum: ['plan', 'contract', 'implement', 'evaluate', 'repair', 'reset', 'generic'],
-            description: '可选。补充或修改统一编排节点类型。',
-          },
-          orchestration_run_id: {
-            type: 'string',
-            description: '可选。补充或修改所属 OrchestrationRun。',
-          },
-          generation: {
-            type: 'integer',
-            minimum: 0,
-            description: '可选。补充或修改编排 generation，非负整数，用于 reset/repair 后拒绝 stale terminal event。',
-          },
         },
         required: ['task_id'],
+
       },
     },
   },

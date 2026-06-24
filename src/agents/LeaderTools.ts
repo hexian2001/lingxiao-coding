@@ -500,6 +500,8 @@ export class LeaderToolsExecutor {
         return await this.dispatchAgent(args);
       case 'dispatch_batch':
         return await this.dispatchBatch(args);
+      case 'spawn_worker':
+        return await this.spawnWorker(args);
       case 'explore':
         return await this.exploreCodebase(args);
       case 'send_message_to_agent':
@@ -865,6 +867,46 @@ export class LeaderToolsExecutor {
     const dispatchResult = await this.dispatchAgentWithOptions({ task_id: taskId, agent_name: agentName });
     // 在返回结果前缀 task_id，供 Leader 追踪异步探索任务
     return `[task_id=${taskId}] ${dispatchResult}`;
+  }
+
+  /**
+   * spawn_worker: 一步到位派发临时 worker——create_task + dispatch + 异步回流。
+   * v1.0.4 新增，替代 create_task + dispatch_agent 两步操作。
+   */
+  protected async spawnWorker(args: Record<string, unknown>): Promise<string> {
+    const goal = typeof args.goal === 'string' ? args.goal.trim() : '';
+    if (!goal) {
+      throw fail('spawn_worker 的 goal 不能为空');
+    }
+    const scope = typeof args.scope === 'string' ? args.scope.trim() : '';
+    const role = typeof args.role === 'string' ? args.role.trim() : 'fullstack';
+    const context = typeof args.context === 'string' ? args.context.trim() : '';
+
+    const subject = goal.length > 60 ? `${goal.slice(0, 60)}…` : goal;
+    const contextParts: string[] = [`【任务目标】\n${goal}`];
+    if (scope) contextParts.push(`【工作范围】${scope}`);
+    if (context) contextParts.push(`【背景知识】\n${context}`);
+    contextParts.push('【要求】完成后用 attempt_completion 回流结果和证据。');
+    const fullContext = contextParts.join('\n\n');
+
+    const agentName = memoryNameFromContent(role, goal);
+    const writeScope = scope ? [scope] : [];
+
+    const taskId = this.leader.board.nextTaskId();
+    this.leader.board.createTask(
+      taskId,
+      subject,
+      goal,
+      role,
+      [],           // blocked_by
+      writeScope,
+      undefined,    // working_directory
+      fullContext,
+      { taskType: 'generic', preferred_agent_name: agentName },
+    );
+
+    const dispatchResult = await this.dispatchAgentWithOptions({ task_id: taskId, agent_name: agentName });
+    return `[task_id=${taskId}] 已启动 ${role} worker "${agentName}"。完成后结果将自动回流。\n${dispatchResult}`;
   }
 
   protected async dispatchBatch(args: Record<string, unknown>): Promise<string> {
