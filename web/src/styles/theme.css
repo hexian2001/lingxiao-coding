@@ -2682,6 +2682,140 @@ input[type="number"]::placeholder {
 .browser-viewport.is-inspecting {
   cursor: crosshair;
 }
+/* v1.0.5: 剑阁浏览器交互模式 */
+.browser-viewport.is-clickable {
+  cursor: pointer;
+}
+
+.browser-click-ripple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-brand);
+  background: color-mix(in srgb, var(--color-accent-brand) 20%, transparent);
+  animation: browser-ripple 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes browser-ripple {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.browser-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--color-border-muted);
+  background: var(--color-bg-tertiary);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.browser-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.browser-mode-btn:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+.browser-mode-btn.is-active {
+  color: var(--color-accent-brand);
+  background: color-mix(in srgb, var(--color-accent-brand) 12%, transparent);
+}
+
+.browser-js-input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--color-border-muted);
+  border-radius: 3px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.browser-js-input:focus {
+  border-color: color-mix(in srgb, var(--color-accent-brand) 50%, transparent);
+}
+
+.browser-eval-result {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  z-index: 20;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-muted);
+  border-radius: 4px;
+  padding: 4px;
+  max-width: 300px;
+}
+
+.browser-direct-patch-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: none;
+  background: color-mix(in srgb, var(--color-accent-green) 15%, transparent);
+  color: var(--color-accent-green);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.browser-direct-patch-btn:hover {
+  background: color-mix(in srgb, var(--color-accent-green) 25%, transparent);
+}
+
+.browser-direct-patch-btn:disabled {
+  opacity: 0.5;
+}
+
+.browser-html-edit {
+  margin-top: 4px;
+  padding: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+.browser-html-textarea {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border-muted);
+  border-radius: 3px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  resize: vertical;
+  outline: none;
+}
+
+.browser-html-textarea:focus {
+  border-color: color-mix(in srgb, var(--color-accent-brand) 50%, transparent);
+}
+
 
 .browser-viewport img {
   display: block;

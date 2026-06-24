@@ -29,6 +29,13 @@ interface BrowserState {
   openUrl: (url: string) => Promise<void>;
   refreshScreenshot: () => void;
   inspectAt: (x: number, y: number) => Promise<void>;
+  // v1.0.5: 真实交互
+  interactionMode: 'click' | 'inspect';
+  setInteractionMode: (mode: 'click' | 'inspect') => void;
+  clickAt: (x: number, y: number) => Promise<void>;
+  scrollBy: (x: number, y: number) => Promise<void>;
+  patchElement: (selector: string, patch: { html?: string; text?: string; style?: string; attr?: Record<string, string>; remove?: boolean }) => Promise<boolean>;
+  evalJs: (script: string) => Promise<unknown>;
 }
 
 export const useBrowserStore = create<BrowserState>((set, get) => ({
@@ -44,6 +51,7 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
   health: null,
   healthError: null,
   intent: 'fix',
+  interactionMode: 'click' as 'click' | 'inspect',
 
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false, isInspecting: false }),
@@ -142,7 +150,8 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
         activeSessionId: session.id,
         session,
         screenshotUrl: browserClient.screenshotUrl(session.id),
-        isInspecting: true,
+        isInspecting: false,
+        interactionMode: 'click',
       });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : String(error) });
@@ -176,4 +185,63 @@ export const useBrowserStore = create<BrowserState>((set, get) => ({
       set({ isLoading: false });
     }
   },
+  // v1.0.5: 真实交互
+  setInteractionMode: (mode) => set({ interactionMode: mode, isInspecting: mode === 'inspect' }),
+
+  clickAt: async (x, y) => {
+    const session = get().session;
+    if (!session) return;
+    set({ isLoading: true, error: null });
+    try {
+      await browserClient.click(session.id, x, y);
+      await new Promise(r => setTimeout(r, 400));
+      set({ screenshotUrl: browserClient.screenshotUrl(session.id) });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : String(error) });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  scrollBy: async (x, y) => {
+    const session = get().session;
+    if (!session) return;
+    try {
+      await browserClient.scroll(session.id, x, y);
+      set({ screenshotUrl: browserClient.screenshotUrl(session.id) });
+    } catch {
+      // silent
+    }
+  },
+
+  patchElement: async (selector, patch) => {
+    const session = get().session;
+    if (!session) return false;
+    set({ isLoading: true, error: null });
+    try {
+      const result = await browserClient.patchElement(session.id, selector, patch);
+      await new Promise(r => setTimeout(r, 300));
+      set({ screenshotUrl: browserClient.screenshotUrl(session.id) });
+      return result.applied;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : String(error) });
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  evalJs: async (script) => {
+    const session = get().session;
+    if (!session) return null;
+    try {
+      const result = await browserClient.evalJs(session.id, script);
+      set({ screenshotUrl: browserClient.screenshotUrl(session.id) });
+      return result.result;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : String(error) });
+      return null;
+    }
+  },
+
 }));

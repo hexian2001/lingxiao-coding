@@ -15,7 +15,7 @@ import {
   Settings, Keyboard, BookOpen, ChevronLeft, ChevronRight, Sun, Moon,
   Monitor, AlertCircle, Languages, Plus, RefreshCw, BookMarked, GitBranch,
   Network, GalleryVerticalEnd, Users, Palette, Brain, LayoutGrid,
-  Radar, GitCommitHorizontal, Swords,
+  Radar, GitCommitHorizontal,
 } from 'lucide-react';
 
 interface NavItem {
@@ -34,7 +34,7 @@ const topNav: NavItem[] = [
 ];
 
 const workspaceNav: NavItem[] = [
-  { view: 'tasks', icon: <ListTodo size={16} />, labelKey: 'sidebar.tasks' },  { view: 'jiange', icon: <Swords size={16} />, labelKey: 'sidebar.jiange', isBeta: true },
+  { view: 'tasks', icon: <ListTodo size={16} />, labelKey: 'sidebar.tasks' },
   { view: 'blueprint', icon: <LayoutGrid size={16} />, labelKey: 'sidebar.blueprint' },
   { view: 'blackboard', icon: <Network size={16} />, labelKey: 'sidebar.blackboard' },
   { view: 'terminal', icon: <Terminal size={16} />, labelKey: 'sidebar.terminalMode' },

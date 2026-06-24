@@ -21,6 +21,8 @@ import {
   TerminalSquare,
   X,
   XCircle,
+  FolderTree,
+  Sparkles,
 } from 'lucide-react';
 import { useGitStore } from '../../stores/gitStore';
 import { useViewStore } from '../../stores/viewStore';
@@ -38,7 +40,7 @@ import { getServerToken } from '../../api/headers';
 import { estimateTokens, formatTokenCount } from '../../utils/estimateTokens';
 import { SessionUpdateKind, subscribeSessionUpdateEvents } from '../../stores/sseStore';
 
-export type WorkbenchTool = 'launcher' | 'browser' | 'review' | 'terminal' | 'artifact' | 'references' | 'worktrees' | 'side-chat';
+export type WorkbenchTool = 'launcher' | 'browser' | 'review' | 'terminal' | 'artifact' | 'references' | 'worktrees' | 'side-chat' | 'files' | 'office';
 export type WorkbenchToolRequest = {
   tool: WorkbenchTool;
   id: number;
@@ -63,9 +65,10 @@ interface WorkbenchTab {
 }
 const ARTIFACT_TAB_ID = 'workbench-artifact';
 const logoSrc = `/logo.svg?v=${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}`;
-const WORKBENCH_DEFAULT_WIDTH = 420;
+const WORKBENCH_DEFAULT_WIDTH = 560;
 const TerminalPane = lazy(() => import('../canvas/TerminalPane'));
-const ArtifactView = lazy(() => import('../artifacts/ArtifactView'));
+const ArtifactView = lazy(() => import('../artifacts/ArtifactView'));const FileCanvasCompact = lazy(() => import('./FileCanvasCompact'));
+const OfficeGeneratorCompact = lazy(() => import('./OfficeGeneratorCompact'));
 
 function WorkbenchPaneLoading() {
   return (
@@ -77,7 +80,7 @@ function WorkbenchPaneLoading() {
 }
 
 function getWorkbenchMaxWidth(): number {
-  return typeof window === 'undefined' ? 1200 : Math.max(420, window.innerWidth - 520);
+  return typeof window === 'undefined' ? 1600 : Math.max(900, window.innerWidth - 360);
 }
 
 function clampWorkbenchWidth(width: number, minWidth: number, maxWidth = getWorkbenchMaxWidth()): number {
@@ -85,22 +88,26 @@ function clampWorkbenchWidth(width: number, minWidth: number, maxWidth = getWork
 }
 
 function getWorkbenchMinWidth(tool: WorkbenchTool): number {
-  if (tool === 'browser') return 780;
+  if (tool === 'browser') return 900;
   if (tool === 'terminal') return 480;
   if (tool === 'artifact') return 560;
   if (tool === 'references') return 360;
   if (tool === 'worktrees') return 400;
   if (tool === 'side-chat') return 420;
+  if (tool === 'files') return 560;
+  if (tool === 'office') return 560;
   return 320;
 }
 
 function getWorkbenchPreferredWidth(tool: WorkbenchTool, baseWidth: number): number {
-  if (tool === 'browser') return Math.max(baseWidth, 1120);
+  if (tool === 'browser') return Math.max(baseWidth, 1280);
   if (tool === 'terminal') return Math.max(baseWidth, 560);
   if (tool === 'artifact') return Math.max(baseWidth, 620);
   if (tool === 'references') return Math.max(baseWidth, 420);
   if (tool === 'worktrees') return Math.max(baseWidth, 460);
   if (tool === 'side-chat') return Math.max(baseWidth, 520);
+  if (tool === 'files') return Math.max(baseWidth, 620);
+  if (tool === 'office') return Math.max(baseWidth, 620);
   return baseWidth;
 }
 
@@ -274,6 +281,8 @@ export default function WorkbenchSidePanel({
     if (tool === 'browser') return <Globe size={13} />;
     if (tool === 'review') return <GitPullRequest size={13} />;
     if (tool === 'terminal') return <TerminalSquare size={13} />;
+    if (tool === 'files') return <FolderTree size={13} />;
+    if (tool === 'office') return <FileText size={13} />;
     return <LayoutGrid size={13} />;
   };
 
@@ -472,7 +481,8 @@ export default function WorkbenchSidePanel({
               <ToolMenuItem icon={<MessageCirclePlus size={15} />} label={t('workbench.sideChat', '侧边聊天')} onClick={() => openToolTab('side-chat')} />
               <ToolMenuItem icon={<Globe size={15} />} label={t('workbench.browser', '浏览器')} shortcut="Ctrl+T" onClick={() => openToolTab('browser')} />
               <ToolMenuItem icon={<GitPullRequest size={15} />} label={t('workbench.review', '审查')} shortcut="Ctrl+Shift+G" onClick={() => openToolTab('review')} />
-              <ToolMenuItem icon={<TerminalSquare size={15} />} label={t('workbench.terminal', '终端')} shortcut="Ctrl+`" onClick={() => openToolTab('terminal')} />
+              <ToolMenuItem icon={<TerminalSquare size={15} />} label={t('workbench.terminal', '终端')} shortcut="Ctrl+`" onClick={() => openToolTab('terminal')} />              <ToolMenuItem icon={<FolderTree size={15} />} label={t('workbench.files', '文件画布')} onClick={() => openToolTab('files')} />
+              <ToolMenuItem icon={<Sparkles size={15} />} label={t('workbench.office', '办公生成')} onClick={() => openToolTab('office')} />
             </div>
           )}
         </div>
@@ -574,6 +584,18 @@ export default function WorkbenchSidePanel({
               <div className="workbench-side-terminal">
                 <Suspense fallback={<WorkbenchPaneLoading />}>
                   <TerminalPane terminalId={tab.id} />
+                </Suspense>
+              </div>
+            ) : tab.tool === 'files' ? (
+              <div className="min-h-0 flex-1 overflow-hidden">
+                <Suspense fallback={<WorkbenchPaneLoading />}>
+                  <FileCanvasCompact />
+                </Suspense>
+              </div>
+            ) : tab.tool === 'office' ? (
+              <div className="min-h-0 flex-1 overflow-hidden">
+                <Suspense fallback={<WorkbenchPaneLoading />}>
+                  <OfficeGeneratorCompact />
                 </Suspense>
               </div>
             ) : (

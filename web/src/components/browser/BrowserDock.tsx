@@ -13,6 +13,9 @@ import {
   RefreshCw,
   Send,
   X,
+  Hand,
+  Code2,
+  Sparkles,
 } from 'lucide-react';
 import { browserClient } from '../../api/BrowserClient';
 import { useBrowserStore } from '../../stores/browserStore';
@@ -59,7 +62,20 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
   const [url, setUrl] = useState('http://localhost:5173');
   const [comment, setComment] = useState('');
   const [commentBusy, setCommentBusy] = useState<'insert' | 'send' | null>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);  // v1.0.5: 交互模式
+  const {
+    interactionMode,
+    setInteractionMode,
+    clickAt,
+    scrollBy,
+    patchElement,
+    evalJs,
+  } = useBrowserStore();
+  const [showHtmlEdit, setShowHtmlEdit] = useState(false);
+  const [htmlEditContent, setHtmlEditContent] = useState('');
+  const [jsInput, setJsInput] = useState('');
+  const [evalResult, setEvalResult] = useState<string | null>(null);
+  const [clickRipple, setClickRipple] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     void loadHealth(false);
@@ -89,13 +105,46 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
   };
 
   const handleViewportClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!session || !isInspecting || !imageRef.current) return;
+    if (!session || !imageRef.current) return;
     const rect = imageRef.current.getBoundingClientRect();
     const relX = (event.clientX - rect.left) / Math.max(1, rect.width);
     const relY = (event.clientY - rect.top) / Math.max(1, rect.height);
     const x = relX * session.viewport.width;
     const y = relY * session.viewport.height;
-    void inspectAt(x, y);
+
+    // v1.0.5: 默认点击模式 → 真实点击；检视模式 → 选中元素
+    if (interactionMode === 'inspect' || isInspecting) {
+      void inspectAt(x, y);
+    } else {
+      // 真实点击!
+      setClickRipple({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+      setTimeout(() => setClickRipple(null), 600);
+      void clickAt(x, y);
+    }
+  };
+
+  const handleViewportWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (!session) return;
+    void scrollBy(0, event.deltaY);
+  };
+
+  const submitDirectPatch = async () => {
+    if (!selection || !comment.trim()) return;
+    const isHtml = comment.trim().startsWith('<');
+    const applied = await patchElement(selection.selector, {
+      html: isHtml ? comment.trim() : undefined,
+      text: isHtml ? undefined : comment.trim(),
+    });
+    if (applied) {
+      setComment('');
+      setShowHtmlEdit(false);
+    }
+  };
+
+  const submitEval = async () => {
+    if (!jsInput.trim()) return;
+    const result = await evalJs(jsInput);
+    setEvalResult(JSON.stringify(result, null, 2));
   };
 
   const buildPrompt = async (mode: 'insert' | 'send') => {
@@ -205,6 +254,46 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
         </div>
       )}
 
+      {/* v1.0.5: 交互模式切换 */}
+      {session && (
+        <div className="browser-mode-bar">
+          <button
+            type="button"
+            className={`browser-mode-btn ${interactionMode === 'click' && !isInspecting ? 'is-active' : ''}`}
+            onClick={() => setInteractionMode('click')}
+            title="点击模式：直接点击页面元素"
+          >
+            <MousePointer2 size={13} />
+            <span>点击</span>
+          </button>
+          <button
+            type="button"
+            className={`browser-mode-btn ${interactionMode === 'inspect' || isInspecting ? 'is-active' : ''}`}
+            onClick={() => setInteractionMode('inspect')}
+            title="检视模式：点击选中元素"
+          >
+            <Crosshair size={13} />
+            <span>检视</span>
+          </button>
+          <div className="flex-1" />
+          <input
+            value={jsInput}
+            onChange={(e) => setJsInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && submitEval()}
+            placeholder="执行JS: document.title"
+            className="browser-js-input"
+          />
+          <button type="button" className="browser-mode-btn" onClick={submitEval} title="执行">
+            <Code2 size={13} />
+          </button>
+          {evalResult && (
+            <details className="browser-eval-result">
+              <summary className="text-[10px] text-text-tertiary cursor-pointer">Result</summary>
+              <pre className="mt-1 p-1.5 bg-bg-primary border border-border-subtle rounded text-[10px] font-mono text-text-secondary max-h-32 overflow-auto">{evalResult}</pre>
+            </details>
+          )}
+        </div>
+      )}
       {error && (
         <div className="browser-error">
           <X size={13} />
@@ -241,7 +330,12 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
 
       <div className={`browser-workspace ${selection ? 'has-selection' : ''}`}>
         <div className="browser-preview-column">
-          <div className={`browser-viewport ${isInspecting ? 'is-inspecting' : ''}`} onClick={handleViewportClick}>
+          <div
+            className={`browser-viewport ${interactionMode === 'inspect' || isInspecting ? 'is-inspecting' : 'is-clickable'}`}
+            onClick={handleViewportClick}
+            onWheel={handleViewportWheel}
+            style={{ cursor: interactionMode === 'inspect' || isInspecting ? 'crosshair' : 'pointer' }}
+          >
             {screenshotUrl ? (
               <>
                 <img
@@ -255,6 +349,12 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
                   draggable={false}
                 />
                 {selection && <div className="browser-selection-box" style={selectionStyle} />}
+                {clickRipple && (
+                  <div
+                    className="browser-click-ripple"
+                    style={{ left: clickRipple.x, top: clickRipple.y }}
+                  />
+                )}
                 {isLoading && (
                   <div className="browser-loading-overlay">
                     <Loader2 size={20} className="animate-spin" />
@@ -264,7 +364,7 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
             ) : (
               <div className="browser-empty">
                 <Crosshair size={28} />
-                <span>{t('browser.empty', '打开页面后点选元素')}</span>
+                <span>{t('browser.empty', '打开页面后点击交互')}</span>
               </div>
             )}
           </div>
@@ -340,7 +440,73 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
                   {commentBusy === 'send' ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
                   {t('browser.send', '发送')}
                 </button>
+              </div>              <div className="browser-comment-actions">
+                {/* v1.0.5: 直接修改 HTML */}
+                <button
+                  type="button"
+                  onClick={() => void submitDirectPatch()}
+                  disabled={!comment.trim() || isLoading}
+                  className="browser-direct-patch-btn"
+                  title="输入文本替换内容，或输入 <html> 替换 HTML，直接修改页面"
+                >
+                  {isLoading ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                  直接修改
+                </button>
+                <div className="flex-1" />
+                <button
+                  type="button"
+                  onClick={() => { setShowHtmlEdit(!showHtmlEdit); if (!showHtmlEdit) setHtmlEditContent(selection.htmlSnippet); }}
+                  className="browser-secondary-btn"
+                  title="编辑选中元素的 HTML"
+                >
+                  <Code2 size={13} />
+                  HTML
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void buildPrompt('insert')}
+                  disabled={!comment.trim() || !!commentBusy}
+                  className="browser-secondary-btn"
+                >
+                  {commentBusy === 'insert' ? <Loader2 size={13} className="animate-spin" /> : <Quote size={13} />}
+                  {t('browser.quote', '引用')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void buildPrompt('send')}
+                  disabled={!comment.trim() || !!commentBusy}
+                  className="browser-primary-btn"
+                >
+                  {commentBusy === 'send' ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                  {t('browser.send', '发送')}
+                </button>
               </div>
+              {showHtmlEdit && (
+                <div className="browser-html-edit">
+                  <textarea
+                    value={htmlEditContent}
+                    onChange={(e) => setHtmlEditContent(e.target.value)}
+                    className="browser-html-textarea"
+                    rows={5}
+                    spellCheck={false}
+                  />
+                  <div className="flex gap-1.5 mt-1">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const ok = await patchElement(selection.selector, { html: htmlEditContent });
+                        if (ok) setShowHtmlEdit(false);
+                      }}
+                      className="browser-primary-btn"
+                    >
+                      <Sparkles size={13} /> 应用修改
+                    </button>
+                    <button type="button" onClick={() => setShowHtmlEdit(false)} className="browser-secondary-btn">
+                      取消
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
