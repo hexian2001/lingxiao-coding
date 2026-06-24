@@ -3185,6 +3185,26 @@ export default function ChatView() {
                 if (files.length > 0) {
                   e.preventDefault();
                   handleFileAttach(files);
+                  return;
+                }
+                // 大文本粘贴拦截：超过阈值时直接转为文件附件，不让巨量文本进入 textarea。
+                // 解决 308K 字符粘贴导致浏览器卡死的问题。
+                const pastedText = e.clipboardData?.getData('text/plain');
+                if (pastedText && pastedText.length > LONG_INPUT_ATTACHMENT_THRESHOLD) {
+                  e.preventDefault();
+                  // 异步上传，不阻塞 UI
+                  void (async () => {
+                    const longFile = await uploadLongInputAsFile(pastedText);
+                    if (longFile) {
+                      setPendingFiles((prev) => [...prev, longFile]);
+                      // 在输入框显示简短提示（而不是 308K 原文）
+                      const notice = t('chat.input.longMessageAttachmentNotice', {
+                        count: pastedText.length,
+                        name: longFile.name,
+                      });
+                      setInput((prev) => prev ? `${prev}\n${notice}` : notice);
+                    }
+                  })();
                 }
               }}
               placeholder={!isConnected ? t('connection.disconnected') : `${t('input.placeholder')} (Enter ${t('input.send')}, Shift+Enter)`}

@@ -115,7 +115,7 @@ export class AcpClient {
     return this.connection;
   }
 
-  private async reconnectHandshake() {
+  private async reconnectHandshake(options?: { immediate?: boolean }) {
     if (!this.connection || this.manuallyDisconnected || this.handshakeInProgress) return;
 
     // No server token — try to recover from localhost-only endpoint first
@@ -145,15 +145,17 @@ export class AcpClient {
     const sessionId = this.connection.sessionId;
     this.handshakeInProgress = true;
 
-    // Exponential backoff: 3s, 6s, 12s, 24s, 48s, 60s, 60s, ...
-    const delay = Math.min(
+    // immediate=true 时跳过退避延迟（visibilitychange 触发的确定性 stale 重连）
+    const delay = options?.immediate ? 0 : Math.min(
       AcpClient.RECONNECT_BASE_MS * Math.pow(2, Math.min(this.handshakeReconnectCount - 1, 5)),
       AcpClient.RECONNECT_MAX_DELAY_MS,
     );
 
     this.emitConnectionState('reconnecting', { delayMs: delay, attempt: this.handshakeReconnectCount, cycle: this.reconnectCycle });
 
-    await new Promise(resolve => setTimeout(resolve, delay));
+    if (delay > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
 
     if (this.manuallyDisconnected) {
       this.handshakeInProgress = false;
@@ -522,16 +524,18 @@ export class AcpClient {
     this.visibilityHandler = () => {
       if (document.visibilityState === 'visible' && this.connection && !this.manuallyDisconnected) {
         // 后台 tab 被浏览器节流时 setTimeout/watchdog 可能不触发，SSE 流被静默杀死
-        // 但 sseActive 仍为 true。回到前台时检查是否 stale（超过 90s 无数据），
-        // 如果是则主动重连；否则按原逻辑仅在 sseActive=false 时重连。
+        // 但 sseActive 仍为 true。回到前台时检查是否 stale（超过 45s 无数据，
+        // 服务端 ping 周期 30s），如果是则主动重连；否则按原逻辑仅在 sseActive=false 时重连。
         const now = Date.now();
-        const isStale = this.sseActive && this.lastSseEventAt > 0 && (now - this.lastSseEventAt) > 90_000;
+        const isStale = this.sseActive && this.lastSseEventAt > 0 && (now - this.lastSseEventAt) > 45_000;
         if (!this.sseActive || isStale) {
           if (isStale) {
             console.warn(`[AcpClient] SSE stale detected on visibilitychange: last event ${Math.round((now - this.lastSseEventAt) / 1000)}s ago, forcing reconnect`);
             this.abortCurrentSse();
           }
-          this.reconnectHandshake();
+          // 确定性 stale 重连：重置计数器 + 立即连接，不走指数退避
+          this.handshakeReconnectCount = 0;
+          this.reconnectHandshake({ immediate: true });
         }
       }
     };

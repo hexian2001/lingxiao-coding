@@ -872,6 +872,47 @@ export class AnthropicContentGenerator implements ContentGenerator {
       }
     }
 
+    // ── Bedrock/Anthropic tool_result/tool_use 配对修复 ──────────────────────
+    // Bedrock 严格要求每个 user 消息中的 tool_result 数量不超过前一个 assistant 的 tool_use 数量。
+    // 历史消息损坏（压缩残留、resume 不完整、上游流截断）可能导致 mismatch。
+    // 在发送前做最终验证和修复，避免 TOOL_USE_RESULT_MISMATCH 400 错误。
+    for (let i = 1; i < anthropicMessages.length; i++) {
+      const msg = anthropicMessages[i];
+      if (msg.role !== 'user' || !Array.isArray(msg.content)) continue;
+      const toolResults = (msg.content as unknown as Array<Record<string, unknown>>).filter(b => b.type === 'tool_result');
+      if (toolResults.length === 0) continue;
+
+      // 找到前一个 assistant 消息
+      let prevAssistant: MessageParam | undefined;
+      for (let j = i - 1; j >= 0; j--) {
+        if (anthropicMessages[j].role === 'assistant') {
+          prevAssistant = anthropicMessages[j];
+          break;
+        }
+      }
+      if (!prevAssistant || !Array.isArray(prevAssistant.content)) continue;
+
+      const toolUseIds = new Set(
+        (prevAssistant.content as unknown as Array<Record<string, unknown>>)
+          .filter(b => b.type === 'tool_use')
+          .map(b => b.id as string),
+      );
+
+      // 只保留 tool_use_id 与前一个 assistant 的 tool_use 匹配的 tool_results
+      if (toolResults.length > toolUseIds.size) {
+        const filtered = (msg.content as unknown as Array<Record<string, unknown>>).filter(
+          b => b.type !== 'tool_result' || toolUseIds.has(b.tool_use_id as string),
+        );
+        if (filtered.length === 0) {
+          // 全部是孤儿 tool_results → 移除整个消息
+          anthropicMessages.splice(i, 1);
+          i--;
+        } else {
+          (msg as { content: unknown }).content = filtered;
+        }
+      }
+    }
+
     // cache_control 策略：优先把断点放在最后一个稳定 system block。
     // runtime/context manifest、memory、blackboard、mode hint 等 system 块会频繁变化，
     // 如果盲目给最后一个 system block 打 cache_control，会把 volatile 内容纳入缓存前缀，

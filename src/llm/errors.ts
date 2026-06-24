@@ -316,6 +316,10 @@ function hasRateLimitSignal(fields: ExtractedErrorFields): boolean {
 function isContextOverflowSemantic(fields: ExtractedErrorFields): boolean {
   if (hasRateLimitSignal(fields)) return false;
   const text = fields.lowerText;
+  // 排除已知的消息格式验证错误（如 Bedrock TOOL_USE_RESULT_MISMATCH）——
+  // 这些错误包含 "messages" 和 "exceeds" 但与上下文大小无关，
+  // 误分类为 context_overflow 会触发无意义的有损压缩，还会破坏消息序列。
+  if (/tool.?(?:result|use)|mismatch/i.test(text)) return false;
   const hasRequestSizePhrase = /\b(?:payload|request(?:\s+entity)?)\s+too\s+large\b/i.test(text);
   const hasSubject = /\b(context\s+(?:window|length|limit)|max(?:imum)?\s+context|tokens?|prompt|input|messages?)\b/i.test(text) || hasRequestSizePhrase;
   const hasOverflow = hasRequestSizePhrase || /exceed(?:s|ed)?|too\s+(?:long|large|many)|over\s+(?:the\s+)?(?:limit|maximum)|above\s+(?:the\s+)?(?:limit|maximum)|reduce\s+the\s+length|adjust\s+your\s+input/i.test(text);
@@ -595,6 +599,12 @@ const CLASSIFICATION_RULES: readonly ErrorClassificationRule[] = [
   {
     id: 'malformed-tool-args-text',
     textPatterns: MALFORMED_TOOL_ARGS_TEXT_PATTERNS,
+    classify: 'parse_error',
+    retryable: false,
+  },
+  {
+    id: 'tool-result-mismatch-text',
+    textPatterns: [/tool.?(?:result|use).*mismatch/i, /toolResult.*exceeds.*toolUse/i, /TOOL_USE_RESULT_MISMATCH/],
     classify: 'parse_error',
     retryable: false,
   },

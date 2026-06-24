@@ -221,6 +221,29 @@ export class CompressionPipeline {
     try {
       const oldTokens = await this.calc(messages);
       const oldBytes = calculateRequestBytes(messages);
+
+      // 保护：非用户手动触发时，如果 token 和字节都远低于阈值（<60%），跳过有损压缩。
+      // LlmGuard 对任意非可重试错误触发 compact 是“碰运气”策略，但当上下文实际很小时
+      // （如 78K/760K），压缩反而会破坏消息序列结构（删掉 tool_use 导致孤儿 tool_result）。
+      // 用户手动 COMPACT 指令（compactType='manual'）始终尊重。
+      const isManual = ctx.compactType === 'manual';
+      const byteThreshold = this.byteThreshold();
+      const tokenRatio = this.options.threshold > 0 ? oldTokens / this.options.threshold : 0;
+      const byteRatio = Number.isFinite(byteThreshold) && byteThreshold > 0 ? oldBytes / byteThreshold : 0;
+      if (!isManual && tokenRatio < 0.6 && byteRatio < 0.6) {
+        coreLogger.info(
+          `${this.options.sessionId} forceRun 跳过：token ${oldTokens}/${this.options.threshold} (${(tokenRatio * 100).toFixed(0)}%), bytes ${oldBytes}/${byteThreshold} (${(byteRatio * 100).toFixed(0)}%) 远低于阈值，不执行有损压缩`,
+        );
+        return {
+          messages,
+          oldTokens,
+          newTokens: oldTokens,
+          oldBytes,
+          newBytes: oldBytes,
+          compacted: false,
+        };
+      }
+
       await this.executePreCompactHook(ctx.compactType ?? 'manual');
       const result = await this.compress(messages, oldTokens, oldBytes, ctx);
       await this.executePostCompactHook(
@@ -352,6 +375,14 @@ export class CompressionPipeline {
     let llmFailed = false;
     let summaryContent: string;
     if (!this.options.llmClient) {
+      // 无 LLM 客户端时也要发 end 事件，否则 TUI 条幅永远卡住
+      this.emitCompacting('end', 'finalizing', {
+        percent: 100,
+        oldTokens,
+        threshold: this.options.threshold,
+        messageCount: messages.length,
+        label: 'Compression failed: no LLM client',
+      });
       throw new Error('LLM 压缩失败：未配置 LLM 客户端（本地算法已禁用）');
     }
     this.emitCompacting('progress', 'llm_summary', {
@@ -368,6 +399,14 @@ export class CompressionPipeline {
       coreLogger.warn(
         `[CompressionPipeline] ${this.options.sessionId} LLM 压缩失败，不回退本地算法: ${error instanceof Error ? error.message : error}`,
       );
+      // 失败时必须发 end 事件，否则 TUI/Web 压缩条幅永远残留
+      this.emitCompacting('end', 'finalizing', {
+        percent: 100,
+        oldTokens,
+        threshold: this.options.threshold,
+        messageCount: messages.length,
+        label: 'Compression failed',
+      });
       throw error;
     }
 

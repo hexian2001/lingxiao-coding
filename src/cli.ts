@@ -72,10 +72,11 @@ installProcessRuntimeGuards();
 // 主进程信号处理
 //
 // daemon 模式：本就该响应 SIGTERM/SIGHUP 优雅退出（由 DaemonManager / supervisor 管理生命周期）。
-// 交互模式：长跑优先。终端关闭/分离会向进程组发 SIGHUP，某些终端（含 WSL 关窗）发 SIGTERM。
-//   这些信号在信号层无法与"用户真想停"区分，若直接 runAllCleanups 会把会话连同 worker agent
-//   一起拆掉（用户看到的"自杀"）。因此交互模式下不连坐拆 swarm，仅分离：进程存活、Web 端口
-//   仍可访问重连。显式停止途径：TUI 内 Ctrl+Q、`lingxiao stop`、或 SIGKILL。
+// 交互模式：终端断开后进入"有限存活"模式（默认 5 分钟），给 Web UI 重连留窗口。
+//   超时后 ProcessIdleGuard 自动 gracefulShutdown。
+//   全 idle（无活跃会话/Agent）超过 10 分钟也自动退出，杜绝僵尸累积。
+//   显式停止途径：TUI 内 Ctrl+Q、`lingxiao stop`、或 SIGKILL。
+import { getProcessIdleGuard } from './core/ProcessIdleGuard.js';
 const isDaemonProcess = () => !!process.env.LINGXIAO_DAEMON_MODE;
 
 process.on('SIGTERM', async () => {
@@ -83,9 +84,9 @@ process.on('SIGTERM', async () => {
     console.log('[CLI] Received SIGTERM, shutting down gracefully...');
     await gracefulShutdown(0, 10000);
   }
-  // 交互模式：分离而非拆除
-  console.log('\n[CLI] 收到 SIGTERM（终端可能已断开）。会话与 agent 继续后台运行，Web UI 仍可访问。');
-  console.log('[CLI] 如需停止：TUI 内按 Ctrl+Q，或运行 `lingxiao stop`。');
+  // 交互模式：标记 detached，ProcessIdleGuard 会在 TTL 到期后自动退出
+  console.log('\n[CLI] 收到 SIGTERM（终端可能已断开）。进入有限存活模式，Web UI 仍可重连。');
+  getProcessIdleGuard().markDetached();
 });
 process.on('SIGINT', async () => {
   if (isDaemonProcess()) {
@@ -99,8 +100,9 @@ process.on('SIGHUP', async () => {
     console.log('[CLI] Received SIGHUP, shutting down gracefully...');
     await gracefulShutdown(0, 10000);
   }
-  // 交互模式：终端挂断 → 分离，进程存活
-  console.log('\n[CLI] 收到 SIGHUP（终端已断开）。会话与 agent 继续后台运行，Web UI 仍可访问。');
+  // 交互模式：终端挂断 → 有限存活
+  console.log('\n[CLI] 收到 SIGHUP（终端已断开）。进入有限存活模式，Web UI 仍可重连。');
+  getProcessIdleGuard().markDetached();
 });
 
 program
@@ -157,8 +159,22 @@ function _listAvailableSkills(baseWorkspace: string): string {
  * 启动 TUI
  */
 async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promise<void> {
+  // Phase 0: 清理同目录旧实例（防止僵尸累积导致 CPU/swap 爆炸）
+  const { cleanOrphanInstances } = await import('./core/ProcessOrphanCleaner.js');
+  const orphanResult = await cleanOrphanInstances(process.pid, process.cwd());
+  if (orphanResult.cleaned.length > 0) {
+    console.log(`[StartTUI] 已清理 ${orphanResult.cleaned.length} 个同目录旧实例`);
+  }
+
+  // Phase 0.5: 启动进程级 Idle 守卫（daemon 模式由 supervisor 管理，不启动 idle guard）
+  const isDaemonModeEarly = !!process.env.LINGXIAO_DAEMON_MODE;
+  const idleGuard = getProcessIdleGuard();
+  if (!isDaemonModeEarly) {
+    idleGuard.start();
+  }
+
   // 清理上一次崩溃/非正常退出遗留的孤儿 Worker 进程（按进程全量扫描 /proc/*/environ）。
-  // 必须在任何新 Worker 被创建之前执行，否则同名孤儿会引发“Worker 已存在”/工作区与端口竞态。
+  // 必须在任何新 Worker 被创建之前执行，否则同名孤儿会引发"Worker 已存在"/工作区与端口竞态。
   // 不传 sessionId：当前 daemon 自身的 Worker 尚未生成，故清理全部 lingxiao 残留进程。
   await WorkerProcessRunner.killOrphanWorkers();
 
@@ -198,6 +214,13 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
   const setCurrentSessionId = (nextSessionId: string | undefined, source: ActiveSessionSource = 'tui') => {
     activeSessionCoordinator.setActiveSessionId(nextSessionId, source);
   };
+
+  // 注册 Idle Guard 活跃探针：任何会话有 running leader/agent 就算活跃
+  idleGuard.registerProbe(() => sessionManager.hasActiveWork());
+  // 用户操作事件刷新 idle timer
+  emitter.subscribe('user:message', () => idleGuard.touch());
+  emitter.subscribe('session:created', () => idleGuard.touch());
+  emitter.subscribe('round_complete', () => idleGuard.touch());
 
   // Daemon 模式：只启动 Web Server + QQ Bot，跳过 TUI/LLM 预热等
   if (isDaemonMode) {
