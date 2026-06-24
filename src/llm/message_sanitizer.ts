@@ -119,13 +119,29 @@ export function sanitizeOpenAIToolMessageSequence(messages: ChatMessage[]): Chat
   const repaired = dropMalformedToolCallArguments(messages);
   const sanitized: ChatMessage[] = [];
   let pendingToolCalls: ToolCall[] = [];
+  // 被夹在 tool_call 与其 tool_result 之间的 user/system 消息（事件处理器在工具执行
+  // 期间注入，如 orchestration:dag_updated → [Orchestration] status=...，或中断后用户
+  // 继续输入）。OpenAI-compatible provider（DeepSeek 等）要求 assistant.tool_calls 的
+  // 所有 tool 结果必须连续紧跟其后，中间不得插入 user/system，否则 400
+  // `insufficient tool messages following tool_calls`。因此这些消息先暂存，待本批
+  // tool 结果（含补齐的 missing 占位）全部排出后再按原序追加，协议合规且内容无损。
+  let deferredBetween: ChatMessage[] = [];
 
-  const flushMissingToolResults = () => {
-    if (pendingToolCalls.length === 0) return;
+  const flushDeferredBetween = () => {
+    if (deferredBetween.length === 0) return;
+    for (const deferred of deferredBetween) {
+      sanitized.push(deferred);
+    }
+    deferredBetween = [];
+  };
+
+  // 收尾当前 tool_calls 批次：补齐未配对的 tool_call 占位，再排出被推迟的 user/system。
+  const flushPendingBatch = () => {
     for (const toolCall of pendingToolCalls) {
       sanitized.push(makeMissingToolResult(toolCall));
     }
     pendingToolCalls = [];
+    flushDeferredBetween();
   };
 
   for (const original of repaired) {
@@ -152,26 +168,33 @@ export function sanitizeOpenAIToolMessageSequence(messages: ChatMessage[]): Chat
         ...message,
         tool_call_id: matchedToolCall.id,
       });
+      // 本批 tool_calls 全部配齐 → 立即排出被推迟的 user/system，恢复原始相对顺序。
+      if (pendingToolCalls.length === 0) {
+        flushDeferredBetween();
+      }
       continue;
     }
 
-    // 只有 assistant 消息（新的 tool_calls 批次）才触发 flush；
-    // system/user 消息可能由事件处理器在 tool 执行期间注入
-    // （如 orchestration:dag_updated → [Orchestration] status=...），
-    // 合法出现在 tool_call 和 tool_result 之间，不应触发 flush。
+    // assistant 消息开启新的 tool_calls 批次：先收尾上一批（补齐占位 + 排出推迟消息）。
     if (message.role === 'assistant') {
-      flushMissingToolResults();
+      flushPendingBatch();
+      sanitized.push(message);
       if (message.tool_calls?.length) {
-        sanitized.push(message);
         pendingToolCalls = [...message.tool_calls];
-        continue;
       }
+      continue;
     }
 
-    sanitized.push(message);
+    // user/system 消息：若正处于某批 tool_calls 等待 tool 结果的过程中，推迟其输出
+    // （见 deferredBetween 注释），不打断 assistant→tool 的连续性；否则原样排出。
+    if (pendingToolCalls.length > 0) {
+      deferredBetween.push(message);
+    } else {
+      sanitized.push(message);
+    }
   }
 
-  flushMissingToolResults();
+  flushPendingBatch();
   return sanitized;
 }
 
