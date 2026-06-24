@@ -33,6 +33,7 @@
     "dev:test-llm-request": "tsx src/test-llm-request.ts",
     "eval:drift": "tsx src/eval/runDriftEval.ts",
     "eval:security": "node scripts/run-security-eval.mjs",
+    "codeql:triage": "node scripts/triage-codeql-alerts.mjs",
     "test:architecture": "tsx --test src/architecture_refactor_invariants.test.ts",
     "test:scripts": "node --test scripts/canonical-source-invariants.test.mjs",
     "test": "npm run test:scripts && npm run build && node scripts/run-tests.mjs",

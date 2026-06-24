@@ -1,0 +1,26 @@
+name: lingxiao-codeql
+
+paths:
+  - src
+  - scripts
+  - web/src
+  - skills/bundled
+
+paths-ignore:
+  - dist/**
+  - web/dist/**
+  - release/**
+  - node_modules/**
+  - web/node_modules/**
+  - .github/**
+  - docs/**
+  - assets/**
+  - build-resources/**
+
+query-filters:
+  - exclude:
+      id: js/missing-rate-limiting
+  - exclude:
+      id: js/useless-regexp-character-escape
+  - exclude:
+      id: js/double-escaping
