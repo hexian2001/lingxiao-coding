@@ -6,11 +6,12 @@ import McpServerForm, { type McpServerConfig } from './McpServerForm';
 import { useSessionStore } from '../../stores/sessionStore';
 
 async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
+  const hasBody = opts?.body != null;
   const res = await fetch(`/api/v1${path}`, {
     ...opts,
     cache: 'no-store',
     headers: {
-      'Content-Type': 'application/json',
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       'x-lingxiao-token': getServerToken(),
       ...(opts?.headers || {}),
     },
@@ -20,7 +21,7 @@ async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
   return body as T;
 }
 
-export default function McpServersTab() {
+export default function McpServersTab({ inline }: { inline?: boolean }) {
   const { t } = useTranslation();
   const sessionId = useSessionStore((s) => s.sessionId || s.activeSessionId);
   const [servers, setServers] = useState<McpServerConfig[]>([]);
@@ -102,7 +103,26 @@ export default function McpServersTab() {
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {isLoading ? (
+        {creating ? (
+          <McpServerForm
+            inline={inline}
+            onClose={() => setCreating(false)}
+            onSaved={(server) => {
+              setCreating(false);
+              setServers((prev) => [...prev.filter((item) => item.id !== server.id), server].sort((a, b) => a.id.localeCompare(b.id)));
+            }}
+          />
+        ) : editing ? (
+          <McpServerForm
+            inline={inline}
+            initial={editing}
+            onClose={() => setEditing(null)}
+            onSaved={(server) => {
+              setEditing(null);
+              setServers((prev) => prev.map((item) => item.id === server.id ? server : item));
+            }}
+          />
+        ) : isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 text-accent-brand animate-spin" />
           </div>
@@ -153,26 +173,6 @@ export default function McpServersTab() {
           </div>
         )}
       </div>
-
-      {creating && (
-        <McpServerForm
-          onClose={() => setCreating(false)}
-          onSaved={(server) => {
-            setCreating(false);
-            setServers((prev) => [...prev.filter((item) => item.id !== server.id), server].sort((a, b) => a.id.localeCompare(b.id)));
-          }}
-        />
-      )}
-      {editing && (
-        <McpServerForm
-          initial={editing}
-          onClose={() => setEditing(null)}
-          onSaved={(server) => {
-            setEditing(null);
-            setServers((prev) => prev.map((item) => item.id === server.id ? server : item));
-          }}
-        />
-      )}
     </div>
   );
 }

@@ -26,6 +26,7 @@ import {
   Sparkles,
   Trash2,
   X,
+  Zap,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { SettingsSection } from '../components/SettingsSection';
@@ -63,6 +64,7 @@ export function ModelAndReasoningSection({
   const [newModel, setNewModel] = useState<AddModelForm>(() => createDefaultAddModelForm());
   const [addingModel, setAddingModel] = useState(false);
   const [modelStatus, setModelStatus] = useState<StatusMessage>(null);
+  const [cardTestResults, setCardTestResults] = useState<Record<string, StatusMessage>>({});
   const [showApiKey, setShowApiKey] = useState(false);
   const [leaderCtxEdit, setLeaderCtxEdit] = useState<number | ''>('');
   const [agentCtxEdit, setAgentCtxEdit] = useState<number | ''>('');
@@ -75,6 +77,7 @@ export function ModelAndReasoningSection({
   const [deletingModelId, setDeletingModelId] = useState<string | null>(null);
   const [editingModelId, setEditingModelId] = useState<string | null>(null);
   const [autoDetected, setAutoDetected] = useState(false);
+  const [testingModelId, setTestingModelId] = useState<string | null>(null);
 
   const configuredModels = useMemo<ModelItem[]>(
     () => providers.flatMap((p) => p.models.flatMap((m) => (m.provider ? [{ ...m, provider: m.provider }] : []))),
@@ -328,6 +331,47 @@ export function ModelAndReasoningSection({
     }
   };
 
+  const handleTestFormConnection = async () => {
+    const modelName = newModel.model.trim();
+    const apiKey = newModel.apiKey.trim();
+    if (!modelName || !apiKey) {
+      setModelStatus({ kind: 'error', message: t('settings.addModel.error.required') });
+      return;
+    }
+    setTestingModelId('__form__');
+    setModelStatus(null);
+    try {
+      await settingsApiFetch('/settings/test-llm', {
+        method: 'POST',
+        body: JSON.stringify({
+          provider: newModel.protocol,
+          apiKey,
+          baseUrl: newModel.baseUrl.trim(),
+          model: modelName,
+        }),
+      });
+      setModelStatus({ kind: 'success', message: t('onboarding.llm.testSuccess') });
+    } catch (e) {
+      setModelStatus({ kind: 'error', message: e instanceof Error ? e.message : t('onboarding.llm.testFailed') });
+    } finally {
+      setTestingModelId(null);
+    }
+  };
+
+  const handleTestCardConnection = async (modelId: string) => {
+    setTestingModelId(modelId);
+    setCardTestResults((prev) => ({ ...prev, [modelId]: null }));
+    try {
+      await settingsApiFetch(`/settings/test-model-provider/${encodeURIComponent(modelId)}`, { method: 'POST' });
+      setCardTestResults((prev) => ({ ...prev, [modelId]: { kind: 'success', message: t('onboarding.llm.testSuccess') } }));
+    } catch (e) {
+      setCardTestResults((prev) => ({ ...prev, [modelId]: { kind: 'error', message: e instanceof Error ? e.message : t('onboarding.llm.testFailed') } }));
+    } finally {
+      setTestingModelId(null);
+      setTimeout(() => setCardTestResults((prev) => ({ ...prev, [modelId]: null })), 4000);
+    }
+  };
+
   const effortOptions = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'adaptive'].map((value) => ({ value, label: t(`settings.effort.${value}`) }));
   const gatewayEnabled = !!settings.localLlmGatewayEnabled;
   const gatewayProvider = settingString(settings.localLlmGatewayProvider, 'openai');
@@ -488,6 +532,10 @@ export function ModelAndReasoningSection({
                 {addingModel ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                 {existingModel ? t('settings.action.updateModel') : t('settings.addModel.save')}
               </button>
+              <button type="button" onClick={handleTestFormConnection} disabled={testingModelId === '__form__'} className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded border border-border-default px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary disabled:opacity-50">
+                {testingModelId === '__form__' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+                {t('settings.git.testConnection')}
+              </button>
               {modelStatus && <StatusInline status={modelStatus} />}
             </div>
           </div>
@@ -552,8 +600,12 @@ export function ModelAndReasoningSection({
                   deleteDisabled={model.id === leaderModelId || model.id === agentModelId || model.id === gatewayConfiguredModelId}
                   deleteDisabledTitle={t('settings.model.deleteInUse')}
                   deleting={deletingModelId === model.id}
+                  testing={testingModelId === model.id}
+                  testLabel={t('settings.git.testConnection')}
+                  testResult={cardTestResults[model.id] ?? null}
                   onEdit={() => startEditModel(model)}
                   onDelete={() => setDeleteCandidate(model)}
+                  onTest={() => handleTestCardConnection(model.id)}
                 />
               ))}
             </div>
@@ -788,8 +840,12 @@ function ModelConfigCard({
   deleteDisabled,
   deleteDisabledTitle,
   deleting,
+  testing,
+  testLabel,
+  testResult,
   onEdit,
   onDelete,
+  onTest,
 }: {
   model: ModelItem;
   active: boolean;
@@ -800,8 +856,12 @@ function ModelConfigCard({
   deleteDisabled: boolean;
   deleteDisabledTitle: string;
   deleting: boolean;
+  testing: boolean;
+  testLabel: string;
+  testResult: StatusMessage;
   onEdit: () => void;
   onDelete: () => void;
+  onTest: () => void;
 }) {
   return (
     <div className="min-w-0 rounded-md border border-border-muted bg-bg-primary/45 p-3 transition-colors hover:border-accent-brand/40 hover:bg-bg-hover">
@@ -814,6 +874,16 @@ function ModelConfigCard({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={onTest}
+            disabled={testing}
+            className="inline-flex h-7 w-7 items-center justify-center rounded border border-border-default text-text-tertiary transition-colors hover:border-accent-brand/40 hover:bg-accent-brand/10 hover:text-accent-brand disabled:opacity-50"
+            title={testLabel}
+            aria-label={testLabel}
+          >
+            {testing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+          </button>
           <button
             type="button"
             onClick={onEdit}
@@ -843,6 +913,12 @@ function ModelConfigCard({
           <span>{formatNumber(model.contextWindowSize)} {tokenUnit}</span>
         </div>
       </div>
+      {testResult && (
+        <div className={`mt-2 flex items-center gap-1.5 rounded px-2 py-1 text-[11px] ${testResult.kind === 'success' ? 'bg-accent-green/10 text-accent-green' : 'bg-accent-red/10 text-accent-red'}`}>
+          {testResult.kind === 'success' ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+          {testResult.message}
+        </div>
+      )}
     </div>
   );
 }

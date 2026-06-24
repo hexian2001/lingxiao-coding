@@ -859,6 +859,75 @@ export function registerSettingsRoutes(
   });
 
 
+  // POST /api/v1/settings/test-model-provider/:id — 用已保存的模型配置测试连接
+  fastify.post('/api/v1/settings/test-model-provider/:id', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const { id } = request.params as { id: string };
+    if (!id) {
+      reply.status(400).send({ error: 'id is required' });
+      return;
+    }
+    const providers = getConfigValue('llm.model_providers') as ModelProvidersConfig | undefined;
+    if (!providers) {
+      reply.status(404).send({ error: 'No model providers configured' });
+      return;
+    }
+    let found: { provider: string; apiKey: string; baseUrl: string; model: string } | null = null;
+    for (const [providerKey, models] of Object.entries(providers)) {
+      const list = Array.isArray(models) ? models : [];
+      const match = list.find((m) => m?.id === id || m?.name === id);
+      if (match) {
+        found = { provider: providerKey, apiKey: String(match.apiKey ?? ''), baseUrl: String(match.baseUrl ?? ''), model: String(match.model ?? match.id ?? '') };
+        break;
+      }
+    }
+    if (!found || !found.apiKey) {
+      reply.status(404).send({ error: `Model '${id}' not found or has no API key` });
+      return;
+    }
+    try {
+      const isAnthropic = found.provider === 'anthropic';
+      const defaultBaseUrl = isAnthropic ? 'https://api.anthropic.com' : 'https://api.openai.com/v1';
+      const effectiveBaseUrl = found.baseUrl || defaultBaseUrl;
+      const url = isAnthropic
+        ? `${effectiveBaseUrl.replace(/\/$/, '')}/v1/messages`
+        : `${effectiveBaseUrl.replace(/\/$/, '')}/chat/completions`;
+      const headers: Record<string, string> = isAnthropic
+        ? { 'x-api-key': found.apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }
+        : { 'authorization': `Bearer ${found.apiKey}`, 'content-type': 'application/json' };
+      const payload = {
+        model: found.model,
+        max_tokens: 16,
+        messages: [{ role: 'user', content: 'Hi' }],
+      };
+      const llmRes = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (llmRes.ok) {
+        const data = await llmRes.json() as { content?: Array<{ text?: string }>; choices?: Array<{ message?: { content?: string } }> };
+        const preview = isAnthropic
+          ? (data.content?.[0]?.text || '').slice(0, 100)
+          : (data.choices?.[0]?.message?.content || '').slice(0, 100);
+        return { success: true, data: { message: 'Connection successful', responsePreview: preview } };
+      }
+      const errText = await llmRes.text().catch(() => '');
+      let errMsg = `HTTP ${llmRes.status}`;
+      try {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson?.error?.message || errJson?.error || errJson?.message || errMsg;
+      } catch {
+        if (errText) errMsg = errText.slice(0, 200);
+      }
+      reply.status(502).send({ error: `${errMsg} (status ${llmRes.status})` });
+    } catch (e: unknown) {
+      request.log.warn({ err: e }, 'test-model-provider failed');
+      reply.status(502).send({ error: toErrorMessage(e) });
+    }
+  });
+
   // POST /api/v1/settings/model-provider — 添加模型提供者
   fastify.post('/api/v1/settings/model-provider', async (request, reply) => {
     if (!requireServerToken(request, reply)) return;

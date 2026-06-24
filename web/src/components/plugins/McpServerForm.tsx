@@ -42,6 +42,7 @@ interface Props {
   initial?: McpServerConfig;
   onClose: () => void;
   onSaved: (server: McpServerConfig) => void;
+  inline?: boolean;
 }
 
 const ID_RE = /^[a-z][a-z0-9_]{1,79}$/;
@@ -132,7 +133,7 @@ async function saveServer(payload: McpServerConfig): Promise<McpServerConfig> {
   return body.data as McpServerConfig;
 }
 
-export default function McpServerForm({ initial, onClose, onSaved }: Props) {
+export default function McpServerForm({ initial, onClose, onSaved, inline }: Props) {
   const { t } = useTranslation();
   const isEdit = Boolean(initial);
   const [server, setServer] = useState<McpServerConfig>(() => initial ? { ...initial } : emptyServer());
@@ -279,8 +280,8 @@ export default function McpServerForm({ initial, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="lx-overlay p-4">
-      <div className="bg-bg-primary border border-border-default rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
+    <div className={inline ? '' : 'lx-overlay p-4'}>
+      <div className={`bg-bg-primary border border-border-default rounded-lg w-full flex flex-col ${inline ? '' : 'max-w-3xl max-h-[90vh]'}`}>
         <div className="px-4 py-3 border-b border-border-default flex items-center justify-between">
           <h3 className="text-sm font-medium text-text-primary">
             {isEdit ? t('mcp.form.editTitle') : t('mcp.form.addTitle')}
