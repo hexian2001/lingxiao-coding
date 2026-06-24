@@ -456,3 +456,230 @@ export function parseBlueprint(raw: unknown): ProjectBlueprint | null {
     return null;
   }
 }
+
+// ─── 增删改操作 ───────────────────────────────────────────────────────────
+
+export interface AddSubsystemInput {
+  subsystemId: string;
+  name: string;
+  description: string;
+  status?: BlueprintSubsystemStatus;
+  rationale?: string;
+  agentType?: string;
+  dependsOn?: readonly string[];
+}
+
+export type AddSubsystemResult = ProjectBlueprint | { error: string };
+
+/**
+ * 添加单个子系统到蓝图。校验同 normalizeBlueprint：
+ *  - subsystemId 必须唯一（不与现有冲突）
+ *  - name/description 必填
+ *  - defer/not_applicable 必须带 rationale
+ *  - dependsOn 引用必须在蓝图内（包括新增的）
+ *  - 添加后整体必须无环
+ */
+export function addSubsystem(blueprint: ProjectBlueprint, input: AddSubsystemInput, now: number = Date.now()): AddSubsystemResult {
+  const subsystemId = input.subsystemId.trim();
+  if (!subsystemId) {
+    return { error: '子系统 subsystem_id 不能为空。' };
+  }
+  if (blueprint.subsystems.some((e) => e.subsystemId === subsystemId)) {
+    return { error: `子系统 ${subsystemId} 已存在。请使用 update_subsystem 修改现有子系统。` };
+  }
+  const name = input.name.trim();
+  const description = input.description.trim();
+  if (!name) {
+    return { error: `子系统 ${subsystemId} 缺少 name。` };
+  }
+  if (!description) {
+    return { error: `子系统 ${subsystemId} 缺少 description。` };
+  }
+
+  const status = input.status ?? 'implement';
+  const rationale = input.rationale?.trim();
+  if (status !== 'implement' && !rationale) {
+    return { error: `子系统 ${subsystemId} 标记为 ${status} 但未给出 rationale。砍掉一个子系统的实现必须有明确理由。` };
+  }
+
+  // 构建新条目
+  const knownIds = new Set([...blueprint.subsystems.map((e) => e.subsystemId), subsystemId]);
+  const dependsOn = input.dependsOn && input.dependsOn.length > 0
+    ? input.dependsOn.filter((d) => knownIds.has(d))
+    : undefined;
+
+  const newEntry: BlueprintSubsystemEntry = {
+    subsystemId,
+    name,
+    description,
+    status,
+    ...(rationale ? { rationale } : {}),
+    taskIds: [],
+    ...(input.agentType?.trim() ? { agentType: input.agentType.trim() } : {}),
+    ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
+  };
+
+  const newSubsystems = [...blueprint.subsystems, newEntry];
+
+  // 无环校验
+  const topo = topologicalOrder(newSubsystems.map((e) => ({ id: e.subsystemId, blocked_by: e.dependsOn ?? [] })));
+  if ('cycle' in topo) {
+    return { error: `添加子系统 ${subsystemId} 后依赖存在环: ${topo.cycle.join(' → ')}。请检查 depends_on。` };
+  }
+
+  // integration-verify 强制检查
+  const implementCount = newSubsystems.filter((e) => e.status === 'implement').length;
+  if (implementCount >= 3) {
+    const hasIntegrationVerify = newSubsystems.some((e) =>
+      /integration[-_]?verify|integ[-_]?verify/i.test(e.subsystemId),
+    );
+    if (!hasIntegrationVerify) {
+      return {
+        error: `添加后蓝图包含 ${implementCount} 个 implement 子系统(≥ 3),但未定义 integration-verify 类型子系统。` +
+          `请先添加一个 integration-verify 子系统(如 subsystemId: 'integration-verify', status: 'implement')。`,
+      };
+    }
+  }
+
+  return {
+    ...blueprint,
+    subsystems: newSubsystems,
+    updatedAt: now,
+  };
+}
+
+export interface UpdateSubsystemInput {
+  subsystemId: string;
+  name?: string;
+  description?: string;
+  status?: BlueprintSubsystemStatus;
+  rationale?: string;
+  agentType?: string;
+  dependsOn?: readonly string[];
+}
+
+export type UpdateSubsystemResult = ProjectBlueprint | { error: string };
+
+/**
+ * 更新子系统属性。只更新提供的字段，未提供的保持不变。
+ * 校验规则：
+ *  - subsystemId 必须存在
+ *  - 更新后 name/description 不能为空
+ *  - defer/not_applicable 必须带 rationale
+ *  - dependsOn 引用必须在蓝图内
+ *  - 更新后整体必须无环
+ */
+export function updateSubsystem(blueprint: ProjectBlueprint, input: UpdateSubsystemInput, now: number = Date.now()): UpdateSubsystemResult {
+  const subsystemId = input.subsystemId.trim();
+  if (!subsystemId) {
+    return { error: 'subsystem_id 不能为空。' };
+  }
+
+  const existingIndex = blueprint.subsystems.findIndex((e) => e.subsystemId === subsystemId);
+  if (existingIndex === -1) {
+    return { error: `子系统 ${subsystemId} 不存在。请使用 add_subsystem 添加新子系统。` };
+  }
+
+  const existing = blueprint.subsystems[existingIndex];
+  const name = input.name !== undefined ? input.name.trim() : existing.name;
+  const description = input.description !== undefined ? input.description.trim() : existing.description;
+
+  if (!name) {
+    return { error: `子系统 ${subsystemId} 的 name 不能为空。` };
+  }
+  if (!description) {
+    return { error: `子系统 ${subsystemId} 的 description 不能为空。` };
+  }
+
+  const status = input.status ?? existing.status;
+  const rationale = input.rationale !== undefined ? input.rationale?.trim() : existing.rationale;
+
+  if (status !== 'implement' && !rationale) {
+    return { error: `子系统 ${subsystemId} 标记为 ${status} 但未给出 rationale。` };
+  }
+
+  const knownIds = new Set(blueprint.subsystems.map((e) => e.subsystemId));
+  const dependsOn = input.dependsOn !== undefined
+    ? (input.dependsOn.length > 0 ? input.dependsOn.filter((d) => knownIds.has(d)) : undefined)
+    : existing.dependsOn;
+
+  const agentType = input.agentType !== undefined ? input.agentType?.trim() || undefined : existing.agentType;
+
+  const updatedEntry: BlueprintSubsystemEntry = {
+    ...existing,
+    name,
+    description,
+    status,
+    ...(rationale ? { rationale } : {}),
+    ...(agentType ? { agentType } : {}),
+    ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
+  };
+
+  const newSubsystems = [...blueprint.subsystems];
+  newSubsystems[existingIndex] = updatedEntry;
+
+  // 无环校验
+  const topo = topologicalOrder(newSubsystems.map((e) => ({ id: e.subsystemId, blocked_by: e.dependsOn ?? [] })));
+  if ('cycle' in topo) {
+    return { error: `更新子系统 ${subsystemId} 后依赖存在环: ${topo.cycle.join(' → ')}。请检查 depends_on。` };
+  }
+
+  return {
+    ...blueprint,
+    subsystems: newSubsystems,
+    updatedAt: now,
+  };
+}
+
+export type DeleteSubsystemResult = ProjectBlueprint | { error: string };
+
+/**
+ * 删除子系统。校验规则：
+ *  - subsystemId 必须存在
+ *  - 不能有其他子系统依赖它（避免破坏依赖链）
+ *  - 如果有关联任务，给出警告但允许删除（任务的 subsystem 绑定会失效）
+ */
+export function deleteSubsystem(blueprint: ProjectBlueprint, subsystemId: string, now: number = Date.now()): DeleteSubsystemResult {
+  const trimmedId = subsystemId.trim();
+  if (!trimmedId) {
+    return { error: 'subsystem_id 不能为空。' };
+  }
+
+  const existing = blueprint.subsystems.find((e) => e.subsystemId === trimmedId);
+  if (!existing) {
+    return { error: `子系统 ${trimmedId} 不存在。` };
+  }
+
+  // 检查是否有其他子系统依赖它
+  const dependents = blueprint.subsystems.filter((e) =>
+    e.dependsOn?.includes(trimmedId),
+  );
+  if (dependents.length > 0) {
+    return {
+      error: `无法删除子系统 ${trimmedId}：有 ${dependents.length} 个子系统依赖它: ${dependents.map((e) => e.subsystemId).join(', ')}。` +
+        `请先移除这些依赖关系或删除依赖的子系统。`,
+    };
+  }
+
+  const newSubsystems = blueprint.subsystems.filter((e) => e.subsystemId !== trimmedId);
+
+  // 删除后检查 integration-verify 规则
+  const implementCount = newSubsystems.filter((e) => e.status === 'implement').length;
+  if (implementCount >= 3) {
+    const hasIntegrationVerify = newSubsystems.some((e) =>
+      /integration[-_]?verify|integ[-_]?verify/i.test(e.subsystemId),
+    );
+    if (!hasIntegrationVerify) {
+      return {
+        error: `删除 ${trimmedId} 后蓝图仍有 ${implementCount} 个 implement 子系统(≥ 3),但缺少 integration-verify 子系统。` +
+          `无法删除该子系统。`,
+      };
+    }
+  }
+
+  return {
+    ...blueprint,
+    subsystems: newSubsystems,
+    updatedAt: now,
+  };
+}

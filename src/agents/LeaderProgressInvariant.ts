@@ -64,19 +64,6 @@ export interface LeaderProgressInvariantDeps {
   setWaitingForUser: (waiting: boolean) => Promise<void>;
   /** Record token usage for budget tracking */
   recordTokenUsage: (usage: TokenUsage) => void;
-  /**
-   * @deprecated ProjectHealthPolicy 已删除（buildHealthInput 始终返回 null，evaluate 不再被调用）。
-   * 入参保留 optional 仅为兼容历史调用点，新代码请勿继续注入。
-   */
-  buildHealthInput?: () => unknown;
-  /**
-   * @deprecated 同上 — 健康驱动的 recovery 已下线，注入函数永不被调用。
-   */
-  executeRecoveryAction?: (action: unknown) => Promise<void>;
-  /**
-   * @deprecated 同上 — blocked 升级路径已下线，注入函数永不被调用。
-   */
-  escalateBlocked?: (decision: unknown) => Promise<void>;
   /** Dispatch ready tasks in parallel (called by EternalLoop when agents are running) */
   dispatchReadyTasks?: () => Promise<number>;
   /** Get count of ready-to-dispatch tasks (used by EternalLoop to notify Leader) */
@@ -163,8 +150,6 @@ export class LeaderProgressInvariant {
     this.getEternalJudgeLlm = deps.getEternalJudgeLlm;
     this.getEternalJudgeModel = deps.getEternalJudgeModel;
     this.yieldEternalToUser = deps.yieldEternalToUser;
-    // 注：buildHealthInput / executeRecoveryAction / escalateBlocked 入参已 deprecated，
-    //    ProjectHealthPolicy 整体下线后这三处不再注入；签名保留 optional 仅为兼容旧调用点。
   }
 
   // ─────────────────────────────────────────────────────────────────────

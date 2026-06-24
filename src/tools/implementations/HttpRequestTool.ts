@@ -4,6 +4,7 @@ import { createToolError, Tool, type ToolContext, type ToolResult } from '../Too
 import { checkUrlNotPrivate } from './WebCommon.js';
 import { getScopedProxyFetch } from '../../core/ProxyConfig.js';
 import { buildLingxiaoComponentUserAgent } from '../../version.js';
+import https from 'https';
 
 const HTTP_REQUEST_USER_AGENT = buildLingxiaoComponentUserAgent('http_request tool');
 
@@ -36,12 +37,29 @@ export class HttpRequestTool extends Tool {
     return Math.ceil(timeoutSeconds * 1000 * (maxRedirects + 1)) + 5_000;
   }
 
-  private static async fetchWithTimeout(url: string, options: RequestInit, timeoutSeconds: number): Promise<Response> {
+  private static async fetchWithTimeout(url: string, options: RequestInit, timeoutSeconds: number, verifySsl?: boolean): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000);
     try {
       const scopedFetch = getScopedProxyFetch('tools') || fetch;
-      return await scopedFetch(url, { ...options, signal: controller.signal });
+      const fetchOptions: RequestInit = { ...options, signal: controller.signal };
+
+      // Consume verify_ssl parameter: when explicitly false, create an HTTPS agent
+      // that disables certificate verification. When true or undefined, leave default
+      // behavior (Node.js verifies SSL by default).
+      if (verifySsl === false) {
+        const insecureAgent = new https.Agent({ rejectUnauthorized: false });
+        // For node-fetch (proxy path), attach via init.agent;
+        // for global fetch (undici), attach via init.dispatcher.
+        const opts = fetchOptions as Record<string, unknown>;
+        if (scopedFetch !== fetch) {
+          opts.agent = insecureAgent;
+        } else {
+          opts.dispatcher = insecureAgent;
+        }
+      }
+
+      return await scopedFetch(url, fetchOptions);
     } finally {
       clearTimeout(timeoutId);
     }
@@ -76,7 +94,7 @@ export class HttpRequestTool extends Tool {
     const {
       method = 'GET', url, body,
       follow_redirects = true, timeout = 10, max_response_size = 30000,
-      max_redirects = 5,
+      max_redirects = 5, verify_ssl,
     } = params;
     if (typeof headers === 'string') { try { headers = JSON.parse(headers); } catch { /* keep */ } }
     if (typeof cookies === 'string') { try { cookies = JSON.parse(cookies); } catch { /* keep */ } }
@@ -115,7 +133,7 @@ export class HttpRequestTool extends Tool {
       let response: Response | null = null;
 
       while (true) {
-        response = await HttpRequestTool.fetchWithTimeout(currentUrl, { ...fetchOptions, method: httpMethod, body: requestBody }, safeTimeout);
+        response = await HttpRequestTool.fetchWithTimeout(currentUrl, { ...fetchOptions, method: httpMethod, body: requestBody }, safeTimeout, verify_ssl);
         collectedSetCookies.push(...HttpRequestTool.collectSetCookies(response));
 
         const location = response.headers.get('location');

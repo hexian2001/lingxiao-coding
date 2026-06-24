@@ -112,6 +112,11 @@ export class AcpClient {
 
     this.reconnectAttempts = 0;
     this.reconnectCycle = 0;
+    // 关键：handshake 成功后必须复位 handshakeReconnectCount。
+    // 否则该计数器只增不减，长跑期间每次独立的 SSE 断线都会累加，
+    // 累计第 11 次握手时 > MAX_RECONNECT_HANDSHAKES，永久放弃重连 →
+    // isConnected 永久 false → ChatView 退回"选择会话"空状态。
+    this.handshakeReconnectCount = 0;
     return this.connection;
   }
 

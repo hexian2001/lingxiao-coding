@@ -59,10 +59,27 @@ function resolveLlmGuardFactory(deps: GatewayDeps): LlmGuardFactory {
   throw new Error('LocalLlmGatewayRoutes requires createLlmGuard dependency');
 }
 
-function cors(reply: FastifyReply): void {
-  reply.header('Access-Control-Allow-Origin', '*');
+function cors(reply: FastifyReply, request?: FastifyRequest): void {
+  // Restrict CORS to loopback origins instead of wildcard '*'.
+  // The LLM gateway is a local-only service; only allow same-origin or loopback.
+  const origin = request?.headers.origin;
+  if (origin) {
+    try {
+      const parsed = new URL(origin);
+      if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1' || parsed.hostname === '::1') {
+        reply.header('Access-Control-Allow-Origin', origin);
+      } else {
+        reply.header('Access-Control-Allow-Origin', 'null');
+      }
+    } catch {
+      reply.header('Access-Control-Allow-Origin', 'null');
+    }
+  } else {
+    // Same-origin requests (no Origin header) — no CORS header needed.
+  }
   reply.header('Access-Control-Allow-Headers', 'authorization, content-type, x-api-key, anthropic-version, x-lingxiao-session-id, x-lingxiao-agent-id, x-lingxiao-agent-name, x-lingxiao-task-id');
   reply.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  reply.header('Vary', 'Origin');
 }
 
 function headerValue(request: FastifyRequest, name: string): string {
@@ -221,7 +238,7 @@ function recordGatewayRequest(input: {
 }
 
 function authorize(request: FastifyRequest, reply: FastifyReply): LocalLlmGatewayAccess | null {
-  cors(reply);
+  cors(reply, request);
   const result = authorizeLocalLlmGatewayToken(bearerToken(request));
   if (!result.ok) {
     reply.status(result.error.statusCode).send({ error: { message: result.error.message, type: result.error.type } });
@@ -612,12 +629,12 @@ function openAIStreamChunk(text: string, model: string) {
 }
 
 export function registerLocalLlmGatewayRoutes(fastify: FastifyInstance, deps: GatewayDeps): void {
-  fastify.options('/llm/openai/v1/*', async (_request, reply) => {
-    cors(reply);
+  fastify.options('/llm/openai/v1/*', async (request, reply) => {
+    cors(reply, request);
     return reply.status(204).send();
   });
-  fastify.options('/llm/anthropic/v1/*', async (_request, reply) => {
-    cors(reply);
+  fastify.options('/llm/anthropic/v1/*', async (request, reply) => {
+    cors(reply, request);
     return reply.status(204).send();
   });
 
@@ -745,12 +762,11 @@ export function registerLocalLlmGatewayRoutes(fastify: FastifyInstance, deps: Ga
     if (body.stream === true) {
       const startedAt = Date.now();
       reply.hijack();
-      cors(reply);
+      cors(reply, request);
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
       });
       // 客户端断连即中止上游 LLM 调用：避免 provider 在客户端已走后仍跑满生成（烧 token），
       // 且防止 reply.raw.write 向死流缓冲无界增长。
@@ -834,12 +850,11 @@ export function registerLocalLlmGatewayRoutes(fastify: FastifyInstance, deps: Ga
     if (body.stream === true) {
       const startedAt = Date.now();
       reply.hijack();
-      cors(reply);
+      cors(reply, request);
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
       });
       const messageId = completionId('msg');
       // 客户端断连即中止上游 LLM（同 OpenAI 路径）；sseWrite 已对死流守卫。

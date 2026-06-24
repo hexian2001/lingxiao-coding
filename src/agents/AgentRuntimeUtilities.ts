@@ -29,6 +29,25 @@ export function truncateAgentToolResult(
   if (CENTER_PRESERVED_TOOL_RESULTS.has(toolName)) {
     const head = result.slice(0, maxChars / 2);
     const tail = result.slice(-(maxChars / 2));
+
+    // 为 file_read 添加分页提示
+    if (toolName === 'file_read') {
+      // 尝试从结果中提取行号信息，以便给出更准确的提示
+      const lines = result.split('\n');
+      const firstLineMatch = lines[0]?.match(/^\s*(\d+)→/);
+      const lastLineMatch = lines[lines.length - 1]?.match(/^\s*(\d+)→/);
+
+      let hint = '提示：使用 start_line 和 end_line 参数可以分段读取文件';
+      if (firstLineMatch && lastLineMatch) {
+        const firstLine = parseInt(firstLineMatch[1], 10);
+        const lastLine = parseInt(lastLineMatch[1], 10);
+        const midLine = Math.floor((firstLine + lastLine) / 2);
+        hint = `提示：文件内容已截断。使用 start_line=${midLine} 或 end_line=${midLine} 参数可以分段读取`;
+      }
+
+      return `${head}\n\n... [中间 ${result.length - maxChars} 字符已省略] ...\n${hint}\n\n${tail}`;
+    }
+
     return `${head}\n\n... [中间 ${result.length - maxChars} 字符已省略] ...\n\n${tail}`;
   }
 

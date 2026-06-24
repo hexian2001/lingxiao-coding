@@ -772,17 +772,12 @@ export class LeaderAgent {
         await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, waiting ? 'true' : 'false');
       },
       recordTokenUsage: (_usage) => {
-        // Token tracking delegated to EternalLoop
-      },
-      buildHealthInput: () => null,
-      executeRecoveryAction: async (_action) => {
-        // Recovery actions delegated to orchestration runtime
-      },
-      escalateBlocked: async (_decision) => {
-        // Blocked escalation delegated to AlertManager via EternalLoop
+        // Token tracking delegated to EternalLoop — LeaderAgent layer is intentionally a no-op.
+        // EternalLoop has its own recordTokenUsage via its deps, this is just to satisfy the interface.
       },
       dispatchReadyTasks: async () => {
-        // 所有派发决策必须经过 Leader LLM，不再自动 tick scheduler
+        // 所有派发决策必须经过 Leader LLM，不再自动 tick scheduler。
+        // Intentional no-op: auto-dispatch path retired in favor of explicit Leader LLM decisions.
         return 0;
       },
       getReadyTaskCount: () => this.board.getReadyTasks().filter(t => t.status === 'dispatchable').length,

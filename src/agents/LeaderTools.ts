@@ -63,6 +63,9 @@ import {
   defineAgentRole as planDefineAgentRole,
   deleteAgentRole as planDeleteAgentRole,
   defineProjectBlueprint as planDefineProjectBlueprint,
+  addBlueprintSubsystem as planAddBlueprintSubsystem,
+  updateBlueprintSubsystem as planUpdateBlueprintSubsystem,
+  deleteBlueprintSubsystem as planDeleteBlueprintSubsystem,
   listAvailableRoles as planListAvailableRoles,
   updateTaskStatus as planUpdateTaskStatus,
 } from './leader/tools/LeaderTaskPlanningTools.js';
@@ -494,6 +497,12 @@ export class LeaderToolsExecutor {
         return planDeleteAgentRole(planCtx, args);
       case 'define_project_blueprint':
         return await planDefineProjectBlueprint(planCtx, args);
+      case 'add_subsystem':
+        return planAddBlueprintSubsystem(planCtx, args);
+      case 'update_subsystem':
+        return planUpdateBlueprintSubsystem(planCtx, args);
+      case 'delete_subsystem':
+        return planDeleteBlueprintSubsystem(planCtx, args);
       case 'list_available_roles':
         return planListAvailableRoles(planCtx);
       case 'dispatch_agent':

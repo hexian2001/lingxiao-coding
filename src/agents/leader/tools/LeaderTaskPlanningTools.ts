@@ -37,8 +37,13 @@ import {
   registerTaskId,
   unregisterTaskId,
   buildSubsystemContractSeeds,
+  addSubsystem,
+  updateSubsystem,
+  deleteSubsystem,
   type ProjectBlueprint,
   type SubsystemContractSeed,
+  type AddSubsystemInput,
+  type UpdateSubsystemInput,
 } from '../../../core/ProjectBlueprint.js';
 
 export interface TaskPlanningContext {
@@ -995,7 +1000,7 @@ export async function defineProjectBlueprint(
       ? `\n下一步: 用 write_contract(surface="<subsystem_id>", content="...") 为每个子系统写入契约，或 create_task(node_kind="contract") 建单个 architect 任务。\n待写契约: ${surfaces.join(', ')}`
       : '';
   }
-  // 0→1: 蓝图完整性自动审查——派一个 planner 专门找遗漏
+  // 0→1: 蓝图完整性自动审查——创建并强制派发 planner 补全蓝图
   let auditHint = '';
   try {
     const userRequest = ctx.leader.db.getSession(ctx.leader.sessionId)?.user_request || '';
@@ -1005,7 +1010,7 @@ export async function defineProjectBlueprint(
       auditTaskId,
       `蓝图完整性审查`,
       [
-        `你是蓝图审查员。审查以下蓝图是否覆盖了“完整可用产品”所需的全部子系统。`,
+        `你是蓝图审查员。审查以下蓝图是否覆盖了”完整可用产品”所需的全部子系统。`,
         ``,
         `用户原始需求: ${userRequest}`,
         ``,
@@ -1025,6 +1030,7 @@ export async function defineProjectBlueprint(
         `2. 现有子系统的补充建议`,
         `3. 优先级排序`,
         ``,
+        `完成审查后，用 add_subsystem 工具直接补充缺失的子系统到蓝图中。`,
         `注意: 根据项目类型灵活判断。内部工具不需要注册、CLI 不需要导航、API only 不需要 UI 组件。不要无脑补充，只补真正缺失的。`,
       ].join('\n'),
       'planner',
@@ -1034,7 +1040,16 @@ export async function defineProjectBlueprint(
       undefined, // context
       { orchestration: { nodeKind: 'plan' } },
     );
-    auditHint = `\n已自动创建蓝图完整性审查任务 ${auditTaskId}（planner 角色）。建议先派发它，根据审查结果补全蓝图后再开工。`;
+    // 强制派发审查任务——让 planner 立即审查并补全蓝图
+    const auditAgentName = `blueprint-audit-${ctx.leader.sessionId.slice(0, 8)}-${Date.now()}`;
+    try {
+      const dispatchResult = await ctx.dispatchAgent({ task_id: auditTaskId, agent_name: auditAgentName });
+      auditHint = `\n✓ 已自动派发蓝图完整性审查任务 ${auditTaskId} → @${auditAgentName}（planner 角色）。Planner 将审查蓝图并自动补全缺失的子系统。${dispatchResult}`;
+    } catch (dispatchErr) {
+      // 派发失败时降级为提示手动派发
+      leaderLogger.warn(`[LeaderTools] 蓝图审查任务派发失败: ${dispatchErr instanceof Error ? dispatchErr.message : String(dispatchErr)}`);
+      auditHint = `\n已创建蓝图完整性审查任务 ${auditTaskId}（planner 角色），但自动派发失败。请手动 dispatch_agent(task_id=”${auditTaskId}”, agent_name=”blueprint-auditor”) 派发它。`;
+    }
   } catch (err) {
     leaderLogger.warn(`[LeaderTools] 蓝图审查任务创建失败: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -1323,4 +1338,184 @@ export async function updateTaskStatus(
   } catch (error) {
     throw fail(`更新任务状态失败：${error instanceof Error ? error.message : String(error)}`);
   }
+}
+
+// ─── 蓝图增删改工具 ──────────────────────────────────────────────────────
+
+/** add_subsystem 实现：添加单个子系统到现有蓝图。 */
+export function addBlueprintSubsystem(
+  ctx: TaskPlanningContext,
+  args: Record<string, unknown> = {},
+): string {
+  const subsystemId = normalizeOptionalString(args.subsystem_id);
+  if (!subsystemId) {
+    throw fail('add_subsystem 必须提供 subsystem_id。');
+  }
+
+  const name = normalizeOptionalString(args.name);
+  if (!name) {
+    throw fail('add_subsystem 必须提供 name。');
+  }
+
+  const description = normalizeOptionalString(args.description);
+  if (!description) {
+    throw fail('add_subsystem 必须提供 description。');
+  }
+
+  const statusRaw = normalizeOptionalString(args.status);
+  const status = statusRaw as 'implement' | 'defer' | 'not_applicable' | undefined;
+
+  const input: AddSubsystemInput = {
+    subsystemId,
+    name,
+    description,
+    ...(status ? { status } : {}),
+    ...(args.rationale ? { rationale: String(args.rationale) } : {}),
+    ...(args.agent_type ? { agentType: String(args.agent_type) } : {}),
+    ...(Array.isArray(args.depends_on) ? { dependsOn: args.depends_on.filter((d): d is string => typeof d === 'string') } : {}),
+  };
+
+  let result: ProjectBlueprint | null = null;
+  ctx.leader.db.updateSessionState<unknown>(ctx.leader.sessionId, SESSION_KEYS.PROJECT_BLUEPRINT, (current) => {
+    const existing = parseBlueprint(current);
+    if (!existing) {
+      throw fail('当前会话没有蓝图。请先用 define_project_blueprint 创建蓝图。');
+    }
+
+    const updated = addSubsystem(existing, input);
+    if ('error' in updated) {
+      throw fail(updated.error);
+    }
+
+    result = updated;
+    return serializeBlueprint(updated);
+  });
+
+  if (!result) {
+    throw fail('add_subsystem 写入失败。');
+  }
+
+  const blueprint = result as ProjectBlueprint;
+  const coverage = computeBlueprintCoverage(blueprint);
+  try {
+    ctx.leader.emitter.emit('leader:blueprint_updated', { sessionId: ctx.leader.sessionId, blueprint, coverage });
+  } catch (err) {
+    leaderLogger.warn(`[LeaderTools] blueprint_updated 事件发送失败: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  return `已添加子系统 ${subsystemId} (${name}) · status=${input.status ?? 'implement'}。蓝图现有 ${blueprint.subsystems.length} 个子系统。`;
+}
+
+/** update_subsystem 实现：更新子系统属性。 */
+export function updateBlueprintSubsystem(
+  ctx: TaskPlanningContext,
+  args: Record<string, unknown> = {},
+): string {
+  const subsystemId = normalizeOptionalString(args.subsystem_id);
+  if (!subsystemId) {
+    throw fail('update_subsystem 必须提供 subsystem_id。');
+  }
+
+  const statusRaw = normalizeOptionalString(args.status);
+  const status = statusRaw as 'implement' | 'defer' | 'not_applicable' | undefined;
+
+  const input: UpdateSubsystemInput = {
+    subsystemId,
+    ...(args.name !== undefined ? { name: String(args.name) } : {}),
+    ...(args.description !== undefined ? { description: String(args.description) } : {}),
+    ...(status ? { status } : {}),
+    ...(args.rationale !== undefined ? { rationale: args.rationale ? String(args.rationale) : undefined } : {}),
+    ...(args.agent_type !== undefined ? { agentType: args.agent_type ? String(args.agent_type) : undefined } : {}),
+    ...(args.depends_on !== undefined ? { dependsOn: Array.isArray(args.depends_on) ? args.depends_on.filter((d): d is string => typeof d === 'string') : [] } : {}),
+  };
+
+  let result: ProjectBlueprint | null = null;
+  ctx.leader.db.updateSessionState<unknown>(ctx.leader.sessionId, SESSION_KEYS.PROJECT_BLUEPRINT, (current) => {
+    const existing = parseBlueprint(current);
+    if (!existing) {
+      throw fail('当前会话没有蓝图。请先用 define_project_blueprint 创建蓝图。');
+    }
+
+    const updated = updateSubsystem(existing, input);
+    if ('error' in updated) {
+      throw fail(updated.error);
+    }
+
+    result = updated;
+    return serializeBlueprint(updated);
+  });
+
+  if (!result) {
+    throw fail('update_subsystem 写入失败。');
+  }
+
+  const blueprint = result as ProjectBlueprint;
+  const coverage = computeBlueprintCoverage(blueprint);
+  try {
+    ctx.leader.emitter.emit('leader:blueprint_updated', { sessionId: ctx.leader.sessionId, blueprint, coverage });
+  } catch (err) {
+    leaderLogger.warn(`[LeaderTools] blueprint_updated 事件发送失败: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  const updatedFields = Object.keys(input).filter((k) => k !== 'subsystemId').join(', ');
+  return `已更新子系统 ${subsystemId}。更新字段: ${updatedFields}。`;
+}
+
+/** delete_subsystem 实现：删除子系统。 */
+export function deleteBlueprintSubsystem(
+  ctx: TaskPlanningContext,
+  args: Record<string, unknown> = {},
+): string {
+  const subsystemId = normalizeOptionalString(args.subsystem_id);
+  if (!subsystemId) {
+    throw fail('delete_subsystem 必须提供 subsystem_id。');
+  }
+
+  let result: ProjectBlueprint | null = null;
+  let deletedName: string | null = null;
+  let deletedTaskIds: string[] = [];
+
+  ctx.leader.db.updateSessionState<unknown>(ctx.leader.sessionId, SESSION_KEYS.PROJECT_BLUEPRINT, (current) => {
+    const existing = parseBlueprint(current);
+    if (!existing) {
+      throw fail('当前会话没有蓝图。请先用 define_project_blueprint 创建蓝图。');
+    }
+
+    const entry = existing.subsystems.find((e) => e.subsystemId === subsystemId);
+    if (entry) {
+      deletedName = entry.name;
+      deletedTaskIds = [...entry.taskIds];
+    }
+
+    const updated = deleteSubsystem(existing, subsystemId);
+    if ('error' in updated) {
+      throw fail(updated.error);
+    }
+
+    result = updated;
+    return serializeBlueprint(updated);
+  });
+
+  if (!result) {
+    throw fail('delete_subsystem 写入失败。');
+  }
+
+  const blueprint = result as ProjectBlueprint;
+  const coverage = computeBlueprintCoverage(blueprint);
+  try {
+    ctx.leader.emitter.emit('leader:blueprint_updated', { sessionId: ctx.leader.sessionId, blueprint, coverage });
+  } catch (err) {
+    leaderLogger.warn(`[LeaderTools] blueprint_updated 事件发送失败: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  let message = `已删除子系统 ${subsystemId}`;
+  if (deletedName) {
+    message += ` (${deletedName})`;
+    if (deletedTaskIds.length > 0) {
+      message += `。警告: 该子系统有 ${deletedTaskIds.length} 个关联任务: ${deletedTaskIds.join(', ')}。这些任务的 subsystem 绑定已失效。`;
+    }
+  }
+  message += `。蓝图剩余 ${blueprint.subsystems.length} 个子系统。`;
+
+  return message;
 }

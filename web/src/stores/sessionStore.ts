@@ -189,6 +189,15 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   addMessage: (msg) => set((s) => {
     const saved = { ...msg, id: msg.id || String(nextMsgId()) };
+    // 调试：记录消息添加来源
+    if (import.meta.env.DEV && msg.role === 'user') {
+      console.log('[addMessage] Adding user message:', {
+        id: saved.id,
+        content: saved.content.substring(0, 50),
+        timestamp: saved.timestamp,
+        stack: new Error().stack?.split('\n').slice(2, 5).join('\n'),
+      });
+    }
     const next = trimMessageWindow([...s.messages, saved]);
     if (s.sessionId) appendMessage(s.sessionId, saved).catch(() => {});
     return { messages: next };

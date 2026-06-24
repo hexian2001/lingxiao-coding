@@ -242,9 +242,8 @@ export default function BranchPanel() {
                 isSwitching={switchingTo === branch.name}
                 isDeleting={false}
                 onSwitch={() => handleSwitch(branch)}
-                // 远程分支删除需要 git push --delete，目前后端 /git/branch DELETE 只删本地，
-                // 不伪造成功；一律禁用，防止点击无反应。
-                onDelete={() => {}}
+                // 远程分支删除需要 git push --delete，后端不支持；
+                // Button 组件内已通过 !branch.remote 隐藏删除按钮，无需传 onDelete。
               />
             ))}
           </div>
@@ -282,7 +281,7 @@ function BranchRow({
   isSwitching: boolean;
   isDeleting: boolean;
   onSwitch: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }) {
   return (
     <div
@@ -306,7 +305,7 @@ function BranchRow({
       )}
       {!branch.current && !branch.remote && !isSwitching && (
         <button
-          onClick={e => { e.stopPropagation(); onDelete(); }}
+          onClick={e => { e.stopPropagation(); onDelete?.(); }}
           disabled={isDeleting}
           className="p-0.5 rounded text-text-tertiary hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
           title="Delete branch"

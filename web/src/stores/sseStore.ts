@@ -994,10 +994,48 @@ function handleSessionUpdate(store: SessionState, update: SessionEventPayload, d
         // last one — intermediate assistant placeholders or phase-change events
         // can push the local optimistic user message out of the `last` position,
         // causing a duplicate user bubble.
+        //
+        // 修复：对于附带附件的消息，前端 displayContent 包含 "[附件] filename" 后缀，
+        // 而后端 content 可能只有文本部分。使用宽松匹配：如果本地消息以后端消息开头，
+        // 且时间戳接近，则认为是重复。这解决了首条消息和附件消息重复渲染的问题。
+
+        // 调试：记录 SSE UserMessage 事件
+        if (import.meta.env.DEV) {
+          console.log('[SSE UserMessage] Received:', {
+            id: umId,
+            content: umContent.substring(0, 50),
+            timestamp: umTimestamp,
+            recentUserMessages: msgs.filter(m => m.role === 'user').slice(-3).map(m => ({
+              id: m.id,
+              content: m.content.substring(0, 50),
+              timestamp: m.timestamp,
+            })),
+          });
+        }
+
         for (let i = msgs.length - 1; i >= 0 && i >= msgs.length - 5; i--) {
           const m = msgs[i];
-          if (m.role === 'user' && m.content === umContent && Math.abs(m.timestamp - umTimestamp) < 10000) return s;
+          if (m.role === 'user' && Math.abs(m.timestamp - umTimestamp) < 10000) {
+            // 精确匹配或前缀匹配（处理附件场景）
+            if (m.content === umContent ||
+                (umContent && m.content.startsWith(umContent)) ||
+                (m.content && umContent.startsWith(m.content))) {
+              if (import.meta.env.DEV) {
+                console.log('[SSE UserMessage] Duplicate detected, skipping:', {
+                  existingId: m.id,
+                  existingContent: m.content.substring(0, 50),
+                  incomingContent: umContent.substring(0, 50),
+                });
+              }
+              return s;
+            }
+          }
         }
+
+        if (import.meta.env.DEV) {
+          console.log('[SSE UserMessage] No duplicate found, adding message');
+        }
+
         return { messages: trimMessageWindow([...msgs, { id: umId, role: 'user' as const, content: umContent, timestamp: umTimestamp, isStreaming: false, retrying: false }]) };
       });
       break;

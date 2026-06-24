@@ -15,6 +15,10 @@ const FileReadSchema = z.object({
 
 const MAX_LINES = 2000;
 const MAX_LINE_CHARS = 2000;
+const MAX_FILE_SIZE_WITHOUT_RANGE = 256 * 1024; // 256KB - CodeBuddy 启发的前置守卫
+const ESTIMATED_CHARS_PER_TOKEN = 4; // 粗略估算：4 个字符 ≈ 1 token
+const MAX_OUTPUT_TOKENS = parseInt(process.env.LINGXIAO_FILE_READ_MAX_TOKENS || '20000', 10);
+
 function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
     throw new Error('file_read aborted');
@@ -224,15 +228,43 @@ export class FileReadTool extends Tool {
         };
       }
 
+      // 前置守卫：大文件未指定范围时直接拒绝（学习 CodeBuddy）
+      const hasRange = params.start_line !== undefined || params.end_line !== undefined;
+      if (!hasRange && stat.size > MAX_FILE_SIZE_WITHOUT_RANGE) {
+        const sizeMB = (stat.size / 1024 / 1024).toFixed(1);
+        const maxKB = Math.round(MAX_FILE_SIZE_WITHOUT_RANGE / 1024);
+        return {
+          success: false,
+          data: null,
+          error: `ERROR: 文件过大 (${sizeMB}MB)，超过无范围读取上限 (${maxKB}KB)。\n` +
+                 `提示：请使用 start_line 和 end_line 参数分段读取，例如：\n` +
+                 `   - start_line=1, end_line=500（读取前500行）\n` +
+                 `   - start_line=501, end_line=1000（读取501-1000行）`,
+        };
+      }
+
       const s = Math.max(1, params.start_line || 1);
       const e = params.end_line !== undefined ? params.end_line : Number.MAX_SAFE_INTEGER;
       const result = await readLineWindow(p, s, e, context?.abortSignal);
       const lines = [...result.lines];
 
       if (result.hitLineLimit) {
-        lines.push(`...... (⚠️ 已读取 ${MAX_LINES} 行并截断。请使用 start_line=${result.lastLine + 1} 继续读取)`);
+        lines.push(`...... (已读取 ${MAX_LINES} 行并截断。请使用 start_line=${result.lastLine + 1} 继续读取)`);
       }
       const fileContent = lines.join('\n') || '(空文本内容)';
+
+      // 前置守卫：输出 token 估算超限时拒绝（学习 CodeBuddy）
+      const estimatedTokens = Math.ceil(fileContent.length / ESTIMATED_CHARS_PER_TOKEN);
+      if (estimatedTokens > MAX_OUTPUT_TOKENS) {
+        return {
+          success: false,
+          data: null,
+          error: `ERROR: 文件内容过长（估算约 ${estimatedTokens} tokens），超过上限 (${MAX_OUTPUT_TOKENS} tokens)。\n` +
+                 `提示：请缩小读取范围：\n` +
+                 `   - 当前已读 ${result.lines.length} 行，建议分多次读取\n` +
+                 `   - 或使用 code_search 工具搜索特定内容`,
+        };
+      }
 
       return {
         success: true,

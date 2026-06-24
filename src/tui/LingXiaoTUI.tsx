@@ -305,10 +305,9 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     if (processExitRequestedRef.current) return;
     processExitRequestedRef.current = true;
     emitter.emit('shutdown', { reason });
+    // 只调用 Ink 的 exit()，让 cli.ts 的 waitUntilExit 自然完成
+    // 清理和 process.exit 统一在 cli.ts 的 finally 块中执行
     exit();
-    setTimeout(() => {
-      process.exit(0);
-    }, 250).unref?.();
   }, [emitter, exit]);
   const initialLeaderDisplayStatus = normalizeLocalizedAwaitingInputStatus(initialLeaderStatus);
   const [sessionStatus, setSessionStatus] = useState(initialStatus);

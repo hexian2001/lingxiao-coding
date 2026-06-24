@@ -783,17 +783,9 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
   };
 
   // Listen for shutdown signal from TUI to ensure clean process exit
+  // 不在 shutdown 事件中直接 process.exit，让 waitUntilExit 自然完成
   const unsubShutdown = emitter.subscribe('shutdown', () => {
-    void (async () => {
-      try {
-        await runAllCleanups(5000);
-      } catch {
-        // ignore cleanup failures on forced shutdown
-      }
-      restoreConsole();
-      printFarewell();
-      setTimeout(() => process.exit(0), 25);
-    })();
+    // shutdown 事件只是通知，清理逻辑统一在 finally 块中执行
   });
 
   try {
@@ -802,6 +794,16 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
     restoreConsole();
     unsubShutdown();
     printFarewell();
+
+    // 统一执行清理，使用更短的超时避免卡死
+    try {
+      await runAllCleanups(2000);
+    } catch {
+      // 清理失败不阻塞退出
+    }
+
+    // 确保进程退出
+    process.exit(0);
   }
 }
 

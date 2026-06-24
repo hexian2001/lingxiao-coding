@@ -878,9 +878,9 @@ export default function ArtifactView() {
         <XlsxPreview
           preview={preview}
           content={content}
-          onSheetChange={() => {}}
-          currentSheet={null}
-          loadingSheet={false}
+          onSheetChange={handleSheetChange}
+          currentSheet={selectedSheet}
+          loadingSheet={loadingSheet}
         />
       );
     }

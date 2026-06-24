@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { getConfigValue, saveSettings, setConfigValue, config as runtimeConfig } from '../config.js';
 import { getModelManager } from '../config/ModelManager.js';
 
@@ -258,7 +258,11 @@ export function authorizeLocalLlmGatewayToken(token: string): LocalLlmGatewayAut
     };
   }
 
-  if (presented === gateway.token) {
+  // Use timingSafeEqual to prevent timing side-channel attacks on token comparison.
+  const expected = gateway.token;
+  const presentedBuf = Buffer.from(presented);
+  const expectedBuf = Buffer.from(expected);
+  if (presentedBuf.length === expectedBuf.length && timingSafeEqual(presentedBuf, expectedBuf)) {
     try {
       return {
         ok: true,
@@ -493,7 +497,7 @@ export function buildLocalLlmGatewayPromptSection(): string {
     `- 如果正在开发/测试用户项目的 LLM 接入，且用户没有提供项目专属 LLM 配置，可使用已注入的 ${providerVars}。`,
     '- 模型名以已注入配置为准，直接使用该模型开展开发/测试。',
     `- ${alternateEndpoint}；仅当项目代码明确使用另一套 SDK/API 格式时再切换。`,
-    `- 根秘钥（sk- 格式，仅作开发/测试用）: \`${gateway.token}\` —— 用作 \`Authorization: Bearer <sk-…>\` 或 \`x-api-key\`。`,
+    `- 根秘钥已通过环境变量 \`${providerVars}\` 注入；请直接使用环境变量获取 token，不要在代码中硬编码。`,
     '- Gateway 地址、token 和模型配置仅作为当前会话测试环境变量使用；生产配置和部署文档引用项目自己的配置入口。',
   ].join('\n');
 }
