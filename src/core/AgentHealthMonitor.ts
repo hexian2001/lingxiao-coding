@@ -271,16 +271,44 @@ export class AgentHealthMonitor {
     // 导致旧 interval 永跑且无法清理。
     if (this.pollTimer) return;
     this.subscribeEvents();
-    this.pollTimer = setInterval(() => {
+    this.schedulePoll();
+  }
+
+  /**
+   * 资源降级：idle 时拉长轮询周期，减少空转 CPU
+   */
+  private static readonly IDLE_POLL_MULTIPLIER = 3;
+  private idleMode = false;
+
+  setIdleMode(idle: boolean): void {
+    if (this.idleMode === idle) return;
+    this.idleMode = idle;
+    // 重新调度下一次 poll以新周期
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+      this.schedulePoll();
+    }
+  }
+
+  private getEffectivePollInterval(): number {
+    return this.idleMode
+      ? this.config.pollIntervalMs * AgentHealthMonitor.IDLE_POLL_MULTIPLIER
+      : this.config.pollIntervalMs;
+  }
+
+  private schedulePoll(): void {
+    this.pollTimer = setTimeout(() => {
       this.triggerEvaluation('poll');
-    }, this.config.pollIntervalMs);
-    // unref:不阻塞事件循环自然退出(Leader 停止时 stop() 会 clearInterval,#40)
+      this.schedulePoll(); // 继续下一轮
+    }, this.getEffectivePollInterval());
+    // unref：不阻塞事件循环自然退出(Leader 停止时 stop() 会 clearTimeout)
     this.pollTimer.unref?.();
   }
 
   stop(): void {
     if (this.pollTimer) {
-      clearInterval(this.pollTimer);
+      clearTimeout(this.pollTimer);
       this.pollTimer = null;
     }
     if (this.eventDebounceTimer) {

@@ -1023,6 +1023,16 @@ export const LingXiaoTUI: React.FC<LingXiaoTUIProps> = ({
     }
   }, []);
 
+  // Safety timeout: 如果 compactingState 超过 10 分钟仍未收到 end 事件，自动清除
+  // 防止 end 事件丢失或上游异常导致压缩条幅永久残留
+  useEffect(() => {
+    if (!compactingState) return;
+    const timer = setTimeout(() => {
+      setCompactingState(null);
+    }, 10 * 60 * 1000);
+    return () => clearTimeout(timer);
+  }, [compactingState]);
+
   const handlePlanSubmitted = useCallback<TuiEventHandler<'plan:submitted'>>((event) => {
     const payload = eventRecord(event);
     ensureChannel('plan', 'plan');

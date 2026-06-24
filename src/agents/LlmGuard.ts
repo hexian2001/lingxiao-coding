@@ -567,11 +567,14 @@ export class LlmGuard {
             classified.llmErrorKind === 'quota_exhausted';
           const isAuthFatal =
             classified.llmErrorKind === 'auth_error' && this.compactFired;
+          // parse_error 是消息格式/协议错误（如 TOOL_USE_RESULT_MISMATCH、malformed args），
+          // 压缩不会修复格式问题，反而会破坏消息序列结构，直接抛出。
+          const isFormatError = classified.llmErrorKind === 'parse_error';
           // auth 错误 compact 一次后仍 auth → 凭证问题不可能靠丢历史恢复
           const isLastResort =
             this.compactFired && !isOverflowOrQuota && !isAuthFatal;
 
-          if (this.onCompactNeeded && !this.compactFired) {
+          if (this.onCompactNeeded && !this.compactFired && !isFormatError) {
             // === 阶段 1：compact 清理 ===
             this.compactFired = true;
             this.historyDiscarded = false; // 重置下一阶段状态

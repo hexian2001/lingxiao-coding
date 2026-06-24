@@ -547,18 +547,43 @@ export class SessionManager {
 
   /**
    * 启动后台清理循环（定期清理内存中已完成的会话 + 超时的初始化/resume）
+   * 
+   * 资源降级：idle 时自动拉长扫描周期到 5 分钟，活跃时恢复 2 分钟。
    */
+  private static readonly ACTIVE_CLEANUP_INTERVAL_MS = 120_000; // 2 分钟
+  private static readonly IDLE_CLEANUP_INTERVAL_MS = 300_000;   // 5 分钟
+  private currentCleanupIntervalMs = SessionManager.ACTIVE_CLEANUP_INTERVAL_MS;
+  private cleanupLoopIdleMode = false;
+
   private startCleanupLoop(): void {
-    this.cleanupTask = setInterval(() => {
+    this.scheduleNextCleanup();
+  }
+
+  private scheduleNextCleanup(): void {
+    this.cleanupTask = setTimeout(() => {
       try {
         this.cleanupTerminalSessions();
         this.cleanupIdleSessions();
         this.cleanupStaleInitializingSessions();
         this.cleanupStaleResumingSessions();
+
+        // 动态调整扫描频率：无活跃会话时降级到慢速扫描
+        const hasActive = [...this.sessions.values()].some(
+          s => s.leader.isRunning || s.pool.getRunning().length > 0
+        );
+        if (!hasActive && !this.cleanupLoopIdleMode) {
+          this.cleanupLoopIdleMode = true;
+          this.currentCleanupIntervalMs = SessionManager.IDLE_CLEANUP_INTERVAL_MS;
+        } else if (hasActive && this.cleanupLoopIdleMode) {
+          this.cleanupLoopIdleMode = false;
+          this.currentCleanupIntervalMs = SessionManager.ACTIVE_CLEANUP_INTERVAL_MS;
+        }
       } catch (error) {
         sessionLogger.warn('清理任务异常:', error);
       }
-    }, 120_000); // 每 2 分钟扫描一次
+      // 继续下一轮
+      this.scheduleNextCleanup();
+    }, this.currentCleanupIntervalMs);
 
     // Don't let the cleanup timer keep the process alive
     if (this.cleanupTask.unref) this.cleanupTask.unref();
@@ -744,6 +769,18 @@ export class SessionManager {
    */
   getActiveSessionIds(): string[] {
     return Array.from(this.sessions.keys());
+  }
+
+  /**
+   * 检查是否有任何活跃工作（running leader 或 agent）—— 用于 ProcessIdleGuard 探针
+   */
+  hasActiveWork(): boolean {
+    for (const session of this.sessions.values()) {
+      if (session.leader.isRunning || session.pool.getRunning().length > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -2565,8 +2602,7 @@ export class SessionManager {
   destroy(): void {
     // 停止清理循环
     if (this.cleanupTask) {
-      clearInterval(this.cleanupTask);
-      this.cleanupTask = undefined;
+      clearTimeout(this.cleanupTask);
     }
 
     // Fix #4: 释放全局事件订阅
