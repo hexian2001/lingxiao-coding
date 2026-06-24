@@ -548,6 +548,8 @@ export class LeaderToolsExecutor {
         return await agentListRuntimeAgents(ctx, args);
       case 'check_agent_progress':
         return await agentCheckProgress(ctx, args);
+      case 'write_contract':
+        return this.writeContract(args);
       case 'learn_soul':
         return await this.learnSoul(args);
       case 'request_permission_update':
@@ -622,27 +624,16 @@ export class LeaderToolsExecutor {
     if (!task) {
       throw fail(`任务 ${taskId} 不存在`);
     }
-    // 项目蓝图覆盖 gate:会话定义了蓝图时,任何 implement 子系统若无任务覆盖,拦截派发。
-    // 防止"定义了完整蓝图却只建部分任务就开工"导致规划坍缩成 MVP。确定性:机械比对蓝图
-    // status=implement 子系统的 taskIds。解除方式见反馈。
+    // v1.0.4: 蓝图覆盖 gate 降级为警告——不再硬阻塞派发
+    // Leader 现在有 write_contract 可以随时解锁，不需要先建全部任务
     {
       const blueprint = parseBlueprint(this.leader.db.getSessionState(this.leader.sessionId, SESSION_KEYS.PROJECT_BLUEPRINT));
       if (blueprint) {
         const coverage = computeBlueprintCoverage(blueprint);
-        // contract 节点(架构师产契约)豁免覆盖检查:契约是实现的前置,应能在所有 implement 子系统
-        // 都建好实现任务之前先派发(define_project_blueprint 已自动为每子系统建 contract 任务)。
-        // 仅豁免 node_kind=contract;evaluate/repair 等事后节点不豁免。
-        if (coverage.uncovered.length > 0 && task.orchestration?.nodeKind !== 'contract') {
+        if (coverage.uncovered.length > 0 && task.orchestration?.nodeKind !== 'contract' && task.orchestration?.nodeKind !== 'plan') {
           const gapList = coverage.uncovered.map((s) => `${s.id}(${s.name})`).join(', ');
-          throw fail([
-            `项目蓝图覆盖不完整:${coverage.uncovered.length} 个 implement 子系统尚无任务,不能派发。`,
-            `  缺口: ${gapList}`,
-            `补救(任选其一):`,
-            `  1. 为每个缺口 create_task(subsystem=<id>) 建任务;`,
-            `  2. 若确实不做,define_project_blueprint 把对应子系统 status=defer/not_applicable 并附 rationale;`,
-            `  3. 若这是与当前蓝图无关的新项目,重新 define_project_blueprint 覆盖旧蓝图。`,
-            `合法 subsystem id 见每轮注入的「项目蓝图」概览。`,
-          ].join('\n'), 'skipped');
+          leaderLogger.info(`[dispatch] 蓝图覆盖不完整(警告,不阻塞): 缺 ${gapList}`);
+          // 不再 throw——继续派发，信任 Leader 的判断
         }
       }
     }
@@ -815,6 +806,19 @@ export class LeaderToolsExecutor {
       });
     } catch { /* usage tracking is best-effort, never blocks dispatch */ }
     this.leader.setDelegateMode(`已委派任务 ${taskId} 给 @${agentName}，Leader 切换为委派主控模式。`);
+
+    // 0→1: ContractHotSync 注册 consumer——让 running worker 能收到契约变更通知
+    try {
+      const hotSync = this.leader.getContractHotSync();
+      if (hotSync) {
+        const contractSurface = task.orchestration?.contractBinding?.surface;
+        hotSync.registerFromTask(
+          agentName,
+          `${this.leader.sessionId}:${agentName}`,
+          contractSurface || '*',
+        );
+      }
+    } catch { /* non-critical */ }
 
     return `已启动 Agent ${agentName}${capabilityDetails ? ` (baseline=${capabilityDetails.baselineRole}${capabilityDetails.skillNames.length > 0 ? ` · skills=${capabilityDetails.skillNames.join(', ')}` : ''}${capabilityDetails.droppedTools.length > 0 ? ` · dropped=${capabilityDetails.droppedTools.join(', ')}` : ''})` : ''}`;
   }
@@ -1452,7 +1456,50 @@ export class LeaderToolsExecutor {
 
   /**
    * 兼容旧 learn_soul 入口，实际写入统一长期记忆系统。
+   */  /**
+   * write_contract: Leader 直接写入契约到 SharedLedger。
+   * 解除蓝图 dispatch 拦截、满足 contract readiness gate。
    */
+  protected async writeContract(args: Record<string, unknown>): Promise<string> {
+    const surface = typeof args.surface === 'string' ? args.surface.trim() : '';
+    const title = typeof args.title === 'string' ? args.title.trim() : surface;
+    const content = typeof args.content === 'string' ? args.content.trim() : '';
+    if (!surface) throw fail('surface 不能为空');
+    if (!content) throw fail('content 不能为空');
+    const evidence = Array.isArray(args.evidence)
+      ? (args.evidence as unknown[]).filter((v): v is string => typeof v === 'string')
+      : undefined;
+
+    const ledger = this.leader.getSharedLedger();
+    const entryId = ledger.update(surface, 'contract', {
+      author: 'leader',
+      content: `# ${title}\n\n${content}`,
+      evidence,
+    });
+
+    // 同时持久化到项目级 contracts 目录——让前端 API 和跨会话访问能看到
+    try {
+      const { persistContractToProjectDir } = await import('../core/ProjectContracts.js');
+      await persistContractToProjectDir(this.leader.workspace, {
+        surface,
+        title,
+        content,
+        version: 1,
+        createdBy: 'leader',
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      // non-critical: SharedLedger 已写入，项目级持久化失败不影响当前会话
+      leaderLogger.warn(`[writeContract] 项目级持久化失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // 刷新 TaskBoard readiness——可能解除等待此 surface 的任务阻塞
+    this.leader.board.refreshReadiness();
+
+    return `契约已写入 SharedLedger [${entryId}]: surface="${surface}"\n对应 contract_surface 的任务将自动解除阻塞。`;
+  }
+
+
   protected async learnSoul(args: Record<string, unknown>): Promise<string> {
     const content = typeof args.content === 'string' ? args.content.trim() : '';
     const scope: MemoryScope = args.scope === 'user' ? 'user' : 'project';

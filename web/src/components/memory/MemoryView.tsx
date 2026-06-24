@@ -133,6 +133,20 @@ export default function MemoryView() {
     }
   };
 
+  const togglePipeline = async (kind: MemoryKind, enabled: boolean) => {
+    try {
+      await acpClient.sendJsonRpc('memory/toggle', {
+        kind,
+        enabled,
+        ...(sessionId ? { sessionId } : {}),
+      });
+      // 刷新状态
+      await fetchStatus();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
   const activeKind = running || (maintenance.phase === 'running' ? maintenance.kind : null);
   const assetsByForm = useMemo(() => {
     const counts: Record<AssetForm, number> = { skill: 0, command: 0, agent: 0 };
@@ -183,6 +197,7 @@ export default function MemoryView() {
                 active={activeKind === 'dream'}
                 disabled={Boolean(running)}
                 onRun={() => void runPipeline('dream')}
+                onToggle={(enabled) => void togglePipeline('dream', enabled)}
               />
               <PipelineCard
                 title={t('memoryWorkbench.distill.title')}
@@ -191,6 +206,7 @@ export default function MemoryView() {
                 active={activeKind === 'distill'}
                 disabled={Boolean(running)}
                 onRun={() => void runPipeline('distill')}
+                onToggle={(enabled) => void togglePipeline('distill', enabled)}
               />
             </>
           )}
@@ -268,6 +284,7 @@ function PipelineCard({
   active,
   disabled,
   onRun,
+  onToggle,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -275,6 +292,7 @@ function PipelineCard({
   active: boolean;
   disabled: boolean;
   onRun: () => void;
+  onToggle?: (enabled: boolean) => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -289,14 +307,44 @@ function PipelineCard({
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onRun}
-          disabled={disabled || !pipeline.enabled}
-          className="px-3 py-1.5 text-xs rounded-md border border-border-default bg-bg-tertiary text-text-primary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {active ? t('memoryWorkbench.running') : t('memoryWorkbench.runNow')}
-        </button>
+        <div className="flex items-center gap-2">
+          {onToggle && (
+            <div className="flex rounded-md overflow-hidden border border-border-default">
+              <button
+                type="button"
+                onClick={() => onToggle(true)}
+                disabled={disabled}
+                className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  pipeline.enabled
+                    ? 'bg-accent-green/15 text-accent-green border-r border-accent-green/30'
+                    : 'bg-bg-tertiary text-text-tertiary hover:bg-bg-hover border-r border-border-default'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                启用
+              </button>
+              <button
+                type="button"
+                onClick={() => onToggle(false)}
+                disabled={disabled}
+                className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  !pipeline.enabled
+                    ? 'bg-text-tertiary/10 text-text-secondary'
+                    : 'bg-bg-tertiary text-text-tertiary hover:bg-bg-hover'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                禁用
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={onRun}
+            disabled={disabled || !pipeline.enabled}
+            className="px-3 py-1.5 text-xs rounded-md border border-border-default bg-bg-tertiary text-text-primary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {active ? t('memoryWorkbench.running') : t('memoryWorkbench.runNow')}
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-2 mt-4">
         <Metric label={t('memoryWorkbench.lastRun')} value={formatDate(pipeline.lastRunAt)} />

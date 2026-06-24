@@ -574,7 +574,7 @@ export class LlmGuard {
           const isLastResort =
             this.compactFired && !isOverflowOrQuota && !isAuthFatal;
 
-          if (this.onCompactNeeded && !this.compactFired && !isFormatError) {
+          if (this.onCompactNeeded && !this.compactFired && isOverflowOrQuota) {
             // === 阶段 1：compact 清理 ===
             this.compactFired = true;
             this.historyDiscarded = false; // 重置下一阶段状态

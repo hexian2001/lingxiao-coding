@@ -68,6 +68,15 @@ export function ContextSection({
           <DraftNumberInput value={settingNumber(settings.maxSingleMessageBytes, 262144)} onSave={(value) => onSave('maxSingleMessageBytes', value)} min={0} step={1024} saving={saving.maxSingleMessageBytes} saved={saved.maxSingleMessageBytes} />
         </SettingsRow>
       </SettingsSubsection>
+
+      <SettingsSubsection title={t('settings.item.toolResultRetainRounds')} desc={t('settings.item.toolResultRetainRounds.desc')}>
+        <SettingsRow label={t('settings.item.toolResultRetainRounds')} desc={t('settings.item.toolResultRetainRounds.hint')} error={errors.toolResultRetainRounds}>
+          <DraftNumberInput value={settingNumber(settings.toolResultRetainRounds, 50)} onSave={(value) => onSave('advanced.tool_result_retain_rounds', value)} min={1} step={5} saving={saving['advanced.tool_result_retain_rounds']} saved={saved['advanced.tool_result_retain_rounds']} />
+        </SettingsRow>
+        <SettingsRow label={t('settings.item.imageHistoryRetainRounds')} desc={t('settings.item.imageHistoryRetainRounds.hint')} error={errors.imageHistoryRetainRounds}>
+          <DraftNumberInput value={settingNumber(settings.imageHistoryRetainRounds, 2)} onSave={(value) => onSave('advanced.image_history_retain_rounds', value)} min={1} step={1} saving={saving['advanced.image_history_retain_rounds']} saved={saved['advanced.image_history_retain_rounds']} />
+        </SettingsRow>
+      </SettingsSubsection>
     </SettingsSection>
   );
 }

@@ -178,6 +178,14 @@ import { DispatchDecisionCoordinator } from './DispatchDecisionCoordinator.js';
 import { resolveModeRuntimeProjection } from '../core/ModeRuntimeProjection.js';
 import { WorktreeService } from '../core/WorktreeService.js';
 import { DatabaseRepositoryAdapter } from '../core/DatabaseRepositories.js';
+import { SharedLedger } from '../core/SharedLedger.js';
+import { buildExpansion, renderExpansionHint } from '../core/SpecFirstPipeline.js';
+import { ContractHotSync } from '../core/ContractHotSync.js';
+import { IntegrationVerifyInjector } from '../core/IntegrationVerifyInjector.js';
+import { DeterministicAcceptance } from '../core/DeterministicAcceptance.js';
+import { RepairStrategyEngine } from '../core/RepairStrategyEngine.js';
+
+
 
 // 导入预设角色的系统提示
 import { getLeaderSystemPrompt } from './prompts/leader/system_prompt.js';
@@ -434,7 +442,15 @@ export class LeaderAgent {
 
   // ─── 黑板架构（feature flag: LINGXIAO_BLACKBOARD） ───
   /** 黑板集成模块 — 持有 blackboardGraph / graphBridge / dispatcherEngine */
-  protected leaderBlackboard: LeaderBlackboard | null = null;
+  protected leaderBlackboard: LeaderBlackboard | null = null;  /** 共享账本 — 替代 BlackboardGraph 的轻量共享状态 */
+  protected readonly sharedLedger = new SharedLedger();  // ─── 0→1 交付引擎 ───
+  // specPipeline 已经是纯函数（buildExpansion/renderExpansionHint），不再需要实例
+  protected contractHotSync: ContractHotSync | null = null;
+  protected readonly integrationInjector = new IntegrationVerifyInjector();
+  protected readonly deterministicAcceptance = new DeterministicAcceptance();
+  protected readonly repairEngine = new RepairStrategyEngine(this.sharedLedger);
+
+
   /** 统一调度器 — 全局唯一 worker dispatch 入口 */
   protected scheduler: UnifiedScheduler | null = null;
   public getScheduler(): UnifiedScheduler | null { return this.scheduler; }
@@ -462,6 +478,14 @@ export class LeaderAgent {
   private waitedDispatchableSig: string | null = null;
   /** 公开访问器 — SessionRoutes 等外部消费者用来读取黑板分析 */
   public getLeaderBlackboard(): LeaderBlackboard | null { return this.leaderBlackboard; }
+  // ─── 0→1 交付引擎 getter ───
+  public getSpecPipeline() { return { buildExpansion, renderExpansionHint }; }
+  public getContractHotSync() { return this.contractHotSync; }
+  public getIntegrationInjector() { return this.integrationInjector; }
+  public getDeterministicAcceptance() { return this.deterministicAcceptance; }
+  public getRepairEngine() { return this.repairEngine; }
+  public getSharedLedger() { return this.sharedLedger; }
+
 
   /**
    * 获取黑板图分析结果（供 LeaderThinkingEngine 注入上下文）
@@ -486,11 +510,17 @@ export class LeaderAgent {
     const tag = binding.tag || `contract:${binding.surface}`;
 
     if (binding.requireContract) {
+      // 方案 C: 同时查 BlackboardGraph 和 SharedLedger——任一有契约即视为就绪
       const graph = this.leaderBlackboard?.blackboardGraph;
       const contractEvidence = graph?.getContractEvidence(this.sessionId, binding.surface)
         ?? graph?.getActiveContract(this.sessionId, binding.surface);
-      if (!contractEvidence) {
-        reasons.push(`等待黑板契约就绪: ${tag}`);
+      const ledgerContract = this.sharedLedger.query({
+        type: 'contract',
+        surface: binding.surface,
+        latestOnly: true,
+      });
+      if (!contractEvidence && ledgerContract.length === 0) {
+        reasons.push(`等待契约就绪: ${tag}（可用 write_contract 直接写入）`);
       }
     }
 
@@ -832,6 +862,9 @@ export class LeaderAgent {
       getOrchestrationRuntime: () => this.orchestrationRuntime,
       getLeaderBlackboard: () => this.leaderBlackboard,
       getDispatchDecisionCoordinator: () => this.dispatchDecisionCoordinator,
+      getRepairEngine: () => this.repairEngine,
+      getDeterministicAcceptance: () => this.deterministicAcceptance,
+      getSharedLedger: () => this.sharedLedger,
       persistImplementationArtifact: (input) => this.persistImplementationArtifact(input),
       addMessage: (msg) => this.addMessage(msg),
       captureBughuntWorkerEvidence: (input) => this.captureBughuntWorkerEvidence(input),
@@ -1069,12 +1102,21 @@ export class LeaderAgent {
         } catch { /* non-critical */ }
       },
       getBlackboardAnalysis: () => this.getBlackboardAnalysis(),
+      getSharedLedgerContext: () => {
+        const entries = this.sharedLedger.getCompactionSafeEntries();
+        if (entries.length === 0) return null;
+        return this.sharedLedger.formatForContext(entries);
+      },
       upsertSystemSlot: (matcher, content) => this.upsertRuntimeSystemSlot(matcher, content),
       compactContext: () => this.compactContext(),
     });
 
     // ─── 黑板架构初始化（feature flag + mode policy） ───
     this.ensureFullBlackboardInitialized();
+
+    // ─── 0→1 交付引擎: 契约热同步 ───
+    this.contractHotSync = new ContractHotSync(this.sharedLedger, this.bus, this.sessionId);
+    this.contractHotSync.start();
 
     // ─── 统一调度器 — 唯一 worker dispatch 入口 ───
     this.scheduler = new UnifiedScheduler({
@@ -1162,6 +1204,7 @@ export class LeaderAgent {
       teamSynchronizer: this.teamSynchronizer,
       refreshContractBoundTasks: (event) => this.refreshContractBoundTasks(event),
       unsubscribersSink: this._taskTeamUnsubscribers,
+      ledger: this.sharedLedger,
     });
   }
 

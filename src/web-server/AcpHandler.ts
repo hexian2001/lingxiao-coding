@@ -345,6 +345,10 @@ export class AcpHandler {
           result = await this.handleMemoryRun(params, sessionId);
           break;
 
+        case 'memory/toggle':
+          result = await this.handleMemoryToggle(params, sessionId);
+          break;
+
         default:
           return {
             jsonrpc: '2.0',
@@ -1022,5 +1026,29 @@ export class AcpHandler {
       sessionId: targetSessionId,
       allowOverwrite: Boolean(params?.allowOverwrite),
     });
+  }
+
+  private async handleMemoryToggle(params?: Record<string, unknown>, sessionId?: string) {
+    const kind = params?.kind;
+    if (kind !== 'dream' && kind !== 'distill') {
+      throw new Error('kind must be dream or distill');
+    }
+    const enabled = Boolean(params?.enabled);
+
+    // 动态更新 runtimeConfig
+    const { config: runtimeConfig, updateConfig } = await import('../config.js');
+    const configKey = kind === 'dream' ? 'dream' : 'distill';
+
+    await updateConfig({
+      memory: {
+        ...runtimeConfig.memory,
+        [configKey]: {
+          ...runtimeConfig.memory[configKey],
+          enabled,
+        },
+      },
+    });
+
+    return { success: true, kind, enabled };
   }
 }

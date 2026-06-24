@@ -3,6 +3,7 @@ import { contentToPlainText, type ChatMessage } from '../llm/types.js';
 import { CONTRACT_PACK_MARKER } from '../core/ContractPack.js';
 import {
   stripOldImageParts,
+  compactOldToolResults,
 } from './messageMemoryBudget.js';
 
 export interface AgentContextControllerDeps {
@@ -46,12 +47,19 @@ export class AgentContextController {
   }
 
   trimMessageBuffer(messages: ChatMessage[], protectedCount: number, _maxMessages = this.maxMessages): ChatMessage[] {
-    // 只剥离旧图片 base64，不删任何消息（含 tool 消息）。
-    // 消息裁剪统一由 compact 路径负责。
-    return stripOldImageParts(messages, {
+    // 1. 剥离旧图片 base64
+    let trimmed = stripOldImageParts(messages, {
       retainImageMessages: runtimeConfig.advanced.image_history_retain_rounds,
       protectedCount,
     });
+
+    // 2. 压缩旧 tool results
+    trimmed = compactOldToolResults(trimmed, {
+      retainRecentTurns: runtimeConfig.advanced.tool_result_retain_rounds,
+      protectedCount,
+    });
+
+    return trimmed;
   }
 }
 

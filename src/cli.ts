@@ -207,6 +207,12 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
   // 这些子进程会沦为孤儿继续持有 DB 句柄/端口/工作区锁。
   registerCleanup(async () => { await WorkerProcessRunner.killOrphanWorkers(); }, 9.5);
 
+  // 退出兜底：gracefulShutdown 的 runAllCleanups 有 10s 超时，若超时强退则 db.close 可能未执行；
+  // process('exit') 是同步退出的最后机会，幂等调用 db.close()（已关则 no-op）确保 WAL 锁释放。
+  process.on('exit', () => {
+    try { db.close(); } catch { /* tolerate — already closed or closing */ }
+  });
+
   // 初始化会话管理器
   const sessionManager = new SessionManager(db, emitter);
   const activeSessionCoordinator = new ActiveSessionCoordinator(undefined, isDaemonMode ? 'daemon' : 'startup');

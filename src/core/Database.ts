@@ -9,11 +9,16 @@ import { coreLogger } from './Log.js';
 import type { EventEmitter } from './EventEmitter.js';
 import type { OrchestrationTaskMetadata } from './OrchestrationTypes.js';
 import type { TokenUsageRecord, SessionRecord, TaskDbRow } from '../types/canonical.js';
+import { tryRecoverDatabaseLock, robustDatabaseClose } from './DatabaseLockRecovery.js';
 
 // 数据库配置
 const DB_BUSY_TIMEOUT_MS = 30000;
 /** resetIncompatibleSchema 保留的 .replaced-* 备份数上限(FIFO 删最旧)。*/
 const MAX_REPLACED_BACKUPS = 3;
+/** 数据库锁定时的最大重试次数 */
+const MAX_LOCK_RETRIES = 3;
+/** 重试间隔（毫秒） */
+const LOCK_RETRY_DELAY_MS = 1000;
 
 /**
  * 判断错误是否为 SQLite 的"忙/快照冲突"类错误。
@@ -254,10 +259,54 @@ export class DatabaseManager {
       mkdirSync(dir, { recursive: true });
     }
 
-    // 打开数据库（Node 24 内置 node:sqlite，无 native npm binding）
-    this.db = new DatabaseSync(this.path);
-    this.configureConnection(this.db);
-    this.resetIncompatibleSchema();
+    // 尝试打开数据库，如果锁定则尝试恢复
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= MAX_LOCK_RETRIES; attempt++) {
+      try {
+        this.db = new DatabaseSync(this.path);
+        this.configureConnection(this.db);
+        this.resetIncompatibleSchema();
+
+        if (attempt > 1) {
+          coreLogger.info(`[Database] Successfully opened after ${attempt} attempts`);
+        }
+        break; // 成功，跳出循环继续执行后续逻辑
+      } catch (error) {
+        lastError = error as Error;
+        const isLockError = isSqliteBusyError(error);
+
+        if (isLockError && attempt < MAX_LOCK_RETRIES) {
+          coreLogger.warn(`[Database] Database locked (attempt ${attempt}/${MAX_LOCK_RETRIES}), diagnosing...`);
+
+          // 诊断并尝试恢复数据库锁
+          const recovery = tryRecoverDatabaseLock(this.path);
+          for (const line of recovery.diagnostics) {
+            coreLogger.info(`[Database] ${line}`);
+          }
+
+          if (recovery.aliveProcesses.length > 0) {
+            coreLogger.warn(`[Database] ${recovery.aliveProcesses.length} other process(es) hold the DB — waiting ${LOCK_RETRY_DELAY_MS}ms for busy_timeout to queue us`);
+          } else {
+            coreLogger.info('[Database] No competing processes — WAL will auto-recover on retry');
+          }
+
+          // 等待后重试（WAL 模式下 SQLite 会自动恢复，busy_timeout 会排队等锁）
+          const sleepBuf = new Int32Array(new SharedArrayBuffer(4));
+          Atomics.wait(sleepBuf, 0, 0, LOCK_RETRY_DELAY_MS);
+          continue;
+        }
+
+        // 非锁错误或已达最大重试次数
+        if (attempt >= MAX_LOCK_RETRIES) {
+          coreLogger.error(`[Database] Failed to open database after ${MAX_LOCK_RETRIES} attempts`);
+        }
+        throw error;
+      }
+    }
+
+    if (!this.db) {
+      throw lastError || new Error('Failed to initialize database');
+    }
 
     // 创建表
     this.db.exec(`
@@ -822,12 +871,9 @@ export class DatabaseManager {
   close(): void {
     this.closed = true;
     if (this.db) {
-      try {
-        this.db.close();
-      } catch (error) {
-        // 忽略已关闭或损坏的数据库
-      coreLogger.warn(`[Database] 关闭连接时出错: ${error instanceof Error ? error.message : String(error)}`);
-      }
+      // 使用增强的关闭逻辑：先 wal_checkpoint(TRUNCATE) 合并 WAL 并释放写锁，
+      // 再 close()，避免异常退出时锁残留导致下一个进程 "database is locked"。
+      robustDatabaseClose(this.db, this.path);
       this.db = null;
     }
   }
@@ -851,6 +897,11 @@ export class DatabaseManager {
     // schema 已声明 ON DELETE CASCADE，启用后 workflows→executions→logs 的级联删除才真正生效，
     // 否则 deleteWorkflow 的级联是空操作、孤儿行无限堆积。
     db.exec('PRAGMA foreign_keys = ON');
+
+    // 优化多进程并发性能
+    db.exec('PRAGMA synchronous = NORMAL'); // WAL 模式下 NORMAL 足够安全
+    db.exec('PRAGMA wal_autocheckpoint = 1000'); // 每 1000 页自动 checkpoint
+    db.exec('PRAGMA temp_store = MEMORY'); // 临时表使用内存
   }
 
   /**

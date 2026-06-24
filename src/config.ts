@@ -673,11 +673,11 @@ const MemoryGroupSchema = z.object({
   }),
   // /distill 资产提炼：会话回溯天数、独立自动触发间隔（mimo=30天）。
   distill: z.object({
-    enabled: z.boolean().default(true),
+    enabled: z.boolean().default(false),
     auto_interval_days: z.number().int().positive().default(30),
     session_lookback_days: z.number().int().positive().default(14),
   }).default({
-    enabled: true,
+    enabled: false,
     auto_interval_days: 30,
     session_lookback_days: 14,
   }),
@@ -730,6 +730,7 @@ const UiGroupSchema = z.object({
 const AdvancedGroupSchema = z.object({
   cleanup_period_days: z.number().default(30),
   image_history_retain_rounds: z.number().min(1).default(2),
+  tool_result_retain_rounds: z.number().min(1).default(50),
   defer_tool_loading: z.boolean().default(true),
   ignore_gitignore: z.boolean().default(false),
   hook_output_collapsed: z.boolean().default(true),
@@ -1016,6 +1017,7 @@ export const ConfigSchema = z.preprocess(withDefaultConfigGroups, z.object({
   advanced: AdvancedGroupSchema.default({
     cleanup_period_days: 30,
     image_history_retain_rounds: 2,
+    tool_result_retain_rounds: 50,
     defer_tool_loading: true,
     ignore_gitignore: false,
     hook_output_collapsed: true,
@@ -1463,6 +1465,19 @@ export function saveSettings(cfg: Config): void {
     configLogger.error(`[Config] 保存配置文件失败: ${e}`);
     throw e;
   }
+}
+
+/**
+ * 动态更新配置并持久化到 settings.json。
+ * 用于运行时修改配置（如 Web UI 开关）。
+ */
+export async function updateConfig(partial: Partial<Config>): Promise<void> {
+  const current = loadSettings();
+  const merged = { ...current, ...partial };
+  saveSettings(merged);
+  // 刷新全局 config 对象
+  Object.assign(config, merged);
+  fireConfigReload();
 }
 
 export function generateDefaultSettings(): void {

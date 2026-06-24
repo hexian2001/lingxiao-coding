@@ -93,6 +93,12 @@ export interface LeaderWorkOrchestratorDeps {
   getOrchestrationRuntime?: () => OrchestrationRuntime;
   getLeaderBlackboard?: () => LeaderBlackboard | null;
   getDispatchDecisionCoordinator?: () => DispatchDecisionCoordinator | null;
+  /** 0→1: 修复策略引擎 */
+  getRepairEngine?: () => import('../core/RepairStrategyEngine.js').RepairStrategyEngine | null;
+  /** 0→1: 确定性验收 */
+  getDeterministicAcceptance?: () => import('../core/DeterministicAcceptance.js').DeterministicAcceptance | null;
+  /** 0→1: SharedLedger */
+  getSharedLedger?: () => import('../core/SharedLedger.js').SharedLedger | null;
   /** 虚方法回调：persistImplementationArtifact（测试子类可覆盖，故走闭包）。 */
   persistImplementationArtifact?: (input: { taskId: string; agentName?: string; result: string }) => void;
   /** 把黑板 recentFacts 摘要 / 完成报告写入 Leader conversation（in-memory only）。 */
@@ -145,7 +151,8 @@ export class LeaderWorkOrchestrator {
   private openWorkRecoveryMaxAttempts: number;
   private exhaustedOpenWorkRecoveryFingerprint: string | null = null;
   private recoveryController: RuntimeRecoveryController;
-  private bus: MessageBus;
+  private bus: MessageBus;  private deps: LeaderWorkOrchestratorDeps;
+
 
   // ─── Worker 完成结果处理（L2）状态 ───
   private getOrchestrationRuntime: () => OrchestrationRuntime;
@@ -178,6 +185,7 @@ export class LeaderWorkOrchestrator {
   private _processedReceiptOrder: string[] = [];
 
   constructor(deps: LeaderWorkOrchestratorDeps) {
+    this.deps = deps;
     this.sessionId = deps.sessionId;
     this.db = deps.db;
     this.board = deps.board;
@@ -203,19 +211,19 @@ export class LeaderWorkOrchestrator {
     this.openWorkRecoveryMaxAttempts = deps.openWorkRecoveryMaxAttempts;
     this.recoveryController = new RuntimeRecoveryController(this.db, this.board, this.sessionId, this.emitter);
     this.bus = deps.bus;
-    this.getOrchestrationRuntime = deps.getOrchestrationRuntime as () => OrchestrationRuntime;
-    this.getLeaderBlackboard = deps.getLeaderBlackboard as () => LeaderBlackboard | null;
-    this.getDispatchDecisionCoordinator = deps.getDispatchDecisionCoordinator as () => DispatchDecisionCoordinator | null;
-    this.persistImplementationArtifactCb = deps.persistImplementationArtifact as (input: { taskId: string; agentName?: string; result: string }) => void;
-    this.addMessageCb = deps.addMessage as (msg: ChatMessage) => void;
-    this.captureBughuntWorkerEvidenceCb = deps.captureBughuntWorkerEvidence as (input: { taskId: string; status: 'terminal'; exitReason: 'completed' | 'failed'; result: string; agentName?: string; }) => void;
-    this.recordAgentOutcomeCb = deps.recordAgentOutcome as (agentName: string | undefined, taskId: string, outcome: 'success' | 'failure') => void;
-    this.getPendingAgentCompletionSignals = deps.getPendingAgentCompletionSignals as () => CompletionSignal[];
-    this.setPendingAgentCompletionSignals = deps.setPendingAgentCompletionSignals as (signals: CompletionSignal[]) => void;
-    this.getLeaderBusName = deps.getLeaderBusName as () => string;
-    this.clearSoftWaitingForUser = deps.clearSoftWaitingForUser as (reason: string) => Promise<boolean>;
-    this.setDelegateMode = deps.setDelegateMode as (reason: string) => void;
-    this.acceptWorkerTaskResultCb = deps.acceptWorkerTaskResult as (input: WorkerTaskResultInput) => Promise<void>;
+    this.getOrchestrationRuntime = deps.getOrchestrationRuntime ?? (() => null as unknown as OrchestrationRuntime);
+    this.getLeaderBlackboard = deps.getLeaderBlackboard ?? (() => null);
+    this.getDispatchDecisionCoordinator = deps.getDispatchDecisionCoordinator ?? (() => null);
+    this.persistImplementationArtifactCb = deps.persistImplementationArtifact ?? (() => {});
+    this.addMessageCb = deps.addMessage ?? (() => {});
+    this.captureBughuntWorkerEvidenceCb = deps.captureBughuntWorkerEvidence ?? (() => {});
+    this.recordAgentOutcomeCb = deps.recordAgentOutcome ?? (() => {});
+    this.getPendingAgentCompletionSignals = deps.getPendingAgentCompletionSignals ?? (() => []);
+    this.setPendingAgentCompletionSignals = deps.setPendingAgentCompletionSignals ?? (() => {});
+    this.getLeaderBusName = deps.getLeaderBusName ?? (() => '');
+    this.clearSoftWaitingForUser = deps.clearSoftWaitingForUser ?? (async () => false);
+    this.setDelegateMode = deps.setDelegateMode ?? (() => {});
+    this.acceptWorkerTaskResultCb = deps.acceptWorkerTaskResult ?? (async () => {});
   }
 
   buildRuntimeStateSection(): string {
@@ -526,6 +534,31 @@ export class LeaderWorkOrchestrator {
     } else {
       this.board.failTask(input.taskId, input.result);
       this.recordAgentOutcomeCb(localAgentName || input.agentName, input.taskId, 'failure');
+      // 0→1: RepairStrategyEngine —— 分类错误并注入修复策略建议
+      try {
+        const repairEngine = this.deps.getRepairEngine?.();
+        if (repairEngine) {
+          const classification = repairEngine.classify(input.result || '');
+          const decision = repairEngine.decide(input.taskId, classification);
+          if (decision.strategy !== 'escalate_to_user') {
+            this.addMessageCb({
+              role: 'system',
+              content: [
+                `[RepairStrategy] 任务 ${input.taskId} 失败分析:`,
+                `  错误类型: ${classification.category} (confidence=${classification.confidence})`,
+                `  修复策略: ${decision.strategy} (尝试 #${decision.priorAttempts + 1})`,
+                `  指令: ${decision.instructions.split('\n')[0]}`,
+                decision.isFinalAttempt ? '  ⚠ 这是最后一次尝试' : '',
+              ].filter(Boolean).join('\n'),
+            });
+          } else {
+            this.addMessageCb({
+              role: 'system',
+              content: `[RepairStrategy] 任务 ${input.taskId} 已耗尽修复尝试 (${decision.priorAttempts} 次)，建议上报用户。`,
+            });
+          }
+        }
+      } catch { /* repair engine is best-effort */ }
       // 黑板：任务失败时释放其持有的 Intent。
       leaderBlackboard?.releaseIntentForTask(input.taskId);
       if (handled && !accepted) {

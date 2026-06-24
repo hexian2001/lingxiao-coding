@@ -329,6 +329,88 @@ export function registerSessionRoutes(
     return messages;
   });
 
+  // ── POST /api/sessions/import — 导入凌霄对话 JSON ──
+  // 创建新会话并将导入的消息写入 leader_conversation，返回新会话 ID。
+  fastify.post('/api/sessions/import', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const body = request.body as {
+      messages?: Array<{
+        role: string;
+        content: string;
+        thinkingContent?: string;
+        toolCalls?: Array<{
+          id: string;
+          tool: string;
+          input: unknown;
+          result?: unknown;
+          status: string;
+        }>;
+        timestamp?: number;
+      }>;
+      title?: string;
+      workspace?: string;
+    };
+
+    if (!body || !Array.isArray(body.messages) || body.messages.length === 0) {
+      reply.code(400);
+      return { error: '导入失败：messages 字段缺失或为空。' };
+    }
+
+    const workspace = body.workspace || process.cwd();
+    const title = body.title || `Imported ${new Date().toLocaleString()}`;
+
+    // 创建新会话（idle 模式，不触发 LLM）
+    const sessionId = await sessionManager.createSession(title, workspace, { idle: true });
+
+    // 设置会话名称
+    try { repos.sessions.updateName(sessionId, title); } catch { /* ignore */ }
+
+    // 将导入的消息转换为 ConversationMessageRecord 格式并写入数据库
+    const records = body.messages.map((msg, index) => {
+      const role = msg.role === 'assistant' ? 'assistant' : 'user';
+      const ts = (typeof msg.timestamp === 'number' && Number.isFinite(msg.timestamp))
+        ? msg.timestamp
+        : Date.now() + index;
+
+      // 构建 tool_calls（标准 OpenAI function-call 格式）
+      let toolCalls: unknown[] | undefined;
+      if (msg.toolCalls && msg.toolCalls.length > 0) {
+        toolCalls = msg.toolCalls.map((tc) => ({
+          id: tc.id,
+          type: 'function',
+          function: {
+            name: tc.tool,
+            arguments: typeof tc.input === 'string' ? tc.input : JSON.stringify(tc.input ?? {}),
+          },
+        }));
+      }
+
+      // 构建 thinking blocks
+      let thinking: unknown[] | undefined;
+      if (msg.thinkingContent) {
+        thinking = [{ type: 'text', text: msg.thinkingContent }];
+      }
+
+      return {
+        role,
+        content: msg.content || '',
+        tool_calls: toolCalls,
+        thinking,
+        timestamp: ts,
+      };
+    });
+
+    repos.messages.replaceConversation(sessionId, records);
+
+    return {
+      id: sessionId,
+      workspace,
+      title,
+      messageCount: records.length,
+      status: 'imported',
+    };
+  });
+
   // Debug: raw LLM context
   fastify.get('/api/sessions/:id/llm-messages', async (request, reply) => {
     if (!requireServerToken(request, reply)) return;

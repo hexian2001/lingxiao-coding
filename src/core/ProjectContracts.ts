@@ -74,3 +74,38 @@ export function loadProjectContractEntries(workspace?: string): ContractPackEntr
 export function clearProjectContractsCache(): void {
   projectContractsCache.clear();
 }
+
+/**
+ * 持久化单个契约到项目级 contracts 目录。
+ * 用于 Leader 的 write_contract 工具——直接写契约而不经过 BlackboardGraph。
+ * 内部走 ContractPack 的合并逻辑，保证跨会话一致性。
+ */
+export async function persistContractToProjectDir(
+  workspace: string,
+  contract: {
+    surface: string;
+    title: string;
+    content: string;
+    version?: number;
+    createdBy?: string;
+    createdAt?: string;
+  },
+): Promise<void> {
+  const { persistProjectContractEntry } = await import('./ContractPack.js');
+  const { createHash } = await import('crypto');
+
+  const entry: ContractPackEntry = {
+    surface: contract.surface,
+    title: contract.title,
+    content: contract.content,
+    sha256: createHash('sha256').update(contract.content).digest('hex'),
+    version: contract.version ?? 1,
+    createdBy: contract.createdBy ?? 'leader',
+    createdAt: contract.createdAt ? new Date(contract.createdAt).getTime() : Date.now(),
+    tags: [],
+  };
+
+  persistProjectContractEntry(workspace, entry);
+  // 清除缓存让下次 load 立即看到新契约
+  projectContractsCache.delete(getProjectContractPackPath(workspace));
+}

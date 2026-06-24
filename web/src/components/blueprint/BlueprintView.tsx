@@ -109,18 +109,20 @@ interface SubsystemNodeProps {
 }
 
 function SubsystemNode({ entry, contractEntry, tasks, isExpanded, onToggle, isHighlighted, onHoverDeps, dependentIds }: SubsystemNodeProps) {
-  const isUncovered = entry.status === 'implement' && entry.taskIds.length === 0;
+  // v1.0.4: 不再以"无task"作为缺口/拦截标准——Leader 可用 write_contract 直接解锁
+  const hasContract = Boolean(contractEntry);
+  const hasTasks = entry.taskIds.length > 0;
+  const needsAttention = entry.status === 'implement' && !hasContract && !hasTasks;
   const meta = STATUS_META[entry.status];
-  const seal = isUncovered ? '缺' : meta.seal;
-  const accent = isUncovered ? 'text-accent-red' : meta.accent;
+  const seal = needsAttention ? '待' : meta.seal;
+  const accent = needsAttention ? 'text-amber-500' : meta.accent;
   const role = entry.agentType ?? '';
   const desc = entry.description;
-  const hasContract = Boolean(contractEntry);
   const contractVersion = contractEntry?.version;
 
   return (
     <div
-      className={`bp-card bp-node p-3 flex flex-col gap-2 cursor-pointer transition-all ${isUncovered ? 'is-gap' : ''} ${isHighlighted ? 'ring-2 ring-accent-brand' : ''}`}
+      className={`bp-card bp-node p-3 flex flex-col gap-2 cursor-pointer transition-all ${needsAttention ? 'is-gap' : ''} ${isHighlighted ? 'ring-2 ring-accent-brand' : ''}`}
       onClick={onToggle}
       onMouseEnter={() => onHoverDeps([...(entry.dependsOn ?? []), ...dependentIds])}
       onMouseLeave={() => onHoverDeps(null)}
@@ -151,7 +153,7 @@ function SubsystemNode({ entry, contractEntry, tasks, isExpanded, onToggle, isHi
               {hasContract ? `✓@v${contractVersion ?? '?'}` : '◇无契约'}
             </span>
           )}
-          <span className={`bp-status-seal ${accent}`} title={isUncovered ? '缺口' : meta.label}>{seal}</span>
+          <span className={`bp-status-seal ${accent}`} title={needsAttention ? '待定' : meta.label}>{seal}</span>
         </div>
       </div>
 
@@ -169,10 +171,10 @@ function SubsystemNode({ entry, contractEntry, tasks, isExpanded, onToggle, isHi
               <span className="text-text-tertiary">← {entry.dependsOn.join(',')}</span>
             )}
           </>
-        ) : isUncovered ? (
-          <span className={`${accent} flex items-center gap-1`}>
+        ) : needsAttention ? (
+          <span className="text-amber-500 flex items-center gap-1">
             <span>{BLUEPRINT_GAP_GLYPH}</span>
-            <span>未建任务 · dispatch 拦截</span>
+            <span>待建任务/契约</span>
           </span>
         ) : (
           entry.dependsOn && entry.dependsOn.length > 0 && (
@@ -408,9 +410,9 @@ export default function BlueprintView() {
                 <span className="text-xs text-accent-green">可派发</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 text-xs text-accent-red">
-                <span className="bp-status-seal text-accent-red" title="存在缺口">缺</span>
-                <span>{coverage.uncovered.length} 个缺口 · dispatch 拦截中</span>
+              <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                <span className="bp-status-seal text-amber-500" title="部分待建">待</span>
+                <span>{coverage.uncovered.length} 个待建 · 可直接开工</span>
               </div>
             )}
           </div>

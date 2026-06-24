@@ -33,8 +33,9 @@ import {
 import { loadProjectContractEntries } from '../core/ProjectContracts.js';
 import { ImportGraphEngine, type ImportGraph } from '../core/ImportGraphEngine.js';
 import { leaderLogger } from '../core/Log.js';
-import { DEFAULT_RULES, DEFAULT_PARAMS, type ExecutionStrategy, type AdaptiveStrategyRule, type StrategyParams } from '../core/AdaptiveHarness.js';
+// v1.0.4: AdaptiveHarness import removed
 import type { WorkerContractComplianceProof } from '../core/AgentProtocol.js';
+import type { SharedLedger } from '../core/SharedLedger.js';
 
 export class LeaderBlackboard {
   /** 黑板图实例，仅在 blackboard.enabled 时初始化 */
@@ -82,6 +83,7 @@ export class LeaderBlackboard {
     private readonly sessionId: string,
     private readonly pool: AgentPool,
     private readonly workspace: string,
+    private readonly ledger?: SharedLedger,
   ) {}
 
   /**
@@ -105,7 +107,7 @@ export class LeaderBlackboard {
       // 项目级契约跨会话复用:从 .lingxiao/contracts/ 加载已有契约灌入黑板(provenance:declared)。
       this.seedProjectContracts();
       // harness 自身策略契约注册:把 adaptive-enhance 和 eternal-smart 写入黑板。
-      this.seedHarnessContracts();
+      // v1.0.4: seedHarnessContracts removed
 
       // 连接 AgentPool — 让 Worker 能读写黑板图
       const graph = this.blackboardGraph;
@@ -346,6 +348,7 @@ export class LeaderBlackboard {
     teamSynchronizer?: TeamSynchronizer | null;
     refreshContractBoundTasks: (event: BlackboardEvent) => void;
     unsubscribersSink: Array<() => void>;
+    ledger?: SharedLedger;
   }): LeaderBlackboard | null {
     if (!globalConfig.blackboard.enabled) return null;
     if (typeof (deps.db as { getDb?: unknown }).getDb !== 'function') return null;
@@ -358,7 +361,7 @@ export class LeaderBlackboard {
     if (modes.blackboard.mode !== 'full') return null;
 
     try {
-      const blackboard = new LeaderBlackboard(deps.db, deps.emitter, deps.sessionId, deps.pool, deps.workspace);
+      const blackboard = new LeaderBlackboard(deps.db, deps.emitter, deps.sessionId, deps.pool, deps.workspace, deps.ledger);
       blackboard.setActiveTeamProvider(deps.activeTeamProvider);
       blackboard.init();
       deps.workflowEngine?.setBlackboardGraphProvider?.(() => blackboard.blackboardGraph ?? null);
@@ -437,6 +440,19 @@ export class LeaderBlackboard {
     }
     // 图发生了实质变更 —— 让 spawn 装配路径的契约缓存失效。
     this.graphMutationSeq++;
+    // 桥接 SharedLedger：将 contract 节点同步到账本
+    if (this.ledger && event.type === 'node_added' && event.nodeId) {
+      try {
+        const node = this.blackboardGraph.getNode(this.sessionId, event.nodeId);
+        if (node && node.tags?.some((t: string) => t.startsWith('contract:'))) {
+          this.ledger.update(
+            node.title || 'unnamed-contract',
+            'contract',
+            { author: 'blackboard', content: node.content || '', evidence: node.tags },
+          );
+        }
+      } catch { /* non-critical: node lookup may fail */ }
+    }
     this.pendingEvents.push(event);
     if (this.flushTimer !== null) return;
 
@@ -525,99 +541,7 @@ export class LeaderBlackboard {
     }
   }
 
-  /**
-   * harness 自身策略契约注册:把 adaptive-enhance 和 eternal-smart 写入黑板 contract 节点。
-   * 从 AdaptiveHarness 的 DEFAULT_RULES / DEFAULT_PARAMS 和 EternalPatrolPolicy 的巡逻策略提取配置生成契约内容。
-   * 幂等——已存在 active contract 的 surface 跳过。
-   */
-  private seedHarnessContracts(): void {
-    if (!this.blackboardGraph) return;
-    try {
-      let seeded = 0;
 
-      // ── contract:adaptive-enhance ──
-      if (!this.blackboardGraph.getActiveContract(this.sessionId, 'adaptive-enhance')) {
-        const rulesBlock = DEFAULT_RULES.map((rule: AdaptiveStrategyRule) =>
-          `  - id: ${rule.id} | priority: ${rule.priority} | strategy: ${rule.strategy}`,
-        ).join('\n');
-
-        const paramsBlock = (Object.keys(DEFAULT_PARAMS) as ExecutionStrategy[]).map((strategy: ExecutionStrategy) => {
-          const p: StrategyParams = DEFAULT_PARAMS[strategy];
-          return `  ${strategy}: maxRounds=${p.maxRounds}, timeoutMs=${p.timeoutMs}, workerCount=${p.workerCount}, verificationLevel=${p.verificationLevel}, assumptionTracking=${p.assumptionTracking}, speculationEnabled=${p.speculationEnabled}`;
-        }).join('\n');
-
-        const escalateBlock = [
-          '  - build_errors_exceeded: fast_path→standard(count≥1), standard→careful(count>3)',
-          '  - repair_attempts_exceeded: standard→careful(count≥1), careful→speculative(count≥2)',
-          '  - speculation_all_failed: speculative→deep',
-          '  - timeout_approaching: (no auto-escalation, signal only)',
-        ].join('\n');
-
-        const content = [
-          '## AdaptiveHarness Strategy Contract',
-          '',
-          '### Strategy Rules (by priority)',
-          rulesBlock,
-          '',
-          '### Strategy Parameters',
-          paramsBlock,
-          '',
-          '### Escalation Triggers',
-          escalateBlock,
-        ].join('\n');
-
-        this.blackboardGraph.addContract({
-          sessionId: this.sessionId,
-          title: 'AdaptiveHarness Strategy Contract',
-          content,
-          tags: ['contract:adaptive-enhance', 'harness', 'provenance:system'],
-          createdBy: 'harness-contract-seeder',
-        });
-        seeded += 1;
-      }
-
-      // ── contract:eternal-smart ──
-      if (!this.blackboardGraph.getActiveContract(this.sessionId, 'eternal-smart')) {
-        const patrolStrategies = [
-          '  - patrol: Active eternal goal with changed fingerprint or continued stewardship needed',
-          '  - skip: No meaningful project delta (fingerprint unchanged, no open work/agents)',
-          '  - yield_user: No project delta, no open work, no running agents, idle patrol already attempted',
-        ].join('\n');
-
-        const configBlock = [
-          '  - EternalLoopIntelligence: integrates PerformanceBaselineTracker + BaselineAlertMonitor + PatternRecognitionEngine',
-          '  - recordAndCheck(metric): records execution and checks deviation against baseline',
-          '  - recordFailureAndAnalyze(record): records failure and returns recognized patterns',
-          '  - onAlert(handler): subscribes to eternal:baseline_alert events for SSE propagation',
-        ].join('\n');
-
-        const content = [
-          '## EternalPatrolPolicy Contract',
-          '',
-          '### Patrol Decision Strategies',
-          patrolStrategies,
-          '',
-          '### Intelligence Modules',
-          configBlock,
-        ].join('\n');
-
-        this.blackboardGraph.addContract({
-          sessionId: this.sessionId,
-          title: 'EternalPatrolPolicy Contract',
-          content,
-          tags: ['contract:eternal-smart', 'harness', 'provenance:system'],
-          createdBy: 'harness-contract-seeder',
-        });
-        seeded += 1;
-      }
-
-      if (seeded > 0) {
-        leaderLogger.info(`[Blackboard] harness 策略契约注册 ${seeded} 条(adaptive-enhance, eternal-smart)`);
-      }
-    } catch (err) {
-      leaderLogger.warn(`[Blackboard] harness 契约注册失败: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
 
   /** 聚合并广播待合并的黑板事件 */
   private flushPendingEvents(): void {

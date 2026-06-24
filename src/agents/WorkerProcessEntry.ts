@@ -151,9 +151,18 @@ const heartbeatInterval = setInterval(() => {
 }, 30000);
 
 function clearRuntime(): void {
+  // 幂等：可被 gracefulShutdown / exit handler / uncaughtException 重复调用。
+  // cleanupRuntime 首次执行后置 null，后续调用为 no-op。
   clearInterval(heartbeatInterval);
-  cleanupRuntime?.();
+  const cleanup = cleanupRuntime;
   cleanupRuntime = null;
+  try {
+    cleanup?.();
+  } catch (error) {
+    // 退出路径上的清理失败不应阻塞退出；robustDatabaseClose 内部已吞错，
+    // 这里兜底防止其它 cleanup 抛出导致 exit 异常。
+    agentLogger?.warn?.(`[Worker] cleanup error during shutdown: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 function gracefulShutdown(signal: string): void {
@@ -181,6 +190,16 @@ function registerSignalHandlers() {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   process.on('SIGHUP', () => gracefulShutdown('SIGHUP'));
+
+  // 进程退出兜底：无论通过哪条路径退出（gracefulShutdown 已跑过则 cleanupRuntime=null 幂等），
+  // 都确保 db.close()→wal_checkpoint(TRUNCATE) 被执行，彻底释放写锁。
+  // 这是防止"终端被关 / Ctrl+\ / OOM / supervisor 直接 kill"后锁残留的最后一道防线。
+  process.on('exit', () => {
+    if (cleanupRuntime) {
+      try { cleanupRuntime(); } catch { /* tolerate — exit path must not throw */ }
+      cleanupRuntime = null;
+    }
+  });
 
   // Worker 进程 uncaughtException 保护：
   // 已知可恢复的 DB 错误（SQLITE_BUSY、连接关闭）不应杀死 worker。
@@ -280,6 +299,11 @@ async function main(): Promise<void> {
       agentLogger.warn(`[Worker ${payload.agentName}] 黑板图初始化失败，跳过`);
     }
     cleanupRuntime = () => {
+      for (const unsubscribe of bridgeUnsubscribers) {
+        try { unsubscribe(); } catch { /* tolerate */ }
+      }
+      // robustDatabaseClose 由 DatabaseManager.close() 内部调用，
+      // 确保 WAL 锁文件句柄完全释放，避免异常退出时锁残留。
       db.close();
     };
     reportPhase('runtime:init:done');
@@ -326,8 +350,10 @@ async function main(): Promise<void> {
 
     cleanupRuntime = () => {
       for (const unsubscribe of bridgeUnsubscribers) {
-        unsubscribe();
+        try { unsubscribe(); } catch { /* tolerate */ }
       }
+      // robustDatabaseClose 由 DatabaseManager.close() 内部调用，
+      // 确保 WAL 锁文件句柄完全释放，避免异常退出时锁残留。
       db.close();
     };
 

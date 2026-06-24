@@ -10,7 +10,7 @@ import { acpClient } from '../../api/AcpClient';
 import { getServerToken } from '../../api/headers';
 import { notifySettingChanged, SETTINGS_CHANGED_EVENT, settingsApiFetch, type SettingsChangedDetail } from '../settings/settingsApi';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Send, Square, Paperclip, Sparkles, Shield, Check, X, Clock, Plus, MessageCircle, RefreshCw, Image as ImageIcon, Eye, AlertTriangle, Zap, Minimize2, Cpu, Loader2, CheckCircle2, XCircle, ChevronUp, ChevronDown, Wand2, Trash2, Bot, FileText, Table, Archive, ListOrdered, Search, ArrowUp, ArrowDown, Pencil, Workflow, PanelRightOpen } from 'lucide-react';
+import { Send, Square, Paperclip, Sparkles, Shield, Check, X, Clock, Plus, MessageCircle, RefreshCw, Image as ImageIcon, Eye, AlertTriangle, Zap, Minimize2, Cpu, Loader2, CheckCircle2, XCircle, ChevronUp, ChevronDown, Wand2, Trash2, Bot, FileText, Table, Archive, ListOrdered, Search, ArrowUp, ArrowDown, Pencil, Workflow, PanelRightOpen, FileJson, Upload } from 'lucide-react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import MessageBubble from './MessageBubble';
 import { usePopoverMaxHeight } from '../../hooks/usePopoverMaxHeight';
@@ -29,7 +29,16 @@ import WorkbenchTerminalDock from './WorkbenchTerminalDock';
 import RunStatusStrip from './RunStatusStrip';
 import { useWorkbenchContext } from './useWorkbenchContext';
 import ConfirmationDialog from '../ui/ConfirmationDialog';
-import { messagesToMarkdown, downloadAsFile, copyToClipboard, getExportFilename } from '../../utils/exportConversation';
+import {
+  messagesToMarkdown,
+  messagesToJSON,
+  downloadAsFile,
+  downloadJSON,
+  copyToClipboard,
+  getExportFilename,
+  parseLingxiaoJSON,
+  readFileAsText,
+} from '../../utils/exportConversation';
 import { calculateCostDetailed, formatCost } from '../../utils/costCalculator';
 import { estimateTokens, formatTokenCount } from '../../utils/estimateTokens';
 import {
@@ -2327,6 +2336,74 @@ export default function ChatView() {
     }
   }, [messages, sessionId]);
 
+  // ── JSON 导出（凌霄对话格式）──
+  const handleExportJSON = useCallback(() => {
+    const jsonStr = messagesToJSON(messages, {
+      sessionId: sessionId || undefined,
+      title: `Session ${sessionId?.slice(0, 8) || 'unknown'}`,
+    });
+    downloadJSON(jsonStr, getExportFilename(sessionId || undefined, 'json'));
+  }, [messages, sessionId]);
+
+  // ── JSON 导入（凌霄对话格式）──
+  const jsonImportInputRef = useRef<HTMLInputElement>(null);
+  const [importStatus, setImportStatus] = useState<{ kind: 'idle' | 'loading' | 'success' | 'error'; message?: string }>({ kind: 'idle' });
+
+  const handleImportJSON = useCallback(() => {
+    jsonImportInputRef.current?.click();
+  }, []);
+
+  const handleImportFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // 重置 input 以便重复选择同一文件
+    e.target.value = '';
+    if (!file) return;
+
+    setImportStatus({ kind: 'loading' });
+    try {
+      const text = await readFileAsText(file);
+      const parsed = parseLingxiaoJSON(text);
+
+      if (parsed.messages.length === 0) {
+        setImportStatus({ kind: 'error', message: '文件中没有可导入的消息。' });
+        setTimeout(() => setImportStatus({ kind: 'idle' }), 4000);
+        return;
+      }
+
+      // 调用后端导入 API，创建新会话并写入消息
+      const res = await fetch('/api/sessions/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-lingxiao-token': getServerToken(),
+        },
+        body: JSON.stringify({
+          messages: parsed.messages,
+          title: parsed.title || `Imported ${file.name}`,
+          workspace: parsed.workspace,
+        }),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `导入失败 (HTTP ${res.status})`);
+      }
+
+      const result = await res.json() as { id: string; messageCount: number };
+
+      // 刷新会话列表并连接到新会话
+      await fetchSessions();
+      await connectToSession(result.id);
+
+      setImportStatus({ kind: 'success', message: `已导入 ${result.messageCount} 条消息` });
+      setTimeout(() => setImportStatus({ kind: 'idle' }), 4000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '导入失败，请检查文件格式。';
+      setImportStatus({ kind: 'error', message: msg });
+      setTimeout(() => setImportStatus({ kind: 'idle' }), 6000);
+    }
+  }, [fetchSessions, connectToSession]);
+
   const ctxPct = contextRuntimeState && contextRuntimeState.maxTokens > 0
     ? Math.round((contextRuntimeState.currentTokens / contextRuntimeState.maxTokens) * 100)
     : null;
@@ -2774,30 +2851,77 @@ export default function ChatView() {
             </button>
           )}
 
-          {/* Export buttons */}
-          {messages.length > 0 && (
-            <div className="flex items-center gap-0.5">
-              <button
-                onClick={handleCopyMarkdown}
-                className={`flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border transition-colors ${
-                  exportCopied
-                    ? 'border-accent-green/30 text-accent-green bg-accent-green/10'
+          {/* Export / Import buttons */}
+          <div className="flex items-center gap-0.5">
+            {messages.length > 0 && (
+              <>
+                <button
+                  onClick={handleCopyMarkdown}
+                  className={`flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border transition-colors ${
+                    exportCopied
+                      ? 'border-accent-green/30 text-accent-green bg-accent-green/10'
+                      : 'border-border-default text-text-tertiary hover:text-accent-blue hover:border-accent-blue/30'
+                  }`}
+                  title={t('chat.export.copy', 'Copy as Markdown')}
+                >
+                  <FileText size={10} />
+                  {exportCopied ? t('chat.export.copied', 'Copied!') : t('chat.export.copy', 'Copy')}
+                </button>
+                <button
+                  onClick={handleExportMarkdown}
+                  className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border border-border-default text-text-tertiary hover:text-accent-blue hover:border-accent-blue/30 transition-colors"
+                  title={t('chat.export.download', 'Download as Markdown')}
+                >
+                  <Archive size={10} />
+                  {t('chat.export.download', 'Export')}
+                </button>
+                <button
+                  onClick={handleExportJSON}
+                  className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border border-border-default text-text-tertiary hover:text-accent-green hover:border-accent-green/30 transition-colors"
+                  title={t('chat.export.json', 'Export as JSON (凌霄对话格式)')}
+                >
+                  <FileJson size={10} />
+                  {t('chat.export.jsonLabel', 'JSON')}
+                </button>
+              </>
+            )}
+            <button
+              onClick={handleImportJSON}
+              disabled={importStatus.kind === 'loading'}
+              className={`flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border transition-colors ${
+                importStatus.kind === 'success'
+                  ? 'border-accent-green/30 text-accent-green bg-accent-green/10'
+                  : importStatus.kind === 'error'
+                    ? 'border-red-500/30 text-red-400 bg-red-500/10'
                     : 'border-border-default text-text-tertiary hover:text-accent-blue hover:border-accent-blue/30'
-                }`}
-                title={t('chat.export.copy', 'Copy as Markdown')}
-              >
-                <FileText size={10} />
-                {exportCopied ? t('chat.export.copied', 'Copied!') : t('chat.export.copy', 'Copy')}
-              </button>
-              <button
-                onClick={handleExportMarkdown}
-                className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded border border-border-default text-text-tertiary hover:text-accent-blue hover:border-accent-blue/30 transition-colors"
-                title={t('chat.export.download', 'Download as Markdown')}
-              >
-                <Archive size={10} />
-                {t('chat.export.download', 'Export')}
-              </button>
-            </div>
+              } ${importStatus.kind === 'loading' ? 'opacity-50 cursor-wait' : ''}`}
+              title={t('chat.import.json', 'Import conversation from JSON')}
+            >
+              {importStatus.kind === 'loading'
+                ? <Loader2 size={10} className="animate-spin" />
+                : <Upload size={10} />}
+              {importStatus.kind === 'success'
+                ? t('chat.import.success', 'Imported!')
+                : importStatus.kind === 'error'
+                  ? t('chat.import.failed', 'Failed')
+                  : t('chat.import.label', 'Import')}
+            </button>
+            <input
+              ref={jsonImportInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleImportFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {importStatus.kind === 'error' && importStatus.message && (
+            <span className="text-[10px] text-red-400 font-mono max-w-[200px] truncate" title={importStatus.message}>
+              {importStatus.message}
+            </span>
+          )}
+          {importStatus.kind === 'success' && importStatus.message && (
+            <span className="text-[10px] text-accent-green font-mono">{importStatus.message}</span>
           )}
 
           {isLoadingHistory && <span className="text-text-tertiary">Loading...</span>}

@@ -400,46 +400,55 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
     }
 
     try {
-      console.log(chalk.cyan(`\n▸ 源码安装模式，自动升级 (目录: ${sourceDir})`));
+      console.log(chalk.cyan(`\n▸ 源码安装模式，强制升级 (目录: ${sourceDir})`));
 
-      // 1. git fetch + checkout 到最新 tag
+      // 1. git fetch + 强制 reset 到最新 tag（丢弃所有本地修改）
       console.log(chalk.cyan('▸ 拉取最新代码...'));
-      const gitFetch = spawnSync('git', ['fetch', '--tags', 'origin'], {
+      const gitFetch = spawnSync('git', ['fetch', '--all', '--tags', '--prune'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 60000, shell: IS_WINDOWS,
       });
       if (gitFetch.status !== 0) {
-        throw new Error('git fetch 失败，请检查网络或手动执行 git pull');
+        throw new Error('git fetch 失败，请检查网络或手动执行 git fetch --all --tags');
       }
 
-      // checkout 到最新 release tag
-      const gitCheckout = spawnSync('git', ['checkout', release.tag], {
+      // 强制 reset 到最新 release tag，丢弃所有本地修改
+      console.log(chalk.cyan(`▸ 强制重置到 ${release.tag}（将丢弃所有本地修改）...`));
+      const gitReset = spawnSync('git', ['reset', '--hard', release.tag], {
         cwd: sourceDir, stdio: 'inherit', timeout: 30000, shell: IS_WINDOWS,
       });
-      if (gitCheckout.status !== 0) {
-        // checkout 失败可能是本地有修改，尝试 stash + pull
-        console.log(chalk.yellow('  ⚠ checkout 失败，尝试 stash 后 pull...'));
-        spawnSync('git', ['stash'], { cwd: sourceDir, stdio: 'inherit', timeout: 10000, shell: IS_WINDOWS });
-        const gitPull = spawnSync('git', ['pull', 'origin', 'main'], {
-          cwd: sourceDir, stdio: 'inherit', timeout: 60000, shell: IS_WINDOWS,
-        });
-        if (gitPull.status !== 0) {
-          throw new Error('git pull 失败，请手动解决冲突后重试');
-        }
+      if (gitReset.status !== 0) {
+        throw new Error(`git reset --hard ${release.tag} 失败，请检查 tag 是否存在`);
       }
 
-      // 2. npm install（npm 命令跨平台，Windows 上需要 npm.cmd）
+      // 清理未追踪的文件和目录（保留 node_modules，避免重新下载所有依赖）
+      console.log(chalk.cyan('▸ 清理未追踪文件...'));
+      const gitClean = spawnSync('git', ['clean', '-fd'], {
+        cwd: sourceDir, stdio: 'inherit', timeout: 30000, shell: IS_WINDOWS,
+      });
+      if (gitClean.status !== 0) {
+        console.log(chalk.yellow('  ⚠ git clean 失败（可忽略）'));
+      }
+
+      // 2. 清理旧的构建产物（确保全新构建）
+      const distDir = join(sourceDir, 'dist');
+      if (existsSync(distDir)) {
+        console.log(chalk.cyan('▸ 清理旧的构建产物...'));
+        rmSync(distDir, { recursive: true, force: true });
+      }
+
+      // 3. npm install（npm 命令跨平台，Windows 上需要 npm.cmd）
       const npmCmd = IS_WINDOWS ? 'npm.cmd' : 'npm';
-      console.log(chalk.cyan('▸ 安装依赖...'));
+      console.log(chalk.cyan('▸ 安装依赖（强制重新安装）...'));
       // 跳过 electron 二进制下载（CLI 源码升级不需要，避免大文件下载超时）
-      const npmInstall = spawnSync(npmCmd, ['install'], {
+      const npmInstall = spawnSync(npmCmd, ['install', '--force'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 300000,
         env: { ...process.env, ELECTRON_SKIP_BINARY_DOWNLOAD: '1' },
       });
       if (npmInstall.status !== 0) {
-        throw new Error('npm install 失败（可能是网络问题，尝试设置代理后手动执行 npm install）');
+        throw new Error('npm install 失败（可能是网络问题，尝试设置代理后手动执行 npm install --force）');
       }
 
-      // 3. npm run build
+      // 4. npm run build
       console.log(chalk.cyan('▸ 构建项目...'));
       const npmBuild = spawnSync(npmCmd, ['run', 'build'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 300000,
@@ -448,7 +457,7 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
         throw new Error('npm run build 失败');
       }
 
-      // 4. npm link（刷新全局链接）
+      // 5. npm link（刷新全局链接）
       console.log(chalk.cyan('▸ 刷新全局链接...'));
       const npmLink = spawnSync(npmCmd, ['link'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 30000,

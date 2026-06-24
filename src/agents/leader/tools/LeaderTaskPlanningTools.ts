@@ -273,132 +273,7 @@ function validateEvaluationPolicy(policy: Record<string, unknown> | undefined): 
       errors.push('evaluation_policy.max_repair 必须是非负整数');
     }
   }
-  const adaptive = normalizeOptionalObject(policy.adaptive);
-  if (policy.adaptive !== undefined && !adaptive) {
-    errors.push('evaluation_policy.adaptive 必须是对象');
-  }
-  if (adaptive) {
-    if ((adaptive as { confidence?: unknown }).confidence !== undefined) {
-      errors.push('evaluation_policy.adaptive 禁止使用 confidence 分数');
-    }
-    const difficultySignalsValue = adaptive.difficulty_signals ?? adaptive.difficultySignals;
-    const difficultySignals = normalizeOptionalObject(difficultySignalsValue);
-    if (difficultySignalsValue !== undefined && !difficultySignals) {
-      errors.push('evaluation_policy.adaptive.difficulty_signals 必须是对象');
-    }
-    const signalSource = difficultySignals ?? adaptive;
-    for (const key of ['impact_ratio', 'impactRatio']) {
-      if (signalSource[key] !== undefined) {
-        const value = normalizeOptionalNumber(signalSource[key]);
-        if (value === undefined || value < 0) {
-          errors.push(`evaluation_policy.adaptive.${key} 必须是非负数字`);
-        }
-      }
-    }
-    for (const key of ['hotspot_overlap', 'hotspotOverlap', 'cross_module_deps', 'crossModuleDeps', 'prior_failures', 'priorFailures', 'total_project_files', 'totalProjectFiles']) {
-      if (signalSource[key] !== undefined) {
-        const value = normalizeOptionalNumber(signalSource[key]);
-        if (value === undefined || value < 0 || !Number.isInteger(value)) {
-          errors.push(`evaluation_policy.adaptive.${key} 必须是非负整数`);
-        }
-      }
-    }
-    for (const key of ['has_ambiguous_path', 'hasAmbiguousPath', 'ambiguous']) {
-      if (signalSource[key] !== undefined && typeof signalSource[key] !== 'boolean') {
-        errors.push(`evaluation_policy.adaptive.${key} 必须是 boolean`);
-      }
-    }
-  }
-  const speculation = normalizeOptionalObject(policy.speculation);
-  if (policy.speculation !== undefined && !speculation) {
-    errors.push('evaluation_policy.speculation 必须是对象');
-  }
-  if (speculation) {
-    const selectionPolicy = normalizeOptionalString(speculation.selection_policy ?? speculation.selectionPolicy);
-    if (
-      selectionPolicy !== undefined &&
-      !['first_green', 'fewest_changes', 'fastest_tests'].includes(selectionPolicy)
-    ) {
-      errors.push('evaluation_policy.speculation.selection_policy 必须是 first_green/fewest_changes/fastest_tests');
-    }
-    const maxBranches = normalizeOptionalNumber(speculation.max_branches ?? speculation.maxBranches);
-    if (
-      (speculation.max_branches ?? speculation.maxBranches) !== undefined &&
-      (maxBranches === undefined || maxBranches < 1 || maxBranches > 6 || !Number.isInteger(maxBranches))
-    ) {
-      errors.push('evaluation_policy.speculation.max_branches 必须是 1 到 6 的整数');
-    }
-    const timeoutMs = normalizeOptionalNumber(speculation.timeout_ms ?? speculation.timeoutMs);
-    if (
-      (speculation.timeout_ms ?? speculation.timeoutMs) !== undefined &&
-      (timeoutMs === undefined || timeoutMs < 1 || !Number.isInteger(timeoutMs))
-    ) {
-      errors.push('evaluation_policy.speculation.timeout_ms 必须是正整数');
-    }
-    if (speculation.alternatives !== undefined) {
-      if (!Array.isArray(speculation.alternatives)) {
-        errors.push('evaluation_policy.speculation.alternatives 必须是数组');
-      } else {
-        speculation.alternatives.forEach((value, index) => {
-          const alternative = normalizeOptionalObject(value);
-          if (!alternative) {
-            errors.push(`evaluation_policy.speculation.alternatives[${index}] 必须是对象`);
-            return;
-          }
-          if (!normalizeOptionalString(alternative.id ?? alternative.name)) {
-            errors.push(`evaluation_policy.speculation.alternatives[${index}].id 必填且不能为空`);
-          }
-          if (
-            (alternative.write_scope ?? alternative.writeScope) !== undefined &&
-            !normalizeStringArray(alternative.write_scope ?? alternative.writeScope)
-          ) {
-            errors.push(`evaluation_policy.speculation.alternatives[${index}].write_scope 必须是非空字符串数组`);
-          }
-        });
-      }
-    }
-  }
-  const adversarial = normalizeOptionalObject(policy.adversarial ?? policy.breaker);
-  if ((policy.adversarial ?? policy.breaker) !== undefined && !adversarial) {
-    errors.push('evaluation_policy.adversarial 必须是对象');
-  }
-  if (adversarial) {
-    const timeoutMs = normalizeOptionalNumber(adversarial.timeout_ms ?? adversarial.timeoutMs);
-    if (
-      (adversarial.timeout_ms ?? adversarial.timeoutMs) !== undefined &&
-      (timeoutMs === undefined || timeoutMs < 1 || !Number.isInteger(timeoutMs))
-    ) {
-      errors.push('evaluation_policy.adversarial.timeout_ms 必须是正整数');
-    }
-    if (adversarial.strategies !== undefined) {
-      if (!Array.isArray(adversarial.strategies)) {
-        errors.push('evaluation_policy.adversarial.strategies 必须是数组');
-      } else {
-        adversarial.strategies.forEach((value, index) => {
-          const strategy = normalizeOptionalObject(value);
-          if (!strategy) {
-            errors.push(`evaluation_policy.adversarial.strategies[${index}] 必须是对象`);
-            return;
-          }
-          if (strategy.type !== 'command') {
-            errors.push(`evaluation_policy.adversarial.strategies[${index}].type 必须是 command`);
-          }
-          if (!normalizeOptionalString(strategy.id)) {
-            errors.push(`evaluation_policy.adversarial.strategies[${index}].id 必填且不能为空`);
-          }
-          if (!normalizeOptionalString(strategy.command)) {
-            errors.push(`evaluation_policy.adversarial.strategies[${index}].command 必填且不能为空`);
-          }
-          if (
-            strategy.args !== undefined &&
-            (!Array.isArray(strategy.args) || strategy.args.some((arg) => typeof arg !== 'string'))
-          ) {
-            errors.push(`evaluation_policy.adversarial.strategies[${index}].args 必须是字符串数组`);
-          }
-        });
-      }
-    }
-  }
+  // v1.0.4: adaptive/speculation/adversarial 字段已移除，仅保留基础验收字段验证
   return errors;
 }
 
@@ -822,7 +697,26 @@ export async function createTask(
   const subsystemWarning = registerTaskSubsystem(ctx, task.id, args);
   const readinessLabel = formatTaskReadiness(ctx, task);
 
-  return `已创建任务 ${task.id}: ${task.subject} [${readinessLabel}]${formatBlockedReason(ctx, task)}${worktree ? ` · worktree:${worktree.branch}` : requestedWorktreePolicy !== 'none' ? ` · worktree_policy:${requestedWorktreePolicy}->${worktreePolicy}` : ''}${orchestration ? ` · orchestration:${orchestration.nodeKind ?? 'generic'} gen=${orchestration.generation ?? 0}` : ''}${formatContractToolStatus(contractTemplate, contractWriteResult)}${agentTypeNote ? ` · 角色:${agentTypeNote}` : ''}${subsystemWarning ? ` · ${subsystemWarning}` : ''}`;
+
+  // 0→1: IntegrationVerifyInjector —— 检测是否需要插入集成验证节点
+  let integrationHint = '';
+  try {
+    const allTasks = ctx.leader.board.getAllTasks().map(t => ({
+      id: t.id,
+      nodeKind: t.orchestration?.nodeKind,
+      agentType: t.agent_type,
+      writeScope: t.write_scope,
+      blockedBy: t.blocked_by,
+      status: t.status,
+      contractSurface: t.orchestration?.contractBinding?.surface,
+    }));
+    const injection = ctx.leader.getIntegrationInjector().analyze(allTasks, ctx.leader.getSharedLedger());
+    if (injection.needed && injection.verifyNode) {
+      integrationHint = `\nℹ IntegrationVerifyInjector: 建议插入集成验证节点 (${injection.reason})，blocked_by=[${injection.verifyNode.blockedBy.join(',')}]`;
+    }
+  } catch { /* non-critical */ }
+
+  return `已创建任务 ${task.id}: ${task.subject} [${readinessLabel}]${formatBlockedReason(ctx, task)}${worktree ? ` · worktree:${worktree.branch}` : requestedWorktreePolicy !== 'none' ? ` · worktree_policy:${requestedWorktreePolicy}->${worktreePolicy}` : ''}${orchestration ? ` · orchestration:${orchestration.nodeKind ?? 'generic'} gen=${orchestration.generation ?? 0}` : ''}${formatContractToolStatus(contractTemplate, contractWriteResult)}${agentTypeNote ? ` · 角色:${agentTypeNote}` : ''}${subsystemWarning ? ` · ${subsystemWarning}` : ''}${integrationHint}`;
 }
 
 /** update_task 实现 */
@@ -1067,33 +961,84 @@ export async function defineProjectBlueprint(
   }
   const implementCount = coverage.implemented.length + coverage.uncovered.length;
   const header = `已定义项目蓝图 · ${blueprint.subsystems.length} 子系统(implement ${implementCount} · defer ${coverage.deferred.length} · na ${coverage.notApplicable.length})。`;
-  // 治本接线:蓝图存盘后,为每个 implement 子系统自动建 contract 前置任务(architect 产真契约)。
-  // 陷阱A:不传 contract 模板(writeContractNodeToBlackboard 守卫不预写节点,真契约由 architect 经 graph_contract 物化才就绪);
-  // 陷阱B 已修正:contract 任务也登记 subsystem,使 computeBlueprintCoverage 判定覆盖完整(避免"建了任务仍显示缺口"的 UX 摩擦);
-  // 陷阱F:幂等——已有未完成同 surface 的 contract 任务则跳过,重复 define_project_blueprint 不翻倍。
-  const seeds = buildSubsystemContractSeeds(blueprint);
-  const contractTaskNotes: string[] = [];
-  for (const seed of seeds) {
-    const dup = ctx.leader.board.getAllTasks().find((t) =>
-      t.orchestration?.nodeKind === 'contract'
-      && t.orchestration?.contractBinding?.surface === seed.surface
-      && t.status !== 'terminal');
-    if (dup) {
-      contractTaskNotes.push(`${seed.surface}:复用 ${dup.id}`);
-      continue;
+  // v1.0.4: 自动 contract seed 默认关闭——Leader 可用 write_contract 直接写契约（更高效）
+  // 仅当显式传 auto_contract_tasks: true 时才恢复旧行为
+  const autoContractTasks = parseBooleanFlag(args.auto_contract_tasks);
+  let contractSummary = '';
+  if (autoContractTasks) {
+    const seeds = buildSubsystemContractSeeds(blueprint);
+    const contractTaskNotes: string[] = [];
+    for (const seed of seeds) {
+      const dup = ctx.leader.board.getAllTasks().find((t) =>
+        t.orchestration?.nodeKind === 'contract'
+        && t.orchestration?.contractBinding?.surface === seed.surface
+        && t.status !== 'terminal');
+      if (dup) {
+        contractTaskNotes.push(`${seed.surface}:复用 ${dup.id}`);
+        continue;
+      }
+      try {
+        const id = await createContractSeedTask(ctx, seed);
+        contractTaskNotes.push(`${seed.surface}:${id}`);
+      } catch (err) {
+        leaderLogger.warn(`[LeaderTools] contract seed 任务创建失败 (surface=${seed.surface}): ${err instanceof Error ? err.message : String(err)}`);
+      }
     }
-    try {
-      const id = await createContractSeedTask(ctx, seed);
-      contractTaskNotes.push(`${seed.surface}:${id}`);
-    } catch (err) {
-      leaderLogger.warn(`[LeaderTools] contract seed 任务创建失败 (surface=${seed.surface}): ${err instanceof Error ? err.message : String(err)}`);
-      contractTaskNotes.push(`${seed.surface}:创建失败`);
+    if (contractTaskNotes.length > 0) {
+      contractSummary = `\n已生成 ${contractTaskNotes.length} 个 contract 任务: ${contractTaskNotes.join('; ')}`;
     }
+  } else {
+    const surfaces = blueprint.subsystems
+      .filter(s => s.status === 'implement')
+      .map(s => s.subsystemId);
+    contractSummary = surfaces.length > 0
+      ? `\n下一步: 用 write_contract(surface="<subsystem_id>", content="...") 为每个子系统写入契约，或 create_task(node_kind="contract") 建单个 architect 任务。\n待写契约: ${surfaces.join(', ')}`
+      : '';
   }
-  const contractSummary = contractTaskNotes.length > 0
-    ? `\n已自动生成 ${contractTaskNotes.length} 个 contract 前置任务(architect 角色,已登记到对应 subsystem,覆盖完整): ${contractTaskNotes.join('; ')}。\n【执行步骤】1. 先 dispatch 这些 contract 任务收敛契约(可并行派发);2. contract 完成后,为每个 subsystem 建 implement 任务(create_task 带 subsystem=<id>);3. implement 任务会自动等待对应 surface 的契约就绪后解锁派发。`
-    : '';
-  return [header, contractSummary].filter(Boolean).join('\n');
+  // 0→1: 蓝图完整性自动审查——派一个 planner 专门找遗漏
+  let auditHint = '';
+  try {
+    const userRequest = ctx.leader.db.getSession(ctx.leader.sessionId)?.user_request || '';
+    const blueprintJson = JSON.stringify(blueprint.subsystems.map(s => ({ id: s.subsystemId, name: s.name, status: s.status })));
+    const auditTaskId = ctx.leader.board.nextTaskId();
+    ctx.leader.board.createTask(
+      auditTaskId,
+      `蓝图完整性审查`,
+      [
+        `你是蓝图审查员。审查以下蓝图是否覆盖了“完整可用产品”所需的全部子系统。`,
+        ``,
+        `用户原始需求: ${userRequest}`,
+        ``,
+        `当前蓝图: ${blueprintJson}`,
+        ``,
+        `审查维度（不限于）:`,
+        `- 用户怎么进来？（认证、登录、注册、OAuth）`,
+        `- 用户怎么管理自己？（个人中心、设置、安全）`,
+        `- 管理员怎么管？（后台、权限、审计）`,
+        `- 出错了怎么办？（错误页、重试、降级）`,
+        `- 数据多了怎么办？（分页、搜索、筛选、导出）`,
+        `- 界面怎么组织？（导航、布局、响应式、空状态）`,
+        `- 操作有反馈吗？（加载态、Toast、进度）`,
+        ``,
+        `输出格式:`,
+        `1. 缺失的子系统列表（subsystem_id + name + 为什么必须有）`,
+        `2. 现有子系统的补充建议`,
+        `3. 优先级排序`,
+        ``,
+        `注意: 根据项目类型灵活判断。内部工具不需要注册、CLI 不需要导航、API only 不需要 UI 组件。不要无脑补充，只补真正缺失的。`,
+      ].join('\n'),
+      'planner',
+      [], // blocked_by: 不阻塞任何人
+      [], // deps
+      {}, // scope
+      undefined, // context
+      { orchestration: { nodeKind: 'plan' } },
+    );
+    auditHint = `\n已自动创建蓝图完整性审查任务 ${auditTaskId}（planner 角色）。建议先派发它，根据审查结果补全蓝图后再开工。`;
+  } catch (err) {
+    leaderLogger.warn(`[LeaderTools] 蓝图审查任务创建失败: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  return [header, contractSummary, auditHint].filter(Boolean).join('\n');
 }
 
 /** 建单个 contract 前置任务(architect 产真契约)。复用 createTask,保留其重复防御/角色校验/持久化/事件路径。

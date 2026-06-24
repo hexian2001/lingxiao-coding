@@ -203,82 +203,12 @@ const CONTRACT_SCHEMA = {
 
 const EVALUATION_POLICY_SCHEMA = {
   type: 'object',
-  description: '可选。结构化评估策略；不要写自然语言猜测，不要传 confidence。adaptive 使用 difficulty_signals；speculation/adversarial 使用下列固定字段。',
+  description: '可选。结构化评估策略；定义验收门槛、必须证据和修复上限。',
   properties: {
     required_evidence: { type: 'array', items: { type: 'string', minLength: 1 }, description: '必须产出的证据清单，例如外部来源、API 测试结果、定向测试命令。' },
     critical_gates: { type: 'array', items: { type: 'string', minLength: 1 }, description: '关键验收 gate 清单；任一失败则任务不应完成。' },
     max_repair: { type: 'integer', minimum: 0, description: '最多允许修复轮数，非负整数。' },
     evaluator_role: { type: 'string', minLength: 1, description: '可选。评估/验收角色。' },
-    adaptive: {
-      type: 'object',
-      description: '自适应编排信号；禁止 confidence。新调用只使用 difficulty_signals 的 snake_case 字段。',
-      properties: {
-        difficulty_signals: {
-          type: 'object',
-          properties: {
-            impact_ratio: { type: 'number', minimum: 0, description: '影响范围比例，可为小数。' },
-            hotspot_overlap: { type: 'integer', minimum: 0, description: '与热点区域重叠数量，非负整数。' },
-            cross_module_deps: { type: 'integer', minimum: 0, description: '跨模块依赖数量，非负整数。' },
-            prior_failures: { type: 'integer', minimum: 0, description: '历史失败次数，非负整数。' },
-            total_project_files: { type: 'integer', minimum: 0, description: '可选。项目文件总量，非负整数。' },
-            has_ambiguous_path: { type: 'boolean', description: '是否存在不明确实现路径。' },
-          },
-          additionalProperties: false,
-        },
-      },
-      additionalProperties: false,
-    },
-    speculation: {
-      type: 'object',
-      description: '投机执行策略。',
-      properties: {
-        enabled: { type: 'boolean', description: '是否启用投机执行' },
-        selection_policy: { type: 'string', enum: ['first_green', 'fewest_changes', 'fastest_tests'], description: '分支选择策略' },
-        max_branches: { type: 'integer', minimum: 1, maximum: 6, description: '最大并行分支数' },
-        timeout_ms: { type: 'integer', minimum: 1, description: '超时毫秒数' },
-        alternatives: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string', minLength: 1, description: '分支 ID' },
-              label: { type: 'string', description: '分支标签' },
-              strategy_prompt: { type: 'string', description: '策略提示词' },
-              working_directory: { type: 'string', description: '工作目录' },
-              write_scope: { type: 'array', items: { type: 'string', minLength: 1 }, description: '写入范围' },
-            },
-            required: ['id'],
-            additionalProperties: false,
-          },
-        },
-      },
-      additionalProperties: false,
-    },
-    adversarial: {
-      type: 'object',
-      description: '对抗验证策略。',
-      properties: {
-        enabled: { type: 'boolean', description: '是否启用对抗验证' },
-        timeout_ms: { type: 'integer', minimum: 1, description: '超时毫秒数' },
-        strategies: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string', minLength: 1, description: '策略 ID' },
-              type: { type: 'string', enum: ['command'], description: '策略类型' },
-              command: { type: 'string', minLength: 1, description: '执行命令' },
-              args: { type: 'array', items: { type: 'string' }, description: '命令参数' },
-              expected_exit_code: { type: 'integer', description: '期望退出码' },
-              fail_on_exit_code: { type: 'integer', description: '失败退出码' },
-            },
-            required: ['id', 'type', 'command'],
-            additionalProperties: false,
-          },
-        },
-      },
-      additionalProperties: false,
-    },
   },
   additionalProperties: false,
 };
@@ -927,6 +857,23 @@ description: '提交当前的完整执行方案。行为取决于控制模式（
           agent_name: { type: 'string', description: '要查看的Agent名称' },
         },
         required: ['agent_name'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'write_contract',
+      description: 'Leader 直接写入契约到 SharedLedger。用于解除蓝图 dispatch 拦截、跟过 architect 任务、或 Leader 已有明确接口设计时直接写入。写入后对应 contract_surface 的任务将自动解除契约阻塞。',
+      parameters: {
+        type: 'object',
+        properties: {
+          surface: { type: 'string', minLength: 1, description: '契约 surface，如 "POST /api/login" 或 "data-model" 或蓝图 subsystem id。' },
+          title: { type: 'string', minLength: 1, description: '契约标题。' },
+          content: { type: 'string', minLength: 1, description: '契约正文：接口定义、数据结构、行为约束、验收标准等。' },
+          evidence: { type: 'array', items: { type: 'string' }, description: '可选。证据引用：文件路径、URL、task_id 等。' },
+        },
+        required: ['surface', 'content'],
       },
     },
   },

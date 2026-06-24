@@ -9,10 +9,7 @@ import {
   renderSpeculativeOrchestrationPlan,
   type SpeculativeProjectEvidence,
 } from '../../core/SpeculativeOrchestrationPlanner.js';
-import {
-  AdaptiveHarness,
-  renderAdaptiveStrategyPlan,
-} from '../../core/AdaptiveHarness.js';
+// v1.0.4: AdaptiveHarness removed — static defaults used inline
 import { SESSION_KEYS } from '../../core/SessionStateKeys.js';
 import { resolveModeRuntimeProjection } from '../../core/ModeRuntimeProjection.js';
 import { enrichTaskContext } from '../../core/TaskContextEnricher.js';
@@ -289,17 +286,13 @@ export async function buildWorkerPayload(input: WorkerPayloadBuilderInput): Prom
       : speculativeSection;
   }
 
-  const adaptiveHarness = new AdaptiveHarness();
-  const adaptivePlan = adaptiveHarness.buildPlan({
-    task: input.task,
-    projectModel: projectMemory.model,
-  });
-  const adaptiveSection = renderAdaptiveStrategyPlan(adaptivePlan);
-  if (adaptiveSection) {
-    enrichedContext = enrichedContext
-      ? `${enrichedContext}\n\n${adaptiveSection}`
-      : adaptiveSection;
-  }
+  // v1.0.4: AdaptiveHarness 移除——用静态默认值替代动态策略
+  const adaptivePlan = {
+    strategy: 'standard' as const,
+    params: { maxRounds: 25, timeoutMs: 10 * 60_000, parallelToolCalls: true },
+    signals: {},
+  };
+  // 不再注入 adaptive section 到 worker context
 
   // B-B: 注入蓝图定位段,让 Worker 知道自己在整体项目中的位置(防局部优化)。
   // 从 session state 读蓝图,反查 task 属于哪个子系统,投影定位 + 整体进度 + 依赖链。

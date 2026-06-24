@@ -167,6 +167,12 @@ export async function createServer() {
   // 进程全量清理是单机单 daemon 的设计约定。
   registerCleanup(async () => { await WorkerProcessRunner.killOrphanWorkers(); }, 9.5);
 
+  // 退出兜底：gracefulShutdown 超时强退时 runAllCleanups 可能未跑到 db.close，
+  // process('exit') 是同步退出的最后窗口，幂等调用确保 WAL checkpoint + 锁释放。
+  process.on('exit', () => {
+    try { db.close(); } catch { /* tolerate — already closed */ }
+  });
+
   const sessionManager = new SessionManager(db, defaultEmitter);
   const activeSessionCoordinator = new ActiveSessionCoordinator(undefined, 'server');
 

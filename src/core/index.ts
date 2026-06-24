@@ -13,3 +13,19 @@ export { TaskStatus, MessageRole, ToolName, Channel, ExecutionMode } from './con
 export { EternalSupervisor } from './EternalSupervisor.js';
 export { EternalLoop } from './EternalLoop.js';
 export { AlertManager, alertManager, StdoutAlertChannel, LogFileAlertChannel, WebhookAlertChannel } from './AlertManager.js';
+// 共享账本（替代 BlackboardGraph）
+export { SharedLedger } from './SharedLedger.js';
+export type { LedgerEntry, LedgerEntryType, LedgerQuery, LedgerSnapshot } from './SharedLedger.js';
+
+
+// 0→1 交付引擎
+export { buildExpansion, renderExpansionHint } from './SpecFirstPipeline.js';
+export type { PipelineExpansion, PipelineNode } from './SpecFirstPipeline.js';
+export { ContractHotSync } from './ContractHotSync.js';
+export type { ContractDelta, ContractConsumer } from './ContractHotSync.js';
+export { IntegrationVerifyInjector } from './IntegrationVerifyInjector.js';
+export type { VerifyInjection, VerifyScenario } from './IntegrationVerifyInjector.js';
+export { DeterministicAcceptance } from './DeterministicAcceptance.js';
+export type { AcceptanceCheck, AcceptanceSuite } from './DeterministicAcceptance.js';
+export { RepairStrategyEngine } from './RepairStrategyEngine.js';
+export type { ErrorClassification, RepairDecision, RepairStrategy } from './RepairStrategyEngine.js';

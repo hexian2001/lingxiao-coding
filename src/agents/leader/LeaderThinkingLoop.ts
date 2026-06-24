@@ -175,7 +175,9 @@ export interface LeaderThinkingEngineOptions {
 
   // 黑板架构（feature flag: LINGXIAO_BLACKBOARD）
   /** 获取黑板图分析结果，用于注入 LLM 上下文 */
-  getBlackboardAnalysis?: () => import('../../core/blackboard/types.js').GraphAnalysis | null;
+  getBlackboardAnalysis?: () => import('../../core/blackboard/types.js').GraphAnalysis | null;  /** SharedLedger: 获取 constraint + decision 条目（compaction-safe） */
+  getSharedLedgerContext?: () => string | null;
+
   /** 注入统一上下文记忆召回结果 */
   appendContextMemoryIfChanged?: () => Promise<boolean>;
 }
@@ -680,45 +682,38 @@ export class LeaderThinkingEngine {
       this.opts.appendRuntimeContextManifestIfChanged();
       await this.opts.appendContextMemoryIfChanged?.();
 
-      // 黑板架构：注入图分析上下文（作为 system 消息，不影响 LLM 决策）
+      // SharedLedger 注入：constraint + decision 条目永远保留在 Leader 上下文中
+      if (this.opts.getSharedLedgerContext) {
+        const ledgerContent = this.opts.getSharedLedgerContext();
+        if (ledgerContent) {
+          if (this.opts.upsertSystemSlot) {
+            this.opts.upsertSystemSlot({ kind: 'prefix', prefix: '## Shared Ledger' }, ledgerContent);
+          } else {
+            this.opts.addMessage({ role: 'system', content: ledgerContent });
+          }
+        }
+      }
+
+      // 向后兼容：如果仍有 blackboard analysis provider，保留旧注入
       if (this.opts.getBlackboardAnalysis) {
         const analysis = this.opts.getBlackboardAnalysis();
-        if (analysis) {
-          const parts: string[] = ['## 黑板图分析（自动注入，供你参考已有知识）'];
-          // 始终显示已知事实及其内容摘要（避免 LLM 误判黑板为空）
+        if (analysis && (analysis.recentFacts.length > 0 || analysis.openIntents.length > 0)) {
+          const parts: string[] = ['## 黑板图分析（向后兼容）'];
           if (analysis.recentFacts.length > 0) {
             parts.push(`已知事实 (${analysis.recentFacts.length}):`);
-            for (const f of analysis.recentFacts.slice(0, 5)) {
-              const contentPreview = f.content ? f.content.slice(0, 300) : '';
+            for (const f of analysis.recentFacts.slice(0, 3)) {
               parts.push(`  - [${f.id}] ${f.title}`);
-              if (contentPreview) parts.push(`    摘要: ${contentPreview}`);
             }
           }
           if (analysis.openIntents.length > 0) {
             parts.push(`开放 Intent (${analysis.openIntents.length}):`);
-            for (const i of analysis.openIntents.slice(0, 5)) {
-              parts.push(`  - [${i.id}] ${i.title}${i.content ? `: ${i.content.slice(0, 100)}` : ''}`);
+            for (const i of analysis.openIntents.slice(0, 3)) {
+              parts.push(`  - [${i.id}] ${i.title}`);
             }
           }
-          if (analysis.unresolvedContradictions.length > 0) {
-            parts.push(`矛盾 (${analysis.unresolvedContradictions.length}):`);
-            for (const c of analysis.unresolvedContradictions.slice(0, 3)) {
-              parts.push(`  - ${c.nodeA.title} ↔ ${c.nodeB.title}`);
-            }
-          }
-          if (analysis.knowledgeGaps.length > 0) {
-            parts.push(`知识缺口: ${analysis.knowledgeGaps.slice(0, 3).join(', ')}`);
-          }
-          if (analysis.completionSignals.length > 0) {
-            parts.push(`完成信号: ${analysis.completionSignals.join(', ')}`);
-          }
-          if (analysis.recentFacts.length === 0 && analysis.openIntents.length === 0) {
-            parts.push('黑板当前无数据。');
-          }
-          // 黑板图分析是状态镜像（每轮刷新、最新值即权威）→ 单槽 in-place，避免每轮 append 堆积。
           const blackboardContent = parts.join('\n');
           if (this.opts.upsertSystemSlot) {
-            this.opts.upsertSystemSlot({ kind: 'prefix', prefix: '## 黑板图分析（自动注入' }, blackboardContent);
+            this.opts.upsertSystemSlot({ kind: 'prefix', prefix: '## 黑板图分析（向后兼容' }, blackboardContent);
           } else {
             this.opts.addMessage({ role: 'system', content: blackboardContent });
           }
@@ -1006,6 +1001,14 @@ export class LeaderThinkingEngine {
                 const ctxMgr = this.opts.contextManager;
                 const tokens = await ctxMgr.getTokenCount().catch(() => 0);
                 const threshold = ctxMgr.getThreshold();
+                // 安全阀：如果 token 远低于阈值（<50%），说明可能是误分类
+                // （如消息格式错误被当作 overflow）。此时不压缩，直接抛错。
+                if (threshold > 0 && tokens < threshold * 0.5) {
+                  leaderLogger.warn(
+                    `Leader 收到 context_overflow 但 token 使用率很低 (${tokens}/${threshold} = ${Math.round(tokens / threshold * 100)}%)，疑似误分类，跳过压缩`,
+                  );
+                  throw classified;
+                }
                 leaderLogger.warn(
                   `Leader 收到 ${classified.statusCode ?? '?'} ${errorLabel}，先同步压缩再重试`,
                 );

@@ -19,7 +19,6 @@ import type { BusMessage } from './MessageBus.js';
 import type { WorkerContractComplianceProof } from './AgentProtocol.js';
 import type { SpeculativeOrchestrationPlan } from './SpeculativeOrchestrationPlanner.js';
 import type { SpeculativeWinnerEvidence } from './SpeculativeExecutionController.js';
-import type { AdaptiveStrategyPlan } from './AdaptiveHarness.js';
 import type { ContractPack } from './ContractPack.js';
 import type { ContractAllowedScope } from './ContractAllowedScope.js';
 import { coreLogger } from './Log.js';
@@ -65,8 +64,8 @@ export interface WorkerTaskPayload {
   contractPack?: Pick<ContractPack, 'sessionId' | 'contractsDir' | 'generatedAt' | 'entries'>;
   /** Deterministic speculative branch plan derived from orchestration metadata and trace memory. */
   speculativePlan?: SpeculativeOrchestrationPlan;
-  /** Deterministic adaptive execution strategy derived from structural signals and trace memory. */
-  adaptiveStrategy?: AdaptiveStrategyPlan;
+  /** @deprecated v1.0.4: adaptive strategy removed, kept for payload compat */
+  adaptiveStrategy?: { strategy: string; params: { maxRounds: number; timeoutMs: number; parallelToolCalls: boolean }; signals: Record<string, unknown> };
   /** Prior conversation history for respawn — full agent conversation from DB */
   conversationHistory?: Array<{ role: string; content: unknown; tool_calls?: unknown[]; tool_call_id?: string; thinking?: unknown[]; timestamp?: number }>;
   /**

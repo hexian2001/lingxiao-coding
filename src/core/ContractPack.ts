@@ -333,6 +333,56 @@ function persistProjectContractPack(pack: ContractPack, workspace: string): void
   });
 }
 
+/**
+ * 持久化单个契约条目到项目级 contracts 目录。
+ * 用于 Leader 的 write_contract 工具——绕过 BlackboardGraph 直接写契约。
+ * 内部走相同的锁和合并逻辑，保证跨会话一致性。
+ */
+export function persistProjectContractEntry(workspace: string, entry: ContractPackEntry): void {
+  const dir = getProjectContractsDir(workspace);
+  mkdirSync(dir, { recursive: true });
+
+  withProjectContractPackLock(dir, () => {
+    const packPath = join(dir, CONTRACT_PACK_FILENAME);
+    const existingBySurface = new Map<string, ContractPackEntry>();
+
+    // 读取已有契约
+    if (existsSync(packPath)) {
+      try {
+        const raw = readFileSync(packPath, 'utf8');
+        const parsed = JSON.parse(raw) as unknown;
+        if (parsed && typeof parsed === 'object' && Array.isArray((parsed as Record<string, unknown>).entries)) {
+          for (const e of (parsed as Record<string, unknown[]>).entries) {
+            if (e && typeof e === 'object'
+              && typeof (e as Record<string, unknown>).surface === 'string'
+              && typeof (e as Record<string, unknown>).content === 'string'
+              && typeof (e as Record<string, unknown>).sha256 === 'string') {
+              const existing = e as ContractPackEntry;
+              const key = existing.version !== undefined ? `${existing.surface}@v${existing.version}` : existing.surface;
+              existingBySurface.set(key, existing);
+            }
+          }
+        }
+      } catch { /* 容错 */ }
+    }
+
+    // 合并新 entry
+    const key = entry.version !== undefined ? `${entry.surface}@v${entry.version}` : entry.surface;
+    existingBySurface.set(key, entry);
+
+    const mergedEntries = [...existingBySurface.values()].sort((a, b) =>
+      a.surface.localeCompare(b.surface) || (a.version ?? 0) - (b.version ?? 0),
+    );
+
+    // 写入文件
+    for (const e of mergedEntries) {
+      const fileName = `${sanitizeSurfaceForFilename(e.surface)}.json`;
+      writeJsonAtomic(join(dir, fileName), e);
+    }
+    writeJsonAtomic(packPath, { generatedAt: Date.now(), contractsDir: dir, entries: mergedEntries });
+  });
+}
+
 export function buildAndPersistContractPackFromSnapshot(
   snapshot: GraphSnapshot,
   input: { sessionId: string; workspace?: string; generatedAt?: number },
