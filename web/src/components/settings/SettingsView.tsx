@@ -128,7 +128,7 @@ export default function SettingsView() {
             <Loader2 className="w-6 h-6 text-accent-brand animate-spin" />
           </div>
         ) : (
-          <div className="flex max-w-7xl flex-col gap-4 lg:flex-row">
+          <div className="flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-start">
             <SettingsNav items={navItems} />
             <div className="min-w-0 flex-1 space-y-6">
               <ModelAndReasoningSection settings={settings} providers={providers} saveState={saveState} onSave={handleSave} onProvidersChange={setProviders} onRefreshSettings={fetchSettings} />

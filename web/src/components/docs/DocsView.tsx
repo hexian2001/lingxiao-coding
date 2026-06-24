@@ -16,7 +16,9 @@ import {
 interface DocSection {
   id: string;
   title: string;
+  titleZh: string;
   content: string;
+  contentZh: string;
   children?: DocSection[];
 }
 
@@ -28,7 +30,9 @@ function normalizeDocSection(value: unknown): DocSection | null {
   if (!isRecord(value)) return null;
   const id = typeof value.id === 'string' ? value.id.trim() : '';
   const title = typeof value.title === 'string' ? value.title.trim() : '';
+  const titleZh = typeof value.titleZh === 'string' ? value.titleZh.trim() : title;
   const content = typeof value.content === 'string' ? value.content : '';
+  const contentZh = typeof value.contentZh === 'string' ? value.contentZh : content;
   if (!id || !title) return null;
 
   if (value.children !== undefined && !Array.isArray(value.children)) return null;
@@ -38,7 +42,9 @@ function normalizeDocSection(value: unknown): DocSection | null {
   return {
     id,
     title,
+    titleZh,
     content,
+    contentZh,
     ...(children.length > 0 ? { children } : {}),
   };
 }
@@ -70,8 +76,10 @@ function firstSectionId(sections: DocSection[]): string {
 }
 
 export default function DocsView() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isZh = i18n.language === 'zh';
   const [docs, setDocs] = useState<DocSection[]>([]);
+
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [activeSection, setActiveSection] = useState<string>('');
   const [search, setSearch] = useState('');
@@ -116,9 +124,12 @@ export default function DocsView() {
 
   const filterSections = (sections: DocSection[], query: string): DocSection[] => {
     if (!query) return sections;
+    const q = query.toLowerCase();
     return sections.filter((s) =>
-      s.title.toLowerCase().includes(query.toLowerCase()) ||
-      s.content.toLowerCase().includes(query.toLowerCase()) ||
+      s.title.toLowerCase().includes(q) ||
+      s.titleZh.toLowerCase().includes(q) ||
+      s.content.toLowerCase().includes(q) ||
+      s.contentZh.toLowerCase().includes(q) ||
       (s.children && filterSections(s.children, query).length > 0)
     );
   };
@@ -142,7 +153,7 @@ export default function DocsView() {
               {expanded.has(section.id) ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
             </span>
           )}
-          <span className="truncate">{section.title}</span>
+          <span className="truncate">{isZh ? section.titleZh : section.title}</span>
         </button>
         {section.children && expanded.has(section.id) && renderToc(section.children, depth + 1)}
       </div>
@@ -156,7 +167,7 @@ export default function DocsView() {
         <div className="px-3 py-2 border-b border-border-default">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-4 h-4 text-text-tertiary" />
-            <span className="text-sm font-medium text-text-primary">{t('docs.toc')}</span>
+            <span className="text-sm font-medium text-text-primary flex-1">{t('docs.toc')}</span>
           </div>
           <div className="relative">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-text-tertiary" />
@@ -210,9 +221,9 @@ export default function DocsView() {
           </div>
         ) : active ? (
           <article>
-            <h1 className="text-xl font-semibold text-text-primary mb-4">{active.title}</h1>
-            <div className="prose prose-sm prose-invert max-w-none text-text-secondary">
-              <SafeMarkdown>{active.content}</SafeMarkdown>
+            <h1 className="text-xl font-semibold text-text-primary mb-4">{isZh ? active.titleZh : active.title}</h1>
+            <div className="docs-prose max-w-none">
+              <SafeMarkdown>{isZh ? active.contentZh : active.content}</SafeMarkdown>
             </div>
             {active.children && (
               <div className="mt-6 space-y-4">
@@ -222,10 +233,10 @@ export default function DocsView() {
                       className="text-base font-medium text-text-primary mb-2 cursor-pointer hover:text-accent-brand"
                       onClick={() => setActiveSection(child.id)}
                     >
-                      {child.title}
+                      {isZh ? child.titleZh : child.title}
                     </h2>
-                    <div className="prose prose-sm prose-invert max-w-none text-text-secondary">
-                      <SafeMarkdown>{child.content}</SafeMarkdown>
+                    <div className="docs-prose max-w-none">
+                      <SafeMarkdown>{isZh ? child.contentZh : child.content}</SafeMarkdown>
                     </div>
                   </section>
                 ))}

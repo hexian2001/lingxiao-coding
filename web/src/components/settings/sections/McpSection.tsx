@@ -21,7 +21,7 @@ export function McpSection({ settings, saveState, onSave }: { settings: Settings
       </SettingsRow>
       <div className="border-t border-border-default pt-3">
         <div className="h-[520px] border border-border-muted rounded overflow-hidden bg-bg-primary">
-          <McpServersTab />
+          <McpServersTab inline />
         </div>
       </div>
     </SettingsSection>
