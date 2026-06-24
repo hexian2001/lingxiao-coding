@@ -1336,7 +1336,7 @@
   "changes.otherSessionWarning": "Other sessions ({{ids}}) have changes after this checkpoint. Reverting will overwrite their changes.",
   "sidebar.activeInstances": "Active Instances",
   "sidebar.authMethod": "Auth Method",
-  "sidebar.artifacts": "Artifacts",
+  "sidebar.artifacts": "Artifacts",  "sidebar.jiange": "Jiange",
   "sidebar.canvas": "Canvas",
   "sidebar.changes": "Changes",
   "sidebar.chatHistory": "Chat History",

@@ -51,6 +51,7 @@ import { registerWorktreeRoutes } from './web-server/WorktreeRoutes.js';
 import { registerMcpShareRoutes } from './web-server/McpShareRoutes.js';
 import { registerDesignMarketRoutes } from './web-server/DesignMarketRoutes.js';
 import { registerBrowserRoutes } from './web-server/BrowserRoutes.js';
+import { registerOfficeRoutes } from './web-server/OfficeRoutes.js';
 import { createLlmGuard } from './agents/LlmGuard.js';
 import { getExternalAgentAvailability } from './agents/external/availability.js';
 
@@ -475,6 +476,7 @@ export async function createServerWithDeps(
   registerWorkbenchRoutes(fastify, { repos, sessionManager, requireServerToken, getActiveSessionId });
   registerWorktreeRoutes(fastify, { repos, requireServerToken });
   registerBrowserRoutes(fastify, { requireServerToken, browserRuntime });
+  registerOfficeRoutes(fastify, { requireServerToken, getActiveSessionId });
   registerStatsRoutes(fastify, { repos, requireServerToken });
   registerWorkflowRoutes(fastify, { repos, acpHandler, requireServerToken, sessionManager, emitter: eventEmitter, scheduledTaskManager });
   registerPluginRoutes(fastify, { repos, requireServerToken, emitter: eventEmitter });

@@ -1337,7 +1337,7 @@
   "changes.otherSessionWarning": "其他会话（{{ids}}）在此检查点之后有修改，回退将覆盖它们的变更。",
   "sidebar.activeInstances": "活跃实例",
   "sidebar.authMethod": "认证方式",
-  "sidebar.artifacts": "文件画布",
+  "sidebar.artifacts": "文件画布",  "sidebar.jiange": "剑阁",
   "sidebar.canvas": "画布",
   "sidebar.changes": "变更",
   "sidebar.chatHistory": "对话历史",

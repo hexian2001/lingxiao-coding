@@ -134,4 +134,91 @@ export const browserClient = {
     const token = encodeURIComponent(getServerToken());
     return `/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/screenshot?token=${token}&t=${Date.now()}`;
   },
+  // v1.0.5 剑阁大改：真实交互
+  async click(sessionId: string, x: number, y: number): Promise<{ ok: true; url: string; title: string }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/click`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ x, y }),
+    });
+    return readJson(res);
+  },
+
+  async clickSelector(sessionId: string, selector: string): Promise<{ ok: true; url: string; title: string }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/click`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ selector }),
+    });
+    return readJson(res);
+  },
+
+  async fill(sessionId: string, selector: string, value: string): Promise<{ ok: true }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/fill`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ selector, value }),
+    });
+    return readJson(res);
+  },
+
+  async scroll(sessionId: string, x: number, y: number): Promise<{ ok: true; scrollX: number; scrollY: number }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/scroll`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ x, y }),
+    });
+    return readJson(res);
+  },
+
+  async evalJs(sessionId: string, script: string): Promise<{ ok: true; result: unknown }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/eval`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ script }),
+    });
+    return readJson(res);
+  },
+
+  async getHtml(sessionId: string): Promise<{ html: string; url: string; title: string }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/html`, {
+      headers: apiHeaders(),
+    });
+    return readJson(res);
+  },
+
+  async setHtml(sessionId: string, html: string): Promise<{ ok: true; url: string; title: string }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/html`, {
+      method: 'PUT',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ html }),
+    });
+    return readJson(res);
+  },
+
+  async getDomTree(sessionId: string, depth?: number): Promise<DomTreeNode> {
+    const url = `/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/dom-tree${depth ? `?depth=${depth}` : ''}`;
+    const res = await fetch(url, { headers: apiHeaders() });
+    return readJson<DomTreeNode>(res);
+  },
+
+  async patchElement(sessionId: string, selector: string, patch: {
+    html?: string; text?: string; style?: string; attr?: Record<string, string>; remove?: boolean;
+  }): Promise<{ ok: true; applied: boolean }> {
+    const res = await fetch(`/api/v1/browser/sessions/${encodeURIComponent(sessionId)}/patch-element`, {
+      method: 'POST',
+      headers: apiHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ selector, ...patch }),
+    });
+    return readJson(res);
+  },
 };
+
+export interface DomTreeNode {
+  tag: string;
+  attrs: Record<string, string>;
+  text?: string;
+  rect: { x: number; y: number; w: number; h: number };
+  childCount: number;
+  children?: DomTreeNode[];
+}

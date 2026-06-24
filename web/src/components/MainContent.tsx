@@ -27,6 +27,7 @@ const BlueprintView = lazy(() => import('./blueprint/BlueprintView'));
 const LangfuseView = lazy(() => import('./langfuse/LangfuseView'));
 const GitActivityView = lazy(() => import('./git/GitActivityView'));
 const AgentActivityView = lazy(() => import('./git/AgentActivityView'));
+const JiangeView = lazy(() => import('./jiange/JiangeView'));
 
 type ViewComponent = ComponentType | LazyExoticComponent<ComponentType>;
 
@@ -80,7 +81,7 @@ const viewComponents: Record<string, ViewComponent> = {
   blueprint: BlueprintView,
   langfuse: LangfuseView,
   'git-activity': GitActivityView,
-  'agent-activity': AgentActivityView,
+  'agent-activity': AgentActivityView,  jiange: JiangeView,
 };
 
 export default function MainContent() {

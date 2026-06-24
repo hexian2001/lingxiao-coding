@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type { AuthFn } from './types.js';
-import { BrowserRuntime, type BrowserElementSelection } from '../core/BrowserRuntime.js';
+import { BrowserRuntime, type BrowserElementSelection, type DomTreeNode } from '../core/BrowserRuntime.js';
 
 interface BrowserRoutesDeps {
   requireServerToken: AuthFn;
@@ -105,5 +105,136 @@ export function registerBrowserRoutes(fastify: FastifyInstance, deps: BrowserRou
       return;
     }
     return { data: browserRuntime.buildComment({ selection: body.selection, comment: body.comment, intent: body.intent }) };
+  });
+
+  // ============================================================
+  // v1.0.5 剑阁大改：真实交互端点
+  // ============================================================
+
+  fastify.post('/api/v1/browser/sessions/:id/click', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as { x?: number; y?: number; selector?: string } | undefined;
+    try {
+      if (body?.selector) {
+        return { data: await browserRuntime.clickSelector(params.id, body.selector) };
+      }
+      if (typeof body?.x !== 'number' || typeof body?.y !== 'number') {
+        reply.status(400).send({ error: 'x and y (or selector) are required' });
+        return;
+      }
+      return { data: await browserRuntime.click(params.id, { x: body.x, y: body.y }) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.post('/api/v1/browser/sessions/:id/fill', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as { selector?: string; value?: string } | undefined;
+    if (!body?.selector || typeof body.value !== 'string') {
+      reply.status(400).send({ error: 'selector and value are required' });
+      return;
+    }
+    try {
+      return { data: await browserRuntime.fill(params.id, body.selector, body.value) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.post('/api/v1/browser/sessions/:id/scroll', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as { x?: number; y?: number } | undefined;
+    try {
+      return { data: await browserRuntime.scroll(params.id, { x: body?.x ?? 0, y: body?.y ?? 0 }) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.post('/api/v1/browser/sessions/:id/eval', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as { script?: string } | undefined;
+    if (!body?.script?.trim()) {
+      reply.status(400).send({ error: 'script is required' });
+      return;
+    }
+    try {
+      return { data: await browserRuntime.evalJs(params.id, body.script) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.get('/api/v1/browser/sessions/:id/html', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    try {
+      return { data: await browserRuntime.getHtml(params.id) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.put('/api/v1/browser/sessions/:id/html', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as { html?: string } | undefined;
+    if (!body?.html) {
+      reply.status(400).send({ error: 'html is required' });
+      return;
+    }
+    try {
+      return { data: await browserRuntime.setHtml(params.id, body.html) };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.get('/api/v1/browser/sessions/:id/dom-tree', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const query = request.query as { depth?: string } | undefined;
+    const maxDepth = Math.min(10, Math.max(1, Number(query?.depth ?? 5)));
+    try {
+      const tree: DomTreeNode = await browserRuntime.getDomTree(params.id, maxDepth);
+      return { data: tree };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
+  });
+
+  fastify.post('/api/v1/browser/sessions/:id/patch-element', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const params = request.params as { id: string };
+    const body = request.body as {
+      selector?: string;
+      html?: string;
+      text?: string;
+      style?: string;
+      attr?: Record<string, string>;
+      remove?: boolean;
+    } | undefined;
+    if (!body?.selector) {
+      reply.status(400).send({ error: 'selector is required' });
+      return;
+    }
+    try {
+      return {
+        data: await browserRuntime.patchElement(params.id, body.selector, {
+          html: body.html,
+          text: body.text,
+          style: body.style,
+          attr: body.attr,
+          remove: body.remove,
+        }),
+      };
+    } catch (error) {
+      sendError(reply, 500, error);
+    }
   });
 }
