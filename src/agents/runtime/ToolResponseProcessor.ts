@@ -94,6 +94,9 @@ export async function processToolCallResponse<TDone extends { done: boolean; res
       tool_calls: toolCalls,
       ...(thinking && thinking.length > 0 ? { thinking } : {}),
     };
+    // ⚠️ 关键：persistAssistantMessage 会立即把 assistant 加入内存 conversation，
+    // 即使数据库还没写入。如果后续流程异常/中断，必须确保对应的 tool 结果也被补齐，
+    // 否则会导致 conversation 残缺（有 tool_calls 但无 tool 结果）→ provider 400 错误。
     await persistAssistantMessage(assistantMessage);
 
     for (const toolCall of toolCalls) {
