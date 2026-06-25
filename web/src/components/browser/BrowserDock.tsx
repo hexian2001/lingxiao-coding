@@ -21,6 +21,7 @@ import {
 import { browserClient } from '../../api/BrowserClient';
 import { useBrowserStore } from '../../stores/browserStore';
 import { getServerToken } from '../../api/headers';
+import { BrowserScreencastCanvas } from './BrowserScreencastCanvas';
 
 interface BrowserDockProps {
   workspaceName?: string;
@@ -353,51 +354,17 @@ export default function BrowserDock({ workspaceName, onInsertPrompt, onSendPromp
 
       <div className={`browser-workspace ${selection ? 'has-selection' : ''}`}>
         <div className="browser-preview-column">
-          {/* v1.0.5: 代理 iframe — 原生体验，点击/输入/滚动全部原生 */}
-          {session && session.url && session.url !== 'about:blank' ? (
-            <div className="browser-iframe-container">
-              <iframe
-                key={session.id + session.url}
-                src={`/api/v1/browser/proxy/${session.id}?token=${encodeURIComponent(getServerToken())}`}
-                className="browser-iframe"
-                title={session.title || session.url}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
-                allow="fullscreen; clipboard-read; clipboard-write"
-              />
-              {(interactionMode === 'inspect' || isInspecting) && (
-                <div className="browser-inspect-overlay" onClick={handleViewportClick} style={{ cursor: 'crosshair' }}>
-                  {isLoading && <div className="browser-loading-overlay"><Loader2 size={20} className="animate-spin" /></div>}
-                </div>
-              )}
-            </div>
+          {/* v1.0.5: CDP Screencast — 实时画面 + 原生输入转发 */}
+          {session ? (
+            <BrowserScreencastCanvas
+              sessionId={session.id}
+              width={session.viewport.width}
+              height={session.viewport.height}
+            />
           ) : (
-            <div
-              className={`browser-viewport ${interactionMode === 'inspect' || isInspecting ? 'is-inspecting' : 'is-clickable'}`}
-              onClick={handleViewportClick}
-              onWheel={handleViewportWheel}
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Backspace') { e.preventDefault(); void pressKey('Backspace'); refreshScreenshot(); }
-                else if (e.key === 'Enter') { e.preventDefault(); void pressKey('Enter'); refreshScreenshot(); }
-                else if (e.key === 'Tab') { e.preventDefault(); void pressKey('Tab'); refreshScreenshot(); }
-                else if (e.key === 'Escape') { e.preventDefault(); void pressKey('Escape'); refreshScreenshot(); }
-                else if (e.key.length === 1) { e.preventDefault(); void typeText(e.key); refreshScreenshot(); }
-              }}
-              style={{ cursor: interactionMode === 'inspect' || isInspecting ? 'crosshair' : 'pointer' }}
-            >
-              {screenshotUrl ? (
-                <>
-                  <img ref={imageRef} src={screenshotUrl} alt={session?.title || session?.url || 'Browser'} draggable={false} />
-                  {selection && <div className="browser-selection-box" style={selectionStyle} />}
-                  {clickRipple && <div className="browser-click-ripple" style={{ left: clickRipple.x, top: clickRipple.y }} />}
-                  {isLoading && <div className="browser-loading-overlay"><Loader2 size={20} className="animate-spin" /></div>}
-                </>
-              ) : (
-                <div className="browser-empty">
-                  <Crosshair size={28} />
-                  <span>{t('browser.empty', '打开页面后点击交互')}</span>
-                </div>
-              )}
+            <div className="browser-empty">
+              <Crosshair size={28} />
+              <span>{t('browser.empty', '打开页面后点击交互')}</span>
             </div>
           )}
           {session && (

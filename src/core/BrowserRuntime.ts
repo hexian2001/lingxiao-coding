@@ -316,7 +316,12 @@ export class BrowserRuntime {
   // ============================================================
   // v1.0.5 剑阁大改：真实交互能力
   // ============================================================
-  /** 获取页面信息 */
+  /** 获取页面信息 */  /** 获取 session 的 page 对象（供 screencast 等内部模块使用） */
+  getPage(id: string): Page | undefined {
+    return this.sessions.get(id)?.page;
+  }
+
+
   async getPageInfo(id: string): Promise<{ url: string; title: string }> {
     const session = this.getSession(id);
     session.lastUsedAt = Date.now();

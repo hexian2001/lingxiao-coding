@@ -2700,6 +2700,17 @@ input[type="number"]::placeholder {
   border: none;
   background: white;
 }
+.browser-screencast-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+}
+
+.browser-screencast-container canvas {
+  outline: none;
+}
+
 
 .browser-inspect-overlay {
   position: absolute;
