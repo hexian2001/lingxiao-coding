@@ -17,7 +17,7 @@ export function SettingsSection({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-4">
+    <section id={id} className="scroll-mt-12">
       <div className="mb-3 flex items-start gap-2">
         <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border-muted bg-bg-secondary">
           <Icon className={`w-3.5 h-3.5 ${iconClassName}`} />
