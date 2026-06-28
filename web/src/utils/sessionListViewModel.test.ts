@@ -173,13 +173,13 @@ test('pickBootstrapSessionId prefers running worker sessions over stale activeSe
   assert.equal(selected, 'worker-live');
 });
 
-test('pickBootstrapSessionId restores last selected session before backend active session', () => {
+test('pickBootstrapSessionId prefers backend active session over last selected session (startup loads new session)', () => {
   const selected = pickBootstrapSessionId([
     session({ id: 'backend-active', status: 'active', isActive: true, createdAt: 3 }),
     session({ id: 'last-viewed', status: 'active', createdAt: 2 }),
   ], 'backend-active', 'last-viewed');
 
-  assert.equal(selected, 'last-viewed');
+  assert.equal(selected, 'backend-active');
 });
 
 test('pickBootstrapSessionId prefers active memory sessions before resumable persisted sessions', () => {

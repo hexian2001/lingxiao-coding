@@ -1695,8 +1695,20 @@ export class LeaderAgent {
    * 注册系统预置角色
    */
   protected registerBuiltinRoles(): void {
+    // 读取 prompt overrides 并应用
+    const promptOverrides = (globalConfig as { prompts?: { overrides?: Record<string, string> } }).prompts?.overrides || {};
+    const buildWorkerPromptMap = <T extends Record<string, Record<string, string>>>(defaults: T): T => {
+      const result = { ...defaults } as T;
+      for (const [key, override] of Object.entries(promptOverrides)) {
+        if (key in result && override) {
+          (result as Record<string, Record<string, string>>)[key] = { zh: override, en: override };
+        }
+      }
+      return result;
+    };
+
     const roles = collectBuiltinRoles({
-      prompts: {
+      prompts: buildWorkerPromptMap({
         research: RESEARCH_SYSTEM_PROMPT_BY_LOCALE,
         explore: EXPLORE_SYSTEM_PROMPT_BY_LOCALE,
         coding: CODING_SYSTEM_PROMPT_BY_LOCALE,
@@ -1710,7 +1722,7 @@ export class LeaderAgent {
         planner: PLANNER_SYSTEM_PROMPT_BY_LOCALE,
         evaluator: EVALUATOR_SYSTEM_PROMPT_BY_LOCALE,
         architect: ARCHITECT_SYSTEM_PROMPT_BY_LOCALE,
-      },
+      }),
       externalCodingPrompt: CODING_SYSTEM_PROMPT_BY_LOCALE,
       availability: getExternalAgentAvailability(),
       descriptions: {
@@ -1780,8 +1792,11 @@ export class LeaderAgent {
       : modes.collaboration.mode === 'team'
         ? 'team'
         : 'solo';
+    const promptKey = `leader_${promptProfile}`;
+    const promptOverrides = (globalConfig as { prompts?: { overrides?: Record<string, string> } }).prompts?.overrides || {};
+    const leaderOverride = promptOverrides[promptKey];
     return buildLeaderSystemPrompt({
-      template: this.customPrompt || getLeaderSystemPrompt(locale, promptProfile),
+      template: leaderOverride || this.customPrompt || getLeaderSystemPrompt(locale, promptProfile),
       availableRoles: this.roleRegistry.toLLMContext(),
       sessionId: this.sessionId,
       workspace: this.workspace,

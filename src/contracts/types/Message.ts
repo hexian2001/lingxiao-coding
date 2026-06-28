@@ -100,7 +100,8 @@ export function contentToPlainText(content: MessageContent | unknown): string {
         return '[image]';
       }
       if (part.type === 'image_blob_ref') {
-        return `[image: ${part.mime}, ${Math.max(1, Math.round(part.size / 1024))}KB stored as blob:${part.blob_id.slice(0, 12)}]`;
+        const blobId = part.blob_id ?? 'unknown';
+        return `[image: ${part.mime}, ${Math.max(1, Math.round(part.size / 1024))}KB stored as blob:${blobId.slice(0, 12)}]`;
       }
       try {
         return JSON.stringify(part);

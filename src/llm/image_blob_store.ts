@@ -29,7 +29,8 @@ function extensionForMime(mime: string): string {
 
 function placeholder(ref: ImageBlobRefContentPart): string {
   const kb = Math.max(1, Math.round(ref.size / 1024));
-  return `[Image from ${ref.source || 'tool result'} (${ref.mime}, ${kb}KB) - stored as blob:${ref.blob_id.slice(0, 12)}]`;
+  const blobId = ref.blob_id ?? 'unknown';
+  return `[Image from ${ref.source || 'tool result'} (${ref.mime}, ${kb}KB) - stored as blob:${blobId.slice(0, 12)}]`;
 }
 
 export async function storeImageDataUri(

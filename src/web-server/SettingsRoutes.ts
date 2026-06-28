@@ -1261,4 +1261,151 @@ export function registerSettingsRoutes(
     }
     return { data: { settings, sessionId: sessionId || null, snapshot } };
   });
+
+  // ---------------------------------------------------------------------------
+  // Prompts management — 系统提示词 override 管理
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/prompts — 返回所有 prompt 的默认值和当前 override
+  fastify.get('/api/v1/prompts', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    try {
+      // 动态 import 所有 prompt 模块获取默认值
+      const { RESEARCH_SYSTEM_PROMPT_BY_LOCALE, EXPLORE_SYSTEM_PROMPT_BY_LOCALE, CODING_SYSTEM_PROMPT_BY_LOCALE, VERIFY_SYSTEM_PROMPT_BY_LOCALE, REVIEW_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/worker/system_prompts.js');
+      const { FRONTEND_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/frontend_system.js');
+      const { BACKEND_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/backend_system.js');
+      const { FULLSTACK_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/fullstack_system.js');
+      const { QA_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/qa_system.js');
+      const { UX_DESIGNER_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/ux_designer_system.js');
+      const { PLANNER_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/planner_system.js');
+      const { EVALUATOR_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/evaluator_system.js');
+      const { ARCHITECT_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/architect_system.js');
+      const { getLeaderSystemPrompt } = await import('../agents/prompts/leader/system_prompt.js');
+
+      // 确定当前 locale
+      const lang = getConfigValue('ui.language') as string | undefined;
+      const locale: 'zh' | 'en' = lang === 'en' ? 'en' : 'zh';
+
+      // 读取当前 overrides
+      const overrides = (getConfigValue('prompts.overrides') as Record<string, string> | undefined) || {};
+
+      // Worker 角色默认 prompt map
+      const workerDefaults: Record<string, Record<string, string>> = {
+        research: RESEARCH_SYSTEM_PROMPT_BY_LOCALE,
+        explore: EXPLORE_SYSTEM_PROMPT_BY_LOCALE,
+        coding: CODING_SYSTEM_PROMPT_BY_LOCALE,
+        verify: VERIFY_SYSTEM_PROMPT_BY_LOCALE,
+        review: REVIEW_SYSTEM_PROMPT_BY_LOCALE,
+        frontend: FRONTEND_SYSTEM_PROMPT_BY_LOCALE,
+        backend: BACKEND_SYSTEM_PROMPT_BY_LOCALE,
+        fullstack: FULLSTACK_SYSTEM_PROMPT_BY_LOCALE,
+        qa: QA_SYSTEM_PROMPT_BY_LOCALE,
+        ux_designer: UX_DESIGNER_SYSTEM_PROMPT_BY_LOCALE,
+        planner: PLANNER_SYSTEM_PROMPT_BY_LOCALE,
+        evaluator: EVALUATOR_SYSTEM_PROMPT_BY_LOCALE,
+        architect: ARCHITECT_SYSTEM_PROMPT_BY_LOCALE,
+      };
+
+      const workerLabels: Record<string, string> = {
+        research: 'Research',
+        explore: 'Explore',
+        coding: 'Coding',
+        verify: 'Verify',
+        review: 'Review',
+        frontend: 'Frontend',
+        backend: 'Backend',
+        fullstack: 'Fullstack',
+        qa: 'QA',
+        ux_designer: 'UX Designer',
+        planner: 'Planner',
+        evaluator: 'Evaluator',
+        architect: 'Architect',
+      };
+
+      const prompts: Array<{ key: string; label: string; default: string; override: string | null }> = [];
+
+      // Leader prompts (3 profiles)
+      for (const profile of ['solo', 'team', 'workflow'] as const) {
+        const key = `leader_${profile}`;
+        const label = `Leader (${profile.charAt(0).toUpperCase() + profile.slice(1)})`;
+        prompts.push({
+          key,
+          label,
+          default: getLeaderSystemPrompt(locale, profile),
+          override: overrides[key] || null,
+        });
+      }
+
+      // Worker prompts (13 roles)
+      for (const [key, promptMap] of Object.entries(workerDefaults)) {
+        prompts.push({
+          key,
+          label: workerLabels[key] || key,
+          default: promptMap[locale] || promptMap['zh'] || '',
+          override: overrides[key] || null,
+        });
+      }
+
+      return { prompts };
+    } catch (err) {
+      reply.status(500).send({ error: toErrorMessage(err) });
+    }
+  });
+
+  // PUT /api/v1/prompts/:key — 设置/更新某个 prompt override
+  fastify.put('/api/v1/prompts/:key', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const { key } = request.params as { key: string };
+    const body = request.body as { content?: string } | null;
+
+    if (!body || typeof body.content !== 'string') {
+      reply.status(400).send({ error: 'Body must contain "content" string field' });
+      return;
+    }
+
+    // 验证 key 是否合法
+    const validKeys = new Set([
+      'leader_solo', 'leader_team', 'leader_workflow',
+      'research', 'explore', 'coding', 'verify', 'review',
+      'frontend', 'backend', 'fullstack', 'qa', 'ux_designer',
+      'planner', 'evaluator', 'architect',
+    ]);
+    if (!validKeys.has(key)) {
+      reply.status(400).send({ error: `Invalid prompt key: ${key}` });
+      return;
+    }
+
+    try {
+      const overrides = (getConfigValue('prompts.overrides') as Record<string, string> | undefined) || {};
+      overrides[key] = body.content;
+      setConfigValue('prompts.overrides', overrides);
+      ConfigSchema.parse(runtimeConfig);
+      saveSettings(runtimeConfig);
+      fireConfigReload();
+      return { success: true, key, override: body.content };
+    } catch (err) {
+      reply.status(500).send({ error: toErrorMessage(err) });
+    }
+  });
+
+  // DELETE /api/v1/prompts/:key — 删除某个 prompt override（恢复默认）
+  fastify.delete('/api/v1/prompts/:key', async (request, reply) => {
+    if (!requireServerToken(request, reply)) return;
+    const { key } = request.params as { key: string };
+
+    try {
+      const overrides = (getConfigValue('prompts.overrides') as Record<string, string> | undefined) || {};
+      if (!(key in overrides)) {
+        return { success: true, key, override: null };
+      }
+      delete overrides[key];
+      setConfigValue('prompts.overrides', overrides);
+      ConfigSchema.parse(runtimeConfig);
+      saveSettings(runtimeConfig);
+      fireConfigReload();
+      return { success: true, key, override: null };
+    } catch (err) {
+      reply.status(500).send({ error: toErrorMessage(err) });
+    }
+  });
 }

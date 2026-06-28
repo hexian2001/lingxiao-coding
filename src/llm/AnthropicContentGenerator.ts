@@ -794,7 +794,8 @@ export class AnthropicContentGenerator implements ContentGenerator {
         return [{ type: 'text', text: part.text }];
       }
       if (part.type === 'image_blob_ref') {
-        return [{ type: 'text', text: `[image stored as blob:${part.blob_id.slice(0, 12)}]` }];
+        const blobId = part.blob_id ?? 'unknown';
+        return [{ type: 'text', text: `[image stored as blob:${blobId.slice(0, 12)}]` }];
       }
       if (part.type === 'mcp_app') {
         return [{ type: 'text', text: part.title ? `[mcp-app: ${part.title}]` : '[mcp-app]' }];

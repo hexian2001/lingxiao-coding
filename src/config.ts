@@ -850,6 +850,22 @@ const RolesGroupSchema = z.object({
 export type RoleOverrideConfig = z.infer<typeof RoleOverrideSchema>;
 export type RolesGroupConfig = z.infer<typeof RolesGroupSchema>;
 
+/**
+ * Prompts group — 系统 prompt override 管理
+ *
+ * 允许用户自定义 Leader 和 worker 角色的系统提示词。
+ * overrides 是一个 key→content 的映射，key 格式：
+ *   - leader_solo / leader_team / leader_workflow
+ *   - research / explore / coding / verify / review / frontend / backend / fullstack / qa / ux_designer / planner / evaluator / architect
+ * 运行时：worker prompts 在 collectBuiltinRoles 时覆盖 zh/en 两个 locale；
+ * Leader prompts 在 getSystemPrompt() 中按 profile 检查。
+ */
+const PromptsGroupSchema = z.object({
+  overrides: z.record(z.string(), z.string()).default({}),
+});
+
+export type PromptsGroupConfig = z.infer<typeof PromptsGroupSchema>;
+
 const CONFIG_DEFAULT_GROUPS = [
   'llm',
   'llm_gateway',
@@ -867,6 +883,7 @@ const CONFIG_DEFAULT_GROUPS = [
   'mcp',
   'tools',
   'roles',
+  'prompts',
   'server',
   'network',
   'security',
@@ -994,6 +1011,7 @@ export const ConfigSchema = z.preprocess(withDefaultConfigGroups, z.object({
   mcp: McpGroupSchema.default({ enabled: true, servers: [], tool_timeout_ms: 60_000 }),
   tools: ToolsGroupSchema.default({ user_defined: [], disabled_names: [], execution_timeout_ms: D.TOOLS.EXECUTION_TIMEOUT_MS }),
   roles: RolesGroupSchema.default({ basic_tools_enabled: true, overrides: {} }),
+  prompts: PromptsGroupSchema.default({ overrides: {} }),
   server: ServerGroupSchema,
   network: NetworkGroupSchema.default({ user_agent: D.NETWORK.USER_AGENT, proxy: DEFAULT_NETWORK_PROXY }),
   browser: BrowserGroupSchema.default({ daemon: false }),

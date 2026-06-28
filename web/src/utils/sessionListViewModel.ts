@@ -134,12 +134,15 @@ export function pickBootstrapSessionId(
   const busyRuntimeSession = latestSession(selectable.filter(sessionRuntimeBusy));
   if (busyRuntimeSession) return busyRuntimeSession.id;
 
-  if (lastSelectedSessionId && selectable.some((session) => session.id === lastSelectedSessionId)) {
-    return lastSelectedSessionId;
-  }
-
+  // 后端 active session 优先于 localStorage 旧会话：
+  // 启动时后端刚 createSession 新会话并设为 active，应优先载入它，
+  // 而不是回退到上次使用的旧会话（避免每次启动都载入旧会话而非新会话）。
   if (activeSessionId && selectable.some((session) => session.id === activeSessionId)) {
     return activeSessionId;
+  }
+
+  if (lastSelectedSessionId && selectable.some((session) => session.id === lastSelectedSessionId)) {
+    return lastSelectedSessionId;
   }
 
   const memoryActive = latestSession(selectable.filter((session) => session.isActive));

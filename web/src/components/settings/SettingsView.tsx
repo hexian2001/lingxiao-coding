@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Brain, Database, GitBranch, Globe, Loader2, Monitor, Settings, Shield, Zap, Users, Info, Server, Activity, Layers } from 'lucide-react';
+import { Brain, Database, GitBranch, Globe, Loader2, Monitor, Settings, Shield, Zap, Users, Info, Server, Activity, Layers, FileText } from 'lucide-react';
 import { useThemeStore } from '../../stores/themeStore';
 import { SettingsNav } from './components/SettingsNav';
 import { notifySettingChanged, SETTINGS_CHANGED_EVENT, settingsApiFetch, type SettingsChangedDetail } from './settingsApi';
@@ -15,6 +15,7 @@ import { SecuritySection } from './sections/SecuritySection';
 import { AdvancedSection } from './sections/AdvancedSection';
 import { AppearanceSection } from './sections/AppearanceSection';
 import { RolesSection } from './sections/RolesSection';
+import { PromptsSection } from './sections/PromptsSection';
 import { SystemInfoSection } from './sections/SystemInfoSection';
 import { LangfuseSection } from './sections/LangfuseSection';
 import { ContextSection } from './sections/ContextSection';
@@ -109,6 +110,7 @@ export default function SettingsView() {
     { id: 'advanced', label: t('settings.group.advanced'), icon: Settings },
     { id: 'appearance', label: t('settings.appearance'), icon: Monitor },
     { id: 'roles', label: t('settings.roles.title'), icon: Users },
+    { id: 'prompts', label: t('settings.group.prompts'), icon: FileText },
     { id: 'langfuse', label: t('settings.group.langfuse', 'Langfuse'), icon: Activity },
     { id: 'system', label: t('settings.systemInfo'), icon: Info },
   ], [t]);
@@ -143,6 +145,7 @@ export default function SettingsView() {
               <AppearanceSection mode={mode} setMode={setMode} settings={settings} saveState={saveState} i18n={i18n} onSave={handleSave} />
               <LangfuseSection settings={settings} saveState={saveState} onSave={handleSave} />
               <RolesSection />
+              <PromptsSection />
               <SystemInfoSection systemInfo={systemInfo} />
             </div>
           </div>

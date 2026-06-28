@@ -847,7 +847,19 @@ export class SessionManager {
     const { EVALUATOR_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/evaluator_system.js');
     const { ARCHITECT_SYSTEM_PROMPT_BY_LOCALE } = await import('../agents/prompts/architect_system.js');
 
-    for (const role of applyRoleToolsConfigMap(buildBuiltinRoles({
+    // 读取 prompt overrides 并应用
+    const promptOverrides = (runtimeConfig as { prompts?: { overrides?: Record<string, string> } }).prompts?.overrides || {};
+    const buildWorkerPromptMap = <T extends Record<string, Record<string, string>>>(defaults: T): T => {
+      const result = { ...defaults } as T;
+      for (const [key, override] of Object.entries(promptOverrides)) {
+        if (key in result && override) {
+          (result as Record<string, Record<string, string>>)[key] = { zh: override, en: override };
+        }
+      }
+      return result;
+    };
+
+    for (const role of applyRoleToolsConfigMap(buildBuiltinRoles(buildWorkerPromptMap({
       research: RESEARCH_SYSTEM_PROMPT_BY_LOCALE,
       explore: EXPLORE_SYSTEM_PROMPT_BY_LOCALE,
       coding: CODING_SYSTEM_PROMPT_BY_LOCALE,
@@ -861,7 +873,7 @@ export class SessionManager {
       planner: PLANNER_SYSTEM_PROMPT_BY_LOCALE,
       evaluator: EVALUATOR_SYSTEM_PROMPT_BY_LOCALE,
       architect: ARCHITECT_SYSTEM_PROMPT_BY_LOCALE,
-    }), {
+    })), {
       basicToolsEnabled: (runtimeConfig as { roles?: { basic_tools_enabled?: boolean } }).roles?.basic_tools_enabled !== false,
       overrides: (runtimeConfig as { roles?: { overrides?: Record<string, { tools_added?: string[]; tools_removed?: string[] }> } }).roles?.overrides,
     })) {

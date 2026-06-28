@@ -698,7 +698,8 @@ export class OpenAIContentGenerator implements ContentGenerator {
       if (part.type === 'text') return { type: 'text' as const, text: part.text };
       if (part.type === 'image_url') return { type: 'image_url' as const, image_url: part.image_url };
       if (part.type === 'mcp_app') return { type: 'text' as const, text: part.title ? `[mcp-app: ${part.title}]` : '[mcp-app]' };
-      return { type: 'text' as const, text: `[image stored as blob:${part.blob_id.slice(0, 12)}]` };
+      const blobId = part.blob_id ?? 'unknown';
+      return { type: 'text' as const, text: `[image stored as blob:${blobId.slice(0, 12)}]` };
     });
   }
 
