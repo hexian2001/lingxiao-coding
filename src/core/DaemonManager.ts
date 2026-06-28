@@ -285,9 +285,10 @@ export const DaemonManager = {
         try {
           // 健康检查：轮询 daemon.json 获取真实 URL
           // daemon 启动后会通过 updateDaemonPid 写入真实端口到 daemon.json
-          // 关键：初始 daemon.json 的 url 可能是占位的（随机端口时），必须等 updateDaemonPid 覆盖
+          // 随机端口（port=0）时初始 URL 是占位的，必须等 updateDaemonPid 覆盖；
+          // 固定端口（port≠0）时初始 URL 已有效，可直接用于健康检查。
           const initialUrl = url;
-          let healthUrl = '';
+          let healthUrl = (port !== 0) ? initialUrl : '';
           const deadline = Date.now() + STARTUP_HEALTH_TIMEOUT_MS;
           while (Date.now() < deadline) {
             if (!isAlive(pid)) {
