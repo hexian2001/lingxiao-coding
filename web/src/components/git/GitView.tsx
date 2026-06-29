@@ -164,6 +164,7 @@ export default function GitView() {
   };
 
   const handleInitRepo = async () => {
+    if (isIniting || isLoading) return;
     setIsIniting(true);
     try {
       await initRepo();
@@ -199,15 +200,15 @@ export default function GitView() {
           <div className="flex items-center gap-2 mt-2">
             <button
               onClick={handleInitRepo}
-              disabled={isIniting}
+              disabled={isIniting || isLoading}
               className="cyber-btn cyber-btn-primary !py-1.5 !text-xs flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isIniting ? (
+              {isIniting || isLoading ? (
                 <RefreshCw size={12} className="animate-spin" />
               ) : (
                 <GitMerge size={12} />
               )}
-              {isIniting ? t('git.initializing') : 'git init'}
+              {isIniting || isLoading ? t('git.initializing') : 'git init'}
             </button>
             <button
               onClick={handleRefreshAll}

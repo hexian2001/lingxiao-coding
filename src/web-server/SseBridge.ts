@@ -493,7 +493,7 @@ export class SseBridge {
     // 每次从 connectionManager.getClients() 获取当前活跃列表，不闭包持有 client 对象
     const STALE_THRESHOLD_MS = 5 * 60 * 1000;
     this.heartbeatInterval = setInterval(() => {
-      if (this._destroyed || !this._started) return;    if (this.heartbeatInterval) this.heartbeatInterval.unref();
+      if (this._destroyed || !this._started) return;
       const now = Date.now();
       const stats = this.connectionManager.getStats();
       for (const { sessionId } of stats.perSession) {

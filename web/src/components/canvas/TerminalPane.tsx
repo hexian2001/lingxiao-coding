@@ -194,24 +194,32 @@ export default function TerminalPane({ terminalId }: Props) {
 
     initTerminal();
 
-    // Resize observer
-    const resizeObserver = new ResizeObserver(() => {
-      requestAnimationFrame(() => {
-        if (fitAddonRef.current && xtermRef.current) {
-          try {
-            fitAddonRef.current.fit();
-            // Send resize to PTY
-            const dims = fitAddonRef.current.proposeDimensions();
-            const ws = wsRef.current;
-            if (ws && ws.readyState === WebSocket.OPEN && dims) {
-              ws.send(JSON.stringify({ type: 'resize', cols: dims.cols, rows: dims.rows }));
+    // Resize observer — debounced to prevent rapid fit() calls during layout transitions
+    let resizeRafId: number | null = null;
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+    const debouncedFit = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (disposed || disposedRef.current) return;
+        if (resizeRafId !== null) cancelAnimationFrame(resizeRafId);
+        resizeRafId = requestAnimationFrame(() => {
+          if (disposed || disposedRef.current) return;
+          if (fitAddonRef.current && xtermRef.current) {
+            try {
+              fitAddonRef.current.fit();
+              const dims = fitAddonRef.current.proposeDimensions();
+              const ws = wsRef.current;
+              if (ws && ws.readyState === WebSocket.OPEN && dims) {
+                ws.send(JSON.stringify({ type: 'resize', cols: dims.cols, rows: dims.rows }));
+              }
+            } catch (err) {
+              if (!disposed) log.warn('[TerminalPane] Failed to resize terminal:', err);
             }
-          } catch (err) {
-            log.warn('[TerminalPane] Failed to resize terminal:', err);
           }
-        }
-      });
-    });
+        });
+      }, 100);
+    };
+    const resizeObserver = new ResizeObserver(debouncedFit);
 
     if (terminalRef.current) {
       resizeObserver.observe(terminalRef.current);
@@ -223,6 +231,14 @@ export default function TerminalPane({ terminalId }: Props) {
       if (retryTimerRef.current) {
         clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
+      }
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
+        resizeTimer = null;
+      }
+      if (resizeRafId !== null) {
+        cancelAnimationFrame(resizeRafId);
+        resizeRafId = null;
       }
       resizeObserver.disconnect();
       if (wsRef.current) {

@@ -15,7 +15,7 @@
 import { config as runtimeConfig } from '../config.js';
 import { LLM } from '../config/defaults.js';
 import { classifyLLMError, formatLLMErrorLabel, LLMError, type LLMErrorKind } from '../llm/errors.js';
-import { getCircuitBreaker, CircuitOpenError } from '../llm/CircuitBreaker.js';
+import { getCircuitBreaker, CircuitOpenError, resetCircuitBreakersForProvider } from '../llm/CircuitBreaker.js';
 import type { ChatMessage, ChatResponse, StreamCallbacks, ToolDefinition } from '../llm/types.js';
 import type { ContentGenerator, GenerateContentParams } from '../llm/ContentGenerator.js';
 import { coreLogger } from '../core/Log.js';
@@ -366,44 +366,35 @@ export class LlmGuard {
         // （aborted / CircuitOpen / compact / 续写再中断 等所有出口都不会残留注入消息）
         rollbackContinuation();
 
-        // CircuitOpenError：CB 主动拒绝（不消耗 retryCount）
-        // 语义与 timeout 路径对齐——CB OPEN 说明当前 socket 池/连接已经连续失败 8 次，
-        // 旧 client + keep-alive socket 不可信，必须先 recycle 销毁再走 fallback。
-        // 此前只 fallback 不 recycle：新 client 复用同一组病态 socket，fallback 模型
-        // 也会立刻被同一根因打死，体感"卡死"。recycle 之后新 fallback 用全新连接池，
-        // 如果根因是网络/握手级问题，重试有机会成功。
+        // CircuitOpenError：CB 主动拒绝（不消耗 retryCount）。
+        // 这类错误说明请求还没真正发出，如果继续在当前 call 内 sleep/backoff，UI 会刷
+        // "retry in ~1s" 并卡住。按 ESC 重请求语义处理：废弃旧 SDK client / keep-alive
+        // socket 池，重置该 provider 的 CB 状态，然后把 CircuitOpenError 抛给上层，
+        // 由 Leader 立即结束当前 attempt 并重新发起同模型请求。
         if (error instanceof CircuitOpenError) {
           gateway.finishAttempt(attempt, {
             status: 'failed',
-            errorKind: 'circuit_open',
+            errorKind: 'circuit_open_recycled',
             errorMessage: error.message,
-            retryable: true,
+            retryable: false,
           });
-          failedModels.add(currentModel);
 
-          // 与 timeout 路径一致的 recycle：换连接池，不重置 CB（CB 计数必须累积，
-          // 否则阈值永远到不了——见下方 timeout 分支的"不重置 CircuitBreaker"注释）。
           try {
             llm.recycle?.();
+            if (providerKey) {
+              resetCircuitBreakersForProvider(providerKey);
+            }
             coreLogger.warn(
-              `[LlmGuard:${this.actorLabel}] circuit open retry=${this.retryCount + 1} → recycled LLM client (fresh socket pool, CB count preserved) provider="${providerKey ?? '?'}"`,
+              `[LlmGuard:${this.actorLabel}] circuit open → recycled LLM client and reset CB provider="${providerKey ?? error.providerKey}"; caller should re-request`,
             );
           } catch (recycleErr) {
             coreLogger.warn(
-              `[LlmGuard:${this.actorLabel}] recycle 调用失败（已忽略）: ${recycleErr instanceof Error ? recycleErr.message : String(recycleErr)}`,
+              `[LlmGuard:${this.actorLabel}] circuit-open recycle/reset 失败（已忽略）: ${recycleErr instanceof Error ? recycleErr.message : String(recycleErr)}`,
             );
           }
 
-          const fallback = gateway.pickFallback(trace, failedModels);
-          if (fallback && !mergedSignal.aborted && trace.attempts.length < this.maxRetries) {
-            currentModel = fallback;
-            hooks?.onRetry?.(this.retryCount, this.classifyFn(error));
-            coreLogger.warn(`[LlmGuard:${this.actorLabel}] circuit open → fallback model="${fallback}"`);
-            continue;
-          }
           gateway.failTrace(trace);
-          this.onError?.(this.classifyFn(error));
-          this.finishLlmSpan(llmSpan, 'error', currentModel, callStartedAt, 'circuit_open', undefined, messages);
+          this.finishLlmSpan(llmSpan, 'error', currentModel, callStartedAt, 'circuit_open_recycled', undefined, messages);
           this.attachGatewayTrace(error, trace);
           throw error;
         }

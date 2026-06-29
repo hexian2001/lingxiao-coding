@@ -8,6 +8,7 @@ export {
   type FileStatus,
   type GitBranch,
   type GitCommit,
+  type GitInitResult,
   type GitRemote,
   type GitStatus,
   type PushOptions,

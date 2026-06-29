@@ -84,15 +84,17 @@ process.on('SIGTERM', async () => {
   if (isDaemonProcess()) {
     console.log('[CLI] Received SIGTERM, shutting down gracefully...');
     await gracefulShutdown(0, 10000);
+    return;
   }
   // 交互模式：标记 detached，ProcessIdleGuard 会在 TTL 到期后自动退出
   console.log('\n[CLI] 收到 SIGTERM（终端可能已断开）。进入有限存活模式，Web UI 仍可重连。');
-  getProcessIdleGuard().markDetached();
+  getProcessIdleGuard().markDetached('SIGTERM');
 });
 process.on('SIGINT', async () => {
   if (isDaemonProcess()) {
     console.log('[CLI] Received SIGINT, shutting down gracefully...');
     await gracefulShutdown(0, 10000);
+    return;
   }
   // 交互模式：SIGINT(Ctrl+C) 交给 TUI/ink 处理，不在此拆 swarm
 });
@@ -100,10 +102,11 @@ process.on('SIGHUP', async () => {
   if (isDaemonProcess()) {
     console.log('[CLI] Received SIGHUP, shutting down gracefully...');
     await gracefulShutdown(0, 10000);
+    return;
   }
   // 交互模式：终端挂断 → 有限存活
   console.log('\n[CLI] 收到 SIGHUP（终端已断开）。进入有限存活模式，Web UI 仍可重连。');
-  getProcessIdleGuard().markDetached();
+  getProcessIdleGuard().markDetached('SIGHUP');
 });
 
 program
@@ -262,13 +265,15 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
       }
       setCurrentSessionId(daemonSessionId, 'daemon');
 
-      const { fastify: webServer, token: serverToken } = await createServerWithDeps(db, sessionManager, {
+      const daemonServerResult = await createServerWithDeps(db, sessionManager, {
         logger: false,
         activeSessionCoordinator,
         isDaemon: true,
         emitter,
         messageBus,
       });
+      const webServer = daemonServerResult.fastify;
+      const serverToken = daemonServerResult.token;
 
       const useRandomPort = getConfigValue('server.random_port') === true;
       const requestedPort = useRandomPort ? 0 : webPort;
@@ -424,6 +429,8 @@ async function startTUI(sessionId?: string, opts?: { tuiOnly?: boolean }): Promi
     const webServer = serverResult.fastify;
     const serverToken = serverResult.token;
     scheduledTaskManager = serverResult.scheduledTaskManager;
+    // Web UI 保持连接时也视为进程活跃，避免交互终端被误判 idle 后自杀。
+    idleGuard.registerProbe(() => serverResult.connectionManager.getStats().totalConnections > 0);
 
     warnIfInsecureHostBinding(webHost, isHardenedMode());
 

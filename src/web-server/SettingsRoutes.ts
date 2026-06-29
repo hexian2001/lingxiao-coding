@@ -227,6 +227,7 @@ const MODEL_PROVIDER_CREATE_FIELDS = new Set([
 ]);
 
 const MODEL_PROVIDER_UPDATE_FIELDS = new Set([
+  'name',
   'contextWindowSize',
   'apiKey',
   'envKey',
@@ -1052,6 +1053,7 @@ export function registerSettingsRoutes(
     if (!requireServerToken(request, reply)) return;
     const { id } = request.params as { id: string };
     const body = (request.body || {}) as {
+      name?: unknown;
       contextWindowSize?: unknown;
       apiKey?: unknown;
       envKey?: unknown;
@@ -1120,6 +1122,12 @@ export function registerSettingsRoutes(
         }
         next[foundProvider][foundIndex].baseUrl = baseUrl;
       }
+    }
+    if (typeof body.name === 'string') {
+      const name = body.name.trim();
+      if (name) next[foundProvider][foundIndex].name = name;
+    } else if (body.name === null) {
+      delete next[foundProvider][foundIndex].name;
     }
     if (typeof body.model === 'string') {
       const model = body.model.trim();

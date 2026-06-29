@@ -5,6 +5,8 @@
  * 支持分支管理、提交、推送、拉取等完整 git 工作流。
  */
 
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { simpleGit, type SimpleGit, type StatusResult } from 'simple-git';
 import { getConfigValue } from '../../config.js';
 import { buildSafeGitEnv } from './GitEnv.js';
@@ -14,6 +16,30 @@ function validateRefName(name: string, label = 'ref'): void {
   // Git ref names: allow alphanumeric, slash, dash, underscore, dot, hash, @
   if (!/^[a-zA-Z0-9_./@#-]+$/.test(name)) {
     throw new Error(`Invalid ${label} name: "${name}"`);
+  }
+}
+
+export interface GitInitResult {
+  initialized: boolean;
+  repositoryRoot: string;
+  message: string;
+}
+
+/**
+ * Fast filesystem-only repository marker detection.
+ *
+ * This deliberately checks ancestor `.git` directory/file markers before shelling
+ * out to `git`. For very large non-git directories, `git status`/`rev-parse`
+ * still spawns Git for Windows and can be expensive; marker detection is O(depth)
+ * and makes the common "not a repo" path cheap and idempotent.
+ */
+function findGitRepositoryMarkerRoot(startPath: string): string | null {
+  let dir = resolve(startPath);
+  while (true) {
+    if (existsSync(join(dir, '.git'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
   }
 }
 
@@ -65,21 +91,25 @@ export interface PushOptions {
 }
 
 export class RealGitService {
+  private static initLocks = new Map<string, Promise<GitInitResult>>();
+
   private projectRoot: string;
   private git: SimpleGit;
 
   constructor(projectRoot: string) {
-    this.projectRoot = projectRoot;
-    this.git = simpleGit(projectRoot).env(buildSafeGitEnv());
+    this.projectRoot = resolve(projectRoot);
+    this.git = simpleGit(this.projectRoot).env(buildSafeGitEnv());
   }
 
   /**
    * 检查当前目录是否为 git 仓库
    */
   async isGitRepo(): Promise<boolean> {
+    // Fast negative path: if neither this workspace nor any ancestor has a
+    // .git marker, do not spawn a git process just to learn it is not a repo.
+    if (!findGitRepositoryMarkerRoot(this.projectRoot)) return false;
     try {
-      await this.git.status();
-      return true;
+      return await this.git.checkIsRepo();
     } catch {/* expected: operation may fail */
       return false;
     }
@@ -386,10 +416,58 @@ export class RealGitService {
   }
 
   /**
+   * Idempotently initialize a git repository for this workspace.
+   *
+   * Repeated or concurrent calls for the same workspace share one in-flight
+   * operation and re-check the filesystem marker under the lock before running
+   * `git init`, so double-clicks cannot fan out into many Git processes.
+   */
+  async initIfNeeded(): Promise<GitInitResult> {
+    const existingRoot = findGitRepositoryMarkerRoot(this.projectRoot);
+    if (existingRoot) {
+      return {
+        initialized: false,
+        repositoryRoot: existingRoot,
+        message: 'Already a git repository',
+      };
+    }
+
+    const current = RealGitService.initLocks.get(this.projectRoot);
+    if (current) return current;
+
+    const operation = (async (): Promise<GitInitResult> => {
+      const rootAfterWait = findGitRepositoryMarkerRoot(this.projectRoot);
+      if (rootAfterWait) {
+        return {
+          initialized: false,
+          repositoryRoot: rootAfterWait,
+          message: 'Already a git repository',
+        };
+      }
+
+      await this.git.init();
+      return {
+        initialized: true,
+        repositoryRoot: this.projectRoot,
+        message: 'Initialized empty Git repository',
+      };
+    })();
+
+    RealGitService.initLocks.set(this.projectRoot, operation);
+    try {
+      return await operation;
+    } finally {
+      if (RealGitService.initLocks.get(this.projectRoot) === operation) {
+        RealGitService.initLocks.delete(this.projectRoot);
+      }
+    }
+  }
+
+  /**
    * 初始化 git 仓库
    */
   async init(): Promise<void> {
-    await this.git.init();
+    await this.initIfNeeded();
   }
 }
 

@@ -653,7 +653,7 @@ export async function createServerWithDeps(
     console.log(`[Server] createServerWithDeps took ${__elapsedMs.toFixed(0)}ms`);
   }
 
-  return { fastify, token: serverAuth.token, scheduledTaskManager };
+  return { fastify, token: serverAuth.token, scheduledTaskManager, connectionManager };
 }
 
 // ═══════════════════════════════════════════════════════════════

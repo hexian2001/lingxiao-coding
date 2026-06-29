@@ -517,13 +517,18 @@ export class GitIntegrationApi {
     fastify.post('/api/v1/git/init', async (request, reply) => {
       if (!requireAuth(request, reply)) return;
       const { workspace } = request.body as { workspace?: string };
-      const dir = safeResolveReadWorkspace(workspace) || SERVER_CWD;
+      const dir = resolveWriteWorkspace(workspace);
+      if (!dir) return reply.status(400).send({ error: 'workspace is required for write operations' });
       try {
         const git = self.getGitService(dir);
-        const isRepo = await git.isGitRepo();
-        if (isRepo) return { data: { message: 'Already a git repository' } };
-        await git.init();
-        return { data: { message: 'Initialized empty Git repository', path: dir } };
+        const result = await git.initIfNeeded();
+        return {
+          data: {
+            message: result.message,
+            path: result.repositoryRoot,
+            initialized: result.initialized,
+          },
+        };
       } catch (e) {
         reply.status(500).send({ error: e instanceof Error ? e.message : String(e) });
       }

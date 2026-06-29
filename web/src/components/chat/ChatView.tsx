@@ -794,6 +794,9 @@ export default function ChatView() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef(false);
   const isAtBottomRef = useRef(true);
+  // 用户手动滚动标记：当用户用滚轮上翻时，暂停 followOutput 自动跟随，
+  // 避免流式 chunk 的 auto 跳转和用户滚动互相打断造成抖动。
+  const userScrolledAwayRef = useRef(false);
   // 初始滚动标记：sessionId 变化或历史首次加载完成时需要自动滚到底部。
   // followOutput 只在 data 变化时触发，首次渲染/切换 session 不会自动滚。
   const needsInitialScrollRef = useRef(true);
@@ -1191,6 +1194,8 @@ export default function ChatView() {
     let enhanced = '';
     let lastUsage: PromptEnhanceStats['usage'];
     let firstTokenMs: number | undefined;
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    let streamCompleted = false;
 
     const updateStats = (patch: Partial<PromptEnhanceStats>) => {
       setEnhanceStats((current) => {
@@ -1265,7 +1270,7 @@ export default function ChatView() {
       }
 
       updateStats({ status: 'waiting' });
-      const reader = res.body.getReader();
+      reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       const handleEvent = (raw: string) => {
@@ -1343,7 +1348,10 @@ export default function ChatView() {
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          streamCompleted = true;
+          break;
+        }
         buffer += decoder.decode(value, { stream: true });
         const parts = buffer.split(/\r?\n\r?\n/);
         buffer = parts.pop() || '';
@@ -1370,6 +1378,18 @@ export default function ChatView() {
         addToast({ type: 'error', message: msg, duration: 5000 });
       }
     } finally {
+      if (reader) {
+        try {
+          if (!streamCompleted) await reader.cancel();
+        } catch {
+          // best-effort: fetch abort / network close may already have released it
+        }
+        try {
+          reader.releaseLock();
+        } catch {
+          // ignore: already released by browser implementation
+        }
+      }
       if (enhanceAbortRef.current === controller) enhanceAbortRef.current = null;
       setIsEnhancing(false);
     }
@@ -1468,6 +1488,7 @@ export default function ChatView() {
   }, [searchOpen, closeSearch]);
 
   const scrollToBottom = useCallback(() => {
+    userScrolledAwayRef.current = false;
     virtuosoRef.current?.scrollToIndex({ index: messages.length - 1, behavior: 'smooth' });
   }, [messages.length]);
 
@@ -3039,6 +3060,8 @@ export default function ChatView() {
                 // isAtBottom 初始为 false，followOutput 返回 false 不滚动 → 死锁。
                 // 用 needsInitialScrollRef 在初始加载完成前强制返回 'auto'。
                 if (needsInitialScrollRef.current) return 'auto';
+                // 用户手动上翻后暂停自动跟随，直到用户滚回底部或点滚动按钮
+                if (userScrolledAwayRef.current) return false;
                 if (!isAtBottom) return false;
                 // 流式期间用 'auto'（瞬时跳转）而非 'smooth'：每帧 chunk 触发一次 smooth
                 // 滚动动画会互相打断、抖动。仅在非流式（离散新消息）时用平滑滚动。
@@ -3049,6 +3072,14 @@ export default function ChatView() {
               atBottomStateChange={(atBottom) => {
                 isAtBottomRef.current = atBottom;
                 setShowScrollBtn(!atBottom);
+                // 用户滚回底部时清除手动滚动标记，恢复自动跟随
+                if (atBottom) userScrolledAwayRef.current = false;
+              }}
+              onWheel={() => {
+                // 用户主动滚动且不在底部时，标记为手动上翻，暂停 followOutput
+                if (!isAtBottomRef.current) {
+                  userScrolledAwayRef.current = true;
+                }
               }}
               rangeChanged={(range) => {
                 setTimelineIndex(range.startIndex);

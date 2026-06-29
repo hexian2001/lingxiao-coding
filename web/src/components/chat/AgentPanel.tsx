@@ -66,6 +66,8 @@ function AgentPanel({ onClose, onExpandChange }: { onClose: () => void; onExpand
   }, [stopAgent]);
   const handleSetExpanded = (v: boolean) => { setIsExpanded(v); onExpandChange?.(v); };
   const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const userScrolledAwayRef = useRef(false);
+  const isAtBottomRef = useRef(true);
 
   // Get agent list from both runtime state and conversation history.
   // 会话切换/重连时这两路数据可能短暂只到一边：只要任一侧存在，就应能打开面板。
@@ -163,6 +165,7 @@ function AgentPanel({ onClose, onExpandChange }: { onClose: () => void; onExpand
   // agent switch we jump to the bottom of the newly-selected conversation.
   const activeAgent = activeAgentId ? agentList.find((a) => a.agentId === activeAgentId) : null;
   useEffect(() => {
+    userScrolledAwayRef.current = false;
     virtuosoRef.current?.scrollToIndex({ index: 'LAST', behavior: 'auto' });
   }, [activeAgentId]);
 
@@ -435,7 +438,17 @@ function AgentPanel({ onClose, onExpandChange }: { onClose: () => void; onExpand
                 ref={virtuosoRef}
                 className="h-full"
                 data={groupedMessages}
-                followOutput={(atBottom) => atBottom}
+                followOutput={(atBottom) => {
+                  if (userScrolledAwayRef.current) return false;
+                  return atBottom;
+                }}
+                atBottomStateChange={(atBottom) => {
+                  isAtBottomRef.current = atBottom;
+                  if (atBottom) userScrolledAwayRef.current = false;
+                }}
+                onWheel={() => {
+                  if (!isAtBottomRef.current) userScrolledAwayRef.current = true;
+                }}
                 increaseViewportBy={{ top: 200, bottom: 200 }}
                 components={{
                   Footer: () =>

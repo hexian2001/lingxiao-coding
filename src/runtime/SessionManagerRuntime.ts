@@ -1013,6 +1013,29 @@ export class SessionManager {
     }
   }
 
+  /**
+   * 解析会话级模型选择：优先使用持久化的 session-local override，
+   * 无值或模型已不可用时再回退到全局默认配置。
+   *
+   * 注意：新建会话与 resume 会话必须共用这条路径，否则 Web UI 切换模型后
+   * 会在会话恢复时被 runtimeConfig.llm.* 默认值顶掉。
+   */
+  private resolveEffectiveSessionModel(sessionId: string, key: string, fallback: string, label: 'Leader' | 'Agent'): string {
+    const raw = this.db.getSessionState(sessionId, key);
+    const candidate = typeof raw === 'string' ? raw.trim() : '';
+    if (!candidate) return fallback;
+    try {
+      getModelManager().getModelByIdStrict(candidate);
+      return candidate;
+    } catch (error) {
+      this.db.deleteSessionState(sessionId, key);
+      sessionLogger.warn(
+        `会话 ${sessionId}：${label} session 模型 '${candidate}' 已不可用，回退到全局配置 '${fallback}' (${error instanceof Error ? error.message : String(error)})`,
+      );
+      return fallback;
+    }
+  }
+
   /** 构建会话运行时：加载 skills、创建 RoleRegistry、调用 createSessionRuntime */
   private async buildSessionRuntime(sessionId: string, workspace: string) {
     const disabledNames = resolveDisabledSkillNames();
@@ -1026,27 +1049,14 @@ export class SessionManager {
     });
 
     const roleRegistry = await this.createRoleRegistryWithBuiltinRoles(workspace);
-    const resolveEffectiveSessionModel = (key: string, fallback: string, label: 'Leader' | 'Agent'): string => {
-      const raw = this.db.getSessionState(sessionId, key);
-      const candidate = typeof raw === 'string' ? raw.trim() : '';
-      if (!candidate) return fallback;
-      try {
-        getModelManager().getModelByIdStrict(candidate);
-        return candidate;
-      } catch (error) {
-        this.db.deleteSessionState(sessionId, key);
-        sessionLogger.warn(
-          `会话 ${sessionId}：${label} session 模型 '${candidate}' 已不可用，回退到全局配置 '${fallback}' (${error instanceof Error ? error.message : String(error)})`,
-        );
-        return fallback;
-      }
-    };
-    const effectiveLeaderModel = resolveEffectiveSessionModel(
+    const effectiveLeaderModel = this.resolveEffectiveSessionModel(
+      sessionId,
       SESSION_KEYS.CURRENT_MODEL,
       runtimeConfig.llm.leader_model,
       'Leader',
     );
-    const effectiveAgentModel = resolveEffectiveSessionModel(
+    const effectiveAgentModel = this.resolveEffectiveSessionModel(
+      sessionId,
       SESSION_KEYS.CURRENT_AGENT_MODEL,
       runtimeConfig.llm.agent_model,
       'Agent',
@@ -1781,14 +1791,26 @@ export class SessionManager {
 
     // 先创建 RoleRegistry 并注册内置角色
     const roleRegistry = await this.createRoleRegistryWithBuiltinRoles(workspacePath);
+    const effectiveLeaderModel = this.resolveEffectiveSessionModel(
+      sessionId,
+      SESSION_KEYS.CURRENT_MODEL,
+      runtimeConfig.llm.leader_model,
+      'Leader',
+    );
+    const effectiveAgentModel = this.resolveEffectiveSessionModel(
+      sessionId,
+      SESSION_KEYS.CURRENT_AGENT_MODEL,
+      runtimeConfig.llm.agent_model,
+      'Agent',
+    );
     const runtime = createSessionRuntime({
       sessionId,
       workspacePath,
       db: this.db,
       emitter: this.emitter,
       roleRegistry,
-      leaderModel: runtimeConfig.llm.leader_model,
-      agentModel: runtimeConfig.llm.agent_model,
+      leaderModel: effectiveLeaderModel,
+      agentModel: effectiveAgentModel,
       defaultSkillsContent,
       scheduledTaskManager: this.scheduledTaskManager,
     });

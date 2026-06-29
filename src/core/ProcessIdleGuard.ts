@@ -43,6 +43,7 @@ export class ProcessIdleGuard {
   private probes: ActivityProbe[] = [];
   private idleCallbacks: Array<(idleMs: number) => void> = [];
   private started = false;
+  private lastProbeErrorLogMs = 0;
 
   constructor(config?: Partial<ProcessIdleGuardConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -52,6 +53,16 @@ export class ProcessIdleGuard {
     if (envIdleMs) {
       const parsed = parseInt(envIdleMs, 10);
       if (!isNaN(parsed) && parsed >= 0) this.config.idleExitMs = parsed;
+    }
+    const envDetachedTtlMs = process.env.LINGXIAO_DETACHED_TTL_MS;
+    if (envDetachedTtlMs) {
+      const parsed = parseInt(envDetachedTtlMs, 10);
+      if (!isNaN(parsed) && parsed >= 0) this.config.detachedTtlMs = parsed;
+    }
+    const envCheckIntervalMs = process.env.LINGXIAO_IDLE_CHECK_INTERVAL_MS;
+    if (envCheckIntervalMs) {
+      const parsed = parseInt(envCheckIntervalMs, 10);
+      if (!isNaN(parsed) && parsed > 0) this.config.checkIntervalMs = parsed;
     }
     const envDisabled = process.env.LINGXIAO_IDLE_EXIT_DISABLED;
     if (envDisabled === '1' || envDisabled === 'true') {
@@ -87,9 +98,12 @@ export class ProcessIdleGuard {
   /**
    * 标记终端已断开 — 进入有限存活模式
    */
-  markDetached(): void {
+  markDetached(reason = 'signal'): void {
     if (this.detachedAtMs === null) {
       this.detachedAtMs = Date.now();
+      coreLogger.warn(
+        `[ProcessIdleGuard] Terminal detached (${reason}); will auto-exit in ${Math.round(this.config.detachedTtlMs / 1000)}s unless activity resumes`,
+      );
     }
   }
 
@@ -162,8 +176,12 @@ export class ProcessIdleGuard {
           this.lastActivityMs = now;
           return; // 有活跃工作，不需要继续检查
         }
-      } catch {
-        // 忽略探针异常
+      } catch (error) {
+        // 探针异常不能让 idle guard 自身成为 uncaughtException 源；限频记录，方便排查误判 idle。
+        if (now - this.lastProbeErrorLogMs >= 60_000) {
+          this.lastProbeErrorLogMs = now;
+          coreLogger.warn(`[ProcessIdleGuard] Activity probe failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
       }
     }
 
@@ -196,7 +214,9 @@ export class ProcessIdleGuard {
     }
 
     if (shouldExit) {
-      coreLogger.info(`[ProcessIdleGuard] Auto-exit: ${reason}`);
+      coreLogger.info(
+        `[ProcessIdleGuard] Auto-exit: ${reason}; idleMs=${idleMs}; detachedAtMs=${this.detachedAtMs ?? 'null'}; probes=${this.probes.length}`,
+      );
       this.stop();
       void gracefulShutdown(0, 10_000);
     }

@@ -913,48 +913,24 @@ export class LeaderThinkingEngine {
                 return { type: 'break' };
               }
 
-              // CircuitBreaker OPEN：provider 整体不可用，主动 sleep 到探针窗口
-              // 而不是 200ms 高频 retry 形成死循环。sleep 期间 emit 等待状态。
+              // CircuitBreaker OPEN：LlmGuard 已回收旧 LLM client / keep-alive socket 池，并重置该
+              // provider 的 CB 状态。这里不 sleep、不注入错误、不累计外层 retry，直接按 ESC
+              // 中断语义结束当前 attempt，下一轮重新发起同模型请求。
               if (error instanceof CircuitOpenError) {
-                const waitMs = error.retryAfterMs;
-                const waitSec = Math.ceil(waitMs / 1000);
                 leaderLogger.warn(
-                  `Leader CB OPEN provider="${error.providerKey}"，sleep ${waitSec}s 等待 HALF_OPEN 探针窗口`,
+                  `Leader CB OPEN provider="${error.providerKey}"，已回收旧连接并重新请求`,
                 );
                 emitter.emit('leader:status', {
                   sessionId,
-                  status: `🛑 Provider 暂不可用，${waitSec}s 后自动重试...`,
+                  status: '🔄 Provider 连接已回收，重新请求中...',
                 });
-                emitter.emit('leader:error', { sessionId, error: classifyLLMError(error) });
-                await new Promise((resolve) => setTimeout(resolve, waitMs));
-                // 不再 setLlmErrorRetryCount(0) — 那会清零外层计数器导致无限 sleep 循环。
-                // 用外层 retry 计数器追踪连续 CB OPEN sleep，到达上限后停下等待用户介入。
-                const cbRetry = this.opts.getLlmErrorRetryCount() + 1;
-                this.opts.setLlmErrorRetryCount(cbRetry);
-                const outerMax = this.opts.getLlmMaxErrorRetries();
-                if (cbRetry >= outerMax) {
-                  leaderLogger.error(
-                    `Leader CB OPEN 已连续 ${cbRetry}/${outerMax} 次仍未恢复，停下等待用户介入`,
-                  );
-                  emitter.emit('leader:status', {
-                    sessionId,
-                    status: `🛑 Provider 持续不可用：等待人工介入`,
-                  });
-                  // 抢救 partial content
-                  const partialCb = (error as unknown as Record<string, unknown>).partialContent;
-                  if (typeof partialCb === 'string' && partialCb.trim()) {
-                    this.opts.addMessage({ role: 'assistant', content: partialCb });
-                    const pcb = this.opts.getConversation();
-                    await db.saveConversationMessage(sessionId, pcb[pcb.length - 1]);
-                    leaderLogger.info(`Leader CB OPEN 终态：已抢救 partial content (${partialCb.length} chars)`);
-                  }
-                  const stopMsg = `🛑 [系统终止] Provider 持续不可用（Circuit Breaker 已连续触发 ${cbRetry}/${outerMax} 次）。请检查 provider 状态或更换模型后再继续。`;
-                  this.opts.addMessage({ role: 'system', content: stopMsg });
-                  const c2 = this.opts.getConversation();
-                  await db.saveConversationMessage(sessionId, c2[c2.length - 1]);
-                  this.opts.setLlmErrorRetryCount(0);
-                  this.opts.setWaitingForUser(true);
-                  return { type: 'break' };
+                // 抢救 partial content（理论上 CB OPEN 发生在请求前，通常为空；保留兜底）。
+                const partialCb = (error as unknown as Record<string, unknown>).partialContent;
+                if (typeof partialCb === 'string' && partialCb.trim()) {
+                  this.opts.addMessage({ role: 'assistant', content: partialCb });
+                  const pcb = this.opts.getConversation();
+                  await db.saveConversationMessage(sessionId, pcb[pcb.length - 1]);
+                  leaderLogger.info(`Leader CB OPEN 重请求：已抢救 partial content (${partialCb.length} chars)`);
                 }
                 return { type: 'continue' };
               }

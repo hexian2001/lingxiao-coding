@@ -278,6 +278,7 @@ export function ModelAndReasoningSection({
         await settingsApiFetch(`/settings/model-provider/${encodeURIComponent(editingModelId)}`, {
           method: 'PUT',
           body: JSON.stringify({
+            name: displayName,
             model: payload.model,
             provider: payload.provider,
             baseUrl: payload.baseUrl,

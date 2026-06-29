@@ -162,6 +162,8 @@ async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
   return res.json() as T;
 }
 
+let initRepoInFlight: { workspace: string; promise: Promise<void> } | null = null;
+
 export const useGitStore = create<GitState>((set, get) => ({
   workspace: '',
   status: null,
@@ -438,23 +440,38 @@ export const useGitStore = create<GitState>((set, get) => ({
   clearError: () => set({ error: null, mrError: null, mrUnavailable: null }),
 
   initRepo: async () => {
-    const { workspace } = get();
-    set({ isLoading: true, error: null });
+    let workspace: string;
     try {
-      const body = workspace ? JSON.stringify({ workspace }) : '{}';
-      await apiFetch<{ data: { message: string } }>('/git/init', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
-      });
-      // 重新加载状态
-      const { fetchStatus, fetchBranches, fetchLog } = get();
-      await fetchStatus();
-      await Promise.all([fetchBranches(), fetchLog()]);
+      workspace = requireWorkspace(get().workspace);
     } catch (e) {
       set({ error: e instanceof Error ? e.message : String(e) });
+      return;
+    }
+    if (initRepoInFlight?.workspace === workspace) return initRepoInFlight.promise;
+
+    const operation = (async () => {
+      set({ isLoading: true, error: null });
+      try {
+        await apiFetch<{ data: { message: string; initialized: boolean; path: string } }>('/git/init', {
+          method: 'POST',
+          body: JSON.stringify({ workspace }),
+        });
+        // 重新加载状态
+        const { fetchStatus, fetchBranches, fetchLog } = get();
+        await fetchStatus();
+        await Promise.all([fetchBranches(), fetchLog()]);
+      } catch (e) {
+        set({ error: e instanceof Error ? e.message : String(e) });
+      } finally {
+        set({ isLoading: false });
+      }
+    })();
+
+    initRepoInFlight = { workspace, promise: operation };
+    try {
+      return await operation;
     } finally {
-      set({ isLoading: false });
+      if (initRepoInFlight?.promise === operation) initRepoInFlight = null;
     }
   },
 }));
