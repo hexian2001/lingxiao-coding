@@ -95,6 +95,22 @@ type OpenAIStreamErrorLike = Error & {
   error?: unknown;
 };
 
+interface OpenAIChatCompletionMessageLike extends Record<string, unknown> {
+  content?: unknown;
+  tool_calls?: Array<{ id: string; type: string; function?: { name: string; arguments: string } }>;
+}
+
+interface OpenAIChatCompletionChoiceLike {
+  message?: OpenAIChatCompletionMessageLike;
+  finish_reason?: string | null;
+}
+
+interface OpenAIChatCompletionLike {
+  choices?: OpenAIChatCompletionChoiceLike[];
+  usage?: unknown;
+  model?: string;
+}
+
 // ─── OpenAIContentGenerator ─────────────────────────────────────────────────
 
 export class OpenAIContentGenerator implements ContentGenerator {
@@ -276,42 +292,7 @@ export class OpenAIContentGenerator implements ContentGenerator {
           );
           heartbeat.clear();
 
-          if (!response.choices?.length) {
-            throw createLLMError('network_error', 'Empty response: no choices returned', {
-              provider: 'openai', model: params.model, retryable: true,
-            });
-          }
-
-          const choice = response.choices[0];
-          const message = choice.message;
-          const content = normalizeMessageContent(message.content);
-          let reasoningContent = extractCapabilityReasoningContent(message as unknown as Record<string, unknown>) || undefined;
-          const toolCalls = this.extractToolCalls(message.tool_calls);
-
-          const contentStr = typeof content === 'string' ? content : '';
-          const thinkMatch = contentStr.match(/<think>([\s\S]*?)<\/think>/s);
-          let finalContent: MessageContent = content;
-          if (thinkMatch && !reasoningContent) {
-            reasoningContent = thinkMatch[1].trim();
-            finalContent = contentStr.replace(/<think>[\s\S]*?<\/think>/gs, '').trim();
-          }
-
-          if (isEmptyContent(finalContent) && !reasoningContent && (!toolCalls || toolCalls.length === 0)) {
-            throw createLLMError('network_error', 'Provider returned an empty completion', {
-              provider: 'openai', model: params.model, retryable: true,
-            });
-          }
-
-          const usage = this.extractUsage(response.usage);
-          return {
-            content: finalContent,
-            thinking: this.wrapReasoningText(reasoningContent),
-            tool_calls: toolCalls,
-            usage,
-            model: response.model,
-            finish_reason: choice.finish_reason ?? undefined,
-            was_output_truncated: choice.finish_reason === 'length',
-          };
+          return this.parseNonStreamingResponse(response, params.model);
         } catch (error) {
           heartbeat.clear();
           throw error;
@@ -609,6 +590,65 @@ export class OpenAIContentGenerator implements ContentGenerator {
 
   // ─── Private helpers ───────────────────────────────────────────────────
 
+  private parseNonStreamingResponse(response: unknown, model: string): ChatResponse {
+    if (!response || typeof response !== 'object') {
+      throw createLLMError('network_error', 'Empty non-streaming response: provider returned no JSON body', {
+        provider: 'openai', model, retryable: true,
+      });
+    }
+
+    const completion = response as OpenAIChatCompletionLike;
+    if (!Array.isArray(completion.choices) || completion.choices.length === 0) {
+      throw createLLMError('network_error', 'Malformed non-streaming response: no choices returned', {
+        provider: 'openai', model, retryable: true,
+      });
+    }
+
+    const choice = completion.choices[0];
+    if (!choice || typeof choice !== 'object') {
+      throw createLLMError('network_error', 'Malformed non-streaming response: first choice is missing', {
+        provider: 'openai', model, retryable: true,
+      });
+    }
+
+    const message = choice.message;
+    if (!message || typeof message !== 'object') {
+      throw createLLMError('network_error', 'Malformed non-streaming response: first choice has no message', {
+        provider: 'openai', model, retryable: true,
+      });
+    }
+
+    const content = normalizeMessageContent(message.content);
+    let reasoningContent = extractCapabilityReasoningContent(message) || undefined;
+    const toolCalls = this.extractToolCalls(Array.isArray(message.tool_calls) ? message.tool_calls : undefined);
+
+    const contentStr = typeof content === 'string' ? content : '';
+    const thinkMatch = contentStr.match(/<think>([\s\S]*?)<\/think>/s);
+    let finalContent: MessageContent = content;
+    if (thinkMatch && !reasoningContent) {
+      reasoningContent = thinkMatch[1].trim();
+      finalContent = contentStr.replace(/<think>[\s\S]*?<\/think>/gs, '').trim();
+    }
+
+    if (isEmptyContent(finalContent) && !reasoningContent && (!toolCalls || toolCalls.length === 0)) {
+      throw createLLMError('network_error', 'Provider returned an empty non-streaming completion', {
+        provider: 'openai', model, retryable: true,
+      });
+    }
+
+    const usage = this.extractUsage(completion.usage);
+    const finishReason = typeof choice.finish_reason === 'string' ? choice.finish_reason : undefined;
+    return {
+      content: finalContent,
+      thinking: this.wrapReasoningText(reasoningContent),
+      tool_calls: toolCalls,
+      usage,
+      model: typeof completion.model === 'string' ? completion.model : model,
+      finish_reason: finishReason,
+      was_output_truncated: finishReason === 'length',
+    };
+  }
+
   private async tryEscalate(
     request: PipelineRequest,
     params: GenerateContentParams,
@@ -626,22 +666,7 @@ export class OpenAIContentGenerator implements ContentGenerator {
         { timeout: this.timeoutMs, signal: params.signal },
       );
 
-      const choice = response.choices[0];
-      const message = choice.message;
-      const content = normalizeMessageContent(message.content);
-      const reasoningContent = extractCapabilityReasoningContent(message as unknown as Record<string, unknown>) || undefined;
-      const toolCalls = this.extractToolCalls(message.tool_calls);
-      const usage = this.extractUsage(response.usage);
-
-      return {
-        content,
-        thinking: this.wrapReasoningText(reasoningContent),
-        tool_calls: toolCalls,
-        usage,
-        model: response.model,
-        finish_reason: choice.finish_reason ?? undefined,
-        was_output_truncated: choice.finish_reason === 'length',
-      };
+      return this.parseNonStreamingResponse(response, params.model);
     } catch {/* expected: operation may fail gracefully */
       return null; // 升级失败，返回 null 让调用者用原始结果
     }

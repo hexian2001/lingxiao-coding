@@ -206,15 +206,28 @@ export class LeaderProgressInvariant {
   }
 
   private injectStagnationBreaker(rounds: number): void {
-    const breakerMsg = [
-      `⚠️ [系统检测] 你已连续 ${rounds} 轮没有推进任何任务。`,
-      '请立即执行以下自检：',
-      '1. 检查当前 task board 状态，是否有被阻塞的任务',
-      '2. 如果所有任务已完成，请调用 finish_session 结束会话',
-      '3. 如果存在未解决的依赖，请打破依赖链或将问题升级为新任务',
-      '4. 如果你不确定下一步，请用 ask_user 向用户确认',
-      '请立即采取行动，并使用新的证据、参数或工具路径。',
-    ].join('\n');
+    // Eternal mode: never steer the leader toward ask_user / finish_session on
+    // stagnation. The eternal contract is continuous autonomous stewardship;
+    // stalling to ask the user contradicts it. Steer toward blackboard-driven
+    // progress instead. Non-eternal keeps the original human-in-the-loop guidance.
+    const breakerMsg = this.isEternalMode()
+      ? [
+          `⚠️ [系统检测] 你已连续 ${rounds} 轮没有推进任何任务。`,
+          '当前处于 eternal 自主模式，不要停下来问用户或结束会话。请立即执行以下自检：',
+          '1. 检查当前 task board 与 blackboard，是否有被阻塞的任务或未消费的 contract / 事件',
+          '2. 如果存在未解决的依赖，主动打破依赖链或拆分为新任务并派发',
+          '3. 基于项目当前状态提出下一步改进并直接推进（重构、补测试、修缺陷、完善文档等）',
+          '请立即采取行动，并使用新的证据、参数或工具路径，不要重复上一轮的无效输出。',
+        ].join('\n')
+      : [
+          `⚠️ [系统检测] 你已连续 ${rounds} 轮没有推进任何任务。`,
+          '请立即执行以下自检：',
+          '1. 检查当前 task board 状态，是否有被阻塞的任务',
+          '2. 如果所有任务已完成，请调用 finish_session 结束会话',
+          '3. 如果存在未解决的依赖，请打破依赖链或将问题升级为新任务',
+          '4. 如果你不确定下一步，请用 ask_user 向用户确认',
+          '请立即采取行动，并使用新的证据、参数或工具路径。',
+        ].join('\n');
 
     void this.addAndPersistMessage({ role: 'system', content: breakerMsg }).catch((err) => {
       leaderLogger.warn(`[ProgressInvariant] 注入 breaker 失败: ${err instanceof Error ? err.message : String(err)}`);

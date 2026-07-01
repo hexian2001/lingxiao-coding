@@ -1191,6 +1191,17 @@ export class LeaderThinkingEngine {
                 return { type: 'continue' };
               }
 
+              // Eternal mode: do not latch waitingForUser on an idle round unless
+              // there is an explicit user gate (ask_user / permission / plan_review).
+              // Latching would deadlock EternalLoop.tick (which skips while
+              // isWaitingForUser). Instead break and let the eternal patrol take over
+              // idle stewardship.
+              if (this.opts.isEternalMode?.() === true && !this.opts.hasExplicitUserGate()) {
+                leaderLogger.debug('[Eternal] 本轮无新工作，但 eternal 模式不 latch waitingForUser，交由巡逻接管');
+                emitter.emit('leader:busy', { sessionId, isBusy: false, queueLength: 0 });
+                return { type: 'break' };
+              }
+
               leaderLogger.debug('LLM 本轮结束，无新工作产出，进入等待');
               emitter.emit('leader:status', { sessionId, status: '等待用户输入...' });
               emitter.emit('leader:busy', { sessionId, isBusy: false, queueLength: 0 });

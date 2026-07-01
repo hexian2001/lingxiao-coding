@@ -925,18 +925,31 @@ export class LeaderAgent {
             safeTaskId = this.board.nextTaskId();
           } while (blockedBy.includes(safeTaskId));
         }
-        const task = this.board.createTask(
-          safeTaskId,
-          input.subject,
-          input.description,
-          input.agentType,
-          blockedBy,
-          [],
-          undefined,
-          input.context,
-          { orchestration: input.orchestration },
-        );
-        return task.id;
+        // 根因修复（audit-2026-07-01, crash-2026-07-01T12-19-39）：board.createTask 在依赖任务
+        // 已被 evictStalledTerminalTasks 从内存 Map 回收（TTL 30 分钟）或跨会话 taskCounter 未同步等
+        // 场景下会抛 "Task X depends on missing task Y"。此调用来自 OrchestrationRuntime 的
+        // evaluator/repair followup 创建，属于 fire-and-forget 的编排层良性失败，不应让异常经
+        // void handleTerminalTask(...) 逃逸成 unhandledRejection 污染进程 exitCode。捕获后仅告警、
+        // 跳过本次 followup 创建，编排链路容忍单次 followup 缺失。
+        try {
+          const task = this.board.createTask(
+            safeTaskId,
+            input.subject,
+            input.description,
+            input.agentType,
+            blockedBy,
+            [],
+            undefined,
+            input.context,
+            { orchestration: input.orchestration },
+          );
+          return task.id;
+        } catch (error) {
+          leaderLogger.warn(
+            `[Orchestration] createFollowupTask failed (subject="${input.subject}", blockedBy=${JSON.stringify(blockedBy)}): ${error instanceof Error ? error.message : String(error)}`,
+          );
+          return undefined;
+        }
       },
     });
     this.directToolsExecutor = new LeaderDirectToolsExecutor({

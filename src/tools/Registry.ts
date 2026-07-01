@@ -434,6 +434,22 @@ function valueMatchesSchema(value: unknown, schema: unknown): boolean {
   }
 }
 
+function findSiblingObjectPropertyForKey(
+  properties: Record<string, unknown>,
+  key: string,
+): string | null {
+  let match: string | null = null;
+  for (const [propName, propSchema] of Object.entries(properties)) {
+    if (!isRecord(propSchema)) continue;
+    const childProps = schemaProperties(propSchema);
+    if (Object.prototype.hasOwnProperty.call(childProps, key)) {
+      if (match) return null; // ambiguous: multiple siblings declare this key
+      match = propName;
+    }
+  }
+  return match;
+}
+
 function isStringLikeSchema(schema: unknown): boolean {
   if (!isRecord(schema)) return false;
   const type = new Set(Array.isArray(schema.type) ? schema.type : [schema.type]);
@@ -598,12 +614,36 @@ function normalizeValueForSchema(value: unknown, schema: unknown): unknown {
     const properties = schemaProperties(selected);
     const required = new Set(requiredKeysForSchema(selected));
     const out: Record<string, unknown> = {};
+    const orphanKeys: string[] = [];
     for (const [key, nestedValue] of Object.entries(value)) {
       const propSchema = properties[key];
       if (nestedValue === '' && propSchema && isStringLikeSchema(propSchema) && !required.has(key)) {
         continue;
       }
-      out[key] = propSchema ? normalizeValueForSchema(nestedValue, propSchema) : nestedValue;
+      if (propSchema) {
+        out[key] = normalizeValueForSchema(nestedValue, propSchema);
+      } else if (selected.additionalProperties === false) {
+        // Schema explicitly forbids extra props; ajv would hard-reject the whole
+        // call for one misplaced/extra key. Defer these orphan keys to a second
+        // pass so we can relocate them into a sibling object (already fully
+        // normalized by then) or drop them, instead of failing the whole call.
+        orphanKeys.push(key);
+      } else {
+        out[key] = nestedValue;
+      }
+    }
+    // Second pass: relocate orphan keys into the sibling object property that
+    // declares them (e.g. a field mistakenly nested under the wrong object).
+    // Unrelocatable orphans are dropped, keeping required/type checks intact.
+    for (const key of orphanKeys) {
+      const target = findSiblingObjectPropertyForKey(properties, key);
+      if (!target) continue;
+      const existing = isRecord(out[target]) ? out[target] as Record<string, unknown> : {};
+      if (existing[key] === undefined) {
+        const targetProps = schemaProperties(properties[target] as Record<string, unknown>);
+        existing[key] = normalizeValueForSchema((value as Record<string, unknown>)[key], targetProps[key]);
+      }
+      out[target] = existing;
     }
     return out;
   }

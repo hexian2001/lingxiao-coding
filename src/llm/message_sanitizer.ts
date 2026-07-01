@@ -310,6 +310,32 @@ function ensureHasUserMessage(messages: ChatMessage[]): ChatMessage[] {
 }
 
 /**
+ * Some providers and OpenAI-compatible gateways (notably those proxying to
+ * Anthropic backends) reject a request whose final message is an assistant
+ * message ("assistant-prefill final message is not supported; last message
+ * must be user"). When the Leader/Agent resumes, the conversation tail can be
+ * a leftover assistant message (plain-text output, worker completion reflow
+ * without a fresh user turn, partial rescue). Append a user placeholder so the
+ * tail is always a user message.
+ *
+ * Safe for native OpenAI too (a trailing user message is always valid). Only
+ * triggers when the tail assistant has NO tool_calls — a tool_calls tail must
+ * be followed by tool results, so appending a user there would break pairing;
+ * that case is left to the tool-sequencing logic. LlmGuard stream-interrupt
+ * prefill injects a paired [assistant, user] (tail already user), so it never
+ * hits this branch.
+ */
+function ensureLastMessageIsUser(messages: ChatMessage[]): ChatMessage[] {
+  if (messages.length === 0) return messages;
+  const last = messages[messages.length - 1];
+  if (!last || last.role !== 'assistant') return messages;
+  const hasToolCalls = Array.isArray((last as { tool_calls?: unknown[] }).tool_calls)
+    && ((last as { tool_calls?: unknown[] }).tool_calls?.length ?? 0) > 0;
+  if (hasToolCalls) return messages;
+  return [...messages, { role: 'user', content: 'Continue.' } as ChatMessage];
+}
+
+/**
  * 统一消息序列净化管线（provider 无关）。
  *
  * 在每次 API 调用前执行，确保消息序列符合所有 provider 的格式要求：
@@ -336,7 +362,8 @@ export function sanitizeMessageSequence(messages: ChatMessage[]): ChatMessage[] 
   const toolSequenced = sanitizeOpenAIToolMessageSequence(contentSanitized);
   // GLM/Qwen 等模型拒绝只有 system 消息、没有 user 消息的请求（返回 400）。
   // 兜底：如果序列中没有 user 消息，把最后一条非 tool 消息转为 user。
-  const final = ensureHasUserMessage(toolSequenced);
+  const withUser = ensureHasUserMessage(toolSequenced);
+  const final = ensureLastMessageIsUser(withUser);
 
   const afterCount = final.length;
   const afterRoles = countByRole(final);

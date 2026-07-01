@@ -1083,6 +1083,21 @@ export class AnthropicContentGenerator implements ContentGenerator {
       });
     }
 
+    // Anthropic 要求 messages 末尾必须是 user 消息——它不支持以 assistant 消息结尾的
+    // "assistant-prefill" 续跑（报错 400 "assistant-prefill final message is not supported;
+    // last message must be user"）。当 Leader/Agent 续跑时对话末尾可能残留 assistant 消息
+    // （上一轮纯文本输出、worker 完成回流后未注入新 user、partial 抢救等），裸发即触发该 400。
+    // 这里追加一条 user 占位消息把末尾规整为 user。注：LlmGuard 的 stream-interrupt 续写 prefill
+    // 注入的是成对的 [assistant, user]（末尾恒为 user），不会命中此分支，故不破坏 prefill 语义。
+    // 该规整仅在 Anthropic ContentGenerator 内，OpenAI 侧不受影响（OpenAI 允许 assistant 结尾）。
+    const lastMessage = anthropicMessages[anthropicMessages.length - 1];
+    if (lastMessage && lastMessage.role === 'assistant') {
+      anthropicMessages.push({
+        role: 'user',
+        content: [{ type: 'text', text: 'Continue.' }],
+      });
+    }
+
     return {
       system: systemBlocks.length > 0 ? systemBlocks : undefined,
       messages: anthropicMessages,

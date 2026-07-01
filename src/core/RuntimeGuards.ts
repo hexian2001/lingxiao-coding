@@ -59,6 +59,23 @@ export function popSuppressedError(): Error | undefined {
 }
 
 /**
+ * 判断是否为 TUI 写终端遇到的瞬态 I/O 错误（EIO/EPIPE）。
+ *
+ * 根因（audit-2026-07-01）：Ink.writeToStderr/writeToStdout 是同步 stream.write()，未包 try-catch。
+ * 终端在窗口切换 / resize 竞态 / tty 短暂不可写时，底层 socket write 会抛 `Error: write EIO`
+ * 逃逸成 uncaughtException，被本文件当作致命错误处理，直接 gracefulShutdown(1) 杀掉整个进程
+ * （包括承载 Web UI 的 Web Server）。这类错误只是本次终端帧写入失败，不代表进程状态已损坏，
+ * 应与 DB busy 等基础设施类错误同口径：丢弃本次写入，不杀进程。
+ */
+function isTerminalWriteError(error: Error): boolean {
+  const code = (error as NodeJS.ErrnoException).code;
+  if (code === 'EIO' || code === 'EPIPE') return true;
+  const msg = error.message || '';
+  if (/^write EIO$/i.test(msg) || /^write EPIPE$/i.test(msg)) return true;
+  return false;
+}
+
+/**
  * 判断异常是否属于可恢复的 DB/IO 错误（不应杀死主进程）。
  * SQLITE_BUSY、连接关闭、序列化失败等场景下，丢弃该操作好过整个 CLI 退出。
  */
@@ -71,6 +88,8 @@ function isRecoverableInfraError(error: Error): boolean {
   if (/requires sessionId/i.test(msg)) return true;
   // EventEmitter error from worker:exit / worker:timeout handler — 已在调用方加了 try-catch 但某些路径仍可能逃逸
   if (/Recovery record/i.test(msg)) return true;
+  // TUI 写终端瞬态 EIO/EPIPE（见 isTerminalWriteError 注释）
+  if (isTerminalWriteError(error)) return true;
   return false;
 }
 

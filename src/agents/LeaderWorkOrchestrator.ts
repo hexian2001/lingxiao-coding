@@ -392,7 +392,12 @@ export class LeaderWorkOrchestrator {
       status: summary,
     });
 
-    if (!this.isWaitingForUser()) {
+    // Eternal mode: do NOT latch waitingForUser when the board is fully
+    // terminal. Latching here would block EternalLoop.tick (it early-returns
+    // while waitingForUser), producing a stall deadlock. Instead leave the
+    // flag clear so the main loop proceeds to maybeEternalIdlePatrol and the
+    // EternalLoop keeps stewarding autonomously.
+    if (!this.isEternalMode() && !this.isWaitingForUser()) {
       await this.setWaitingForUser(true);
     }
     return false;

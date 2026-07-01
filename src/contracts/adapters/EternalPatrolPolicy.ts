@@ -28,17 +28,13 @@ export function decideEternalActionFromRuntimeState(input: EternalPatrolJudgeInp
     };
   }
   if (!input.fingerprintChanged) {
-    if (
-      !input.hasOpenWork &&
-      !input.hasRunningAgents &&
-      input.lastPatrolOutcome !== 'productive' &&
-      input.consecutiveIdlePatrols >= 1
-    ) {
-      return {
-        action: 'yield_user',
-        reason: 'runtime: no project delta, no open work, idle patrol already attempted',
-      };
-    }
+    // Eternal principle: never yield back to the user on our own. When there is
+    // no project delta and no open work, back off with 'skip' instead of
+    // 'yield_user'. The caller's idle backoff stretches the patrol interval
+    // exponentially, so a standing 'skip' does not burn tokens, and any
+    // external event (worker completion, file change, fingerprint delta)
+    // resumes patrol. Yielding to the user would stall the eternal loop, which
+    // contradicts the autonomous stewardship contract.
     return {
       action: 'skip',
       reason: 'runtime: no meaningful project delta',

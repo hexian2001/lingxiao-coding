@@ -1529,18 +1529,59 @@ export class SessionManager {
 
     if (!leaderRunning) {
       sessionLogger.debug(`重启 Leader 进行后续对话：${sessionId}`);
-
-      // 收集被中断的任务，传给 Leader.run() 以便恢复（避免任务卡在 in_progress 状态）
-      const agentStates = this.db.getAgentStates(sessionId);
-      const checkpoints = loadAgentResumeCheckpoints(this.db, sessionId);
-      const recoveredTasks = collectRecoveredTasks(session.board, agentStates, checkpoints);
-
-      this.launchLeaderDetached(
-        sessionId,
-        () => session.leader.run(undefined, true, recoveredTasks.length > 0 ? recoveredTasks : undefined),
-        'Leader 重启',
-      );
+      this.restartLeaderForFollowup(session, sessionId);
     }
+  }
+
+  /**
+   * 收集被中断的任务并重启 Leader 主循环处理后续对话。
+   * 由 _sendToBus（send 时 leader 已停）与 recoverStalledUserInterventionAfterInterrupt
+   * （打断后 TOCTOU 兜底）共用。run() 自身的 currentRunPromise 并发保护可兜住重复调用。
+   */
+  private restartLeaderForFollowup(session: SessionState, sessionId: string, label = 'Leader 重启'): void {
+    // 收集被中断的任务，传给 Leader.run() 以便恢复（避免任务卡在 in_progress 状态）
+    const agentStates = this.db.getAgentStates(sessionId);
+    const checkpoints = loadAgentResumeCheckpoints(this.db, sessionId);
+    const recoveredTasks = collectRecoveredTasks(session.board, agentStates, checkpoints);
+
+    this.launchLeaderDetached(
+      sessionId,
+      () => session.leader.run(undefined, true, recoveredTasks.length > 0 ? recoveredTasks : undefined),
+      label,
+    );
+  }
+
+  /**
+   * 打断后的 user_intervention 滞留兜底（修复：web 打断后新消息 LLM 有概率看不到）。
+   *
+   * 竞态：sendUserInput→_sendToBus 的重启判定基于 send 那一刻的 leader.isRunning 瞬时值，
+   * 与 interruptSession→leader.stop() 之间存在 TOCTOU。web 端 cancel 与 prompt 是两个独立
+   * 并发请求，prompt 的消息可能在 stop() 之前送入 inbox 却因读到 isRunning=true 而未触发重启；
+   * 随后 stop() 让主循环退出，消息永久滞留、LLM 永远看不到。TUI 因操作串行天然规避。
+   *
+   * 修复：interruptSession 在 stop() 之后同步复查 leader inbox，若仍有未消费的 user_intervention
+   * 且 leader 确已停止，则补偿重启去消费它。stop() 与本方法之间无 await 让出点，并发的
+   * send 无法插入该同步区间：若 send 在本扫描前已完成则能读到滞留消息；若在后完成则读到
+   * isRunning=false 而自行重启，两种交错均被覆盖。
+   */
+  private recoverStalledUserInterventionAfterInterrupt(session: SessionState, sessionId: string): void {
+    // leader 仍在运行说明主循环会正常 poll 消费，无需补偿（并发 _sendToBus 亦已负责重启）。
+    if (session.leader.isRunning) return;
+    const leaderInbox = `${sessionId}:leader`;
+    const hasStalledUserMessage = session.bus
+      .peek(leaderInbox)
+      .some((m) => m.type === 'user_intervention');
+    if (!hasStalledUserMessage) return;
+
+    sessionLogger.warn(
+      `[实时介入] 打断后检测到滞留的 user_intervention（send/stop TOCTOU），补偿重启 Leader 消费：${sessionId}`,
+    );
+    // 用户既打断又发了新消息，最终意图是处理新消息：对齐 _sendToBus 的重启前状态。
+    session.status = 'active';
+    this.db.updateSessionStatus(sessionId, 'active');
+    session.isLeaderBusy = true;
+    void this.db.setSessionState(sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+    this.restartLeaderForFollowup(session, sessionId, 'Leader 打断后消息补偿重启');
   }
 
   /**
@@ -1978,6 +2019,11 @@ export class SessionManager {
     sessionLogger.info(
       `会话 ${sessionId} 已中断，${runningAgents.length} 个 Agent 被停止`
     );
+
+    // TOCTOU 兜底：并发的 sendUserInput 可能在本次 stop() 之前把 user_intervention 送入 leader inbox，
+    // 且 send 那一刻读到 isRunning=true 而未触发重启；stop() 后主循环退出，消息将永久滞留、LLM 看不到。
+    // web 端 cancel/prompt 两个独立并发请求会暴露该窗口，TUI 串行操作天然规避。此处复查并补偿重启。
+    this.recoverStalledUserInterventionAfterInterrupt(session, sessionId);
 
     return true;
   }
