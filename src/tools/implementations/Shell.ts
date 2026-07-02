@@ -444,10 +444,35 @@ export class ShellTool extends Tool {
           cwd: workDir,
           env: sandbox.env,
           ...hiddenSpawnOpts(),
-          ...(abortSignal ? { signal: abortSignal } : {}),
+          // detached=true 让 shell 成为独立进程组组长(POSIX)，使下方 abort / 超时的
+          // killProcess(tree:true) 能通过负 PID 杀掉整棵进程树(shell + 其派生的
+          // npm/python/node 等孙进程)。不加则 kill(-pid) 找不到进程组，只有直接
+          // shell 被杀，孙进程沦为孤儿继续占用端口/句柄，阻塞后续消息处理。
+          ...(process.platform !== 'win32' ? { detached: true } : {}),
         });
         const pid = typeof child.pid === 'number' ? child.pid : undefined;
         this.emitShellState(context, { pid, status: 'started' });
+
+        // 用户中断处理：不再依赖 Node spawn 内置 signal 选项——它只对直接 shell 子
+        // 进程发 SIGTERM，不会杀掉孙进程，导致中断后孙进程存活、后续用户消息被卡。
+        // 改为显式监听 abort → 对整棵进程树发 SIGKILL。
+        let userAborted = false;
+        const onAbort = () => {
+          userAborted = true;
+          if (pid) {
+            void killProcess(pid, 'SIGKILL', { tree: true });
+          } else {
+            try { child.kill('SIGKILL'); } catch { /* ignore */ }
+          }
+          this.emitShellState(context, { pid, status: 'killed' });
+        };
+        if (abortSignal) {
+          if (abortSignal.aborted) {
+            onAbort();
+          } else {
+            abortSignal.addEventListener('abort', onAbort, { once: true });
+          }
+        }
 
         // 超时后立即返回后台结果（不阻塞等待进程关闭）
         let backgroundResult: ToolResult | undefined;
@@ -499,13 +524,21 @@ export class ShellTool extends Tool {
           });
           child.on('error', (error) => {
             clearTimeout(timeoutHandle);
+            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
             this.emitShellState(context, { pid, status: 'failed' });
             reject(error);
           });
           child.on('close', (code, signal) => {
             clearTimeout(timeoutHandle);
+            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
             // backgroundResult 已设置说明已转后台，Promise 已被 resolve，忽略 close
             if (backgroundResult) return;
+
+            // 用户中断：进程树已在 onAbort 里被 SIGKILL，返回明确的中断结果而非报错
+            if (userAborted) {
+              resolve();
+              return;
+            }
 
             if (code === 0) {
               this.emitShellState(context, { pid, status: 'completed' });
@@ -522,6 +555,18 @@ export class ShellTool extends Tool {
             reject(commandError);
           });
         });
+
+        // 用户中断：进程树已被杀，返回中断结果
+        if (userAborted) {
+          return {
+            success: false,
+            data: JSON.stringify({
+              output: stdoutText || '[UserInterrupt] 命令被用户中断',
+              exitCode: -1,
+              interrupted: true,
+            }),
+          };
+        }
 
         // 超时转后台：立即返回后台会话信息，不再走下面的输出截断逻辑
         if (backgroundResult) {
