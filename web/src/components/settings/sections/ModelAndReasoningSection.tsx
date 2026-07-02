@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
@@ -78,6 +78,7 @@ export function ModelAndReasoningSection({
   const [editingModelId, setEditingModelId] = useState<string | null>(null);
   const [autoDetected, setAutoDetected] = useState(false);
   const [testingModelId, setTestingModelId] = useState<string | null>(null);
+  const modelFormRef = useRef<HTMLDivElement | null>(null);
 
   const configuredModels = useMemo<ModelItem[]>(
     () => providers.flatMap((p) => p.models.flatMap((m) => (m.provider ? [{ ...m, provider: m.provider }] : []))),
@@ -205,6 +206,10 @@ export function ModelAndReasoningSection({
     setModelFormOpen(true);
     setModelStatus(null);
     setAutoDetected(false);
+    // 展开编辑表单后滚动到表单位置，避免用户还要手动往上滑
+    requestAnimationFrame(() => {
+      modelFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   const resetModelForm = () => {
@@ -478,7 +483,7 @@ export function ModelAndReasoningSection({
         </div>
 
         {modelFormOpen && (
-          <div className="rounded-md border border-border-default bg-bg-primary/55 p-3">
+          <div ref={modelFormRef} className="rounded-md border border-border-default bg-bg-primary/55 p-3">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="text-sm font-medium text-text-primary">{existingModel ? t('settings.model.editModelTitle') : t('settings.model.addModelTitle')}</div>

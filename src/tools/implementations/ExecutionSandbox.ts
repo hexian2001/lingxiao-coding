@@ -65,6 +65,7 @@ export interface ExecutionSandboxResult {
      * 用于让上层/前端知晓"请求了 allowlisted 但实际被降级为 disabled"。
      */
     allowedHostsFailClosed?: boolean;
+    sandboxFallbackReason?: string;
   };
 }
 
@@ -409,6 +410,7 @@ export function prepareExecutionSandbox(policy: ExecutionSandboxPolicy): Executi
   const requestedBackend = requireStrongSandbox ? 'bubblewrap' : policy.backend || 'app-guard';
   const capabilities = detectSandboxCapabilities();
   let selectedBackend: SandboxBackend = requestedBackend;
+  let sandboxFallbackReason: string | undefined;
   if (requireStrongSandbox && (!capabilities.bubblewrapAvailable || !policy.sessionId)) {
     return {
       ok: false,
@@ -423,10 +425,12 @@ export function prepareExecutionSandbox(policy: ExecutionSandboxPolicy): Executi
       !policy.sessionId
     )
   ) {
-    return {
-      ok: false,
-      error: buildFallbackError(policy, capabilities),
-    };
+    // 默认关闭硬沙盒/允许 guardrails-only 执行：bubblewrap 是 Linux-only，macOS/Windows
+    // 或无 sessionId 场景不应因为显式/历史参数 sandbox_backend=bubblewrap 直接失败。
+    // 只有 enterprise hardening(requireStrongSandbox) 才 fail-closed；普通模式降级到 app-guard。
+    selectedBackend = 'app-guard';
+    sandboxFallbackReason = buildFallbackError(policy, capabilities).replace(/^ERROR:\s*/, '');
+    coreLogger.warn(`[Sandbox] bubblewrap unavailable; falling back to app-guard: ${sandboxFallbackReason}`);
   }
 
   // 读取用户配置的环境变量
@@ -491,6 +495,7 @@ export function prepareExecutionSandbox(policy: ExecutionSandboxPolicy): Executi
     // "已通过禁网真正强制"（bubblewrap）。非加固时保持现状恒 false（不强制）。
     allowedHostsEnforced: allowedHostsFailClosed && selectedBackend === 'bubblewrap',
     allowedHostsFailClosed,
+    sandboxFallbackReason,
     visibleRoots: [policy.workspace, scope.sessionDir || ''].filter(Boolean),
     sessionDir: scope.sessionDir,
   } as const;

@@ -4,7 +4,7 @@ import { open as openFile } from 'fs/promises';
 import { join, dirname, basename, resolve, isAbsolute, sep } from 'path';
 import { AsyncFileLock } from '../../core/FileLock.js';
 import { getPythonExecutable } from '../../utils/platform.js';
-import { allowArbitraryTerminalCwd } from '../../core/HardeningPolicy.js';
+import { allowArbitraryTerminalCwd, shouldEnforceTaskWriteScope } from '../../core/HardeningPolicy.js';
 import { CONFIG_DIR } from '../../config.js';
 import type { ContractAllowedScope } from '../../core/ContractAllowedScope.js';
 import { getSessionScopePaths } from '../../contracts/adapters/SessionScope.js';
@@ -109,6 +109,12 @@ export function ensureTaskScopedWritePath(
   // 写入隔离：目标路径必须落在 workspace root、显式 taskWriteScope、当前 session runtime 或
   // lingxiao 全局配置目录（~/.lingxiao/ — skills/agents/commands/memory 等）之内。
   const workspaceRoot = resolve(workspace || process.cwd());
+  // Task write-scope isolation is only enforced in hardened mode. In non-hardened
+  // mode, skip the scope boundary check and keep only the contract tightening layer.
+  if (!shouldEnforceTaskWriteScope()) {
+    enforceContractAllowedScope(absolutePath, workspaceRoot, contractAllowedScope, mode);
+    return;
+  }
   const allowedRoots = new Set<string>([workspaceRoot, CONFIG_DIR]);
   for (const root of normalizeTaskWriteScope(workspaceRoot, taskWriteScope, sessionId)) {
     allowedRoots.add(root);
