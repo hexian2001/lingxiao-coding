@@ -75,6 +75,7 @@ export class LLMClientManager implements ContentGenerator {
       provider: this.provider,
       apiKey: this.modelConfig.apiKey,
       baseUrl: this.modelConfig.baseUrl,
+      wireApi: this.modelConfig.wireApi,
     };
 
     return createContentGenerator(config);

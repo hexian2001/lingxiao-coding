@@ -140,6 +140,8 @@ export interface ContentGeneratorConfig {
   baseUrl: string;
   /** 强制使用 Vercel AI SDK 统一实现（也可通过 LINGXIAO_USE_VERCEL_AI=1 环境变量启用） */
   useVercelAI?: boolean;
+  /** Wire API hint. Third-party OpenAI-compatible endpoints default to chat unless explicitly set to responses. */
+  wireApi?: 'chat' | 'responses';
 }
 
 // ─── 工厂函数 ────────────────────────────────────────────────────────────────

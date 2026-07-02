@@ -114,6 +114,7 @@ export interface RuntimeModelSnapshot {
   generationConfig?: ModelGenerationConfig;
   capabilities?: ModelCapabilities;
   pricing?: ModelPricingConfig;
+  wireApi?: 'chat' | 'responses';
 }
 
 type ModelProviderKind = ModelProviderConfig['provider'];

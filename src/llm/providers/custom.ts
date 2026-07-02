@@ -15,5 +15,13 @@ export function createCustomModel(config: VercelAIProviderConfig): LanguageModel
     baseURL: config.baseUrl,
     name: 'custom',
   });
-  return provider(config.apiModelName);
+
+  // Third-party "OpenAI-compatible" gateways usually implement /chat/completions
+  // even when they advertise OpenAI model names such as gpt-5.5. The AI SDK's
+  // default provider(model) may route gpt-5* models to the Responses API and send
+  // Responses-only fields such as max_output_tokens, which many gateways reject
+  // with HTTP 400. Keep custom endpoints on chat unless the model config opts in.
+  return config.wireApi === 'responses'
+    ? provider.responses(config.apiModelName)
+    : provider.chat(config.apiModelName);
 }

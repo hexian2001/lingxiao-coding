@@ -30,6 +30,8 @@ export interface VercelAIProviderConfig extends Omit<ContentGeneratorConfig, 'pr
   secretAccessKey?: string;
   /** AWS session token (Bedrock) */
   sessionToken?: string;
+  /** Wire API hint for OpenAI-compatible providers. */
+  wireApi?: 'chat' | 'responses';
 }
 
 /**

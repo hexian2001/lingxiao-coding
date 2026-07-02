@@ -17,6 +17,8 @@ const DB_BUSY_TIMEOUT_MS = 30000;
 const MAX_REPLACED_BACKUPS = 3;
 /** 数据库锁定时的最大重试次数 */
 const MAX_LOCK_RETRIES = 3;
+/** 启动期发现损坏数据库时保留的 .corrupt-* 备份数上限。 */
+const MAX_CORRUPT_BACKUPS = 3;
 /** 重试间隔（毫秒） */
 const LOCK_RETRY_DELAY_MS = 1000;
 
@@ -32,6 +34,17 @@ export function isSqliteBusyError(error: unknown): boolean {
   // node:sqlite 主码 5 = SQLITE_BUSY
   if (e.errcode === 5 || e.errcode === 261 /* SQLITE_BUSY_SNAPSHOT */) return true;
   if (typeof e.message === 'string' && /SQLITE_BUSY|database is locked|busy/i.test(e.message)) return true;
+  return false;
+}
+
+/** SQLite 主码 26 = SQLITE_NOTADB，常见于 DB 文件被文本/HTML/零散内容覆盖或截断。 */
+export function isSqliteNotDatabaseError(error: unknown): boolean {
+  if (!error) return false;
+  const e = error as { code?: string; errcode?: number; errstr?: string; message?: string };
+  if (e.errcode === 26) return true;
+  if (typeof e.code === 'string' && /SQLITE_NOTADB|ERR_SQLITE_ERROR/i.test(e.code)
+    && /file is not a database|not a database/i.test(`${e.message ?? ''} ${e.errstr ?? ''}`)) return true;
+  if (/file is not a database|not a database/i.test(`${e.message ?? ''} ${e.errstr ?? ''}`)) return true;
   return false;
 }
 
@@ -259,8 +272,9 @@ export class DatabaseManager {
       mkdirSync(dir, { recursive: true });
     }
 
-    // 尝试打开数据库，如果锁定则尝试恢复
+    // 尝试打开数据库，如果锁定则尝试恢复；若文件损坏则隔离后新建，并在 schema 初始化后自动恢复。
     let lastError: Error | null = null;
+    let corruptBackupPath: string | null = null;
     for (let attempt = 1; attempt <= MAX_LOCK_RETRIES; attempt++) {
       try {
         this.db = new DatabaseSync(this.path);
@@ -274,6 +288,13 @@ export class DatabaseManager {
       } catch (error) {
         lastError = error as Error;
         const isLockError = isSqliteBusyError(error);
+        const isCorruptDatabase = isSqliteNotDatabaseError(error);
+
+        if (isCorruptDatabase) {
+          coreLogger.warn(`[Database] SQLite file is not a database; quarantining local DB and rebuilding: ${lastError.message}`);
+          corruptBackupPath = this.replaceCorruptDatabase();
+          break;
+        }
 
         if (isLockError && attempt < MAX_LOCK_RETRIES) {
           coreLogger.warn(`[Database] Database locked (attempt ${attempt}/${MAX_LOCK_RETRIES}), diagnosing...`);
@@ -728,6 +749,10 @@ export class DatabaseManager {
 
     // 当前没有外部旧库升级需求：初始化只写入最新 schema，并标记版本。
     this.stampLatestSchemaVersion();
+
+    if (corruptBackupPath) {
+      this.tryAutoRecoverFromBackups(corruptBackupPath);
+    }
   }
 
   private static readonly SCHEMA_VERSION = 15;
@@ -772,6 +797,158 @@ export class DatabaseManager {
   private stampLatestSchemaVersion(): void {
     if (!this.db) return;
     this.db.exec(`PRAGMA user_version = ${DatabaseManager.SCHEMA_VERSION}`);
+  }
+
+  /**
+   * 启动期发现 SQLite 文件损坏/非数据库时，将原文件隔离备份并重建空库。
+   * 只允许 init() 阶段调用，避免运行中 worker 写入时误移动数据库。
+   */
+  private replaceCorruptDatabase(): string | null {
+    if ((globalThis as Record<string, unknown>).__lingxiao_workers_alive) {
+      coreLogger.error('[Database] replaceCorruptDatabase called while workers are alive — aborting to prevent corruption');
+      throw new Error('Cannot replace corrupt database while worker processes are running');
+    }
+
+    let backupPath: string | null = null;
+
+    if (this.db) {
+      try { this.db.close(); } catch { /* tolerate corrupt handle close failure */ }
+      this.db = null;
+    }
+
+    if (this.path !== ':memory:' && existsSync(this.path)) {
+      backupPath = `${this.path}.corrupt-${Date.now()}`;
+      renameSync(this.path, backupPath);
+      for (const suffix of ['-wal', '-shm']) {
+        const sidecar = `${this.path}${suffix}`;
+        if (existsSync(sidecar)) {
+          renameSync(sidecar, `${backupPath}${suffix}`);
+        }
+      }
+      coreLogger.warn(`[Database] corrupt database moved to ${backupPath}; a fresh database will be created`);
+      this.pruneBackups('.corrupt-', MAX_CORRUPT_BACKUPS);
+    }
+
+    this.db = new DatabaseSync(this.path);
+    this.configureConnection(this.db);
+    return backupPath;
+  }
+
+  private tryAutoRecoverFromBackups(corruptBackupPath: string): void {
+    if (!this.db || this.path === ':memory:') return;
+
+    const candidates = this.listRecoveryCandidates(corruptBackupPath);
+    if (candidates.length === 0) {
+      coreLogger.warn('[Database] no recovery candidates found after corrupt DB quarantine');
+      return;
+    }
+
+    for (const candidate of candidates) {
+      let sourceDb: DatabaseType | null = null;
+      try {
+        sourceDb = new DatabaseSync(candidate, { readOnly: true });
+        const integrity = sourceDb.prepare('PRAGMA integrity_check').get() as { integrity_check?: string } | undefined;
+        if (integrity?.integrity_check !== 'ok') {
+          coreLogger.warn(`[Database] recovery candidate failed integrity_check: ${candidate}`);
+          continue;
+        }
+
+        const imported = this.importRecoverableRows(sourceDb, candidate);
+        if (imported.totalRows > 0) {
+          coreLogger.warn(`[Database] auto-recovered ${imported.totalRows} row(s) from ${candidate}: ${imported.tables.join(', ')}`);
+          return;
+        }
+        coreLogger.warn(`[Database] recovery candidate was valid but no rows were imported: ${candidate}`);
+      } catch (error) {
+        coreLogger.warn(`[Database] skipping recovery candidate ${candidate}: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (sourceDb) {
+          try { sourceDb.close(); } catch { /* tolerate */ }
+        }
+      }
+    }
+
+    coreLogger.warn(`[Database] automatic recovery did not find importable data; corrupt backup preserved at ${corruptBackupPath}`);
+  }
+
+  private listRecoveryCandidates(primaryCandidate: string): string[] {
+    if (this.path === ':memory:') return [];
+    const lastSlash = Math.max(this.path.lastIndexOf('/'), this.path.lastIndexOf('\\'));
+    const dir = lastSlash >= 0 ? this.path.slice(0, lastSlash) : '.';
+    const base = lastSlash >= 0 ? this.path.slice(lastSlash + 1) : this.path;
+    const markers = ['.corrupt-', '.replaced-', '.backup-', '.pre-restore-'];
+    let entries: string[] = [];
+    try {
+      entries = readdirSync(dir)
+        .filter((entry) => markers.some((marker) => entry.startsWith(`${base}${marker}`)))
+        .filter((entry) => !entry.endsWith('-wal') && !entry.endsWith('-shm'))
+        .sort()
+        .reverse()
+        .map((entry) => join(dir, entry));
+    } catch {
+      entries = [];
+    }
+
+    return Array.from(new Set([primaryCandidate, ...entries]))
+      .filter((candidate) => candidate && candidate !== this.path && existsSync(candidate));
+  }
+
+  private importRecoverableRows(sourceDb: DatabaseType, sourcePath: string): { totalRows: number; tables: string[] } {
+    if (!this.db) return { totalRows: 0, tables: [] };
+
+    let totalRows = 0;
+    const importedTables: string[] = [];
+
+    for (const [table, latestColumns] of Object.entries(DatabaseManager.LATEST_SCHEMA_COLUMNS)) {
+      const sourceColumns = new Set(this.readTableColumns(sourceDb, table));
+      const destinationColumns = new Set(this.readTableColumns(this.db, table));
+      const columns = latestColumns.filter((column) => sourceColumns.has(column) && destinationColumns.has(column));
+      if (columns.length === 0) continue;
+
+      const tableSql = DatabaseManager.quoteIdentifier(table);
+      const columnSql = columns.map((column) => DatabaseManager.quoteIdentifier(column)).join(', ');
+      const placeholders = columns.map(() => '?').join(', ');
+      const select = sourceDb.prepare(`SELECT ${columnSql} FROM ${tableSql}`);
+      const insert = this.db.prepare(`INSERT OR IGNORE INTO ${tableSql} (${columnSql}) VALUES (${placeholders})`);
+
+      let tableRows = 0;
+      try {
+        runTransaction(this.db, () => {
+          for (const row of select.iterate() as Iterable<Record<string, unknown>>) {
+            const values = columns.map((column) => {
+              const value = row[column];
+              return value === undefined ? null : value;
+            }) as SQLInputValue[];
+            const result = insert.run(...values) as { changes?: number };
+            tableRows += result.changes ?? 0;
+          }
+        }, { immediate: true, retries: 3 });
+      } catch (error) {
+        coreLogger.warn(`[Database] failed to auto-recover table ${table} from ${sourcePath}: ${error instanceof Error ? error.message : String(error)}`);
+        continue;
+      }
+
+      if (tableRows > 0) {
+        totalRows += tableRows;
+        importedTables.push(`${table}:${tableRows}`);
+      }
+    }
+
+    return { totalRows, tables: importedTables };
+  }
+
+  private readTableColumns(db: DatabaseType, table: string): string[] {
+    try {
+      return (db.prepare(`PRAGMA table_info(${DatabaseManager.quoteIdentifier(table)})`).all() as Array<{ name?: string }>)
+        .map((column) => column.name)
+        .filter((name): name is string => typeof name === 'string' && name.length > 0);
+    } catch {
+      return [];
+    }
+  }
+
+  private static quoteIdentifier(identifier: string): string {
+    return `"${identifier.replaceAll('"', '""')}"`;
   }
 
   /**
@@ -844,21 +1021,21 @@ export class DatabaseManager {
     this.configureConnection(this.db);
   }
 
-  /** 清理过期的 .replaced-* 备份(含 -wal/-shm sidecar),保留最近 MAX_REPLACED_BACKUPS 个。 */
-  private pruneReplacedBackups(): void {
+  /** 清理过期数据库备份(含 -wal/-shm sidecar),保留最近 maxBackups 个。 */
+  private pruneBackups(marker: '.replaced-' | '.corrupt-', maxBackups: number): void {
     if (this.path === ':memory:') return;
     const lastSlash = Math.max(this.path.lastIndexOf('/'), this.path.lastIndexOf('\\'));
     const dir = lastSlash >= 0 ? this.path.slice(0, lastSlash) : '.';
     const base = lastSlash >= 0 ? this.path.slice(lastSlash + 1) : this.path;
-    const prefix = `${base}.replaced-`;
+    const prefix = `${base}${marker}`;
     let entries: string[];
     try {
       entries = readdirSync(dir).filter((f) => f.startsWith(prefix));
     } catch { /* tolerate */ return; }
-    if (entries.length <= MAX_REPLACED_BACKUPS) return;
+    if (entries.length <= maxBackups) return;
     // 文件名含 Date.now() 时间戳,字典序≈时间序;删最旧的。
     entries.sort();
-    const toDelete = entries.slice(0, entries.length - MAX_REPLACED_BACKUPS);
+    const toDelete = entries.slice(0, entries.length - maxBackups);
     for (const f of toDelete) {
       const full = join(dir, f);
       try { unlinkSync(full); } catch { /* tolerate */ }
@@ -866,6 +1043,11 @@ export class DatabaseManager {
         try { unlinkSync(`${full}${suffix}`); } catch { /* tolerate */ }
       }
     }
+  }
+
+  /** 清理过期的 .replaced-* 备份(含 -wal/-shm sidecar),保留最近 MAX_REPLACED_BACKUPS 个。 */
+  private pruneReplacedBackups(): void {
+    this.pruneBackups('.replaced-', MAX_REPLACED_BACKUPS);
   }
 
   close(): void {

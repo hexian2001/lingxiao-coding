@@ -510,6 +510,21 @@ const CONTEXT_TEXT_PATTERNS = [
   'payload too large',
   'request entity too large',
   'request too large',
+  'input length',
+  'input tokens',
+  'too many tokens',
+  'maximum tokens',
+  'max tokens',
+  'tokens too long',
+  'prompt tokens',
+  'input too large',
+  'messages too long',
+  'messages exceed',
+  'conversation too long',
+  /context\s*(?:window|length|limit).*exceed/i,
+  /(?:input|prompt|messages?|conversation).*too\s+(?:long|large)/i,
+  /(?:input|prompt|messages?)\s+tokens?.*(?:exceed|limit|maximum|max)/i,
+  /(?:maximum|max)\s+(?:context|token|input|prompt)/i,
 ] as const;
 
 const CLASSIFICATION_RULES: readonly ErrorClassificationRule[] = [
@@ -554,6 +569,13 @@ const CLASSIFICATION_RULES: readonly ErrorClassificationRule[] = [
   {
     id: 'context-status',
     statusCode: [413],
+    classify: 'context_overflow',
+    retryable: false,
+  },
+  {
+    id: 'context-400-text',
+    statusCode: [400],
+    when: (fields) => hasAnyText(fields, CONTEXT_TEXT_PATTERNS),
     classify: 'context_overflow',
     retryable: false,
   },
