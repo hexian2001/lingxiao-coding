@@ -147,6 +147,63 @@ function normalizeSlashCommand(value: unknown): SlashCommand | null {
   };
 }
 
+const SLASH_COMMAND_AUTOCOMPLETE_RE = /^\/([A-Za-z][A-Za-z0-9_-]*)?$/;
+
+function getSlashCommandAutocompleteQuery(value: string): string | null {
+  const match = value.match(SLASH_COMMAND_AUTOCOMPLETE_RE);
+  return match ? (match[1] || '').toLowerCase() : null;
+}
+
+function filterSlashCommandSuggestions(commands: SlashCommand[], query: string): SlashCommand[] {
+  const prefix = `/${query}`;
+  return commands
+    .filter((command) => query ? command.name.toLowerCase().startsWith(prefix) : true)
+    .slice(0, 12);
+}
+
+function getExactSlashCommand(text: string, commands: SlashCommand[]): { name: string; args: string } | null {
+  const match = text.match(/^\/(\S+)(.*)?$/s);
+  if (!match) return null;
+  const name = `/${match[1]}`;
+  if (!commands.some((command) => command.name === name)) return null;
+  return { name, args: (match[2] || '').trim() };
+}
+
+function filePathFromFile(file: File): string | null {
+  const candidate = file as File & { path?: string; webkitRelativePath?: string };
+  return candidate.path || candidate.webkitRelativePath || null;
+}
+
+type WebkitEntryLike = { fullPath?: string; isDirectory?: boolean; isFile?: boolean };
+type DataTransferItemWithEntry = DataTransferItem & { webkitGetAsEntry?: () => WebkitEntryLike | null };
+
+function filePathFromDataTransferItem(item: DataTransferItem): string | null {
+  const entry = (item as DataTransferItemWithEntry).webkitGetAsEntry?.();
+  return entry?.fullPath || null;
+}
+
+function decodeFileUri(uri: string): string | null {
+  if (!uri.startsWith('file://')) return null;
+  try {
+    const url = new URL(uri.trim());
+    return decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+}
+
+function extractDroppedTextPaths(dataTransfer: DataTransfer): string[] {
+  const raw = [dataTransfer.getData('text/uri-list'), dataTransfer.getData('text/plain')]
+    .filter(Boolean)
+    .join('\n');
+  return raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'))
+    .map((line) => decodeFileUri(line) || line)
+    .filter((line) => line.length > 0);
+}
+
 function extractModeToolMeta(payload: unknown): ModeToolMeta | null {
   if (!isRecord(payload)) return null;
   const count = typeof payload.toolCount === 'number' && Number.isFinite(payload.toolCount) ? payload.toolCount : undefined;
@@ -793,6 +850,7 @@ export default function ChatView() {
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef(false);
+  const lastCompositionEndAtRef = useRef(0);
   const isAtBottomRef = useRef(true);
   // 用户手动滚动标记：当用户用滚轮上翻时，暂停 followOutput 自动跟随，
   // 避免流式 chunk 的 auto 跳转和用户滚动互相打断造成抖动。
@@ -1752,6 +1810,19 @@ export default function ChatView() {
   const MAX_IMAGE_DIM = 1280;
   const JPEG_QUALITY = 0.7;
 
+  const appendPathsToInput = useCallback((paths: string[]) => {
+    const uniquePaths = Array.from(new Set(paths.map((path) => path.trim()).filter(Boolean)));
+    if (uniquePaths.length === 0) return;
+    setInput((prev) => {
+      const prefix = prev.trimEnd();
+      const block = uniquePaths.join('\n');
+      return prefix ? `${prefix}\n${block}` : block;
+    });
+    setShowCmdDropdown(false);
+    setPromptSuggestions([]);
+    setTimeout(() => textareaRef.current?.focus(), 30);
+  }, []);
+
   const resizeImage = useCallback((file: File): Promise<string> => {
     return new Promise((resolve) => {
       const url = URL.createObjectURL(file);
@@ -1796,26 +1867,26 @@ export default function ChatView() {
   }, []);
 
   const handleFileAttach = useCallback(async (files: FileList | File[]) => {
-    const selected = Array.from(files).slice(0, MAX_UPLOAD_BATCH_FILES);
-    const skipped = Array.from(files).length - selected.length;
+    const allFiles = Array.from(files);
+    const selected = allFiles.slice(0, MAX_UPLOAD_BATCH_FILES);
+    const skipped = allFiles.length - selected.length;
     setAttachmentError(null);
-    setUploadingCount((count) => count + selected.length);
-
-    const readAsBase64 = (file: File) => new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(',')[1] || '');
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
 
     const failures: string[] = [];
-    try {
-      const images = selected.filter((file) => file.type.startsWith('image/'));
-      const documents = selected.filter((file) => !file.type.startsWith('image/'));
+    const images = selected.filter((file) => file.type.startsWith('image/'));
+    const nonImages = selected.filter((file) => !file.type.startsWith('image/'));
+    const nonImagePaths = nonImages.map(filePathFromFile).filter((path): path is string => Boolean(path));
+    const missingPathFiles = nonImages.filter((file) => !filePathFromFile(file)).map((file) => file.name);
 
+    if (nonImagePaths.length > 0) {
+      appendPathsToInput(nonImagePaths);
+    }
+    if (missingPathFiles.length > 0) {
+      failures.push(`无法读取路径：${missingPathFiles.slice(0, 3).join(', ')}${missingPathFiles.length > 3 ? ` +${missingPathFiles.length - 3}` : ''}`);
+    }
+
+    if (images.length > 0) {
+      setUploadingCount((count) => count + images.length);
       const imageResults = await runWithConcurrency(images, MAX_UPLOAD_CONCURRENCY, async (file) => {
         try {
           const dataUrl = await resizeImage(file);
@@ -1829,57 +1900,34 @@ export default function ChatView() {
       const nextImages = imageResults.flatMap((result) => result.ok ? [result.value] : []);
       if (nextImages.length > 0) setPendingImages((prev) => [...prev, ...nextImages]);
       failures.push(...imageResults.filter((result) => !result.ok).map((result) => result.name));
-
-      if (documents.length > 0) {
-        const encodedDocuments = await runWithConcurrency(documents, MAX_UPLOAD_CONCURRENCY, async (file) => {
-          try {
-            const data = await readAsBase64(file);
-            return { ok: true as const, file, data };
-          } catch (error) {
-            return { ok: false as const, file, error };
-          }
-        });
-        failures.push(...encodedDocuments.filter((item) => !item.ok).map((item) => item.file.name));
-        const uploadable = encodedDocuments.filter((item): item is { ok: true; file: File; data: string } => item.ok);
-
-        if (uploadable.length > 0) {
-          const res = await fetch('/api/v1/files/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-lingxiao-token': getServerToken() },
-            body: JSON.stringify({
-              files: uploadable.map(({ file, data }) => ({ name: file.name, mimeType: file.type, size: file.size, data })),
-            }),
-          });
-          const json = await res.json().catch(() => ({}));
-          const responseFiles: UploadResponseFile[] = Array.isArray(json.files) ? json.files : [json];
-          const nextFiles = responseFiles.flatMap((item, index): PendingFile[] => {
-            const fallbackFile = uploadable[index]?.file;
-            if (!item?.success || !item.path) {
-              failures.push(item?.name || fallbackFile?.name || 'unknown');
-              return [];
-            }
-            return [{
-              path: item.path,
-              name: item.name || fallbackFile?.name || item.path,
-              size: item.size ?? fallbackFile?.size ?? 0,
-              format: item.preview?.format,
-              preview: item.preview?.content,
-              metadata: item.preview?.metadata,
-            }];
-          });
-          if (nextFiles.length > 0) setPendingFiles((prev) => [...prev, ...nextFiles]);
-          if (!res.ok && failures.length === 0) failures.push(json.error || `HTTP ${res.status}`);
-        }
-        setUploadingCount((count) => Math.max(0, count - documents.length));
-      }
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : 'upload failed');
-      setUploadingCount((count) => Math.max(0, count - selected.length));
     }
 
     if (skipped > 0) failures.push(t('chat.input.skippedFiles', { count: skipped, max: MAX_UPLOAD_BATCH_FILES }));
     if (failures.length > 0) setAttachmentError(`${t('chat.input.attachmentFailed')}${failures.slice(0, 3).join(', ')}${failures.length > 3 ? ` +${failures.length - 3}` : ''}`);
-  }, [resizeImage, t]);
+  }, [appendPathsToInput, resizeImage, t]);
+
+  // 拖拽处理：图片交给 handleFileAttach 走上传，其它文件/文件夹/压缩包只提取路径插入输入框。
+  // 浏览器安全模型下 File.path 不一定存在；此时回退到 DataTransferItem entry 或 text/uri-list。
+  const handleChatDrop = useCallback((dataTransfer: DataTransfer) => {
+    const files = Array.from(dataTransfer.files || []);
+    if (files.length > 0) {
+      handleFileAttach(files);
+      return;
+    }
+    const itemPaths: string[] = [];
+    const items = dataTransfer.items ? Array.from(dataTransfer.items) : [];
+    for (const item of items) {
+      if (item.kind !== 'file') continue;
+      const path = filePathFromDataTransferItem(item);
+      if (path) itemPaths.push(path);
+    }
+    const paths = itemPaths.length > 0 ? itemPaths : extractDroppedTextPaths(dataTransfer);
+    if (paths.length > 0) {
+      appendPathsToInput(paths);
+    } else {
+      setAttachmentError('无法从拖入内容读取文件路径，请直接把路径粘贴到输入框。');
+    }
+  }, [appendPathsToInput, handleFileAttach]);
 
   const uploadLongInputAsFile = useCallback(async (text: string): Promise<PendingFile | null> => {
     const name = makeLongInputAttachmentName();
@@ -2054,11 +2102,13 @@ export default function ChatView() {
       });
     }
 
-    // Slash command interception — route through session/command ACP
-    const cmdMatch = text.match(/^\/([^\s]+)(.*)?$/s);
-    if (cmdMatch) {
-      const cmdName = `/${cmdMatch[1]}`;
-      const cmdArgs = (cmdMatch[2] || '').trim();
+    // Slash command interception — only exact registered commands are routed.
+    // This prevents absolute paths like /Users/me/file.zip or normal text starting
+    // with '/' from being misclassified as commands.
+    const slashCommand = getExactSlashCommand(text, SLASH_COMMANDS);
+    if (slashCommand) {
+      const cmdName = slashCommand.name;
+      const cmdArgs = slashCommand.args;
       setInput(''); setShowCmdDropdown(false); setPromptSuggestions([]);
 
       // Client-only commands
@@ -2164,13 +2214,13 @@ export default function ChatView() {
     requestAnimationFrame(() => requestAnimationFrame(resizeInput));
     // Clear prompt suggestions when user starts typing
     if (value.trim()) setPromptSuggestions([]);
-    // Check for / command trigger (only at start of input)
-    const cmdMatch = value.match(/^\/([^\s]*)$/);
-    if (cmdMatch) {
-      const query = cmdMatch[1].toLowerCase();
-      const filtered = SLASH_COMMANDS.filter(c => c.name.slice(1).toLowerCase().includes(query)).slice(0, 12);
+    // Check for / command trigger. Only command-like ASCII tokens trigger the menu;
+    // paths (/Users/..., /root/...), Chinese text and arbitrary slash-prefixed input stay plain text.
+    const slashQuery = getSlashCommandAutocompleteQuery(value);
+    if (slashQuery !== null) {
+      const filtered = filterSlashCommandSuggestions(SLASH_COMMANDS, slashQuery);
       setCmdSuggestions(filtered);
-      setShowCmdDropdown(filtered.length > 0 || slashCommandRegistryStatus !== 'ready');
+      setShowCmdDropdown(filtered.length > 0 || (slashQuery === '' && slashCommandRegistryStatus === 'loading'));
       setCmdSelectedIndex(0);
       setShowSkillDropdown(false);
       setShowAgentDropdown(false);
@@ -2204,12 +2254,11 @@ export default function ChatView() {
 
   useEffect(() => {
     if (!showCmdDropdown) return;
-    const cmdMatch = input.match(/^\/([^\s]*)$/);
-    if (!cmdMatch) return;
-    const query = cmdMatch[1].toLowerCase();
-    const filtered = SLASH_COMMANDS.filter(c => c.name.slice(1).toLowerCase().includes(query)).slice(0, 12);
+    const slashQuery = getSlashCommandAutocompleteQuery(input);
+    if (slashQuery === null) return;
+    const filtered = filterSlashCommandSuggestions(SLASH_COMMANDS, slashQuery);
     setCmdSuggestions(filtered);
-    setShowCmdDropdown(filtered.length > 0 || slashCommandRegistryStatus !== 'ready');
+    setShowCmdDropdown(filtered.length > 0 || (slashQuery === '' && slashCommandRegistryStatus === 'loading'));
     setCmdSelectedIndex(0);
   }, [input, showCmdDropdown, SLASH_COMMANDS, slashCommandRegistryStatus]);
 
@@ -2343,7 +2392,15 @@ export default function ChatView() {
       setEditingMessageId(null);
       return;
     }
-    if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current && !e.nativeEvent.isComposing) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      // macOS 中文输入法：确认候选的 Enter 会在 composition 结束后立刻再触发一次 keydown，
+      // isComposing 此时已为 false，但这次 Enter 只是「确认候选」不应发送。用组合结束时间戳兜底：
+      // 距上次 compositionend < 250ms 的 Enter 一律吞掉，只确认候选、不发送。
+      const composing = isComposingRef.current
+        || e.nativeEvent.isComposing
+        || (e.nativeEvent as unknown as { keyCode?: number }).keyCode === 229
+        || (Date.now() - lastCompositionEndAtRef.current < 250);
+      if (composing) return;
       e.preventDefault();
       if (uploadingCount === 0 && (input.trim() || pendingImages.length > 0 || pendingFiles.length > 0)) handleSend();
     }
@@ -2589,7 +2646,7 @@ export default function ChatView() {
       onDrop={(e) => {
         e.preventDefault();
         setIsDraggingOverChat(false);
-        if (e.dataTransfer.files.length) handleFileAttach(e.dataTransfer.files);
+        handleChatDrop(e.dataTransfer);
       }}
     >
       {/* 全屏拖拽蒙层 */}
@@ -3380,7 +3437,7 @@ export default function ChatView() {
               className="codex-icon-btn !h-8 !min-w-8 disabled:opacity-50" title="Attach file"><Paperclip size={16} /></button>
             <textarea ref={textareaRef} value={input} onChange={(e) => handleInputChange(e.target.value)} onKeyDown={handleKeyDown}
               onCompositionStart={() => { isComposingRef.current = true; }}
-              onCompositionEnd={() => { isComposingRef.current = false; }}
+              onCompositionEnd={() => { isComposingRef.current = false; lastCompositionEndAtRef.current = Date.now(); }}
               onPaste={(e) => {
                 const items = e.clipboardData?.items;
                 if (!items) return;
