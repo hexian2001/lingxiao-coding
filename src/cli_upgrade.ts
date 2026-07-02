@@ -403,21 +403,26 @@ export async function runUpgrade(opts: UpgradeOptions = {}): Promise<void> {
       console.log(chalk.cyan(`\n▸ 源码安装模式，强制升级 (目录: ${sourceDir})`));
 
       // 1. git fetch + 强制 reset 到最新 tag（丢弃所有本地修改）
+      // --force：允许覆盖本地已存在但被远端重打的 tag（避免 "would clobber existing tag" 让整个升级失败）
       console.log(chalk.cyan('▸ 拉取最新代码...'));
-      const gitFetch = spawnSync('git', ['fetch', '--all', '--tags', '--prune'], {
+      const gitFetch = spawnSync('git', ['fetch', '--all', '--tags', '--prune', '--force'], {
         cwd: sourceDir, stdio: 'inherit', timeout: 60000, shell: IS_WINDOWS,
       });
+      // fetch 非零通常只是个别历史 tag 冲突，主要 ref（目标 tag / 分支）一般已成功拉取。
+      // 不直接中断，降级为警告，让后续 reset 决定成败——reset 找不到目标 ref 时才真正报错。
       if (gitFetch.status !== 0) {
-        throw new Error('git fetch 失败，请检查网络或手动执行 git fetch --all --tags');
+        console.log(chalk.yellow('  ⚠ git fetch 返回非零（可能是个别 tag 冲突或网络抖动），继续尝试重置到目标版本...'));
       }
 
-      // 强制 reset 到最新 release tag，丢弃所有本地修改
+      // 强制 reset 到最新 release tag，丢弃所有本地修改。
+      // 用 refs/tags/ 前缀消除 tag 与同名分支的歧义（refname ambiguous）。
+      const resetRef = `refs/tags/${release.tag}`;
       console.log(chalk.cyan(`▸ 强制重置到 ${release.tag}（将丢弃所有本地修改）...`));
-      const gitReset = spawnSync('git', ['reset', '--hard', release.tag], {
+      const gitReset = spawnSync('git', ['reset', '--hard', resetRef], {
         cwd: sourceDir, stdio: 'inherit', timeout: 30000, shell: IS_WINDOWS,
       });
       if (gitReset.status !== 0) {
-        throw new Error(`git reset --hard ${release.tag} 失败，请检查 tag 是否存在`);
+        throw new Error(`git reset --hard ${release.tag} 失败，请检查 tag 是否存在（fetch 是否成功拉取该 tag）`);
       }
 
       // 清理未追踪的文件和目录（保留 node_modules，避免重新下载所有依赖）
