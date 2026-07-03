@@ -29,9 +29,16 @@ async function fetchVersionCheck(): Promise<VersionCheckData> {
 /**
  * 侧边栏版本号徽章
  *
- * 显示当前版本号 v1.0.0，如果有新版本则显示橙色小圆点提示。
+ * 显示当前版本号（构建期注入），如果有新版本则显示橙色小圆点提示。
  * 点击版本号或圆点可触发更新对话框（UpdateNotification 组件监听 CustomEvent）。
  */
+// 构建期注入的版本号，用于立即展示（避免冷启动显示 '—'）
+declare const __APP_VERSION__: string;
+const BUILD_VERSION: string =
+  typeof __APP_VERSION__ === 'string' && __APP_VERSION__.length > 0
+    ? __APP_VERSION__
+    : '';
+
 export function SidebarVersionBadge() {
   const [versionInfo, setVersionInfo] = useState<VersionCheckData | null>(null);
 
@@ -53,7 +60,8 @@ export function SidebarVersionBadge() {
     };
   }, []);
 
-  const currentVersion = versionInfo?.current ?? '—';
+  // API 回来前用构建期版本兜底，避免显示 '—'
+  const currentVersion = (versionInfo?.current ?? BUILD_VERSION) || '—';
   const hasUpdate = versionInfo?.hasUpdate ?? false;
 
   const handleClick = () => {

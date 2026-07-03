@@ -196,7 +196,7 @@ export default function SettingsView() {
               search={navSearch}
               onSearchChange={setNavSearch}
             />
-            <div className="min-w-0 flex-1 overflow-y-auto lg:h-full lg:pr-1">
+            <div className="settings-panel min-w-0 flex-1 overflow-y-auto rounded-lg border border-border-default bg-bg-primary/80 p-4 shadow-sm lg:h-full lg:pr-1">
               {renderSection()}
             </div>
           </div>
