@@ -132,6 +132,13 @@ LingXiao 内置了 Claude Code Driver 和 Codex Driver，可以把 `claude` CLI 
 - npm 或兼容包管理器
 ```
 
+### npm 全局安装（推荐）
+
+```bash
+npm install -g @lingxiao-office/lingxiao-coding
+lingxiao
+```
+
 ### 源码安装
 
 ```bash
