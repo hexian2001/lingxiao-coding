@@ -316,6 +316,19 @@ function encodeUtf8Base64(text: string): string {
   return btoa(binary);
 }
 
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  }
+  return btoa(binary);
+}
+
+function uploadErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'upload failed';
+}
+
 function makeLongInputAttachmentName(): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   return `long-message-${timestamp}.txt`;
@@ -1866,6 +1879,35 @@ export default function ChatView() {
     });
   }, []);
 
+  const uploadFileToTempPath = useCallback(async (file: File): Promise<PendingFile> => {
+    const data = arrayBufferToBase64(await file.arrayBuffer());
+    const res = await fetch('/api/v1/files/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-lingxiao-token': getServerToken() },
+      body: JSON.stringify({
+        files: [{
+          name: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          size: file.size,
+          data,
+        }],
+      }),
+    });
+    const json = await res.json().catch(() => ({}));
+    const responseFile: UploadResponseFile | undefined = Array.isArray(json.files) ? json.files[0] : json;
+    if (!res.ok || !responseFile?.success || !responseFile.path) {
+      throw new Error(responseFile?.error || json.error || `HTTP ${res.status}`);
+    }
+    return {
+      path: responseFile.path,
+      name: responseFile.name || file.name,
+      size: responseFile.size ?? file.size,
+      format: responseFile.preview?.format,
+      preview: responseFile.preview?.content,
+      metadata: responseFile.preview?.metadata,
+    };
+  }, []);
+
   const handleFileAttach = useCallback(async (files: FileList | File[]) => {
     const allFiles = Array.from(files);
     const selected = allFiles.slice(0, MAX_UPLOAD_BATCH_FILES);
@@ -1876,13 +1918,27 @@ export default function ChatView() {
     const images = selected.filter((file) => file.type.startsWith('image/'));
     const nonImages = selected.filter((file) => !file.type.startsWith('image/'));
     const nonImagePaths = nonImages.map(filePathFromFile).filter((path): path is string => Boolean(path));
-    const missingPathFiles = nonImages.filter((file) => !filePathFromFile(file)).map((file) => file.name);
+    const filesNeedingUpload = nonImages.filter((file) => !filePathFromFile(file));
 
     if (nonImagePaths.length > 0) {
       appendPathsToInput(nonImagePaths);
     }
-    if (missingPathFiles.length > 0) {
-      failures.push(`无法读取路径：${missingPathFiles.slice(0, 3).join(', ')}${missingPathFiles.length > 3 ? ` +${missingPathFiles.length - 3}` : ''}`);
+
+    if (filesNeedingUpload.length > 0) {
+      setUploadingCount((count) => count + filesNeedingUpload.length);
+      const fileResults = await runWithConcurrency(filesNeedingUpload, MAX_UPLOAD_CONCURRENCY, async (file) => {
+        try {
+          const uploaded = await uploadFileToTempPath(file);
+          return { ok: true as const, value: uploaded };
+        } catch (error) {
+          return { ok: false as const, name: file.name, error };
+        } finally {
+          setUploadingCount((count) => Math.max(0, count - 1));
+        }
+      });
+      const nextFiles = fileResults.flatMap((result) => result.ok ? [result.value] : []);
+      if (nextFiles.length > 0) setPendingFiles((prev) => [...prev, ...nextFiles]);
+      failures.push(...fileResults.filter((result) => !result.ok).map((result) => `${result.name}: ${uploadErrorMessage(result.error)}`));
     }
 
     if (images.length > 0) {
@@ -1904,10 +1960,10 @@ export default function ChatView() {
 
     if (skipped > 0) failures.push(t('chat.input.skippedFiles', { count: skipped, max: MAX_UPLOAD_BATCH_FILES }));
     if (failures.length > 0) setAttachmentError(`${t('chat.input.attachmentFailed')}${failures.slice(0, 3).join(', ')}${failures.length > 3 ? ` +${failures.length - 3}` : ''}`);
-  }, [appendPathsToInput, resizeImage, t]);
+  }, [appendPathsToInput, resizeImage, t, uploadFileToTempPath]);
 
-  // 拖拽处理：图片交给 handleFileAttach 走上传，其它文件/文件夹/压缩包只提取路径插入输入框。
-  // 浏览器安全模型下 File.path 不一定存在；此时回退到 DataTransferItem entry 或 text/uri-list。
+  // 拖拽/选择处理：图片压缩为 vision 附件；非图片优先插入本机路径，拿不到路径时上传到临时目录并注入返回路径。
+  // 浏览器安全模型下 File.path 不一定存在；此时仍会回退到 DataTransferItem entry、text/uri-list 或临时上传。
   const handleChatDrop = useCallback((dataTransfer: DataTransfer) => {
     const files = Array.from(dataTransfer.files || []);
     if (files.length > 0) {
