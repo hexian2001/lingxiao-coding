@@ -1,11 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, isAbsolute, join, relative, resolve } from 'node:path';
-import ts from 'typescript';
+import { createRequire } from 'node:module';
+import type ts from 'typescript';
 import type { DatabaseManager } from './Database.js';
 import type { EventEmitter } from './EventEmitter.js';
 import { AstStructuralEngine } from './AstStructuralEngine.js';
 import { TestRunnerAdapter } from './TestRunnerAdapter.js';
+
+// 懒加载 typescript：顶层静态 import 会把整个 TS 编译器 (+69MB/~330ms) 拉进
+// 每一次 CLI 启动图（含仅 --version 的路径）。改为首次真正用到时同步 require
+// （CJS，无 async 涟漪）。类型位置继续用 `import type ts` 完全擦除。
+let tsModule: typeof ts | null = null;
+const requireTs = createRequire(import.meta.url);
+function TS(): typeof ts {
+  tsModule ??= requireTs('typescript') as typeof ts;
+  return tsModule;
+}
 
 export type AssumptionStatus = 'unverified' | 'verified' | 'falsified';
 export type AssumptionVerificationType = 'type_check' | 'file_content' | 'test_execution' | 'ast_query';
@@ -118,20 +129,21 @@ function splitAstTarget(target: string): { file?: string; symbol: string } {
 }
 
 function collectDeclarationSnippets(sourceFile: ts.SourceFile): string[] {
+  const t = TS();
   const snippets: string[] = [];
   const visit = (node: ts.Node): void => {
     if (
-      ts.isInterfaceDeclaration(node) ||
-      ts.isTypeAliasDeclaration(node) ||
-      ts.isClassDeclaration(node) ||
-      ts.isFunctionDeclaration(node) ||
-      ts.isEnumDeclaration(node)
+      t.isInterfaceDeclaration(node) ||
+      t.isTypeAliasDeclaration(node) ||
+      t.isClassDeclaration(node) ||
+      t.isFunctionDeclaration(node) ||
+      t.isEnumDeclaration(node)
     ) {
       snippets.push(summarize(node.getText(sourceFile).replace(/\s+/g, ' '), 240));
     }
-    ts.forEachChild(node, visit);
+    t.forEachChild(node, visit);
   };
-  ts.forEachChild(sourceFile, visit);
+  t.forEachChild(sourceFile, visit);
   return snippets;
 }
 
@@ -357,7 +369,8 @@ export class AssumptionTracker {
       };
     }
     const content = readFileSync(file, 'utf8');
-    const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.ES2022, true);
+    const t = TS();
+    const sourceFile = t.createSourceFile(file, content, t.ScriptTarget.ES2022, true);
     const diagnostics = (sourceFile as { parseDiagnostics?: readonly ts.Diagnostic[] }).parseDiagnostics ?? [];
     if (diagnostics.length > 0) {
       const actual = diagnostics.map((diagnostic: ts.Diagnostic) => diagnostic.messageText).join('; ');

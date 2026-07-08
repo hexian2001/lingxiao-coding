@@ -1,5 +1,4 @@
-import type { Browser } from 'playwright';
-import { chromium } from 'playwright';
+import type { Browser, chromium as ChromiumType } from 'playwright';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { execFileSync } from 'child_process';
@@ -83,6 +82,23 @@ const DEFAULT_BROWSER_ARGS = [
 let cachedChromePath: string | undefined | null = null;
 let cachedChromeSource: BrowserExecutableSource | undefined;
 let installPromise: Promise<void> | null = null;
+
+// 懒加载 playwright：顶层静态 import 会把整个 playwright (+110MB/~480ms) 拉进
+// 每一次 CLI 启动图（含仅打印 --version 的路径）。改为首次实际需要浏览器时再 import。
+// chromiumModule 缓存已加载的 chromium 命名空间；chromiumSync 供同步探测点在“已加载”后复用。
+let chromiumModule: typeof ChromiumType | null = null;
+let chromiumLoadPromise: Promise<typeof ChromiumType> | null = null;
+
+async function loadChromium(): Promise<typeof ChromiumType> {
+  if (chromiumModule) return chromiumModule;
+  chromiumLoadPromise ??= import('playwright').then((mod) => {
+    chromiumModule = mod.chromium;
+    return chromiumModule;
+  }).finally(() => {
+    chromiumLoadPromise = null;
+  });
+  return chromiumLoadPromise;
+}
 
 export function isBrowserSkipped(env: NodeJS.ProcessEnv = process.env): boolean {
   return env.LINGXIAO_SKIP_BROWSER === '1' || env.LINGXIAO_SKIP_BROWSER?.toLowerCase() === 'true';
@@ -176,8 +192,11 @@ export function browserProxyChanged(prev: BrowserProxyConfig | undefined, next: 
 }
 
 function expectedChromeExecutable(): string | undefined {
+  // 仅在 playwright 已按需加载后可用；未加载时返回 undefined，探测退回系统浏览器候选。
+  // 所有真正需要该路径的入口（launch/health/install）都会先 await loadChromium()。
+  if (!chromiumModule) return undefined;
   try {
-    return chromium.executablePath();
+    return chromiumModule.executablePath();
   } catch {/* expected: resource not available */
     return undefined;
   }
@@ -467,6 +486,9 @@ async function downloadBrowser(): Promise<void> {
 
 export async function ensureBrowserInstalled(): Promise<void> {
   if (isBrowserSkipped()) throw createBrowserSkippedError();
+  // 预加载 playwright，使 expectedChromeExecutable() 能命中 playwright 自带 chromium。
+  // 加载失败不致命：探测会退回系统浏览器候选。
+  await loadChromium().catch(() => undefined);
   if (findChromeExecutable()) return;
   if (installPromise) return installPromise;
 
@@ -479,6 +501,9 @@ export async function ensureBrowserInstalled(): Promise<void> {
 }
 
 export async function checkBrowserHealth(options?: { launch?: boolean }): Promise<BrowserHealth> {
+  // 加载 playwright 以便 expectedChromeExecutable() 能报告 playwright 自带 chromium 路径；
+  // 加载失败不致命，探测退回系统浏览器候选。
+  await loadChromium().catch(() => undefined);
   const expectedExecutablePath = expectedChromeExecutable();
   const detected = detectChromeExecutable();
   const resolvedExecutablePath = detected?.path;
@@ -525,9 +550,9 @@ export async function checkBrowserHealth(options?: { launch?: boolean }): Promis
 function buildBrowserLaunchOptions(options?: {
   proxy?: BrowserProxyConfig;
   extraArgs?: string[];
-}): Parameters<typeof chromium.launch>[0] {
+}): Parameters<typeof ChromiumType.launch>[0] {
   const chromePath = detectChromeExecutable()?.path;
-  const launchOptions: Parameters<typeof chromium.launch>[0] = {
+  const launchOptions: Parameters<typeof ChromiumType.launch>[0] = {
     headless: true,
     args: [...DEFAULT_BROWSER_ARGS, ...(options?.extraArgs || [])],
     ...(options?.proxy ? { proxy: options.proxy } : {}),
@@ -556,6 +581,7 @@ export async function launchManagedChromium(options?: {
   }
 
   try {
+    const chromium = await loadChromium();
     const browser = await chromium.launch(launchOptions);
     return { browser, proxy, executablePath, executableSource: detected?.source };
   } catch (error) {

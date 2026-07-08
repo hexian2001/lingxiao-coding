@@ -500,6 +500,11 @@ export const RESOURCE_BUDGET = {
   /** 单个 Worker 子进程 RSS 内存上限 (MB)：超过则按温控 kill 并走可恢复重派。
    *  0 表示禁用内存温控。默认 2GB——正常 worker 远低于此，触顶通常意味着失控/泄漏。 */
   WORKER_MAX_RSS_MB: 2048,
+  /** 单个 Worker 子进程 V8 老生代堆上限 (MB)：通过 --max-old-space-size 传入 worker execArgv。
+   *  这是「主动式」内存治理——V8 会在触及此阈值前主动 GC，比 RSS 温控（反应式 SIGKILL）
+   *  更平滑；真正失控时 worker 以 OOM 优雅退出并走 crash→可恢复重派管线，而非拖垮宿主。
+   *  设在 WORKER_MAX_RSS_MB 之下留出 external/buffer 余量。0 表示不限制（用 Node 默认）。 */
+  WORKER_MAX_OLD_SPACE_MB: 1536,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════

@@ -1,6 +1,18 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path';
-import ts from 'typescript';
+import { createRequire } from 'node:module';
+// 懒加载 typescript：顶层静态 import 会把整个 TS 编译器 (+70MB/~360ms) 拉进每一次
+// CLI 启动图（含仅打印 --version 的路径）。类型仍走 `import type`（编译期擦除，零运行时成本）；
+// 运行时值经 TS() 首次访问时同步 require —— 仅当真正执行 AST 分析（ast_query 等）时才加载。
+// 用 createRequire 而非 await import，保持所有引擎方法同步，避免向 ChangeImpactResolver /
+// AssumptionTracker / AstQueryTool 等同步调用点扩散 async 改动。
+import type * as ts from 'typescript';
+
+const _require = createRequire(import.meta.url);
+let _ts: typeof ts | null = null;
+function TS(): typeof ts {
+  return (_ts ??= _require('typescript') as typeof ts);
+}
 
 export type AstDefinitionKind =
   | 'function'
@@ -94,31 +106,34 @@ function uniqueByLocation<T extends { location: AstLocation }>(values: T[]): T[]
 }
 
 function hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
-  return Boolean(ts.canHaveModifiers(node) && ts.getModifiers(node)?.some((modifier) => modifier.kind === kind));
+  const t = TS();
+  return Boolean(t.canHaveModifiers(node) && t.getModifiers(node)?.some((modifier) => modifier.kind === kind));
 }
 
 function declarationKind(node: ts.Node): AstDefinitionKind | null {
-  if (ts.isFunctionDeclaration(node)) return 'function';
-  if (ts.isClassDeclaration(node)) return 'class';
-  if (ts.isInterfaceDeclaration(node)) return 'interface';
-  if (ts.isTypeAliasDeclaration(node)) return 'type';
-  if (ts.isEnumDeclaration(node)) return 'enum';
-  if (ts.isVariableDeclaration(node)) return 'variable';
-  if (ts.isMethodDeclaration(node) || ts.isMethodSignature(node)) return 'method';
-  if (ts.isPropertyDeclaration(node) || ts.isPropertySignature(node)) return 'property';
-  if (ts.isConstructorDeclaration(node)) return 'constructor';
-  if (ts.isParameter(node)) return 'parameter';
+  const t = TS();
+  if (t.isFunctionDeclaration(node)) return 'function';
+  if (t.isClassDeclaration(node)) return 'class';
+  if (t.isInterfaceDeclaration(node)) return 'interface';
+  if (t.isTypeAliasDeclaration(node)) return 'type';
+  if (t.isEnumDeclaration(node)) return 'enum';
+  if (t.isVariableDeclaration(node)) return 'variable';
+  if (t.isMethodDeclaration(node) || t.isMethodSignature(node)) return 'method';
+  if (t.isPropertyDeclaration(node) || t.isPropertySignature(node)) return 'property';
+  if (t.isConstructorDeclaration(node)) return 'constructor';
+  if (t.isParameter(node)) return 'parameter';
   return null;
 }
 
 function getDeclarationNameNode(node: ts.Node): ts.Identifier | null {
-  if (ts.isConstructorDeclaration(node)) {
+  const t = TS();
+  if (t.isConstructorDeclaration(node)) {
     const parent = node.parent;
-    return ts.isClassDeclaration(parent) && parent.name ? parent.name : null;
+    return t.isClassDeclaration(parent) && parent.name ? parent.name : null;
   }
   if (!('name' in node)) return null;
   const name = (node as { name?: ts.Node }).name;
-  return name && ts.isIdentifier(name) ? name : null;
+  return name && t.isIdentifier(name) ? name : null;
 }
 
 function getContainerName(node: ts.Node): string | undefined {
@@ -137,13 +152,14 @@ function isDefinitionIdentifier(node: ts.Identifier): boolean {
 }
 
 function compilerOptions(): ts.CompilerOptions {
+  const t = TS();
   return {
     allowJs: true,
     checkJs: false,
-    jsx: ts.JsxEmit.ReactJSX,
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    jsx: t.JsxEmit.ReactJSX,
+    target: t.ScriptTarget.ES2022,
+    module: t.ModuleKind.ESNext,
+    moduleResolution: t.ModuleResolutionKind.Bundler,
     noEmit: true,
     skipLibCheck: true,
   };
@@ -186,11 +202,12 @@ export class AstStructuralEngine {
     const targetKeys = new Set(definitions.map((definition) => definition.symbolKey).filter((key): key is string => Boolean(key)));
     if (targetKeys.size === 0) return [];
 
+    const t = TS();
     const references: AstReference[] = [];
     for (const sourceFile of this.projectSourceFiles(ast.program)) {
       if (options.file && this.relativeFile(sourceFile.fileName) !== this.normalizeInputFile(options.file)) continue;
       const visit = (node: ts.Node): void => {
-        if (ts.isIdentifier(node)) {
+        if (t.isIdentifier(node)) {
           const key = this.symbolKeyAt(ast.checker, node);
           if (key && targetKeys.has(key)) {
             references.push({
@@ -202,9 +219,9 @@ export class AstStructuralEngine {
             });
           }
         }
-        ts.forEachChild(node, visit);
+        t.forEachChild(node, visit);
       };
-      ts.forEachChild(sourceFile, visit);
+      t.forEachChild(sourceFile, visit);
     }
 
     return uniqueByLocation(references).slice(0, options.limit ?? 500);
@@ -238,9 +255,10 @@ export class AstStructuralEngine {
     );
     if (targetKeys.size === 0) return [];
 
+    const t = TS();
     const implementors: AstSymbolSummary[] = [];
     for (const definition of definitions) {
-      if (!ts.isClassDeclaration(definition.node) && !ts.isInterfaceDeclaration(definition.node)) continue;
+      if (!t.isClassDeclaration(definition.node) && !t.isInterfaceDeclaration(definition.node)) continue;
       const clauses = definition.node.heritageClauses ?? [];
       for (const clause of clauses) {
         for (const typeNode of clause.types) {
@@ -310,10 +328,11 @@ export class AstStructuralEngine {
   }
 
   private collectDirectCallEdges(ast: ProjectAst, definitionsByKey: Map<string, DefinitionRecord>): AstCallGraphEdge[] {
+    const t = TS();
     const out: AstCallGraphEdge[] = [];
     for (const sourceFile of this.projectSourceFiles(ast.program)) {
       const visit = (node: ts.Node): void => {
-        if (ts.isCallExpression(node)) {
+        if (t.isCallExpression(node)) {
           const caller = this.enclosingCallableDefinition(ast.checker, node, definitionsByKey);
           const calleeKey = this.symbolKeyAt(ast.checker, node.expression);
           const callee = calleeKey ? definitionsByKey.get(calleeKey) : undefined;
@@ -326,9 +345,9 @@ export class AstStructuralEngine {
             });
           }
         }
-        ts.forEachChild(node, visit);
+        t.forEachChild(node, visit);
       };
-      ts.forEachChild(sourceFile, visit);
+      t.forEachChild(sourceFile, visit);
     }
     return out;
   }
@@ -358,6 +377,7 @@ export class AstStructuralEngine {
     const out: DefinitionRecord[] = [];
     const exportNamesByFile = new Map<string, Set<string>>();
 
+    const t = TS();
     for (const sourceFile of this.projectSourceFiles(ast.program)) {
       exportNamesByFile.set(this.relativeFile(sourceFile.fileName), this.exportNames(ast.checker, sourceFile));
       const visit = (node: ts.Node): void => {
@@ -372,9 +392,9 @@ export class AstStructuralEngine {
             symbolKey: this.symbolKeyAt(ast.checker, nameNode),
           });
         }
-        ts.forEachChild(node, visit);
+        t.forEachChild(node, visit);
       };
-      ts.forEachChild(sourceFile, visit);
+      t.forEachChild(sourceFile, visit);
     }
 
     this.cachedDefinitions = out;
@@ -382,11 +402,12 @@ export class AstStructuralEngine {
   }
 
   private shouldIncludeDefinition(node: ts.Node, kind: AstDefinitionKind): boolean {
+    const t = TS();
     if (kind === 'parameter') return false;
-    if (kind === 'property' && ts.isPropertySignature(node)) return true;
-    if (kind === 'method' && ts.isMethodSignature(node)) return true;
-    if (ts.isVariableDeclaration(node)) {
-      return ts.isIdentifier(node.name);
+    if (kind === 'property' && t.isPropertySignature(node)) return true;
+    if (kind === 'method' && t.isMethodSignature(node)) return true;
+    if (t.isVariableDeclaration(node)) {
+      return t.isIdentifier(node.name);
     }
     return true;
   }
@@ -410,10 +431,11 @@ export class AstStructuralEngine {
   }
 
   private isExported(checker: ts.TypeChecker, node: ts.Node, nameNode: ts.Identifier, exportNames: Set<string>): boolean {
-    if (hasModifier(node, ts.SyntaxKind.ExportKeyword)) return true;
-    if (ts.isVariableDeclaration(node) && ts.isVariableDeclarationList(node.parent)) {
+    const t = TS();
+    if (hasModifier(node, t.SyntaxKind.ExportKeyword)) return true;
+    if (t.isVariableDeclaration(node) && t.isVariableDeclarationList(node.parent)) {
       const statement = node.parent.parent;
-      if (statement && hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return true;
+      if (statement && hasModifier(statement, t.SyntaxKind.ExportKeyword)) return true;
     }
     const symbol = checker.getSymbolAtLocation(nameNode);
     const rawName = symbol?.getName() ?? nameNode.text;
@@ -429,7 +451,7 @@ export class AstStructuralEngine {
   private buildProject(): ProjectAst {
     if (this.cachedProject) return this.cachedProject;
     const files = this.collectSourceFiles();
-    const program = ts.createProgram(files.map((file) => join(this.projectRoot, file)), compilerOptions());
+    const program = TS().createProgram(files.map((file) => join(this.projectRoot, file)), compilerOptions());
     this.cachedProject = { program, checker: program.getTypeChecker(), files };
     return this.cachedProject;
   }
@@ -504,7 +526,7 @@ export class AstStructuralEngine {
   private symbolKeyAt(checker: ts.TypeChecker, node: ts.Node): string | undefined {
     let symbol = checker.getSymbolAtLocation(node);
     if (!symbol) return undefined;
-    if (symbol.flags & ts.SymbolFlags.Alias) {
+    if (symbol.flags & TS().SymbolFlags.Alias) {
       symbol = checker.getAliasedSymbol(symbol);
     }
     const declarations = symbol.getDeclarations() ?? [];

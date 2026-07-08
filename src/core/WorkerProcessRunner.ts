@@ -203,6 +203,8 @@ export interface WorkerProcessRunnerOptions {
   debug?: boolean;
   workerScriptPath?: string;
   heartbeatMonitorIntervalMs?: number;
+  /** Worker V8 老生代堆上限 (MB)，通过 --max-old-space-size 传入子进程 execArgv。0 = 不限制。 */
+  maxOldSpaceMb?: number;
 }
 
 const DEFAULT_OPTIONS: Required<WorkerProcessRunnerOptions> = {
@@ -212,6 +214,7 @@ const DEFAULT_OPTIONS: Required<WorkerProcessRunnerOptions> = {
   debug: false,
   workerScriptPath: resolve(__dirname, '../agents/WorkerProcessEntry.js'),
   heartbeatMonitorIntervalMs: 5000,
+  maxOldSpaceMb: RESOURCE_BUDGET.WORKER_MAX_OLD_SPACE_MB,
 };
 
 /**
@@ -306,7 +309,14 @@ export class WorkerProcessRunner extends EventEmitter {
     };
 
     // 启动子进程
-    const child = spawn(process.execPath, [this.options.workerScriptPath], {
+    // V8 堆上限：--max-old-space-size 必须置于脚本路径之前（V8 flag，非脚本参数）。
+    // 命令行 flag 优先级高于 NODE_OPTIONS env，故即便父进程 env 继承了不同的值也以此为准。
+    // 主动式治理：V8 在触顶前主动 GC；真正失控则 worker OOM 优雅退出走 crash→可恢复重派，
+    // 而非等 RSS 温控 SIGKILL 或拖垮宿主。0 = 不限制（沿用 Node 默认）。
+    const nodeArgs = this.options.maxOldSpaceMb > 0
+      ? [`--max-old-space-size=${this.options.maxOldSpaceMb}`, this.options.workerScriptPath]
+      : [this.options.workerScriptPath];
+    const child = spawn(process.execPath, nodeArgs, {
       cwd: process.cwd(),  // 确保工作目录正确
       env: childEnv,
       stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
