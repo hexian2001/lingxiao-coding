@@ -107,6 +107,22 @@ export interface RuntimeDiagnosticsPayload {
     retentionState?: string;
     blockedAgingSeverity?: string;
   };
+  /** Orchestration Kernel v2 SessionRun 投影（若已持久化） */
+  sessionRun?: {
+    phase: string;
+    reason: string;
+    generation: number;
+    readyTaskCount: number;
+    runningAgentCount: number;
+    hasDeferredReadyWork: boolean;
+    silentIdleViolation: boolean;
+    controlMode?: string;
+    collaborationMode?: string;
+    teamReady?: boolean | null;
+    waitingForUser?: boolean;
+  };
+  /** Explicit S1|S2|S3 if set; otherwise null (resolve defaults at tool gate) */
+  orchestrationTier?: string | null;
 }
 
 export interface RuntimeDiagnosticsItem {
@@ -199,6 +215,55 @@ export function buildRuntimeDiagnosticsPayload(options: BuildRuntimeDiagnosticsO
   };
   const leaderMode = sessionId ? db.getSessionState(sessionId, SESSION_KEYS.LEADER_EXECUTION_MODE) : null;
   const leaderReason = sessionId ? db.getSessionState(sessionId, SESSION_KEYS.LEADER_EXECUTION_REASON) : null;
+  const orchestrationTierRaw = sessionId ? db.getSessionState(sessionId, SESSION_KEYS.ORCHESTRATION_TIER) : null;
+  const orchestrationTier = typeof orchestrationTierRaw === 'string' && orchestrationTierRaw.trim()
+    ? orchestrationTierRaw.trim().toUpperCase()
+    : null;
+  let sessionRun: RuntimeDiagnosticsPayload['sessionRun'];
+  const sessionRunRaw = sessionId ? db.getSessionState(sessionId, SESSION_KEYS.SESSION_RUN_SNAPSHOT) : null;
+  if (typeof sessionRunRaw === 'string' && sessionRunRaw.trim()) {
+    try {
+      const parsed = JSON.parse(sessionRunRaw) as Record<string, unknown>;
+      if (parsed && typeof parsed.phase === 'string') {
+        sessionRun = {
+          phase: parsed.phase,
+          reason: typeof parsed.reason === 'string' ? parsed.reason : 'unknown',
+          generation: typeof parsed.generation === 'number' ? parsed.generation : 0,
+          readyTaskCount: typeof parsed.readyTaskCount === 'number' ? parsed.readyTaskCount : 0,
+          runningAgentCount: typeof parsed.runningAgentCount === 'number' ? parsed.runningAgentCount : 0,
+          hasDeferredReadyWork: parsed.hasDeferredReadyWork === true,
+          silentIdleViolation: parsed.silentIdleViolation === true,
+          controlMode: typeof parsed.controlMode === 'string' ? parsed.controlMode : undefined,
+          collaborationMode: typeof parsed.collaborationMode === 'string' ? parsed.collaborationMode : undefined,
+          teamReady: typeof parsed.teamReady === 'boolean' || parsed.teamReady === null
+            ? (parsed.teamReady as boolean | null)
+            : undefined,
+          waitingForUser: typeof parsed.waitingForUser === 'boolean' ? parsed.waitingForUser : undefined,
+        };
+      }
+    } catch {
+      sessionRun = undefined;
+    }
+  } else if (sessionRunRaw && typeof sessionRunRaw === 'object') {
+    const parsed = sessionRunRaw as Record<string, unknown>;
+    if (typeof parsed.phase === 'string') {
+      sessionRun = {
+        phase: parsed.phase,
+        reason: typeof parsed.reason === 'string' ? parsed.reason : 'unknown',
+        generation: typeof parsed.generation === 'number' ? parsed.generation : 0,
+        readyTaskCount: typeof parsed.readyTaskCount === 'number' ? parsed.readyTaskCount : 0,
+        runningAgentCount: typeof parsed.runningAgentCount === 'number' ? parsed.runningAgentCount : 0,
+        hasDeferredReadyWork: parsed.hasDeferredReadyWork === true,
+        silentIdleViolation: parsed.silentIdleViolation === true,
+        controlMode: typeof parsed.controlMode === 'string' ? parsed.controlMode : undefined,
+        collaborationMode: typeof parsed.collaborationMode === 'string' ? parsed.collaborationMode : undefined,
+        teamReady: typeof parsed.teamReady === 'boolean' || parsed.teamReady === null
+          ? (parsed.teamReady as boolean | null)
+          : undefined,
+        waitingForUser: typeof parsed.waitingForUser === 'boolean' ? parsed.waitingForUser : undefined,
+      };
+    }
+  }
   const orchestrationRuntime = sessionId ? db.getSessionState(sessionId, `orchestration_runtime:${sessionId}`) : null;
   let orchestrationProject: RuntimeDiagnosticsPayload['orchestrationProject'];
   if (orchestrationRuntime && typeof orchestrationRuntime === 'string') {
@@ -284,6 +349,8 @@ export function buildRuntimeDiagnosticsPayload(options: BuildRuntimeDiagnosticsO
       status: record.status,
     })),
     orchestrationProject,
+    sessionRun,
+    orchestrationTier,
   };
 }
 
@@ -300,6 +367,10 @@ export function renderRuntimeDiagnostics(payload: RuntimeDiagnosticsPayload): st
     payload.sessionStatus === 'interrupted' ? 'Interrupted: yes' : '',
     payload.leaderMode ? `Leader mode: ${payload.leaderMode}` : '',
     payload.leaderReason ? `Leader reason: ${payload.leaderReason}` : '',
+    payload.orchestrationTier ? `Orchestration tier: ${payload.orchestrationTier}` : 'Orchestration tier: (default S2 solo / S3 team)',
+    payload.sessionRun
+      ? `SessionRun: phase=${payload.sessionRun.phase} reason=${payload.sessionRun.reason} ready=${payload.sessionRun.readyTaskCount} running=${payload.sessionRun.runningAgentCount} deferred=${payload.sessionRun.hasDeferredReadyWork ? 'yes' : 'no'} gen=${payload.sessionRun.generation}`
+      : 'SessionRun: (not projected yet)',
     '',
     '## Permissions / Sandbox',
     `Effective permission: ${payload.permissionSummary}`,
@@ -372,7 +443,45 @@ export function buildRuntimeDiagnosticsItems(payload: RuntimeDiagnosticsPayload)
         payload.sessionStatus === 'interrupted' ? 'Interrupted: yes' : '',
         payload.leaderMode ? `Leader mode: ${payload.leaderMode}` : '',
         payload.leaderReason ? `Leader reason: ${payload.leaderReason}` : '',
+        payload.orchestrationTier
+          ? `Orchestration tier: ${payload.orchestrationTier}`
+          : 'Orchestration tier: (default S2 solo / S3 team)',
+        payload.sessionRun
+          ? `SessionRun: phase=${payload.sessionRun.phase} reason=${payload.sessionRun.reason} ready=${payload.sessionRun.readyTaskCount} running=${payload.sessionRun.runningAgentCount} deferred=${payload.sessionRun.hasDeferredReadyWork ? 'yes' : 'no'} gen=${payload.sessionRun.generation}`
+          : 'SessionRun: (not projected yet)',
       ].filter(Boolean).join('\n'),
+    },
+    {
+      id: 'session_run',
+      status: payload.sessionRun?.phase ?? 'n/a',
+      preview: payload.sessionRun
+        ? `${payload.sessionRun.phase}/${payload.sessionRun.reason} ready=${payload.sessionRun.readyTaskCount} running=${payload.sessionRun.runningAgentCount}`
+        : (payload.orchestrationTier ? `tier=${payload.orchestrationTier}` : 'not projected'),
+      detail: [
+        '[SessionRun]',
+        payload.orchestrationTier
+          ? `tier=${payload.orchestrationTier}`
+          : 'tier=(default S2 solo / S3 team)',
+        payload.sessionRun
+          ? [
+            `phase=${payload.sessionRun.phase}`,
+            `reason=${payload.sessionRun.reason}`,
+            `generation=${payload.sessionRun.generation}`,
+            `ready=${payload.sessionRun.readyTaskCount}`,
+            `running=${payload.sessionRun.runningAgentCount}`,
+            `deferred=${payload.sessionRun.hasDeferredReadyWork ? 'yes' : 'no'}`,
+            `silent_idle_violation=${payload.sessionRun.silentIdleViolation ? 'yes' : 'no'}`,
+            payload.sessionRun.controlMode ? `control=${payload.sessionRun.controlMode}` : '',
+            payload.sessionRun.collaborationMode ? `collab=${payload.sessionRun.collaborationMode}` : '',
+            payload.sessionRun.teamReady === null || payload.sessionRun.teamReady === undefined
+              ? 'teamReady=n/a'
+              : `teamReady=${payload.sessionRun.teamReady ? 'yes' : 'no'}`,
+            payload.sessionRun.waitingForUser !== undefined
+              ? `waitingForUser=${payload.sessionRun.waitingForUser ? 'yes' : 'no'}`
+              : '',
+          ].filter(Boolean).join('\n')
+          : 'SessionRun snapshot not persisted yet.',
+      ].join('\n'),
     },
     {
       id: 'permission',

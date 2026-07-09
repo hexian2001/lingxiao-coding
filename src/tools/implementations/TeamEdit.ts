@@ -56,7 +56,16 @@ export class TeamEditTool extends Tool {
       return { success: false, data: null, error: `Team "${params.team_name}" 不存在。先用 team_manage(action="create") 建团。` };
     }
 
-    const renderRoster = (note: string): ToolResult => {
+    /** E：mutation 后 fail-closed 校验 definition 与 registry 对齐 */
+    const assertReadyOrFail = (note: string): ToolResult => {
+      const ready = mailbox.assertTeamReady(params.team_name, mailboxSessionId);
+      if (!ready.ok) {
+        return {
+          success: false,
+          data: null,
+          error: `roster 变更后未就绪：${ready.message}。请重新 team_manage(action="edit") 修复 definition 与 registry。`,
+        };
+      }
       const fresh = mailbox.getTeam(params.team_name, mailboxSessionId)!;
       return {
         success: true,
@@ -65,7 +74,26 @@ export class TeamEditTool extends Tool {
           leader: fresh.leader,
           members: fresh.members,
           description: fresh.description,
+          roster: ready.roster,
           note,
+        },
+      };
+    };
+
+    const renderRoster = (note: string): ToolResult => {
+      // list 只读：仍校验并暴露 ready 状态，但不阻断查询
+      const ready = mailbox.assertTeamReady(params.team_name, mailboxSessionId);
+      const fresh = mailbox.getTeam(params.team_name, mailboxSessionId)!;
+      return {
+        success: true,
+        data: {
+          team: fresh.name,
+          leader: fresh.leader,
+          members: fresh.members,
+          description: fresh.description,
+          teamReady: ready.ok,
+          roster: ready.ok ? ready.roster : undefined,
+          note: ready.ok ? note : `${note}（警告: ${ready.message}）`,
         },
       };
     };
@@ -100,7 +128,7 @@ export class TeamEditTool extends Tool {
         });
         registry.register({ name: member, team: params.team_name, role: 'member', workspace, sessionId: mailboxSessionId });
         this.syncBlackboard(context, params.team_name, team.leader, nextMembers, workspace, params.description ?? team.description);
-        return renderRoster(`已添加成员 "${member}"`);
+        return assertReadyOrFail(`已添加成员 "${member}"`);
       }
       // 批量模式：收集成功 + 跳过
       const added: string[] = [];
@@ -122,7 +150,7 @@ export class TeamEditTool extends Tool {
       });
       this.syncBlackboard(context, params.team_name, team.leader, nextMembers, workspace, params.description ?? team.description);
       const note = `已批量添加 ${added.length} 名成员：${added.join(', ')}` + (skipped.length > 0 ? `；跳过：${skipped.join(', ')}` : '');
-      return renderRoster(note);
+      return assertReadyOrFail(note);
     }
 
     if (params.action === 'remove') {
@@ -149,7 +177,7 @@ export class TeamEditTool extends Tool {
         });
         registry.unregister(member, mailboxSessionId);
         this.syncBlackboard(context, params.team_name, team.leader, nextMembers, workspace, params.description ?? team.description);
-        return renderRoster(`已移除成员 "${member}"`);
+        return assertReadyOrFail(`已移除成员 "${member}"`);
       }
       // 批量模式：收集成功 + 跳过
       const removed: string[] = [];
@@ -171,7 +199,7 @@ export class TeamEditTool extends Tool {
       });
       this.syncBlackboard(context, params.team_name, team.leader, nextMembers, workspace, params.description ?? team.description);
       const note = `已批量移除 ${removed.length} 名成员：${removed.join(', ')}` + (skipped.length > 0 ? `；跳过：${skipped.join(', ')}` : '');
-      return renderRoster(note);
+      return assertReadyOrFail(note);
     }
 
     if (params.action === 'rename') {
@@ -209,7 +237,7 @@ export class TeamEditTool extends Tool {
         sessionId: mailboxSessionId,
       });
       this.syncBlackboard(context, params.team_name, nextLeader, nextMembers, workspace, params.description ?? team.description);
-      return renderRoster(`已将 "${oldName}" 改名为 "${newName}"`);
+      return assertReadyOrFail(`已将 "${oldName}" 改名为 "${newName}"`);
     }
 
     if (params.action === 'set_leader') {
@@ -238,7 +266,7 @@ export class TeamEditTool extends Tool {
       registry.register({ name: newLeader, team: params.team_name, role: 'leader', workspace, sessionId: mailboxSessionId });
       registry.register({ name: oldLeader, team: params.team_name, role: 'member', workspace, sessionId: mailboxSessionId });
       this.syncBlackboard(context, params.team_name, newLeader, nextMembers, workspace, params.description ?? team.description);
-      return renderRoster(`已将 leader 从 "${oldLeader}" 切换为 "${newLeader}"`);
+      return assertReadyOrFail(`已将 leader 从 "${oldLeader}" 切换为 "${newLeader}"`);
     }
 
     return { success: false, data: null, error: `未知 action: ${String(params.action)}` };

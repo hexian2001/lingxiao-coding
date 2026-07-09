@@ -2982,8 +2982,8 @@ export class LeaderAgent {
         // 或用户消息驱动 —— 关掉 eternal 后绝不残留无限自驱。
         //
         // SessionRun D：ready_needs_decision = 有 ready 任务且未 latch 等待。
-        // 此时禁止 silent idle，强制一轮决策（think 结束通常会 latch waiting，
-        // 下一轮变为 leader_deferred_ready_tasks，不会 30s 狂刷 LLM）。
+        // 此时禁止 silent idle，强制一轮决策；若 think 后仍未 dispatch/latch，
+        // 立刻 markWaitingForUser → leader_deferred_ready_tasks，防 30s 狂刷 LLM（anti-spin）。
         const runSnap = this.projectSessionRun('loop_idle_branch');
         if (
           !this.isEternalMode()
@@ -3003,6 +3003,22 @@ export class LeaderAgent {
             await this.leaderThinkAndAct();
           } catch (err) {
             leaderLogger.error('ready_needs_decision leaderThinkAndAct failed:', err);
+          }
+          const after = this.projectSessionRun('ready_decision_after');
+          if (
+            after.reason === 'ready_needs_decision'
+            && after.readyTaskCount > 0
+            && !this.waitingForUser
+            && !this.isBusy
+          ) {
+            this.markWaitingForUser(true, 'ready_decision_deferred');
+            leaderLogger.info(
+              `[SessionRun] ready_needs_decision anti-spin latch (ready=${after.readyTaskCount}) → waiting_user/deferred`,
+            );
+            this.emitter.emit('leader:status', {
+              sessionId: this.sessionId,
+              status: `有 ${after.readyTaskCount} 个任务可派发（等待 Leader/用户决策）`,
+            });
           }
           return 'continue';
         }

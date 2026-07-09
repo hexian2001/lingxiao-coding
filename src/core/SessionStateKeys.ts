@@ -9,6 +9,8 @@ export const SESSION_KEYS = {
   LEADER_WAITING_FOR_USER: 'leader_waiting_for_user',
   /** SessionRun 相位快照 JSON（Orchestration Kernel v2） */
   SESSION_RUN_SNAPSHOT: 'session_run_snapshot',
+  /** Explicit orchestration tier S1|S2|S3 (optional; default from collaboration) */
+  ORCHESTRATION_TIER: 'orchestration_tier',
   /** Pending plan review flag */
   LEADER_PENDING_REVIEW: 'leader_pending_review',
   /** Whether the plan has been approved */

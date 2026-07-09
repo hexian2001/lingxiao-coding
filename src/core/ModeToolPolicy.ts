@@ -115,6 +115,7 @@ export const LEADER_META_TOOL_NAMES: ReadonlySet<string> = new Set([
   'request_permission_update',
   'create_download_link',
   'set_mode',
+  'set_orchestration_tier',
   'set_bughunt_dag',
   'upsert_bughunt_finding',
   'get_bughunt_ledger',

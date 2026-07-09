@@ -1193,4 +1193,18 @@ description: '提交当前的完整执行方案。行为取决于控制模式（
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'set_orchestration_tier',
+      description: '设置本会话编排档位 S1/S2/S3（代码强制门控，非提示词建议）。S1=Leader 直办、禁止建团与批量/并发派发；S2=最多 1 个 ephemeral worker、禁止建团与 batch>1；S3=多角色团队协作（team 模式派发前要求 roster 就绪）。未设置时：team 协作默认 S3，solo 默认 S2。',
+      parameters: {
+        type: 'object',
+        properties: {
+          tier: { type: 'string', enum: ['S1', 'S2', 'S3'], description: '目标编排档位' },
+        },
+        required: ['tier'],
+      },
+    },
+  },
 ];

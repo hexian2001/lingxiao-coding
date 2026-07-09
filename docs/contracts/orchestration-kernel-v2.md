@@ -176,3 +176,4 @@ type DecisionEnvelope = {
 | 2026-07-10 | **D**：waitingForUser 统一 `markWaitingForUser`；ready_needs_decision 强制决策回合；deferred 状态文案 |
 | 2026-07-10 | **E**：`createTeamWithRoster` + `assertTeamReady`；TeamCreate/auto-team 原子路径 |
 | 2026-07-10 | **G 起步**：裸 complete 不再自动注入 evaluator（需显式 evaluationPolicy） |
+| 2026-07-10 | **G 完成**：`set_orchestration_tier` + `evaluateOrchestrationTierGate` 代码门控；ready anti-spin latch；TeamEdit 后 assertTeamReady；RuntimeDiagnostics SessionRun/tier；纯函数单测 |

@@ -80,6 +80,11 @@ import {
   isLeaderExecutionTool as gateIsLeaderExecutionTool,
   evaluateLeaderAutonomyToolGate,
 } from './leader/LeaderToolGates.js';
+import {
+  evaluateOrchestrationTierGate,
+  resolveOrchestrationTier,
+} from './leader/OrchestrationTierGates.js';
+import { isOrchestrationTier } from '../contracts/types/OrchestrationTier.js';
 import { LeaderToolFailure, fail, type DispatchItemStatus } from './leader/LeaderToolFailure.js';
 import { getTeamMailbox, getTeamMemberRegistry } from '../core/TeamMailbox.js';
 import { type MemoryScope } from '../memory/MemoryManager.js';
@@ -484,6 +489,42 @@ export class LeaderToolsExecutor {
       throw fail(autonomyGate.message);
     }
 
+    // Orchestration Kernel v2：S1/S2/S3 代码门控（与纯函数 evaluateOrchestrationTierGate 同源）
+    if (name !== 'set_orchestration_tier') {
+      const modesForTier = resolveModeRuntimeProjection({
+        sessionId: this.leader.sessionId,
+        db: this.leader.db,
+        blackboardAvailable: this.leader.isBlackboardEnabled(),
+        permissionContext: this.leader.getPermissionContext(),
+        permissionSummary: this.leader.getInteractionSnapshot().permissionSummary,
+      });
+      const explicitTier = this.leader.db.getSessionState(
+        this.leader.sessionId,
+        SESSION_KEYS.ORCHESTRATION_TIER,
+      );
+      const tier = resolveOrchestrationTier({
+        explicitTier: typeof explicitTier === 'string' ? explicitTier : null,
+        collaborationMode: modesForTier.collaboration.mode,
+      });
+      const teamReady = modesForTier.collaboration.mode === 'team'
+        ? modesForTier.collaboration.teamEnabled
+        : null;
+      const runningAgentCount = typeof this.leader.pool?.getRunning === 'function'
+        ? this.leader.pool.getRunning().length
+        : 0;
+      const tierGate = evaluateOrchestrationTierGate({
+        tier,
+        toolName: name,
+        args,
+        collaborationMode: modesForTier.collaboration.mode,
+        teamReady,
+        runningAgentCount,
+      });
+      if (!tierGate.ok) {
+        throw fail(`[${tierGate.code}] ${tierGate.message}`);
+      }
+    }
+
     const ctx = this.getAgentControlContext();
     const planCtx = this.getTaskPlanningContext();
     switch (name) {
@@ -589,6 +630,8 @@ export class LeaderToolsExecutor {
         return await this.verifyFindingTool(args);
       case 'set_mode':
         return this.setMode(args);
+      case 'set_orchestration_tier':
+        return this.setOrchestrationTier(args);
       default:
         throw new Error(`Unknown leader tool: ${name}`);
     }
@@ -1859,6 +1902,51 @@ export class LeaderToolsExecutor {
    * 与 TUI /office、/bughunt 命令走同一条路径，保证状态/工具面/prompt 注入一致。
    * workflow 是 beta 功能，只允许手动开启，故此处显式拒绝。
    */
+  /**
+   * 设置会话编排档位 S1/S2/S3（代码门控，非 prompt 建议）。
+   * 写入 SESSION_KEYS.ORCHESTRATION_TIER；后续 dispatch/team 经 evaluateOrchestrationTierGate 强制。
+   */
+  protected setOrchestrationTier(args: Record<string, unknown>): string {
+    const raw = typeof args.tier === 'string' ? args.tier.trim().toUpperCase() : '';
+    if (!isOrchestrationTier(raw)) {
+      throw fail(`set_orchestration_tier 仅支持 S1 | S2 | S3；收到: ${String(args.tier ?? '(空)')}`);
+    }
+    const sessionId = this.leader.sessionId;
+    const prevRaw = this.leader.db.getSessionState(sessionId, SESSION_KEYS.ORCHESTRATION_TIER);
+    const previous = typeof prevRaw === 'string' && isOrchestrationTier(prevRaw) ? prevRaw : null;
+    if (previous === raw) {
+      return JSON.stringify({
+        ok: true,
+        tier: raw,
+        previous,
+        changed: false,
+        message: `编排档位已是 ${raw}，无需变更。门控持续生效。`,
+      });
+    }
+    this.leader.db.setSessionState(sessionId, SESSION_KEYS.ORCHESTRATION_TIER, raw);
+    try {
+      this.leader.projectSessionRun('set_orchestration_tier');
+    } catch {
+      /* projection best-effort */
+    }
+    const tierHints: Record<string, string> = {
+      S1: 'Leader 直办：禁止 team_manage(create/edit)、dispatch_batch、并发 worker。',
+      S2: '最多 1 个 ephemeral worker：禁止建团、batch>1、并发>1。',
+      S3: '多角色协作：team 模式派发前要求 roster 就绪（definition 与 registry 对齐）。',
+    };
+    this.leader.emitter.emit('leader:status', {
+      sessionId,
+      status: `编排档位 → ${raw}${previous ? ` (was ${previous})` : ''}`,
+    });
+    return JSON.stringify({
+      ok: true,
+      tier: raw,
+      previous,
+      changed: true,
+      message: `已设置编排档位 ${raw}。${tierHints[raw] ?? ''} 代码门控已生效。`,
+    });
+  }
+
   protected setMode(args: Record<string, unknown>): string {
     const mode = typeof args.mode === 'string' ? args.mode.trim().toLowerCase() : '';
     if (mode !== 'office' && mode !== 'bughunt') {

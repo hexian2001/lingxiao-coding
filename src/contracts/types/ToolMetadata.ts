@@ -143,6 +143,7 @@ export const TOOL_METADATA: Readonly<Record<string, ToolMetadata>> = Object.free
   request_permission_update: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   create_download_link: read('file', { visibility: 'leader', resultShape: 'json' }),
   set_mode: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  set_orchestration_tier: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   set_bughunt_dag: write('security', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   upsert_bughunt_finding: write('security', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   get_bughunt_ledger: read('security', { visibility: 'leader' }),

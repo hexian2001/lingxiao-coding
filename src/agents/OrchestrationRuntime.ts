@@ -63,8 +63,9 @@ function isRejectVerdict(verdict: OrchestrationVerdict | undefined): boolean {
 }
 
 /**
- * 默认最小验收策略：当任务没有显式 evaluationPolicy 时自动注入。
- * 确保每个完成的任务都会触发 evaluator 验收，堵住"Agent说完成就完成"的漏洞。
+ * 默认最小验收策略：仅在任务已进入 orchestration run（有 orchestrationRunId）
+ * 或调用方显式带 evaluationPolicy 时使用。
+ * G：裸 complete（无 runId 且无 evaluationPolicy）不再自动注入 evaluator。
  */
 const DEFAULT_MAX_REPAIR_BY_NODE_KIND: Record<string, number> = {
   implement: 2,
