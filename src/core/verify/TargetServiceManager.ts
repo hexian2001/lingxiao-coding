@@ -1,8 +1,8 @@
 /**
  * TargetServiceManager — 验证执行器的目标服务生命周期（blackbox 验证层）。
  *
- * 职责：spawn 目标服务进程 + 分配临时端口（net.createServer listen(0)，
- *   复用 SlidevServerManager 模式）+ 健康检查（HTTP GET healthPath 或 TCP connect）
+ * 职责：spawn 目标服务进程 + 分配临时端口（net.createServer listen(0)）
+ *   + 健康检查（HTTP GET healthPath 或 TCP connect）
  *   + CleanupRegistry 回收（进程退出 + map 清理）。
  *
  * 安全边界：仅监听 127.0.0.1，绝不暴露公网；blackbox 层默认关闭，需 Leader 显式授权。

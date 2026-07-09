@@ -7,7 +7,7 @@
  *     加 hover 高亮 + click 拾取，点击时从 data-* 读出 SourceProvenance 锚点，
  *     组装 CanvasSelection（含归一化 selectionBox）回调给上层。
  *
- * data-* 约定（生成期由 HtmlOfficeEngine 注入，见 provenance.ts）：
+ * data-* 约定（生成 HTML 时注入，与 CanvasSourceMap / canvas_save_sourcemap 对齐）：
  *   data-node-id   稳定语义 ID（必备）
  *   data-anchor    "spec" | "script"
  *   spec  锚点：data-spec-path（spec 节点路径），可选 data-role

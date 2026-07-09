@@ -421,7 +421,7 @@ export class LeaderToolsExecutor {
       source: 'record_capability_intent',
     });
     if (!profile) {
-      return 'ERROR: record_capability_intent 参数无效：必须提供合法 primaryIntent/scope/phase/grants/denies/requiredGates/constraints/confidence/reason。';
+      throw fail('record_capability_intent 参数无效：必须提供合法 primaryIntent/scope/phase/grants/denies/requiredGates/constraints/confidence/reason。');
     }
     this.leader.db.setSessionState(this.leader.sessionId, SESSION_KEYS.CAPABILITY_INTENT_PROFILE, JSON.stringify(profile));
     if (currentTurnId > 0) {
@@ -484,7 +484,7 @@ export class LeaderToolsExecutor {
     });
     this.recordAutonomyDecision(name, autonomyGate);
     if (!autonomyGate.ok) {
-      return `ERROR: ${autonomyGate.message}`;
+      throw fail(autonomyGate.message);
     }
 
     const ctx = this.getAgentControlContext();

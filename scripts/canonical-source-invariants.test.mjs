@@ -284,5 +284,6 @@ test('orphan office/html and tools/slidev directories stay deleted', () => {
   assert.equal(existsSync(join(pkgRoot, 'src/tools/slidev')), false);
   assert.equal(existsSync(join(pkgRoot, 'src/tools/implementations/fonts')), false);
   assert.equal(existsSync(join(pkgRoot, 'src/tools/implementations/office/OoxmlTextReplace.ts')), false);
+  assert.equal(existsSync(join(pkgRoot, 'src/core/SlidevServerManager.ts')), false);
 });
 

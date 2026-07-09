@@ -2,7 +2,7 @@
  * OfficeOutlineCard — PPT 生成前的大纲蓝图确认卡片
  *
  * 当 Agent 准备生成 PPT 时，先展示大纲供用户确认。
- * 这通过解析 generate_pptx 工具的 streaming_input（流式参数生成）
+ * 这通过解析 office 生成类工具的 streaming_input（流式参数生成；兼容 HTTP generate_pptx 回放）
  * 来提取 slides 结构，在大纲模式渲染。
  *
  * 同时也可作为独立组件嵌入 OfficeCanvas 的「生成向导」。
@@ -226,7 +226,7 @@ export default function OfficeOutlineCard({
 }
 
 /**
- * 从 generate_pptx 工具的 input 参数中提取大纲
+ * 从 office 生成工具 input（含 slides[]）提取大纲；兼容 HTTP generate 回放。
  */
 export function extractOutlineFromInput(input: unknown): OutlineSlide[] | null {
   if (!input || typeof input !== 'object') return null;
