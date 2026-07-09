@@ -750,7 +750,7 @@ export class LeaderAgent {
       emitter: this.emitter,
       bus: this.bus,
       workspace: this.workspace,
-      setWaitingForUser: (waiting) => { this.waitingForUser = waiting; },
+      setWaitingForUser: (waiting) => { this.markWaitingForUser(waiting, 'perm_manager'); },
       addAndPersistMessage: (msg) => {
         this.addMessage(msg);
         this.db.saveConversationMessage(this.sessionId, this.conversation[this.conversation.length - 1]);
@@ -777,8 +777,7 @@ export class LeaderAgent {
       },
       leaderThinkAndAct: () => this.leaderThinkAndAct(),
       setWaitingForUser: async (waiting) => {
-        this.waitingForUser = waiting;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, waiting ? 'true' : 'false');
+        this.markWaitingForUser(waiting, 'progress_invariant');
       },
       recordTokenUsage: (_usage) => {
         // Token tracking delegated to EternalLoop — LeaderAgent layer is intentionally a no-op.
@@ -821,10 +820,7 @@ export class LeaderAgent {
       getEternalJudgeModel: () => this.model || null,
       yieldEternalToUser: async (reason) => {
         leaderLogger.info(`[EternalLoop] yielding to user: ${reason}`);
-        if (!this.waitingForUser) {
-          this.waitingForUser = true;
-          await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'true');
-        }
+        this.markWaitingForUser(true, `eternal_yield:${reason}`);
         this.emitter.emit('leader:status', {
           sessionId: this.sessionId,
           status: '等待用户输入...',
@@ -844,8 +840,7 @@ export class LeaderAgent {
       isFinished: () => this.finished,
       isWaitingForUser: () => this.waitingForUser,
       setWaitingForUser: async (waiting) => {
-        this.waitingForUser = waiting;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, waiting ? 'true' : 'false');
+        this.markWaitingForUser(waiting, 'work_orchestrator');
       },
       isPendingReview: () => this.pendingReview,
       getPendingPermissionRequest: () => this.permManager.pendingPermissionRequest,
@@ -1064,7 +1059,7 @@ export class LeaderAgent {
       setCurrentLlmAbortController: (ctrl) => { this.currentLlmAbortController = ctrl; },
       isFinished: () => this.finished,
       isWaitingForUser: () => this.waitingForUser,
-      setWaitingForUser: (v) => { this.waitingForUser = v; },
+      setWaitingForUser: (v) => { this.markWaitingForUser(v, 'thinking_loop'); },
       isUserInterruptPending: () => this.userInterruptPending,
       isToolUseSuppressedForCurrentTurn: () => this.isToolUseSuppressedForCurrentTurn(),
       isPendingReview: () => this.pendingReview,
@@ -2030,9 +2025,21 @@ export class LeaderAgent {
     return this.running && !this.finished;
   }
 
-  markWaitingForUser(waiting: boolean): void {
+  /**
+   * 唯一写 waitingForUser 的入口（D 阶段收编）。
+   * 同步更新内存 + 持久化 session_state + SessionRun 投影。
+   */
+  markWaitingForUser(waiting: boolean, source = 'mark_waiting_for_user'): void {
+    const changed = this.waitingForUser !== waiting;
     this.waitingForUser = waiting;
-    this.projectSessionRun('mark_waiting_for_user');
+    if (changed) {
+      void this.db.setSessionState(
+        this.sessionId,
+        SESSION_KEYS.LEADER_WAITING_FOR_USER,
+        waiting ? 'true' : 'false',
+      );
+    }
+    this.projectSessionRun(source);
   }
 
   /** 当前 SessionRun 快照（编排相位 / ready / deferred） */
@@ -2211,7 +2218,7 @@ export class LeaderAgent {
    */
   async handleUserInput(content: MessageContent): Promise<void> {
     if (this.waitingForUser) {
-      this.waitingForUser = false;
+      this.markWaitingForUser(false, 'handle_user_input');
       this.pendingUserInput = content;
       this.addMessage({
         role: 'user',
@@ -2369,8 +2376,7 @@ export class LeaderAgent {
       leaderLogger.debug(`[Leader] keep waiting_for_user during ${reason}: explicit user gate is active`);
       return false;
     }
-    this.waitingForUser = false;
-    await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+    this.markWaitingForUser(false, `clear_soft:${reason}`);
     return true;
   }
 
@@ -2712,6 +2718,7 @@ export class LeaderAgent {
 
       const state = await this.db.getSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER);
       this.waitingForUser = state === 'true';
+      this.projectSessionRun('resume_load_waiting');
       this.loadPermissionContextFromState();
 
       const pendingReview = await this.db.getSessionState(this.sessionId, SESSION_KEYS.LEADER_PENDING_REVIEW);
@@ -2787,7 +2794,7 @@ export class LeaderAgent {
 
       if (resume && this.board.allTerminal() && this.pool.getRunning().length === 0) {
         leaderLogger.info('恢复已完成会话，等待用户输入新指令');
-        this.waitingForUser = true;
+        this.markWaitingForUser(true, 'resume_completed_idle');
         this.emitter.emit('leader:status', {
           sessionId: this.sessionId,
           status: 'Idle (已完成，等待新指令)',
@@ -2973,6 +2980,33 @@ export class LeaderAgent {
         // 控制模式守卫：inline 自驱与 maybeDriveOpenWork 同属"自治找活"，只在 eternal
         // 下允许。manual / 默认模式即便有未完成任务，也只回到等待状态，由 worker 汇报
         // 或用户消息驱动 —— 关掉 eternal 后绝不残留无限自驱。
+        //
+        // SessionRun D：ready_needs_decision = 有 ready 任务且未 latch 等待。
+        // 此时禁止 silent idle，强制一轮决策（think 结束通常会 latch waiting，
+        // 下一轮变为 leader_deferred_ready_tasks，不会 30s 狂刷 LLM）。
+        const runSnap = this.projectSessionRun('loop_idle_branch');
+        if (
+          !this.isEternalMode()
+          && !this.waitingForUser
+          && !this.isBusy
+          && runSnap.reason === 'ready_needs_decision'
+          && runSnap.readyTaskCount > 0
+        ) {
+          leaderLogger.info(
+            `[SessionRun] ready_needs_decision → force decision turn (ready=${runSnap.readyTaskCount})`,
+          );
+          this.emitter.emit('leader:status', {
+            sessionId: this.sessionId,
+            status: `有 ${runSnap.readyTaskCount} 个任务可派发，进入决策...`,
+          });
+          try {
+            await this.leaderThinkAndAct();
+          } catch (err) {
+            leaderLogger.error('ready_needs_decision leaderThinkAndAct failed:', err);
+          }
+          return 'continue';
+        }
+
         const hasOpenWork = this.hasPendingTasks() || this.hasRunningAgents();
         if (this.isEternalMode() && !this.waitingForUser && hasOpenWork) {
           leaderLogger.info('[Leader] maybeDriveOpenWork 已耗尽，主动触发 leaderThinkAndAct');
@@ -2987,10 +3021,14 @@ export class LeaderAgent {
             });
           }
         } else {
-          // 超时唤醒且无消息、无运行中 Agent → 回到等待状态
+          // 超时唤醒且无消息、无运行中 Agent
+          // deferred ready：明确「有活未派」而非伪装成纯 idle
+          const statusMsg = runSnap.hasDeferredReadyWork
+            ? `有 ${runSnap.readyTaskCount} 个任务可派发（等待 Leader/用户决策）`
+            : '等待用户输入...';
           this.emitter.emit('leader:status', {
             sessionId: this.sessionId,
-            status: '等待用户输入...',
+            status: statusMsg,
           });
           this.emitter.emit('leader:busy', {
             sessionId: this.sessionId,
@@ -3034,8 +3072,7 @@ export class LeaderAgent {
 
       if (this.waitingForUser) {
         leaderLogger.info(`收到用户介入消息，立即处理: ${content.substring(0, 50)}...`);
-        this.waitingForUser = false;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+        this.markWaitingForUser(false, 'user_intervention');
         await this.clearConsumedUserInputState();
         const msgContentInner = (msg.payload as MessageContent) ?? '';
         this.beginUserTurn();
@@ -3085,8 +3122,7 @@ export class LeaderAgent {
 
       const permissionResolution = this.resolvePendingPermissionFromUserInput(content);
       if (permissionResolution === 'resolved') {
-        this.waitingForUser = false;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+        this.markWaitingForUser(false, 'permission_resolved');
         return 'continue';
       }
       if (permissionResolution === 'pending') {
@@ -3101,8 +3137,7 @@ export class LeaderAgent {
       }
   
       leaderLogger.debug(`收到用户消息 (介入/回复): ${content.substring(0, 50)}...`);
-      this.waitingForUser = false;
-      await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+      this.markWaitingForUser(false, 'user_message_consume');
       await this.clearConsumedUserInputState();
       const msgContent = (msg.payload as MessageContent) ?? '';
       this.beginUserTurn();
@@ -3260,8 +3295,7 @@ export class LeaderAgent {
       const hasRecoverableWork = dispatchable.length > 0;
 
       if (hasRecoverableWork && dispatchableSig !== this.waitedDispatchableSig) {
-        this.waitingForUser = false;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+        this.markWaitingForUser(false, 'dispatchable_sig_changed');
       }
     }
 
@@ -3698,8 +3732,7 @@ export class LeaderAgent {
 
       if (!this.waitingForUser) {
         leaderLogger.info('所有任务已完成，进入空闲等待状态');
-        this.waitingForUser = true;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'true');
+        this.markWaitingForUser(true, 'all_tasks_terminal_idle');
         this.emitter.emit('leader:status', {
           sessionId: this.sessionId,
           status: 'Idle',
@@ -3850,8 +3883,7 @@ export class LeaderAgent {
       // 用户消息进来后必须重置 waiting/pending review 等用户门，否则 LLM
       // 这一轮会被 Planning Gate / askUser 等闸门挡住而不回复。
       if (this.waitingForUser) {
-        this.waitingForUser = false;
-        await this.db.setSessionState(this.sessionId, SESSION_KEYS.LEADER_WAITING_FOR_USER, 'false');
+        this.markWaitingForUser(false, 'non_interrupt_user_inject');
       }
       await this.clearConsumedUserInputState();
       leaderLogger.info(`[NonInterrupt] LLM 调用前注入 ${injected} 条用户消息（非打断式）`);

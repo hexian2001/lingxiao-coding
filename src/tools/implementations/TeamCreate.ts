@@ -2,11 +2,12 @@
  * TeamCreateTool — Create a new multi-agent team with a leader and member roster.
  *
  * 团队成员的主键直接是 (sessionId, agent name)，不再生成内部 member id。
+ * E 阶段：经 TeamMailbox.createTeamWithRoster 原子写 definition + registry。
  */
 
 import { z } from 'zod';
 import { Tool, type ToolContext, type ToolResult } from '../Tool.js';
-import { getTeamMailbox, getTeamMemberRegistry } from '../../core/TeamMailbox.js';
+import { getTeamMailbox } from '../../core/TeamMailbox.js';
 import { coreLogger } from '../../core/Log.js';
 
 export class TeamCreateTool extends Tool {
@@ -29,7 +30,6 @@ export class TeamCreateTool extends Tool {
       workspace?: string;
     };
 
-    const registry = getTeamMemberRegistry();
     const mailbox = getTeamMailbox();
     const sessionId = context?.sessionId;
     if (!sessionId) {
@@ -39,9 +39,8 @@ export class TeamCreateTool extends Tool {
         error: 'team_manage(action="create") 必须在明确 sessionId 的上下文中调用。',
       };
     }
-    const mailboxSessionId = sessionId;
 
-    if (mailbox.teamExists(params.team_name, mailboxSessionId)) {
+    if (mailbox.teamExists(params.team_name, sessionId)) {
       return {
         success: false,
         data: null,
@@ -50,45 +49,26 @@ export class TeamCreateTool extends Tool {
     }
 
     const workspace = params.workspace || context?.workspace || process.cwd();
-    const allMembers = [params.leader, ...params.members];
-
-    for (const memberName of allMembers) {
-      registry.register({
-        name: memberName,
-        team: params.team_name,
-        role: memberName === params.leader ? 'leader' : 'member',
-        workspace,
-        sessionId: mailboxSessionId,
-      });
-    }
+    const allMembers = Array.from(new Set([params.leader, ...params.members]));
 
     try {
-      mailbox.createTeam({
+      mailbox.createTeamWithRoster({
         name: params.team_name,
         description: params.description,
         leader: params.leader,
         members: params.members,
         workspace,
-        sessionId: mailboxSessionId,
+        sessionId,
       });
     } catch (err) {
-      // mailbox 创建失败 — 回滚 registry 中刚注册的成员，避免悬挂
-      const rollbackErrors: string[] = [];
-      for (const name of allMembers) {
-        try {
-          registry.unregister(name, mailboxSessionId);
-        } catch (rollbackError) {
-          rollbackErrors.push(`${name}: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
-        }
-      }
       return {
         success: false,
         data: null,
-        error: `Team "${params.team_name}" creation failed: ${err instanceof Error ? err.message : String(err)}${rollbackErrors.length > 0 ? `；rollback failed: ${rollbackErrors.join('; ')}` : ''}`,
+        error: `Team "${params.team_name}" creation failed: ${err instanceof Error ? err.message : String(err)}`,
       };
     }
 
-    // 黑板群组投影 — 让 DispatcherEngine / Reviewer / Worker payload 可以通过 group:<name> tag 拿到组上下文。
+    // 黑板群组投影 — 观测增强，失败不阻断建团
     if (context?.blackboardGraph && context?.sessionId) {
       try {
         context.blackboardGraph.addGroupTag(context.sessionId, params.team_name, {
@@ -98,7 +78,6 @@ export class TeamCreateTool extends Tool {
           description: params.description,
         });
       } catch (err) {
-        // 投影失败不应让 team 创建失败 — 用户视角 mailbox 已 OK，黑板侧仅是观测增强。
         coreLogger.warn(`[TeamCreate] blackboard group projection failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     }

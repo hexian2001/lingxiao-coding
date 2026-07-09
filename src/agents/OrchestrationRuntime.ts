@@ -158,25 +158,14 @@ export class OrchestrationRuntime {
 
   async handleTaskResult(task: Task | undefined, exitReason: 'completed' | 'failed', result: unknown, structuredVerdict?: 'PASS' | 'FAIL' | 'BLOCKED'): Promise<OrchestrationTerminalResult> {
     if (!task?.orchestration?.orchestrationRunId) {
-      // P1: 对无 orchestration metadata 的 implement 类任务，强制注入 orchestrationRunId
-      if (task && exitReason === 'completed') {
+      // G：仅当任务已显式带 evaluationPolicy（Leader/用户要求验收）时才自动注入 evaluator。
+      // 裸 complete（Solo S1/S2 常见）直接接受，避免每个小任务后多开一轮评价噪声。
+      if (task && exitReason === 'completed' && task.orchestration?.evaluationPolicy) {
         const autoRunId = `auto-orch-${task.id}`;
-        const autoNodeKind = task.orchestration?.nodeKind ?? 'implement';
-        const autoPolicy = buildDefaultEvaluationPolicy(autoNodeKind);
-        // 注入默认 orchestration metadata 并触发 evaluator
-        if (!task.orchestration) {
-          task.orchestration = {
-            orchestrationRunId: autoRunId,
-            nodeKind: autoNodeKind,
-            generation: 0,
-            verdict: 'UNKNOWN',
-            evaluationPolicy: autoPolicy,
-            acceptance: { status: 'pending', evidenceTaskIds: [task.id] },
-          };
-        } else if (!task.orchestration.orchestrationRunId) {
-          task.orchestration.orchestrationRunId = autoRunId;
-          task.orchestration.evaluationPolicy ??= autoPolicy;
-        }
+        const autoNodeKind = task.orchestration.nodeKind ?? 'implement';
+        task.orchestration.orchestrationRunId = autoRunId;
+        task.orchestration.evaluationPolicy ??= buildDefaultEvaluationPolicy(autoNodeKind);
+        task.orchestration.acceptance ??= { status: 'pending', evidenceTaskIds: [task.id] };
         this.ensureEvaluatorTask(task, result);
       }
       return { handled: false, accepted: true };

@@ -270,16 +270,20 @@ export class LeaderToolsExecutor {
         if (isInRoster) return { ok: true, teamName: existingTeam };
         // agent 不在 roster → 自动 add
         try {
-          if (!team.members.includes(agentName)) {
+          if (!team.members.includes(agentName) && team.leader !== agentName) {
             mailbox.updateTeam(existingTeam, sessionId, { members: [...team.members, agentName] });
           }
           registry.register({
             name: agentName,
             team: existingTeam,
-            role: 'member',
+            role: agentName === team.leader ? 'leader' : 'member',
             workspace: team.workspace || process.cwd(),
             sessionId,
           });
+          const ready = mailbox.assertTeamReady(existingTeam, sessionId);
+          if (!ready.ok) {
+            return { ok: false, message: ready.message };
+          }
           leaderLogger.info(`[AutoTeam] 已将 @${agentName} 自动加入现有 team "${existingTeam}"`);
           return { ok: true, teamName: existingTeam };
         } catch (err) {
@@ -309,25 +313,12 @@ export class LeaderToolsExecutor {
       }
     } else {
       try {
-        mailbox.createTeam({
+        // E：原子建团（definition + registry），避免半开 roster
+        mailbox.createTeamWithRoster({
           name: teamName,
           description: 'Auto-created team for dispatch',
           leader: leaderName,
-          members: [agentName],
-          workspace: process.cwd(),
-          sessionId,
-        });
-        registry.register({
-          name: leaderName,
-          team: teamName,
-          role: 'leader',
-          workspace: process.cwd(),
-          sessionId,
-        });
-        registry.register({
-          name: agentName,
-          team: teamName,
-          role: 'member',
+          members: agentName === leaderName ? [] : [agentName],
           workspace: process.cwd(),
           sessionId,
         });
@@ -337,6 +328,11 @@ export class LeaderToolsExecutor {
           message: `自动建团失败: ${err instanceof Error ? err.message : String(err)}。请手动调用 team_manage(action="create") 建团。`,
         };
       }
+    }
+
+    const ready = mailbox.assertTeamReady(teamName, sessionId);
+    if (!ready.ok) {
+      return { ok: false, message: ready.message };
     }
 
     this.leader.setActiveTeam(teamName);

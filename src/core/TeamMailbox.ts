@@ -453,6 +453,91 @@ export class TeamMailbox {
     return def;
   }
 
+  /**
+   * 原子建团：teams 行 + team_members 注册表一次写齐。
+   * 失败时回滚 registry 与 teams 行，避免「有 definition 无 roster」半开状态。
+   */
+  createTeamWithRoster(input: {
+    name: string;
+    description?: string;
+    leader: string;
+    members: string[];
+    workspace: string;
+    sessionId: string;
+  }): TeamDefinition {
+    const sessionId = requireSessionId(input.sessionId, 'TeamMailbox.createTeamWithRoster');
+    const registry = getTeamMemberRegistry();
+    const rosterNames = Array.from(new Set([input.leader, ...input.members].filter(Boolean)));
+    if (rosterNames.length === 0) {
+      throw new Error('createTeamWithRoster 需要至少一个成员（含 leader）');
+    }
+
+    // definition.members 保持「成员列表（可不含 leader）」的既有约定
+    const memberList = rosterNames.filter((n) => n !== input.leader);
+    const def = this.createTeam({
+      name: input.name,
+      description: input.description,
+      leader: input.leader,
+      members: memberList.length > 0 ? memberList : input.members,
+      workspace: input.workspace,
+      sessionId,
+    });
+
+    try {
+      for (const name of rosterNames) {
+        registry.register({
+          name,
+          team: input.name,
+          role: name === input.leader ? 'leader' : 'member',
+          workspace: input.workspace,
+          sessionId,
+        });
+      }
+      const ready = this.assertTeamReady(input.name, sessionId);
+      if (!ready.ok) {
+        throw new Error(ready.message);
+      }
+      return def;
+    } catch (err) {
+      for (const name of rosterNames) {
+        try { registry.unregister(name, sessionId); } catch { /* best-effort */ }
+      }
+      try { this.deleteTeam(input.name, sessionId); } catch { /* best-effort */ }
+      throw err;
+    }
+  }
+
+  /**
+   * 校验 team definition 与 registry 对齐（E 阶段单 roster 合同）。
+   * leader + members 均须在 registry 中注册到同一 team。
+   */
+  assertTeamReady(
+    teamName: string,
+    sessionId: string,
+  ): { ok: true; roster: string[] } | { ok: false; message: string } {
+    const sid = requireSessionId(sessionId, 'TeamMailbox.assertTeamReady');
+    const team = this.getTeam(teamName, sid);
+    if (!team || !team.active) {
+      return { ok: false, message: `team "${teamName}" 不存在或未激活` };
+    }
+    const expected = Array.from(new Set([team.leader, ...team.members].filter(Boolean)));
+    if (expected.length === 0) {
+      return { ok: false, message: `team "${teamName}" roster 为空` };
+    }
+    const registry = getTeamMemberRegistry();
+    const registered = new Set(
+      registry.getByTeam(teamName, sid).map((m) => m.name),
+    );
+    const missing = expected.filter((n) => !registered.has(n));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message: `team "${teamName}" registry 缺少成员: ${missing.join(', ')}（definition 与 registry 未对齐）`,
+      };
+    }
+    return { ok: true, roster: expected };
+  }
+
   deleteTeam(teamName: string, sessionId: string): boolean {
     if (!sessionId) {
       throw new Error('TeamMailbox.deleteTeam 必须指定 sessionId（防多 session 串台）');

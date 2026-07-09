@@ -173,3 +173,6 @@ type DecisionEnvelope = {
 | 日期 | 提交/说明 |
 |------|-----------|
 | 2026-07-10 | 固化 roadmap；落地 SessionRunController + derivePhase 单测 + Leader 投影接入（PR-A/B 起步） |
+| 2026-07-10 | **D**：waitingForUser 统一 `markWaitingForUser`；ready_needs_decision 强制决策回合；deferred 状态文案 |
+| 2026-07-10 | **E**：`createTeamWithRoster` + `assertTeamReady`；TeamCreate/auto-team 原子路径 |
+| 2026-07-10 | **G 起步**：裸 complete 不再自动注入 evaluator（需显式 evaluationPolicy） |
