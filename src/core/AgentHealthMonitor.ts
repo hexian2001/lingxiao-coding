@@ -269,7 +269,8 @@ export class AgentHealthMonitor {
   start(): void {
     // P1 修复：start() 必须幂等；重复调用会重复订阅 12 个 listener、覆盖 pollTimer 引用
     // 导致旧 interval 永跑且无法清理。
-    if (this.pollTimer) return;
+    // 同时用 unsubscribers 长度防「pollTimer 已清但 listener 未退」的半开态重入。
+    if (this.pollTimer || this.unsubscribers.length > 0) return;
     this.subscribeEvents();
     this.schedulePoll();
   }

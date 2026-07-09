@@ -3801,7 +3801,15 @@ export class LeaderAgent {
    */
   dispose(): void {
     this.stop();
+    // 即使未走 run() finally，也必须清实例级 timer（watchdog / health poll）
+    try { this.stopWatchdog(); } catch { /* tolerate */ }
+    try { this.healthMonitor?.stop(); } catch { /* tolerate */ }
     this.board.setContractReadinessResolver(undefined);
+    // SessionRun onChange 监听（非共享 emitter，但 dispose 后仍持有闭包引用）
+    if (this._sessionRunUnsub) {
+      try { this._sessionRunUnsub(); } catch { /* tolerate */ }
+      this._sessionRunUnsub = null;
+    }
     // 退订 attachTaskLifecycleToTeamMailbox 注册的团队通知监听器
     for (const off of this._taskTeamUnsubscribers) {
       try { off(); } catch { /* tolerate：单个退订失败不应阻断其余退订 */ }
@@ -3812,8 +3820,8 @@ export class LeaderAgent {
       try { this._configReloadUnsubscribe(); } catch { /* tolerate */ }
       this._configReloadUnsubscribe = null;
     }
-    // 退订 eternal 模式绑定的共享 emitter 监听器（task:completed 等），防止 dispose 后泄漏
-    try { this.progressInvariant?.disposeEternalListeners(); } catch { /* tolerate */ }
+    // watchdog + eternal 监听一并释放（含 stopWatchdog，幂等）
+    try { this.progressInvariant?.dispose(); } catch { /* tolerate */ }
     // 退订 supervCoordinator 注册的 agent:completed/failed 等活动事件监听器
     try { this.supervCoordinator?.unsubscribeAgentActivityEvents(); } catch { /* tolerate */ }
     // 退订 LeaderAgent 拥有的、订阅共享 emitter 的子系统（与现有 run-scoped 退订并列，

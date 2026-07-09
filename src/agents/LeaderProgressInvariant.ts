@@ -405,6 +405,20 @@ export class LeaderProgressInvariant {
   }
 
   /**
+   * 实例终结：停 watchdog 定时器 + 退订 eternal 监听。
+   * LeaderAgent.dispose 必须调用此方法，避免 dispose 未走 run finally 时 interval 残留。
+   */
+  dispose(): void {
+    this.stopWatchdog();
+    this.disposeEternalListeners();
+  }
+
+  /** Test/diagnostic: whether the progress watchdog interval is armed. */
+  isWatchdogRunning(): boolean {
+    return this.watchdogTimer != null;
+  }
+
+  /**
    * 切到 eternal 时调用：若 EternalLoop 已存在但 listener 因之前切回 manual 已被解绑，
    * 这里补上重新绑定；若 loop 还没建则等 maybeEternalIdlePatrol 懒创建。
    */
