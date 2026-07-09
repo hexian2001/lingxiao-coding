@@ -517,16 +517,24 @@ export class LeaderWorkOrchestrator {
         leaderBlackboard?.releaseIntentForTask(input.taskId);
         return;
       }
-      // P1: 当任务完成时无 orchestration 验收链路（handled=false），OrchestrationRuntime
-      // 已在 handleTaskResult 中对 implement 类任务自动注入 orchestrationRunId 并触发 evaluator。
-      // 此处仅记录 info 日志，不再仅 warn——auto-inject 确保了验收链路覆盖。
+      // G：handled=false 表示未走已有 orchestration run 的 terminal 分支。
+      // 仅当 handleTaskResult 因显式 evaluationPolicy 注入了 runId 时才声称验收链路已建立；
+      // 裸 complete（无 evaluationPolicy）不注入 evaluator，禁止误报 auto-orch。
       if (!handled) {
+        const runId = task.orchestration?.orchestrationRunId;
+        const hasPolicy = Boolean(task.orchestration?.evaluationPolicy);
         const nodeKind = task.orchestration?.nodeKind ?? 'implement';
-        leaderLogger.info(
-          `任务 ${input.taskId} (nodeKind=${nodeKind}) ` +
-          `完成时自动注入了 orchestration 验收链路（auto-orch-${input.taskId}）。` +
-          `evaluator 任务将自动创建以独立验收产出。`
-        );
+        if (runId && hasPolicy) {
+          leaderLogger.info(
+            `任务 ${input.taskId} (nodeKind=${nodeKind}) 完成且带 evaluationPolicy：` +
+            `已建立验收链路 runId=${runId}。`,
+          );
+        } else {
+          leaderLogger.info(
+            `任务 ${input.taskId} (nodeKind=${nodeKind}) 裸完成（handled=false），` +
+            `未自动注入 evaluator（无显式 evaluationPolicy）。`,
+          );
+        }
       }
       this.board.completeTask(input.taskId, awarenessResult);
       this.recordAgentOutcomeCb(localAgentName || input.agentName, input.taskId, 'success');

@@ -81,8 +81,7 @@ import {
   evaluateLeaderAutonomyToolGate,
 } from './leader/LeaderToolGates.js';
 import {
-  evaluateOrchestrationTierGate,
-  resolveOrchestrationTier,
+  evaluateSessionOrchestrationTierGate,
 } from './leader/OrchestrationTierGates.js';
 import { isOrchestrationTier } from '../contracts/types/OrchestrationTier.js';
 import { LeaderToolFailure, fail, type DispatchItemStatus } from './leader/LeaderToolFailure.js';
@@ -489,36 +488,19 @@ export class LeaderToolsExecutor {
       throw fail(autonomyGate.message);
     }
 
-    // Orchestration Kernel v2：S1/S2/S3 代码门控（与纯函数 evaluateOrchestrationTierGate 同源）
-    if (name !== 'set_orchestration_tier') {
-      const modesForTier = resolveModeRuntimeProjection({
-        sessionId: this.leader.sessionId,
-        db: this.leader.db,
-        blackboardAvailable: this.leader.isBlackboardEnabled(),
-        permissionContext: this.leader.getPermissionContext(),
-        permissionSummary: this.leader.getInteractionSnapshot().permissionSummary,
-      });
-      const explicitTier = this.leader.db.getSessionState(
-        this.leader.sessionId,
-        SESSION_KEYS.ORCHESTRATION_TIER,
-      );
-      const tier = resolveOrchestrationTier({
-        explicitTier: typeof explicitTier === 'string' ? explicitTier : null,
-        collaborationMode: modesForTier.collaboration.mode,
-      });
-      const teamReady = modesForTier.collaboration.mode === 'team'
-        ? modesForTier.collaboration.teamEnabled
-        : null;
+    // Orchestration Kernel v2：S1/S2/S3 代码门控（与 TeamManageTool / LeaderDirectTools 同源 session gate）
+    {
       const runningAgentCount = typeof this.leader.pool?.getRunning === 'function'
         ? this.leader.pool.getRunning().length
         : 0;
-      const tierGate = evaluateOrchestrationTierGate({
-        tier,
+      const tierGate = evaluateSessionOrchestrationTierGate({
         toolName: name,
         args,
-        collaborationMode: modesForTier.collaboration.mode,
-        teamReady,
+        sessionId: this.leader.sessionId,
+        db: this.leader.db,
         runningAgentCount,
+        blackboardAvailable: this.leader.isBlackboardEnabled(),
+        permissionContext: this.leader.getPermissionContext(),
       });
       if (!tierGate.ok) {
         throw fail(`[${tierGate.code}] ${tierGate.message}`);

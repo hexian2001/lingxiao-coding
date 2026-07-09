@@ -12,6 +12,7 @@ import type { BlackboardGraph } from '../core/blackboard/BlackboardGraph.js';
 import type { ScheduledTaskManager } from '../core/ScheduledTaskManager.js';
 import { resolveModeRuntimeProjection } from '../core/ModeRuntimeProjection.js';
 import { SESSION_KEYS } from '../core/SessionStateKeys.js';
+import { evaluateSessionOrchestrationTierGate } from '../core/OrchestrationTierGates.js';
 import { evaluateLeaderAutonomyToolGate, type LeaderAutonomyToolGateResult } from './leader/LeaderToolGates.js';
 
 export interface LeaderDirectToolsConfig {
@@ -38,6 +39,8 @@ export interface LeaderDirectToolsConfig {
    * 故用 getter 在执行时解析（而非构造时快照，否则永远是 null）。
    */
   getBlackboardGraph?: () => BlackboardGraph | null;
+  /** Running worker count for S1/S2 concurrency caps (AgentPool). */
+  getRunningAgentCount?: () => number;
 }
 
 export class LeaderDirectToolsExecutor {
@@ -54,6 +57,7 @@ export class LeaderDirectToolsExecutor {
   private workflowEngine?: WorkflowEngine;
   private scheduledTaskManager?: ScheduledTaskManager;
   private getBlackboardGraph?: () => BlackboardGraph | null;
+  private getRunningAgentCount?: () => number;
 
   constructor(config: LeaderDirectToolsConfig) {
     this.toolRegistry = config.toolRegistry;
@@ -69,6 +73,7 @@ export class LeaderDirectToolsExecutor {
     this.workflowEngine = config.workflowEngine;
     this.scheduledTaskManager = config.scheduledTaskManager;
     this.getBlackboardGraph = config.getBlackboardGraph;
+    this.getRunningAgentCount = config.getRunningAgentCount;
   }
 
   getDefinitions(toolNames?: string[]): ToolDefinition[] {
@@ -129,6 +134,23 @@ export class LeaderDirectToolsExecutor {
     this.recordAutonomyDecision(name, autonomyGate);
     if (!autonomyGate.ok) {
       return { ok: false, content: autonomyGate.message };
+    }
+
+    // AC4：S1/S2/S3 代码门控 — team_manage 等走 direct 路径时与纯函数同源 fail-closed
+    const runningAgentCount = typeof this.getRunningAgentCount === 'function'
+      ? this.getRunningAgentCount()
+      : 0;
+    const tierGate = evaluateSessionOrchestrationTierGate({
+      toolName: name,
+      args,
+      sessionId: this.sessionId,
+      db: this.db,
+      runningAgentCount,
+      blackboardAvailable: Boolean(this.getBlackboardGraph?.()),
+      permissionContext,
+    });
+    if (!tierGate.ok) {
+      return { ok: false, content: `[${tierGate.code}] ${tierGate.message}` };
     }
 
     const result = await this.toolRegistry.execute(name, args, {

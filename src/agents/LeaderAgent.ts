@@ -974,6 +974,9 @@ export class LeaderAgent {
       // 黑板在本构造函数后段才 init（line ~778），用 getter 惰性解析，
       // 让 Leader 调用 blackboard(action="...") 统一入口时能拿到 graph。
       getBlackboardGraph: () => this.leaderBlackboard?.blackboardGraph ?? null,
+      getRunningAgentCount: () => (
+        typeof this.pool?.getRunning === 'function' ? this.pool.getRunning().length : 0
+      ),
     });
     this.healthMonitor = new AgentHealthMonitor(
       this.emitter,

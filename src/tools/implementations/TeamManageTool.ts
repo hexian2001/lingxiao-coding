@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { createToolError, Tool, type ToolContext, type ToolResult } from '../Tool.js';
+import { evaluateSessionOrchestrationTierGate } from '../../core/OrchestrationTierGates.js';
 import { TeamCreateTool } from './TeamCreate.js';
 import { TeamDeleteTool } from './TeamDelete.js';
 import { TeamEditTool } from './TeamEdit.js';
@@ -50,6 +51,29 @@ export class TeamManageTool extends Tool {
     if (action === 'edit' && edit_action) {
       forwarded.action = edit_action;
     }
+
+    // AC4：S1/S2/S3 代码门控在真实 team_manage 入口 fail-closed（不依赖 LeaderTools 元路径）。
+    // 必须用原始 action=create|edit|...（不要用 edit 转发后的 add/remove，否则 S1 门控失效）。
+    if (context?.db && context.sessionId) {
+      const tierGate = evaluateSessionOrchestrationTierGate({
+        toolName: 'team_manage',
+        args: { action, edit_action },
+        sessionId: context.sessionId,
+        db: context.db,
+        runningAgentCount: 0,
+        blackboardAvailable: Boolean(context.blackboardGraph),
+        permissionContext: context.permissionContext as never,
+      });
+      if (!tierGate.ok) {
+        return createToolError({
+          code: tierGate.code,
+          message: tierGate.message,
+          retryable: false,
+          fix: '调用 set_orchestration_tier 提升档位，或改用 S1 允许的 Leader 直办路径。',
+        });
+      }
+    }
+
     const target = TARGETS[action];
     const parsed = target.parameters.safeParse(forwarded);
     if (!parsed.success) {
