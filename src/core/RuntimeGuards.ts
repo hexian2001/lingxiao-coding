@@ -76,6 +76,19 @@ function isTerminalWriteError(error: Error): boolean {
 }
 
 /**
+ * Best-effort log that never throws when stdout/stderr is already dead (EPIPE).
+ * Prevents RuntimeGuard handlers from cascading into crash-report storms.
+ */
+function safeRuntimeLog(level: 'error' | 'warn', message: string): void {
+  try {
+    if (level === 'error') console.error(message);
+    else console.warn(message);
+  } catch {
+    /* ignore: console itself may throw write EPIPE on detached TTY */
+  }
+}
+
+/**
  * 判断异常是否属于可恢复的 DB/IO 错误（不应杀死主进程）。
  * SQLITE_BUSY、连接关闭、序列化失败等场景下，丢弃该操作好过整个 CLI 退出。
  */
@@ -195,24 +208,29 @@ export function installProcessRuntimeGuards(): void {
   });
 
   process.on('unhandledRejection', (reason) => {
-    console.error('[RuntimeGuard] Unhandled promise rejection:', reason);
     const error = reason instanceof Error ? reason : new Error(String(reason));
     // 可恢复的基础设施错误（DB busy/closed 等）：与 uncaughtException 同口径，**不毒化 exitCode**。
     // 这些常来自 EventEmitter handler 中 fire-and-forget 的 DB/IO 操作；若每次都置 exitCode=1 且
     // 从不复位，一次瞬态拒绝会让后续每次正常退出都报 1，被 supervisor 误判崩溃触发无谓重启。
     if (isRecoverableInfraError(error)) {
+      // 终端 EPIPE/EIO：stdout 已断时禁止再 console.*（否则连环 uncaught + 海量 crash 落盘）
+      if (isTerminalWriteError(error)) return;
       if (consecutiveRecoverableCount < MAX_CONSECUTIVE_RECOVERABLE) {
         consecutiveRecoverableCount++;
-        console.warn(`[RuntimeGuard] Recoverable infra rejection (${consecutiveRecoverableCount}/${MAX_CONSECUTIVE_RECOVERABLE}), NOT poisoning exitCode:`, error.message);
+        safeRuntimeLog(
+          'warn',
+          `[RuntimeGuard] Recoverable infra rejection (${consecutiveRecoverableCount}/${MAX_CONSECUTIVE_RECOVERABLE}), NOT poisoning exitCode: ${error.message}`,
+        );
         setTimeout(() => { consecutiveRecoverableCount = Math.max(0, consecutiveRecoverableCount - 1); }, 60_000).unref();
       }
       return;
     }
+    safeRuntimeLog('error', `[RuntimeGuard] Unhandled promise rejection: ${error.message}`);
     // 真正未处理的拒绝（非基础设施类，确属 bug）：标记非零退出，但仍让进程自然 drain。
     // 落盘结构化崩溃报告（best-effort，永不抛）。
     const crashPath = writeCrashReport({ error, source: 'unhandledRejection' });
     if (crashPath) {
-      console.error(`[RuntimeGuard] 崩溃报告已保存: ${crashPath}`);
+      safeRuntimeLog('error', `[RuntimeGuard] 崩溃报告已保存: ${crashPath}`);
     }
     process.exitCode = 1;
   });
@@ -223,7 +241,12 @@ export function installProcessRuntimeGuards(): void {
     if (suppressedUncaughtCount > 0) {
       suppressedErrors.push(error);
       suppressedUncaughtCount--;
-      console.warn('[RuntimeGuard] Suppressed uncaught exception (handled by caller):', error.message);
+      safeRuntimeLog('warn', `[RuntimeGuard] Suppressed uncaught exception (handled by caller): ${error.message}`);
+      return;
+    }
+
+    // 终端写失败：永不计数杀进程、永不 writeCrashReport、永不 console（防 EPIPE 风暴）
+    if (isTerminalWriteError(error)) {
       return;
     }
 
@@ -231,17 +254,20 @@ export function installProcessRuntimeGuards(): void {
     // 这些错误通常来自 EventEmitter handler 中未被内层 try-catch 捕获的 DB 操作。
     if (isRecoverableInfraError(error) && consecutiveRecoverableCount < MAX_CONSECUTIVE_RECOVERABLE) {
       consecutiveRecoverableCount++;
-      console.warn(`[RuntimeGuard] Recoverable infra error (${consecutiveRecoverableCount}/${MAX_CONSECUTIVE_RECOVERABLE}), NOT exiting:`, error.message);
+      safeRuntimeLog(
+        'warn',
+        `[RuntimeGuard] Recoverable infra error (${consecutiveRecoverableCount}/${MAX_CONSECUTIVE_RECOVERABLE}), NOT exiting: ${error.message}`,
+      );
       // 安排降级重置
       setTimeout(() => { consecutiveRecoverableCount = Math.max(0, consecutiveRecoverableCount - 1); }, 60_000).unref();
       return;
     }
 
-    console.error('[RuntimeGuard] Uncaught exception — exiting to avoid undefined state:', error);
+    safeRuntimeLog('error', `[RuntimeGuard] Uncaught exception — exiting to avoid undefined state: ${error.message}`);
     // 真崩溃落盘结构化报告（best-effort，永不抛）。recoverable/suppressed 分支已在上方短路，不会到这里。
     try {
       const crashPath = writeCrashReport({ error, source: 'uncaughtException' });
-      if (crashPath) console.error(`[RuntimeGuard] 崩溃报告已保存: ${crashPath}`);
+      if (crashPath) safeRuntimeLog('error', `[RuntimeGuard] 崩溃报告已保存: ${crashPath}`);
     } catch { /* crash report best-effort */ }
     // Node.js 文档明确指出 uncaughtException 后继续运行是不安全的。
     // 收敛到单一 gracefulShutdown(F2):与信号 handler / daemon 自停共享 latch + force timer,
