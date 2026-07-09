@@ -1,3 +1,8 @@
+/**
+ * HTTP Office 生成后端（/api/v1/office/generate）。
+ * 由 web-server/OfficeRoutes 直接实例化执行；不注册到 ToolRegistry，不进入 agent 工具面。
+ * Agent 侧产物生成请走 shell + 库（见 OfficeModeProtocol）。
+ */
 import { z } from 'zod';
 import { dirname, resolve } from 'path';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';

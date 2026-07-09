@@ -62,7 +62,7 @@ function hasCellError(value: unknown): boolean {
 
 export class OfficeOpsTool extends Tool {
   readonly name = 'office_ops';
-  readonly description = '统一 Office 操作入口：action="validate" 做文档验收；action="runtime" 运行 OOXML/LibreOffice/PDF 辅助操作；action="review" 做版本对比、审阅清单和 Word 批注/修订；action="assets" 搜索或下载办公素材；action="excel_analysis" 做工作簿结构/公式/错误单元格分析；action="pdf_ocr_pipeline" 规划或执行 PDF 转图/OCR 前置管线；action="render_qa" 规划或执行 PPTX/PDF 高保真渲染验收。runtime/review/assets 的原子动作放在 office_action 字段，例如 {action:"runtime", office_action:"list"}。生成/编辑具体文档仍使用 generate_/edit_ 格式工具。';
+  readonly description = '统一 Office 验收与运维入口：action="validate" 做文档验收；action="runtime" 运行 OOXML/LibreOffice/PDF 辅助操作；action="review" 做版本对比、审阅清单和 Word 批注/修订；action="assets" 搜索或下载办公素材；action="excel_analysis" 做工作簿结构/公式/错误单元格分析；action="pdf_ocr_pipeline" 规划或执行 PDF 转图/OCR 前置管线；action="render_qa" 规划或执行 PPTX/PDF 高保真渲染验收。runtime/review/assets 的原子动作放在 office_action 字段，例如 {action:"runtime", office_action:"list"}。';
   readonly parameters = OfficeOpsSchema;
 
   private readonly delegates = {

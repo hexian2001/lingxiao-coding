@@ -20,7 +20,8 @@ const BLACKBOARD_OUTPUT_PROTOCOL = `**黑板输出协议**：
 - 已确认事实输出 \`\`\`graph_fact\`\`\` 结构化代码块，字段包含 title、content、tags、confidence、evidence
 - 后续探索方向输出 \`\`\`graph_intent\`\`\` 结构化代码块，字段包含 title、content、tags、priority
 - 跨 Agent 契约输出 \`\`\`graph_contract\`\`\`，设计约定输出 \`\`\`graph_design_doc\`\`\`
-- 这些不是工具调用；运行时会解析结构化代码块写入黑板，并通过 Context Manifest 传递给后续 Agent`;
+- 运行时会解析这些结构化代码块并物化到黑板，经 Context Manifest 传给后续 Agent
+- 需要即时读写图时调用 blackboard 工具（action=write_fact|declare_intent|add_edge|supersede_node|read_graph）`;
 
 /**
  * Bootstrap Execute Prompt

@@ -132,13 +132,21 @@ export function uniqueTools(values: string[]): string[] {
  *   - workflow 统一入口（仅 workflow 模式）
  *   - blackboard 统一入口写入（blackboard(action="...")，仅 blackboard 模式）
  *   - office 产物工具在 Office mode 下才暴露；普通模式由 BaseAgent/ToolPruner 统一剔除
+ *   - lsp（仅 LINGXIAO_EXPERIMENTAL_LSP=1 时注册，不进默认白名单）
+ *
+ * 已注册且应进入 Worker 面的工具必须列在这里，否则 role.tools 过滤后 Worker
+ * 永远看不到（历史 bug：get_terminal_output 被 shell nextToolHints 指向却未入白名单）。
  */
 export const WORKER_TOOLS: string[] = mergeTools(
   ['session_artifacts', 'find_tools', 'tool_preflight', 'parallel_read_batch', 'design_asset'],
   BASIC_TOOLS,
+  // AST 结构查询（与 code_search 互补，call graph / definitions / references）
+  ['ast_query'],
   ['web_fetch', 'web_search', 'http_request', 'parse_file'],
   [...OFFICE_TOOL_NAMES],
   ['screenshot', 'visual_contact_sheet', 'browser_visual_verify', 'browser_action', 'ocr', 'mcp', 'node_repl'],
+  // shell 异步会话回读 / 终端控制 / git —— 与 shell 同属执行链路
+  ['get_terminal_output', 'terminal_control', 'git'],
   MEMORY_TOOLS,
   COMM_TOOLS,
   TEAM_COMM_TOOLS,

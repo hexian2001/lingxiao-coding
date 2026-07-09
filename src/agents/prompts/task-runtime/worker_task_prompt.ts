@@ -216,6 +216,8 @@ export function buildWorkerTaskPrompt(input: {
       '```graph_intent {"title","content","tags","priority"}```',
       '```graph_edge {"from","to","type"}```',
       '```graph_supersede {"old_node_id"}```',
+      '```graph_contract {"surface","title","content"}```',
+      '```graph_design_doc {"title","content"}```',
     ])] : []),
 
     section(text.skillPathRulesHeading, [

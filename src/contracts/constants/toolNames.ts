@@ -1,7 +1,7 @@
 export const OFFICE_TOOL_NAMES = [
-  // 固定 schema 的 generate_*/edit_*/inspect_*/html/slidev/canvas 工具已废弃；
-  // office 产物改由 agent 用 shell 跑 node 脚本直调库（pptxgenjs/docx/exceljs/pdfkit）自由生成。
-  // 仅保留验收 runtime 必需的 office_ops 与文件解析 parse_file。
+  // Office 模式对 agent 暴露的工具：验收/运维（office_ops）与文件解析（parse_file）。
+  // 产物生成走 shell + pptxgenjs/docx/exceljs/pdfkit（见 OfficeModeProtocol）。
+  // Web HTTP /api/v1/office/generate 另有独立后端实现，不经本列表。
   'office_ops',
   'parse_file',
 ] as const;

@@ -62,8 +62,19 @@ export const TEAM_MEMBER_TOOL_NAMES: ReadonlySet<string> = new Set([
   'team_inbox',
 ]);
 
+/**
+ * Leader 元工具名集合（Worker 侧 fail-closed 隐藏）。
+ * 与 leaderToolDefinitions 中 LEADER_META_TOOLS + BUGHUNT_TOOLS 对齐。
+ *
+ * 注意：write_work_note / read_work_notes / request_work_note 同时存在于
+ * ToolRegistry（Worker 可用）与 Leader meta schema，不可放入本集合，
+ * 否则 Worker 会被误伤隐藏。
+ */
 export const LEADER_META_TOOL_NAMES: ReadonlySet<string> = new Set([
+  'record_capability_intent',
+  'spawn_worker',
   'create_task',
+  'define_project_blueprint',
   'update_task',
   'delete_task',
   'define_agent_role',
@@ -92,9 +103,12 @@ export const LEADER_META_TOOL_NAMES: ReadonlySet<string> = new Set([
   'plan_checkpoint',
   'plan_finalize',
   'finish_session',
+  'complete_eternal_goal',
+  'write_contract',
   'learn_soul',
   'request_permission_update',
   'create_download_link',
+  'set_mode',
   'set_bughunt_dag',
   'upsert_bughunt_finding',
   'get_bughunt_ledger',

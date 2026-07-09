@@ -169,3 +169,85 @@ test('electron afterPack pruning removes only Windows-unneeded unpacked artifact
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+
+test('worker tool surface stays aligned with ToolRegistry registration', () => {
+  // WORKER_TOOLS must include every always-on registered tool that workers need.
+  // Mode-gated tools (workflow, bughunt_full_scan, office via mode) and experimental lsp
+  // are allowed to be registered without living in WORKER_TOOLS.
+  const indexText = readText(join(pkgRoot, 'src/tools/index.ts'));
+  const roleText = readText(join(pkgRoot, 'src/contracts/constants/rolePresets.ts'));
+
+  const registered = new Set();
+  for (const m of indexText.matchAll(/name:\s*['"`]([a-z][a-z0-9_]+)['"`]/g)) {
+    registered.add(m[1]);
+  }
+
+  // Expand WORKER_TOOLS groups by parsing the mergeTools call region roughly via known literals.
+  const workerRegion = roleText.match(/export const WORKER_TOOLS[\s\S]*?;\n/);
+  assert.ok(workerRegion, 'WORKER_TOOLS export not found');
+  const worker = new Set([...workerRegion[0].matchAll(/['"`]([a-z][a-z0-9_]+)['"`]/g)].map((m) => m[1]));
+  // BASIC_TOOLS / nested constants also define tool names above WORKER_TOOLS
+  for (const m of roleText.matchAll(/['"`]([a-z][a-z0-9_]+)['"`]/g)) {
+    // only collect from tool-list arrays near known constants
+  }
+  // Re-parse with explicit group constants used by WORKER_TOOLS
+  const extractArray = (name) => {
+    const re = new RegExp(`(?:const|export const) ${name}[\\s\\S]*?=\\s*\\[([\\s\\S]*?)\\];`);
+    const m = roleText.match(re);
+    if (!m) return [];
+    return [...m[1].matchAll(/['"`]([a-z][a-z0-9_]+)['"`]/g)].map((x) => x[1]);
+  };
+  for (const name of ['BASIC_TOOLS', 'COMM_TOOLS', 'MEMORY_TOOLS', 'TEAM_COMM_TOOLS', 'OFFICE_TOOL_NAMES']) {
+    for (const n of extractArray(name)) worker.add(n);
+  }
+  // OFFICE comes from import; hardcode known office names from toolNames
+  const toolNames = readText(join(pkgRoot, 'src/contracts/constants/toolNames.ts'));
+  const office = toolNames.match(/export const OFFICE_TOOL_NAMES = \[([\s\S]*?)\]/);
+  if (office) {
+    for (const m of office[1].matchAll(/['"`]([a-z][a-z0-9_]+)['"`]/g)) worker.add(m[1]);
+  }
+  for (const m of workerRegion[0].matchAll(/['"`]([a-z][a-z0-9_]+)['"`]/g)) worker.add(m[1]);
+
+  const modeGated = new Set(['workflow', 'bughunt_full_scan', 'lsp']);
+  const registeredNotWorker = [...registered].filter((n) => !worker.has(n) && !modeGated.has(n)).sort();
+  assert.deepEqual(
+    registeredNotWorker,
+    [],
+    `Registered tools missing from WORKER_TOOLS (and not mode/env gated): ${registeredNotWorker.join(', ')}`,
+  );
+
+  // shell nextToolHints target must be worker-visible
+  const meta = readText(join(pkgRoot, 'src/contracts/types/ToolMetadata.ts'));
+  assert.match(meta, /nextToolHints:\s*\[['"]get_terminal_output['"]\]/);
+  assert.equal(worker.has('get_terminal_output'), true, 'get_terminal_output must be in WORKER_TOOLS');
+  assert.equal(worker.has('git'), true);
+  assert.equal(worker.has('ast_query'), true);
+  assert.equal(worker.has('terminal_control'), true);
+});
+
+test('tools/ToolMetadata re-exports contracts SSOT (no dual map)', () => {
+  const toolsMeta = readText(join(pkgRoot, 'src/tools/ToolMetadata.ts'));
+  assert.match(toolsMeta, /export \* from ['"]\.\.\/contracts\/types\/ToolMetadata\.js['"]/);
+  assert.equal(toolsMeta.includes('export const TOOL_METADATA'), false);
+});
+
+test('orphan Tool class files that are not registered stay out of implementations root (deleted facades only)', () => {
+  // SessionInfo / Edit* / Inspect* / GenerateCanvas/Slidev/Html* were unregistered dead agent tools.
+  const ban = [
+    'SessionInfoTool.ts',
+    'EditDocxTool.ts',
+    'EditPptxTool.ts',
+    'EditXlsxTool.ts',
+    'InspectDocxTool.ts',
+    'InspectPptxTool.ts',
+    'GenerateCanvasTool.ts',
+    'GenerateSlidevTool.ts',
+    'GenerateHtmlDocumentTool.ts',
+    'GenerateHtmlPresentationTool.ts',
+  ];
+  const root = join(pkgRoot, 'src/tools/implementations');
+  const present = ban.filter((name) => existsSync(join(root, name)));
+  assert.deepEqual(present, [], `unexpected orphan tool files still present: ${present.join(', ')}`);
+});
+

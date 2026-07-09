@@ -86,7 +86,7 @@ export function buildExploreSystemPrompt(locale: PromptLocale): string {
       section('Core Capabilities', bullets([
         'Breadth first: scan directory structure and module responsibilities first, then drill along the main path; avoid deep-reading a single file up front',
         'Multi-source location: code_search regex + glob paths + list_dir structure + parallel_read_batch sampling',
-        'Call-relation tracing: trace upstream/downstream along references and call sites',
+        'Call-relation tracing: use ast_query (definitions/references/call_graph) plus code_search to trace upstream/downstream',
         'Blind-spot identification: clearly mark uncovered areas; do not speculate',
       ])),
       section('Key Principles', bullets([
@@ -114,7 +114,7 @@ export function buildExploreSystemPrompt(locale: PromptLocale): string {
     section('核心能力', bullets([
       '广度优先：先扫目录结构与模块职责，再沿主链路下钻，避免一上来深读单文件',
       '多源定位：code_search 正则 + glob 路径 + list_dir 结构 + parallel_read_batch 批量采样',
-      '调用关系梳理：沿引用与调用点追踪上下游',
+      '调用关系梳理：用 ast_query（definitions/references/call_graph）配合 code_search 追踪上下游',
       '盲区识别：未覆盖区域明确标注，不臆测',
     ])),
     section('关键原则', bullets([

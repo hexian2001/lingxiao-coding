@@ -65,8 +65,10 @@ export const TOOL_METADATA: Readonly<Record<string, ToolMetadata>> = Object.free
   mcp: execute('network', { dangerous: false, requiresNetwork: true, privileged: true, resultShape: 'json' }),
   node_repl: execute('execution', { privileged: true, dangerous: true, resultShape: 'json' }),
 
-  // Memory / work notes
+  // Memory / work notes — memory_read/write split (P0-1c)
   memory: write('memory', { dangerous: false, privileged: true, resultShape: 'text' }),
+  memory_read: read('memory', { dangerous: false, privileged: true, resultShape: 'text' }),
+  memory_write: write('memory', { dangerous: false, privileged: true, resultShape: 'text' }),
   write_work_note: read('communication', { resultShape: 'text' }),
   read_work_notes: read('communication', { resultShape: 'text' }),
   request_work_note: read('communication', { resultShape: 'text' }),
@@ -82,7 +84,7 @@ export const TOOL_METADATA: Readonly<Record<string, ToolMetadata>> = Object.free
   // Blackboard
   blackboard: write('blackboard', { dangerous: false, resultShape: 'json' }),
 
-  // Office / artifacts（仅保留验收 runtime 工具；generate_*/edit_*/inspect_* 固定 schema 工具已废弃，改走 JS+shell 自由生成）
+  // Office / artifacts：agent 侧验收与运维入口（office_ops）；产物生成走 shell + pptxgenjs/docx/exceljs/pdfkit
   office_ops: write('office', { dangerous: false, resultShape: 'json' }),
 
   // Design asset library
@@ -95,14 +97,19 @@ export const TOOL_METADATA: Readonly<Record<string, ToolMetadata>> = Object.free
   git: execute('git', { privileged: true, resultShape: 'text' }),
 
   // Leader-only meta tools (not ToolRegistry tools, but governed by same metadata map)
-  // create_task 不再 leaderParallelSafe：通过 nextTaskId() 顺序分配 task_id，并行会破坏依赖解析时序（与 tools/ToolMetadata.ts 保持一致）。
+  // create_task / define_project_blueprint 顺序执行：nextTaskId() 保证声明顺序==分配顺序。
+  record_capability_intent: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  spawn_worker: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   create_task: write('workflow', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  define_project_blueprint: write('workflow', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   update_task: write('workflow', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   delete_task: write('workflow', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   define_agent_role: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   delete_agent_role: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   list_available_roles: read('team', { visibility: 'leader' }),
   dispatch_agent: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  dispatch_batch: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  explore: write('team', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   send_message_to_agent: read('communication', { visibility: 'leader', resultShape: 'json' }),
   update_task_status: write('workflow', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   force_complete_task: write('team', { visibility: 'leader', dangerous: true, resultShape: 'json' }),
@@ -124,9 +131,12 @@ export const TOOL_METADATA: Readonly<Record<string, ToolMetadata>> = Object.free
   plan_checkpoint: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   plan_finalize: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   finish_session: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  complete_eternal_goal: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
+  write_contract: write('blackboard', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   learn_soul: write('memory', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   request_permission_update: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   create_download_link: read('file', { visibility: 'leader', resultShape: 'json' }),
+  set_mode: write('session', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   set_bughunt_dag: write('security', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   upsert_bughunt_finding: write('security', { visibility: 'leader', dangerous: false, resultShape: 'json' }),
   get_bughunt_ledger: read('security', { visibility: 'leader' }),

@@ -881,7 +881,7 @@ description: '提交当前的完整执行方案。行为取决于控制模式（
     type: 'function',
     function: {
       name: 'learn_soul',
-      description: '【已废弃·新代码禁用】记忆便捷写入，等价于 memory(action="save", content=..., scope=...)。保留仅为向后兼容，新代码请直接用 memory 工具。底层调用同一个 MemoryManager，写入路径：project=.lingxiao/memory/ 或 user=~/.lingxiao/memory/。',
+      description: '便捷写入记忆，等价于 memory(action="save", content=..., scope=...)。底层调用同一个 MemoryManager；写入路径：project=.lingxiao/memory/ 或 user=~/.lingxiao/memory/。',
       parameters: {
         type: 'object',
         properties: {

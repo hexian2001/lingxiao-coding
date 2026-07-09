@@ -8,7 +8,7 @@
  *
  * 产物：PowerPoint/WPS/Keynote 可打开、视觉 1:1 保真、含演讲者备注的 .pptx。
  * 文字不可在 PPT 内直接编辑（图片形态）——这是 HTML→PPTX 的世界级诚实上限；
- * 若需可编辑 PPTX，请走 generate_pptx（pptxgenjs 原生形状路径）。
+ * 若需可编辑 PPTX，用 shell + pptxgenjs 原生形状路径生成。
  *
  * 与 HtmlToPng 协作：先逐 slide 截图，再拼装。
  */

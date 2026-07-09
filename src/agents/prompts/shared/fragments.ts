@@ -98,7 +98,7 @@ export function buildCrossStackContractProtocol(role: 'frontend' | 'backend' | '
     return section('Contract Protocol (cross-stack required reading)', bullets([
       'Before starting, read the Context Manifest, blackboard [contract:<surface>] and [design_doc] nodes to confirm request/response schema, error codes, status flow, component props, env vars, and acceptance criteria',
       `Current role action: ${roleAction}`,
-      'When a contract is missing, fields are ambiguous, or implementation needs adjustment, submit a v+1 ```graph_contract``` block; fields include surface, title, version, content; content must cover schema, error codes, status flow, change impact, migration steps, and acceptance evidence',
+      'When a contract is missing, fields are ambiguous, or implementation needs adjustment, submit a v+1 ```graph_contract code block (runtime materializes it onto the blackboard); fields include surface, title, version, content; content must cover schema, error codes, status flow, change impact, migration steps, and acceptance evidence',
       'When the other side must confirm, send team_message(type="request", request_id="<surface>@v<N>"); after receiving a request and finishing the work, send team_message(type="ack", request_id="<same>")',
       'The final summary lists contract surface/version, consumption or upgrade conclusions, affected files, verification evidence, and pending alignment items so the next Agent can reuse them directly',
     ]));
@@ -106,7 +106,7 @@ export function buildCrossStackContractProtocol(role: 'frontend' | 'backend' | '
   return section('契约协议（跨栈必读）', bullets([
     '开工前读取 Context Manifest、黑板 [contract:<surface>] 与 [design_doc] 节点，确认请求/响应 schema、错误码、状态流、组件 props、环境变量和验收口径',
     `当前角色动作：${roleAction}`,
-    '契约缺失、字段含糊或实现需要调整时，提交 v+1 ```graph_contract``` 代码块；字段包含 surface、title、version、content，content 写清 schema、错误码、状态流、变更影响、迁移步骤和验收证据',
+    '契约缺失、字段含糊或实现需要调整时，提交 v+1 ```graph_contract 代码块（运行时写入黑板）；字段包含 surface、title、version、content，content 写清 schema、错误码、状态流、变更影响、迁移步骤和验收证据',
     '需要对方确认时发送 team_message(type="request", request_id="<surface>@v<N>")；收到 request 并完成处理后发送 team_message(type="ack", request_id="<same>")',
     '最终摘要列出契约 surface/version、消费或升级结论、影响文件、验证证据和待对齐项，让后续 Agent 可直接复用',
   ]));

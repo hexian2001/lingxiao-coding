@@ -6,7 +6,7 @@
  * `<td data-formula="=SUM(B2:B5)">合计</td>`）。产物是**可编辑**的 .xlsx
  * （Excel/WPS/Numbers 可直接打开改公式）。
  *
- * 底层用 exceljs（^4.4.0，与 generate_xlsx/edit_xlsx 同源），保证样式体系一致。
+ * 底层用 exceljs（^4.4.0，与 exceljs 工作簿路径同源），保证样式体系一致。
  */
 
 import { writeFile, mkdir } from 'fs/promises';
