@@ -4,7 +4,7 @@
  * 提供:
  * - 最小化的 MessageBus（Wiki Agent 无需与其他 Agent 通信）
  * - 最小化的 TokenTracker（纯内存实现）
- * - 只读工具注册表: file_read, list_dir, code_search
+ * - 只读工具注册表: file_read, list_dir, code_search, ast_query, glob
  * - Wiki 文档生成的系统提示词
  * - 独立 EventEmitter：wiki agent 事件不污染主 TUI
  */
@@ -16,6 +16,8 @@ import { ToolRegistry } from '../tools/Registry.js';
 import { FileReadTool } from '../tools/implementations/FileRead.js';
 import { ListDirTool } from '../tools/implementations/ListDir.js';
 import { CodeSearchTool } from '../tools/implementations/CodeSearchTool.js';
+import { AstQueryTool } from '../tools/implementations/AstQueryTool.js';
+import { GlobTool } from '../tools/implementations/GlobTool.js';
 import { createLLMClient } from '../llm/Client.js';
 import EventEmitter, {
   type EventMap,
@@ -57,6 +59,8 @@ function createWikiToolRegistry(): ToolRegistry {
   registry.register(new FileReadTool());
   registry.register(new ListDirTool());
   registry.register(new CodeSearchTool());
+  registry.register(new AstQueryTool());
+  registry.register(new GlobTool());
   return registry;
 }
 
@@ -214,7 +218,7 @@ export function createWikiAgent(options: CreateWikiAgentOptions): WikiAgent {
     name: `wiki-${sectionTitle}`,
     role: 'wiki-writer',
     systemPrompt: getWikiSystemPrompt(lang),
-    toolNames: ['file_read', 'list_dir', 'code_search'],
+    toolNames: ['file_read', 'list_dir', 'code_search', 'ast_query', 'glob'],
     llmClient: llm,
     toolRegistry,
     messageBus: bus,

@@ -1,7 +1,7 @@
 /**
  * WikiAgent — 扩展 BaseAgent 的 Wiki 文档生成 Agent
  *
- * 拥有完整的 LLM 工具调用循环（file_read, list_dir, code_search），
+ * 拥有完整的 LLM 工具调用循环（file_read, list_dir, code_search, ast_query, glob），
  * 能够自主探索代码库后编写文档，而非依赖预读源码的原始 LLM 调用。
  *
  * 特别处理：

@@ -742,7 +742,7 @@ export class LeaderWorkOrchestrator {
         { title: 'Worker Completion Artifacts', content: combinedAgentReport },
         {
           title: 'Leader Verification Directive',
-          content: `请评估产出并决定下一步动作。如本次任务产出了重要的架构决策、技术选型、用户偏好或关键发现，请调用 learn_soul 写入对应的项目级/用户级长期记忆。${dispatchDirective}`,
+          content: `请评估产出并决定下一步动作。如本次任务产出了重要的架构决策、技术选型、用户偏好或关键发现，请调用 learn_soul 写入项目级/用户级长期记忆（与 memory 工具同一存储）。${dispatchDirective}`,
         },
       ],
     });

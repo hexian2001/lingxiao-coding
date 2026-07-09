@@ -995,7 +995,7 @@ description: '提交当前的完整执行方案。行为取决于控制模式（
     type: 'function',
     function: {
       name: 'learn_soul',
-      description: '便捷写入记忆，等价于 memory(action="save", content=..., scope=...)。底层调用同一个 MemoryManager；写入路径：project=.lingxiao/memory/ 或 user=~/.lingxiao/memory/。',
+      description: 'Leader 写入长期记忆（项目级/用户级）。与 Worker 的 memory/memory_write 共用 MemoryManager；写入路径 project=.lingxiao/memory/ 或 user=~/.lingxiao/memory/。参数：content（必填）、scope=project|user。',
       parameters: {
         type: 'object',
         properties: {

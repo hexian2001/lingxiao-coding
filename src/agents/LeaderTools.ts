@@ -82,7 +82,8 @@ import {
 } from './leader/LeaderToolGates.js';
 import { LeaderToolFailure, fail, type DispatchItemStatus } from './leader/LeaderToolFailure.js';
 import { getTeamMailbox, getTeamMemberRegistry } from '../core/TeamMailbox.js';
-import { MemoryManager, type MemoryScope, type MemoryType } from '../memory/MemoryManager.js';
+import { type MemoryScope } from '../memory/MemoryManager.js';
+import { MemoryWriteTool } from '../tools/implementations/MemoryTool.js';
 import { resolveModeRuntimeProjection, type ModeRuntimeProjection } from '../core/ModeRuntimeProjection.js';
 import { readPersistedEternalGoal } from '../core/EternalGoal.js';
 import { getPromptCatalog } from './prompts/i18n/catalog.js';
@@ -1477,8 +1478,6 @@ export class LeaderToolsExecutor {
   }
 
   /**
-   * 兼容旧 learn_soul 入口，实际写入统一长期记忆系统。
-   */  /**
    * write_contract: Leader 直接写入契约到 SharedLedger。
    * 解除蓝图 dispatch 拦截、满足 contract readiness gate。
    */
@@ -1522,24 +1521,37 @@ export class LeaderToolsExecutor {
   }
 
 
+  /**
+   * Leader 长期记忆入口：薄封装，经 MemoryWriteTool 写入与 Worker `memory` 同一套 MemoryManager。
+   */
   protected async learnSoul(args: Record<string, unknown>): Promise<string> {
     const content = typeof args.content === 'string' ? args.content.trim() : '';
     const scope: MemoryScope = args.scope === 'user' ? 'user' : 'project';
     if (!content) throw fail('记忆内容为空，未写入。');
 
-    const type: MemoryType = scope === 'user' ? 'user' : 'project';
-    const manager = new MemoryManager(this.leader.workspace);
     const timestamp = new Date().toISOString();
-    const saved = manager.saveMemory(
-      memoryNameFromContent('leader-memory', content),
-      type,
-      compactOneLine(content, 140) || 'Leader recorded long-term memory',
-      [`## 学习记录`, '', `source: learn_soul`, `createdAt: ${timestamp}`, '', content].join('\n'),
-      scope,
-    );
+    const name = memoryNameFromContent('leader-memory', content);
+    const description = compactOneLine(content, 140) || 'Leader recorded long-term memory';
+    const body = [`## 学习记录`, '', `source: learn_soul`, `createdAt: ${timestamp}`, '', content].join('\n');
 
-    const scopeName = scope === 'user' ? '用户级' : '项目级';
-    return `已记录到${scopeName}长期记忆 "${saved.name}": ${saved.filePath}`;
+    const result = await new MemoryWriteTool().execute(
+      {
+        action: 'save',
+        name,
+        type: scope === 'user' ? 'user' : 'project',
+        description,
+        content: body,
+        scope,
+      },
+      {
+        workspace: this.leader.workspace,
+        sessionId: this.leader.sessionId,
+      },
+    );
+    if (!result.success) {
+      throw fail(result.error || 'learn_soul 写入失败');
+    }
+    return typeof result.data === 'string' ? result.data : `已写入长期记忆: ${name}`;
   }
 
   protected async requestPermissionUpdate(args: Record<string, unknown>): Promise<string> {
