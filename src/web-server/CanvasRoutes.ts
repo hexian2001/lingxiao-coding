@@ -11,8 +11,9 @@
  *   - POST /api/v1/canvas/comment/status  更新批注状态（pending/applied/dismissed）
  *   - POST /api/v1/canvas/intent     提交 SelectionIntent → 转交 Leader 改源码（回写闭环入口）
  *
- * 选区意图提交后，由 AcpHandler 注入 Leader prompt；Leader 改 spec/script →
- * 重新装配 → CanvasStore 入栈新版本 → SSE 推 artifact:* → 前端热更新。
+ * 选区意图提交后注入 Leader prompt；Leader 应调用：
+ *   canvas_get_state → 改源码/重生成 → canvas_save_sourcemap（可选）→ canvas_push_version
+ * canvas_push_version 会 emit canvas:version_pushed，SseBridge 推到前端。
  */
 
 import type { FastifyInstance } from 'fastify';

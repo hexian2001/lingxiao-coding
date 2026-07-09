@@ -15,8 +15,8 @@ function toolCall(name: string, args: unknown): ToolCall {
 }
 
 describe('ToolLoopDetector', () => {
-  it('is disabled by default and never reports looping', () => {
-    const detector = new ToolLoopDetector({ threshold: 2 });
+  it('can be explicitly disabled and never reports looping', () => {
+    const detector = new ToolLoopDetector({ enabled: false, threshold: 2 });
     const call = toolCall('file_read', { path: 'a.ts' });
 
     detector.observe([call]);
@@ -27,7 +27,7 @@ describe('ToolLoopDetector', () => {
     assert.equal(detector.isLooping, false);
   });
 
-  it('reports repeated identical tool calls when explicitly enabled', () => {
+  it('reports repeated identical tool calls when enabled (default)', () => {
     const detector = new ToolLoopDetector({ enabled: true, threshold: 2 });
     const call = toolCall('file_read', { path: 'a.ts' });
 

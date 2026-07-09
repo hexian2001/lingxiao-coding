@@ -251,3 +251,38 @@ test('orphan Tool class files that are not registered stay out of implementation
   assert.deepEqual(present, [], `unexpected orphan tool files still present: ${present.join(', ')}`);
 });
 
+
+test('leader meta tools required by prompts are registered in LEADER_META_TOOLS schema', () => {
+  const defs = readText(join(pkgRoot, 'src/contracts/constants/leaderToolDefinitions.ts'));
+  const names = new Set([...defs.matchAll(/name:\s*['"`]([a-z][a-z0-9_]+)['"`]/g)].map((m) => m[1]));
+  // 实现与 prompt 共同声明的关键工具必须出现在 schema 中
+  const required = [
+    'define_project_blueprint',
+    'add_subsystem',
+    'update_subsystem',
+    'delete_subsystem',
+    'canvas_save_sourcemap',
+    'canvas_push_version',
+    'canvas_get_state',
+  ];
+  const missing = required.filter((n) => !names.has(n));
+  assert.deepEqual(missing, [], `LEADER_META_TOOLS missing: ${missing.join(', ')}`);
+});
+
+test('leader system prompt subsystem tools are subset of LEADER_META schema', () => {
+  const prompt = readText(join(pkgRoot, 'src/agents/prompts/i18n/leader_system_prompt.ts'));
+  const defs = readText(join(pkgRoot, 'src/contracts/constants/leaderToolDefinitions.ts'));
+  const schemaNames = new Set([...defs.matchAll(/name:\s*['"`]([a-z][a-z0-9_]+)['"`]/g)].map((m) => m[1]));
+  const claimed = [...prompt.matchAll(/\b(add_subsystem|update_subsystem|delete_subsystem|define_project_blueprint)\b/g)].map((m) => m[1]);
+  const unique = [...new Set(claimed)];
+  const missing = unique.filter((n) => !schemaNames.has(n));
+  assert.deepEqual(missing, [], `prompt claims tools missing from schema: ${missing.join(', ')}`);
+});
+
+test('orphan office/html and tools/slidev directories stay deleted', () => {
+  assert.equal(existsSync(join(pkgRoot, 'src/tools/implementations/office/html')), false);
+  assert.equal(existsSync(join(pkgRoot, 'src/tools/slidev')), false);
+  assert.equal(existsSync(join(pkgRoot, 'src/tools/implementations/fonts')), false);
+  assert.equal(existsSync(join(pkgRoot, 'src/tools/implementations/office/OoxmlTextReplace.ts')), false);
+});
+

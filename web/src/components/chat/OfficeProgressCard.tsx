@@ -1,7 +1,7 @@
 /**
  * OfficeProgressCard — Office 工具运行时的进度卡片
  *
- * 在 ToolCallCard 中，当 generate_pptx/docx/xlsx/pdf 工具处于 running 状态时，
+ * 在 ToolCallCard 中，当 office 生成/验收类工具处于 running 状态时，
  * 展示动态进度条和阶段提示，替代纯转圈等待。
  *
  * 注意：后端 SSE 进度机制存在（emitToolOutput + ToolProgressHeartbeat），
@@ -19,6 +19,7 @@ interface Props {
 
 const OFFICE_GENERATE_TOOLS = new Set([
   'generate_pptx', 'generate_docx', 'generate_xlsx', 'generate_pdf',
+  'office_ops',
 ]);
 
 const FORMAT_ICONS: Record<string, React.ReactNode> = {

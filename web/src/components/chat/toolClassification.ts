@@ -90,23 +90,20 @@ const EXACT_TOOL_KINDS: ReadonlyMap<string, ToolUiKind> = new Map([
   ['find_tools', 'read'],
   ['tool_preflight', 'read'],
   ['parse_file', 'read'],
-  ['inspect_docx', 'read'],
-  ['inspect_pptx', 'read'],
   ['create_download_link', 'read'],
   ['get_bughunt_ledger', 'read'],
   ['design_asset', 'read'],
+  ['canvas_get_state', 'read'],
 
   ['file_create', 'file_create'],
   ['create_file', 'file_create'],
   ['file_write', 'file_create'],
   ['write_file', 'file_create'],
   ['writefile', 'file_create'],
+  // HTTP Office 生成后端名（回放兼容）
   ['generate_xlsx', 'file_create'],
   ['generate_docx', 'file_create'],
   ['generate_pptx', 'file_create'],
-  ['generate_canvas', 'file_create'],
-  ['generate_html_presentation', 'file_create'],
-  ['generate_slidev', 'file_create'],
   ['generate_pdf', 'file_create'],
 
   ['structured_patch', 'file_edit'],
@@ -116,10 +113,9 @@ const EXACT_TOOL_KINDS: ReadonlyMap<string, ToolUiKind> = new Map([
   ['replace_in_file', 'file_edit'],
   ['edit_file', 'file_edit'],
   ['file_edit', 'file_edit'],
-  ['edit_xlsx', 'file_edit'],
-  ['edit_docx', 'file_edit'],
-  ['edit_pptx', 'file_edit'],
   ['office_ops', 'file_edit'],
+  ['canvas_save_sourcemap', 'file_edit'],
+  ['canvas_push_version', 'file_edit'],
 ]);
 
 const NAMESPACE_PREFIXES = ['functions.', 'tools.', 'web.', 'image_gen.', 'imagegen.'];

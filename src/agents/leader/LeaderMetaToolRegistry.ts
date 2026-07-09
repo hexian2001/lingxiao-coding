@@ -58,6 +58,14 @@ export class LeaderMetaTool extends MetaTool {
     }
 
     const output = await executor.execute(this.name, toRecordArgs(args));
+    // 兼容仍返回 "ERROR: ..." 字符串的旧路径：一律 fail-closed，避免 LLM 当成功继续幻觉。
+    if (typeof output === 'string' && /^\s*ERROR\s*:/i.test(output)) {
+      return {
+        success: false,
+        data: null,
+        error: output.replace(/^\s*ERROR\s*:\s*/i, '').trim() || output,
+      };
+    }
     return { success: true, data: output };
   } catch (e: unknown) {
     // 确定性失败信号：底层方法 throw LeaderToolFailure 表示「未能完成主操作」。

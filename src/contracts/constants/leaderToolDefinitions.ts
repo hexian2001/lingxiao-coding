@@ -391,6 +391,120 @@ export const LEADER_META_TOOLS: ToolDefinition[] = [
   {
     type: 'function',
     function: {
+      name: 'add_subsystem',
+      description: '向现有项目蓝图添加单个子系统。执行与 define_project_blueprint 相同的校验（id 唯一、必填字段、无环依赖、integration-verify 规则）。会话尚无蓝图时需先调用 define_project_blueprint。',
+      parameters: {
+        type: 'object',
+        properties: {
+          subsystem_id: { type: 'string', description: '子系统稳定标识，全清单内唯一' },
+          name: { type: 'string', description: '子系统中文名' },
+          description: { type: 'string', description: '该子系统涵盖范围' },
+          status: { type: 'string', enum: ['implement', 'defer', 'not_applicable'], description: '处置状态，默认 implement' },
+          rationale: { type: 'string', description: 'defer/not_applicable 时必填原因' },
+          agent_type: { type: 'string', description: '可选实现角色，如 backend/frontend/fullstack/verify' },
+          depends_on: { type: 'array', items: { type: 'string' }, description: '依赖的其它 subsystem_id 列表' },
+        },
+        required: ['subsystem_id', 'name', 'description'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'update_subsystem',
+      description: '更新蓝图中已有子系统的属性；只修改提供的字段。更新后执行完整校验。',
+      parameters: {
+        type: 'object',
+        properties: {
+          subsystem_id: { type: 'string', description: '要更新的子系统 ID' },
+          name: { type: 'string', description: '新名称' },
+          description: { type: 'string', description: '新范围描述' },
+          status: { type: 'string', enum: ['implement', 'defer', 'not_applicable'], description: '新处置状态' },
+          rationale: { type: 'string', description: 'defer/not_applicable 原因；implement 可清空' },
+          agent_type: { type: 'string', description: '实现角色' },
+          depends_on: { type: 'array', items: { type: 'string' }, description: '完整替换依赖列表' },
+        },
+        required: ['subsystem_id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'delete_subsystem',
+      description: '从蓝图删除子系统。若仍被其它子系统 depends_on，校验失败；有关联任务时允许删除并警告。删除后仍须满足 integration-verify 规则。',
+      parameters: {
+        type: 'object',
+        properties: {
+          subsystem_id: { type: 'string', description: '要删除的子系统 ID' },
+        },
+        required: ['subsystem_id'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'canvas_save_sourcemap',
+      description: '保存剑阁 Canvas 产物的 sourcemap（nodeId ↔ 源码/spec 锚点），供前端选区与回写使用。生成可交互 HTML/演示产物后应调用。',
+      parameters: {
+        type: 'object',
+        properties: {
+          artifact_path: { type: 'string', description: '产物路径（相对 workspace 或绝对路径）' },
+          artifact_id: { type: 'string', description: '可选；默认由 artifact_path 规范化得到' },
+          nodes: {
+            type: 'array',
+            description: '节点列表：node_id + anchor（kind=spec|src）',
+            items: {
+              type: 'object',
+              properties: {
+                node_id: { type: 'string' },
+                anchor: { type: 'object', additionalProperties: true },
+                label: { type: 'string' },
+              },
+              required: ['node_id', 'anchor'],
+            },
+          },
+          metadata: { type: 'object', additionalProperties: true, description: '可选附加元数据' },
+        },
+        required: ['artifact_path', 'nodes'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'canvas_push_version',
+      description: '将当前产物快照入栈为 Canvas 新版本（旧 active 标记 superseded）。修改产物后必须调用以闭合选区回写闭环。',
+      parameters: {
+        type: 'object',
+        properties: {
+          artifact_path: { type: 'string', description: '产物路径；与 artifact_id 二选一，优先 artifact_id' },
+          artifact_id: { type: 'string', description: '已有 artifactId' },
+          snapshot_path: { type: 'string', description: '可选；要复制进版本栈的快照文件路径，默认用 artifact_path' },
+          intent: { type: 'string', description: '本版变更意图（用户诉求摘要）' },
+          changed_files: { type: 'array', items: { type: 'string' }, description: '本版改动的源文件列表' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'canvas_get_state',
+      description: '读取 Canvas 产物状态：sourcemap、版本栈、批注摘要。',
+      parameters: {
+        type: 'object',
+        properties: {
+          artifact_path: { type: 'string' },
+          artifact_id: { type: 'string' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'update_task',
       description: '编辑尚未派发的任务定义，用于修正 Leader 建错的 DAG 节点（标题、描述、角色、依赖、上下文、工作目录/写入范围、预绑定成员），也可补充或修改 contractBinding / evaluation_policy。适用于未分配 Agent 且仍为 dispatchable 的任务；running/terminal 任务通过新任务或重派流程处理。agent_type 同 create_task 支持变体名/缩写归约(fe→frontend 等)与 fullstack 回落。',
       parameters: {

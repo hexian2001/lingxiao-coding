@@ -70,6 +70,11 @@ import {
   updateTaskStatus as planUpdateTaskStatus,
 } from './leader/tools/LeaderTaskPlanningTools.js';
 import {
+  canvasSaveSourcemap as planCanvasSaveSourcemap,
+  canvasPushVersion as planCanvasPushVersion,
+  canvasGetState as planCanvasGetState,
+} from './leader/tools/LeaderCanvasTools.js';
+import {
   validateDispatchAgentName as gateValidateDispatchAgentName,
   formatRoster as gateFormatRoster,
   isLeaderExecutionTool as gateIsLeaderExecutionTool,
@@ -503,6 +508,12 @@ export class LeaderToolsExecutor {
         return planUpdateBlueprintSubsystem(planCtx, args);
       case 'delete_subsystem':
         return planDeleteBlueprintSubsystem(planCtx, args);
+      case 'canvas_save_sourcemap':
+        return planCanvasSaveSourcemap(planCtx, args);
+      case 'canvas_push_version':
+        return planCanvasPushVersion(planCtx, args);
+      case 'canvas_get_state':
+        return planCanvasGetState(planCtx, args);
       case 'list_available_roles':
         return planListAvailableRoles(planCtx);
       case 'dispatch_agent':

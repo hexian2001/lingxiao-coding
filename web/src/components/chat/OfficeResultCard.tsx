@@ -1,9 +1,8 @@
 /**
  * OfficeResultCard — 聊天流内嵌的 Office 文件富预览卡片
  *
- * 当 Agent 调用 generate_pptx/docx/xlsx/pdf 或 edit_pptx/docx/xlsx 成功后，
- * 在聊天流中展示文件信息 + 操作按钮（下载/在剑阁画布打开/继续编辑），
- * 而不是只显示一个裸下载链接。
+ * 当工具结果包含 pptx/docx/xlsx/pdf 路径或下载链接时展示富预览。
+ * 覆盖：HTTP /api office generate 名、office_ops、shell 产物、create_download_link。
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -34,9 +33,17 @@ interface Props {
 }
 
 const OFFICE_TOOLS = new Set([
+  // Web HTTP generate 后端仍可能以这些名出现在会话回放中
   'generate_pptx', 'generate_docx', 'generate_xlsx', 'generate_pdf',
-  'edit_pptx', 'edit_docx', 'edit_xlsx',
+  // Agent 面真实工具
+  'office_ops', 'parse_file', 'shell', 'create_download_link', 'session_artifacts',
 ]);
+
+const OFFICE_EXT_RE = /\.(pptx|docx|xlsx|pdf)(?:$|[?#])/i;
+
+function looksLikeOfficePath(value: unknown): boolean {
+  return typeof value === 'string' && OFFICE_EXT_RE.test(value);
+}
 
 const FORMAT_ICONS: Record<string, React.ReactNode> = {
   pptx: <Presentation size={16} />,
@@ -78,6 +85,11 @@ function parseOfficeResult(toolName: string, result: unknown): OfficeResultData 
 
   let data = result;
   if (typeof result === 'string') {
+    // shell 输出里直接出现 office 路径
+    if (looksLikeOfficePath(result)) {
+      const path = result.trim().split(/\s+/).find((tok) => looksLikeOfficePath(tok)) || result.trim();
+      return { path, name: path.split(/[\\/]/).pop() || 'document', success: true };
+    }
     try { data = JSON.parse(result); } catch { return null; }
   }
 
@@ -85,18 +97,38 @@ function parseOfficeResult(toolName: string, result: unknown): OfficeResultData 
   const obj = data as Record<string, unknown>;
 
   // tool result 可能是 { success, data: { url, path, ... } } 或直接 { url, path, ... }
-  const inner = obj.data && typeof obj.data === 'object' ? obj.data as Record<string, unknown> : obj;
+  const inner = obj.data && typeof obj.data === 'object' && !Array.isArray(obj.data)
+    ? obj.data as Record<string, unknown>
+    : obj;
   const success = obj.success !== false && inner.success !== false;
   if (!success) return null;
 
   const url = (inner.url as string) || (inner.downloadUrl as string) || (obj.url as string);
-  const path = (inner.path as string) || (obj.path as string);
-  const name = (inner.name as string) || (obj.name as string) || path?.split('/').pop() || 'document';
+  let path = (inner.path as string) || (inner.output_path as string) || (obj.path as string);
+  // shell / office_ops 嵌套字段
+  if (!path) {
+    for (const key of ['file', 'file_path', 'outputPath', 'artifact_path']) {
+      const v = inner[key] ?? obj[key];
+      if (looksLikeOfficePath(v)) { path = String(v); break; }
+    }
+  }
+  // 文本 data 中挖路径
+  if (!path && typeof inner === 'object') {
+    const blob = JSON.stringify(inner);
+    const m = blob.match(/[^"'\s]+\.(pptx|docx|xlsx|pdf)/i);
+    if (m) path = m[0];
+  }
+
+  const name = (inner.name as string) || (obj.name as string) || path?.split(/[\\/]/).pop() || 'document';
   const size = (inner.size as number) || (obj.size as number);
   const mimeType = (inner.mimeType as string) || (obj.mimeType as string);
   const slideCount = (inner.slideCount as number) || (obj.slideCount as number);
 
   if (!url && !path) return null;
+  // shell 杂项结果：必须真是 office 扩展名
+  if ((toolName === 'shell' || toolName === 'session_artifacts') && !looksLikeOfficePath(path) && !looksLikeOfficePath(url)) {
+    return null;
+  }
 
   return { url, path, name, size, mimeType, slideCount, success, type: inner.type as string };
 }

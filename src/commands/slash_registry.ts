@@ -44,7 +44,7 @@ const SLASH_COMMANDS: SlashCommandDefinition[] = [
   { name: '/bughunt', desc: '启动白盒审计+插桩+黑盒验证闭环', usage: '/bughunt [目标/范围]', handledBy: 'callback', category: 'tools' },
   { name: '/bughunt-status', desc: '查看当前 Bughunt 态势摘要', handledBy: 'callback', category: 'tools' },
   { name: '/bughunt-report', desc: '从 Bughunt ledger 生成事实报告骨架', handledBy: 'callback', category: 'tools' },
-  { name: '/office', desc: '切换 Office 模式（PPTX/DOCX/XLSX/PDF/HTML/Slidev/Canvas/解析）', usage: '/office [on|off]', handledBy: 'callback', category: 'tools' },
+  { name: '/office', desc: '切换 Office 模式（office_ops + parse_file；产物用 shell 调库生成）', usage: '/office [on|off]', handledBy: 'callback', category: 'tools' },
   { name: '/workflow', desc: '切换 Workflow 模式（workflow action=create/add_node/connect/execute/...）', usage: '/workflow [on|off]', handledBy: 'callback', category: 'tools' },
   { name: '/eternal', desc: '设置/管理 Eternal 持续目标模式', usage: '/eternal <要持续完成的目标>|status|pause|resume|clear', handledBy: 'callback', category: 'project',
     argCompleter: (partial) => ['status', 'pause', 'resume', 'clear', 'delete', 'set ']
@@ -154,7 +154,7 @@ const EN_COMMAND_DESCRIPTIONS: Record<string, string> = {
   '/bughunt': 'Start the whitebox audit, instrumentation, and blackbox verification loop',
   '/bughunt-status': 'Show the current Bughunt situation summary',
   '/bughunt-report': 'Generate a factual report outline from the Bughunt ledger',
-  '/office': 'Toggle Office mode (PPTX/DOCX/XLSX/PDF/HTML/Slidev/Canvas/parse)',
+  '/office': 'Toggle Office mode (office_ops + parse_file; generate via shell libraries)',
   '/workflow': 'Toggle Workflow mode (workflow action=create/add_node/connect/execute/...)',
   '/eternal': 'Set/manage Eternal goal mode',
   '/team': 'Show/switch collaboration mode',

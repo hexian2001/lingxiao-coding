@@ -17,8 +17,8 @@ import {
 } from './ToolFailureLoopGuard.js';
 
 describe('ToolFailureLoopGuard', () => {
-  it('is disabled by default and never trips unless explicitly enabled', () => {
-    const guard = new ToolFailureLoopGuard({ threshold: 2 });
+  it('can be explicitly disabled and never trips', () => {
+    const guard = new ToolFailureLoopGuard({ enabled: false, threshold: 2 });
     const base = { sessionId: 's0', agentId: 'a0', agentName: 'A0', toolName: 'shell', args: { cmd: 'ls' }, errorCode: 'PERMISSION_REQUIRED', errorMessage: '需要权限' };
 
     const first = guard.record(base);

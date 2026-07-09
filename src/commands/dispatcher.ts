@@ -496,7 +496,9 @@ function handleOfficeCommand(ctx: CommandHandlerContext): CommandResult {
     toolNames: OFFICE_TOOL_NAMES,
     toolCount: OFFICE_TOOL_NAMES.length,
   });
-  const toolList = next ? `${OFFICE_TOOL_NAMES.length} 个 PPT/DOCX/XLSX/PDF/HTML/Slidev/Canvas/解析工具已加载` : '办公工具已卸载';
+  const toolList = next
+    ? `已注入 ${OFFICE_TOOL_NAMES.join('、')}；产物用 shell + pptxgenjs/docx/exceljs/pdfkit 生成，验收走 office_ops`
+    : '办公工具已卸载';
   return systemMessage(next
     ? `Office 模式已开启 — ${toolList}\n可用：/office off 关闭`
     : `Office 模式已关闭 — 回到纯 Coding 模式\n可用：/office on 开启`);
@@ -517,8 +519,8 @@ function handleWorkflowCommand(ctx: CommandHandlerContext): CommandResult {
     toolCount: WORKFLOW_TOOL_NAMES.length,
   });
   return systemMessage(next
-    ? `Workflow 模式已开启 — ${WORKFLOW_TOOL_NAMES.length} 个 workflow_* 工具已注入到 Leader\n可用：/workflow off 关闭`
-    : 'Workflow 模式已关闭 — workflow_* 工具已卸载\n可用：/workflow on 开启');
+    ? `Workflow 模式已开启 — 已注入统一入口工具：${WORKFLOW_TOOL_NAMES.join('、')}\n可用：/workflow off 关闭`
+    : 'Workflow 模式已关闭 — workflow 工具已卸载\n可用：/workflow on 开启');
 }
 
 function handleTeamCommand(ctx: CommandHandlerContext): CommandResult {

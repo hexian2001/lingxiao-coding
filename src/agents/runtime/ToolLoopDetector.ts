@@ -21,7 +21,7 @@
 import type { ToolCall } from '../../llm/types.js';
 
 export interface ToolLoopDetectorOptions {
-  /** 显式开启重复工具调用探针；默认读取 LINGXIAO_TOOL_LOOP_DETECTOR，未设置时关闭。 */
+  /** 显式开关；默认读取 LINGXIAO_TOOL_LOOP_DETECTOR，未设置时开启（设 0/false/off 关闭）。 */
   enabled?: boolean;
   /** 连续相同的轮数阈值；超过此值返回 isLooping=true */
   threshold?: number;
@@ -29,13 +29,15 @@ export interface ToolLoopDetectorOptions {
 
 const DEFAULT_THRESHOLD = 4;
 
-function isTruthyEnv(value: string | undefined): boolean {
-  return /^(1|true|yes|on)$/i.test((value ?? '').trim());
+function isDisabledEnv(value: string | undefined): boolean {
+  return /^(0|false|no|off)$/i.test((value ?? '').trim());
 }
 
-/** Disabled by default; enable only for diagnostics with LINGXIAO_TOOL_LOOP_DETECTOR=1. */
+/** 默认开启；LINGXIAO_TOOL_LOOP_DETECTOR=0/false/off 时关闭。 */
 export function isToolLoopDetectorEnabled(): boolean {
-  return isTruthyEnv(process.env.LINGXIAO_TOOL_LOOP_DETECTOR);
+  const raw = process.env.LINGXIAO_TOOL_LOOP_DETECTOR;
+  if (raw === undefined || raw.trim() === '') return true;
+  return !isDisabledEnv(raw);
 }
 
 /** 把任意 JSON 值序列化为稳定字符串（递归排序对象 key） */

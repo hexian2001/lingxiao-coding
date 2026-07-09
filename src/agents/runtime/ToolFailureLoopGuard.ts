@@ -148,16 +148,14 @@ const DEFAULT_THRESHOLD = 3;
 const DEFAULT_TRIPPED_RETENTION_MS = 60_000;
 const DEFAULT_MAX_KEYS = 256;
 
-function isTruthyEnv(value: string | undefined): boolean {
-  return /^(1|true|yes|on)$/i.test((value ?? '').trim());
-}
-
 /**
- * Disabled by default: this guard can hide the original tool error/recovery hint.
- * Enable only for diagnostics with LINGXIAO_TOOL_FAILURE_LOOP_GUARD=1.
+ * 默认开启，防止状态类错误空转死循环。
+ * LINGXIAO_TOOL_FAILURE_LOOP_GUARD=0/false/off 可关闭。
  */
 export function isToolFailureLoopGuardEnabled(): boolean {
-  return isTruthyEnv(process.env.LINGXIAO_TOOL_FAILURE_LOOP_GUARD);
+  const raw = process.env.LINGXIAO_TOOL_FAILURE_LOOP_GUARD;
+  if (raw === undefined || raw.trim() === '') return true;
+  return !/^(0|false|no|off)$/i.test(raw.trim());
 }
 
 // ─── 工具函数 ────────────────────────────────────────

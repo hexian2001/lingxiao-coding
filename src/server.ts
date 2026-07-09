@@ -507,12 +507,18 @@ export async function createServerWithDeps(
         : `源文件 \`${intent.anchor.srcFile}\` 第 ${intent.anchor.srcRange[0]}-${intent.anchor.srcRange[1]} 行`;
       const promptText = [
         '【剑阁 Canvas 选区修改请求】',
-        `产物：${intent.artifactId}`,
-        `选中单元：${intent.nodeId}（${anchorDesc}）`,
+        `产物 artifact_id：${intent.artifactId}`,
+        `选中单元 node_id：${intent.nodeId}（${anchorDesc}）`,
         intent.currentContent ? `当前内容：${intent.currentContent}` : '',
         `用户诉求：${intent.userIntent}`,
         '',
-        '请定位上述锚点对应的源码，按用户诉求精准修改，重新生成产物，并将新产物作为新版本入栈（CanvasStore.pushVersion）。',
+        '请按闭环执行：',
+        '1. 用 canvas_get_state(artifact_id=...) 读取 sourcemap/版本栈，定位锚点源码；',
+        '2. 按用户诉求修改对应 spec/脚本源码；',
+        '3. 重新生成产物（shell + 生成脚本/库）；',
+        '4. 若节点映射有变，调用 canvas_save_sourcemap(artifact_path, nodes)；',
+        '5. 必须调用 canvas_push_version(artifact_id 或 artifact_path, snapshot_path=新产物路径, intent=用户诉求摘要, changed_files=[...]) 入栈新版本。',
+        '未调用 canvas_push_version 则回写闭环未闭合。',
       ].filter(Boolean).join('\n');
       try {
         if (!sessionManager.getSession(sessionId)) {

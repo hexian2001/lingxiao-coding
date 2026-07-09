@@ -176,7 +176,7 @@ export const PRESET_ROLE_PROFILES: Record<PresetRoleName, PresetRoleProfile> = {
   },
   coding: {
     name: 'coding',
-    description: '代码实现专家，负责编写和修改代码。注意：HTML/PPT/Word/Excel/海报等交付物由 Leader 统一生成，agent 只产出 markdown 写到 scratchpad',
+    description: '代码实现专家，负责编写和修改代码。Office 模式下可用 shell 调用 pptxgenjs/docx/exceljs/pdfkit 生成交付物，并用 office_ops 验收；非 Office 任务以代码与测试证据为主',
     tools: [...WORKER_TOOLS],
     allowedTiers: [...ALL_TIERS],
     defaultSkillNames: ['explore-implement-verify'],
@@ -214,7 +214,7 @@ export const PRESET_ROLE_PROFILES: Record<PresetRoleName, PresetRoleProfile> = {
   },
   fullstack: {
     name: 'fullstack',
-    description: '全栈开发专家，负责前后端契约清晰的小到中型跨栈实现和端到端验证。注意：HTML/PPT/Word/Excel/海报等交付物由 Leader 统一生成，agent 只产出 markdown 写到 scratchpad',
+    description: '全栈开发专家，负责前后端契约清晰的小到中型跨栈实现和端到端验证。Office 模式下可用 shell 调用库生成办公交付物并用 office_ops 验收；常规任务以跨栈代码与端到端验证为主',
     tools: [...WORKER_TOOLS],
     allowedTiers: [...ALL_TIERS],
     defaultSkillNames: [],

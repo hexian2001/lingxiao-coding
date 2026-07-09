@@ -24,7 +24,7 @@ import { StructuredPatchTool } from './implementations/StructuredPatchTool.js';
 
 // Non-core tools — can be deferred.  Heavy optional tools are registered via
 // LazyToolProxy below so importing this barrel does not eagerly load Playwright,
-// tesseract, sharp, JSZip, docx/pptx/xlsx parsers or Slidev runtime.
+// tesseract, sharp, JSZip, docx/pptx/xlsx parsers or other heavy optional runtimes.
 import { PythonExecTool } from './implementations/PythonExecTool.js';
 import { HttpRequestTool } from './implementations/HttpRequestTool.js';
 import { MemoryTool, MemoryReadTool, MemoryWriteTool } from './implementations/MemoryTool.js';
