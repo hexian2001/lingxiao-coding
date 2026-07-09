@@ -176,6 +176,9 @@ import { LeaderBlackboard } from './LeaderBlackboard.js';
 import { UnifiedScheduler, type DispatchOptions as SchedDispatchOptions } from './UnifiedScheduler.js';
 import { DispatchDecisionCoordinator } from './DispatchDecisionCoordinator.js';
 import { resolveModeRuntimeProjection } from '../core/ModeRuntimeProjection.js';
+import { SessionRunController } from '../core/SessionRunController.js';
+import type { SessionRunSnapshot } from '../contracts/types/SessionRun.js';
+import { listRecoveryRecords } from '../core/RecoveryRecords.js';
 import { WorktreeService } from '../core/WorktreeService.js';
 import { DatabaseRepositoryAdapter } from '../core/DatabaseRepositories.js';
 import { SharedLedger } from '../core/SharedLedger.js';
@@ -346,6 +349,12 @@ export class LeaderAgent {
   protected conversation: ChatMessage[] = [];
   protected pendingUserInput: MessageContent = null;
   protected waitingForUser = false;
+  /**
+   * Orchestration Kernel v2：SessionRun 相位投影（Phase 0–1）。
+   * waitingForUser 仍为遗留门闩；对外语义以 sessionRun.getSnapshot().phase 为准。
+   */
+  protected readonly sessionRun = new SessionRunController();
+  private _sessionRunUnsub: (() => void) | null = null;
   protected controlMode: 'manual' | 'eternal' = 'manual';
   protected currentLlmAbortController: AbortController | null = null;
   protected finished = false;
@@ -380,6 +389,7 @@ export class LeaderAgent {
   }
 
   protected emitRoundComplete(trigger: string): void {
+    this.projectSessionRun(`round_complete:${trigger}`);
     this.emitter.emit('leader:round_complete', { sessionId: this.sessionId, trigger });
   }
 
@@ -2022,6 +2032,98 @@ export class LeaderAgent {
 
   markWaitingForUser(waiting: boolean): void {
     this.waitingForUser = waiting;
+    this.projectSessionRun('mark_waiting_for_user');
+  }
+
+  /** 当前 SessionRun 快照（编排相位 / ready / deferred） */
+  getSessionRunSnapshot(): SessionRunSnapshot {
+    return this.sessionRun.getSnapshot();
+  }
+
+  /**
+   * 从 board/pool/门闩重算 SessionRun 相位并可选持久化 + 发 SSE。
+   * 主循环/think 关键点应调用；不改变业务控制流，只消灭 idle 语义黑洞。
+   */
+  projectSessionRun(source = 'project'): SessionRunSnapshot {
+    const modes = resolveModeRuntimeProjection({
+      sessionId: this.sessionId,
+      db: this.db,
+      blackboardAvailable: this.isBlackboardEnabled(),
+      permissionContext: this.getPermissionContext(),
+    });
+    const ready = typeof this.board.getReadyTasks === 'function'
+      ? this.board.getReadyTasks().length
+      : this.board.getDispatchable().length;
+    const running = typeof this.pool.getRunning === 'function' ? this.pool.getRunning().length : 0;
+    let recoveringCount = 0;
+    try {
+      recoveringCount = listRecoveryRecords(this.db, this.sessionId).filter((r) => {
+        const status = (r as { status?: string }).status;
+        return status === 'recovering' || status === 'pending';
+      }).length;
+    } catch {
+      recoveringCount = 0;
+    }
+
+    const teamReady = modes.collaboration.mode === 'team'
+      ? modes.collaboration.teamEnabled
+      : null;
+
+    if (!this._sessionRunUnsub) {
+      this._sessionRunUnsub = this.sessionRun.onChange((next) => {
+        try {
+          void this.db.setSessionState(
+            this.sessionId,
+            SESSION_KEYS.SESSION_RUN_SNAPSHOT,
+            JSON.stringify(next),
+          );
+        } catch { /* persist best-effort */ }
+        try {
+          this.emitter.emit('session:run_phase_changed', {
+            sessionId: this.sessionId,
+            phase: next.phase,
+            reason: next.reason,
+            generation: next.generation,
+            readyTaskCount: next.readyTaskCount,
+            runningAgentCount: next.runningAgentCount,
+            hasDeferredReadyWork: next.hasDeferredReadyWork,
+            silentIdleViolation: next.silentIdleViolation,
+            controlMode: next.controlMode,
+            collaborationMode: next.collaborationMode,
+            at: next.updatedAt,
+          });
+        } catch { /* emit best-effort */ }
+        if (next.silentIdleViolation) {
+          leaderLogger.warn(
+            `[SessionRun] silent idle violation session=${this.sessionId} ready=${next.readyTaskCount} source=${source}`,
+          );
+        } else if (next.hasDeferredReadyWork) {
+          leaderLogger.info(
+            `[SessionRun] phase=${next.phase} reason=${next.reason} ready=${next.readyTaskCount} running=${next.runningAgentCount} source=${source}`,
+          );
+        }
+      });
+    }
+
+    return this.sessionRun.recompute({
+      isBusyThinking: this.isBusy,
+      waitingForUserFlag: this.waitingForUser,
+      explicitUserGate: this.hasExplicitUserGate(),
+      pendingReview: this.pendingReview,
+      readyTaskCount: ready,
+      runningAgentCount: running,
+      recoveringCount,
+      controlMode: this.controlMode,
+      collaborationMode: modes.collaboration.mode,
+      teamReady,
+      allTasksTerminal: this.board.allTerminal(),
+      isEternalPatrolIdle:
+        this.controlMode === 'eternal'
+        && !this.isBusy
+        && running === 0
+        && ready === 0
+        && !this.waitingForUser,
+    });
   }
 
   /**
@@ -2774,6 +2876,8 @@ export class LeaderAgent {
   private async _runImpl_loopPollAndStatus(frame: LeaderLoopFrame, pollCount: number): Promise<LeaderLoopControl> {
     // 混合唤醒：事件驱动 (即时) + 超时巡检 (30s)
     const runningAgents = this.pool.getRunning();
+    // Orchestration Kernel v2：每轮 poll 刷新相位投影（禁 silent idle 语义）
+    this.projectSessionRun('loop_poll');
   
     if (this.pendingReview) {
       // 等待用户审批方案，不发送状态更新

@@ -64,6 +64,7 @@ export type EventType =
   | 'session:completed'
   | 'session:interrupted'
   | 'session:runtime_state'
+  | 'session:run_phase_changed'
   | 'session:collaboration_mode_changed'
   | 'session:autonomy_mode_changed'
   | 'session:execution_route_changed'

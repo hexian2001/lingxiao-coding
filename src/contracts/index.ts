@@ -5,7 +5,10 @@ export * from './types/Event.js';
 export * from './types/Tool.js';
 export * from './types/Agent.js';
 export * from './types/Session.js';
+export * from './types/SessionRun.js';
 export * from './types/Workflow.js';
-export * from './types/Canvas.js';export * from './constants/toolNames.js';
+export * from './types/Canvas.js';
+export * from './constants/toolNames.js';
 export * from './constants/eventTypes.js';
 export * from './constants/statusValues.js';
+

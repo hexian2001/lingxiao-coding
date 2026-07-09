@@ -542,6 +542,20 @@ export interface EventMap {
     source?: string;
     at: number;
   };
+  /** Orchestration Kernel v2：SessionRun 相位变更 */
+  'session:run_phase_changed': {
+    sessionId: string;
+    phase: string;
+    reason: string;
+    generation: number;
+    readyTaskCount: number;
+    runningAgentCount: number;
+    hasDeferredReadyWork: boolean;
+    silentIdleViolation: boolean;
+    controlMode: string;
+    collaborationMode: string;
+    at: number;
+  };
   'skills:loaded': { sessionId: string; skills: Array<{ name: string; source?: string; summary?: string }> };
   'skill:invoked': { skills: Array<{ name: string; source?: string; summary?: string }> };
   'notification:new': {

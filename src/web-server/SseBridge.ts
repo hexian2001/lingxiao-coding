@@ -94,6 +94,7 @@ const SESSION_FORWARD_EVENTS = [
   'context:compressed',
   'context:overflow',
   'session:runtime_state',
+  'session:run_phase_changed',
   // Langfuse real-time trace push
   'langfuse:trace',
   // Git activity (commit/push/pull with agent identity + gate result)

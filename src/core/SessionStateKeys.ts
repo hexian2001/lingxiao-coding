@@ -7,6 +7,8 @@
 export const SESSION_KEYS = {
   /** Whether the leader is waiting for user input ('true' | 'false') */
   LEADER_WAITING_FOR_USER: 'leader_waiting_for_user',
+  /** SessionRun 相位快照 JSON（Orchestration Kernel v2） */
+  SESSION_RUN_SNAPSHOT: 'session_run_snapshot',
   /** Pending plan review flag */
   LEADER_PENDING_REVIEW: 'leader_pending_review',
   /** Whether the plan has been approved */
